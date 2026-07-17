@@ -1,1 +1,78 @@
-{"name":"t:sections.header.name","type":"header","sections":{"announcement-bar":{"type":"announcement-bar","blocks":{"announcement-bar-0":{"type":"announcement","settings":{"text":"Welcome to our store","link":""}}},"block_order":["announcement-bar-0"],"settings":{"auto_rotate":false,"change_slides_speed":5,"color_scheme":"scheme-1","show_line_separator":true,"show_social":false,"enable_country_selector":false,"enable_language_selector":false}},"header":{"type":"header","settings":{"logo_position":"middle-left","mobile_logo_position":"center","menu":"main-menu","menu_type_desktop":"dropdown","sticky_header_type":"on-scroll-up","show_line_separator":true,"color_scheme":"scheme-1","menu_color_scheme":"scheme-1","enable_country_selector":true,"enable_language_selector":true,"enable_customer_avatar":true,"margin_bottom":0,"padding_top":20,"padding_bottom":20}}},"order":["announcement-bar","header"]}
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "t:sections.header.name",
+  "type": "header",
+  "sections": {
+    "scrolling_banner_fVENfU": {
+      "type": "scrolling-banner",
+      "blocks": {
+        "message_6VjDVf": {
+          "type": "message",
+          "settings": {
+            "text": "ENVÍO GRATIS A PARTIR DE 50€",
+            "link": ""
+          }
+        },
+        "message_J7nPmJ": {
+          "type": "message",
+          "settings": {
+            "text": "SUSCRÍBETE Y AHORRA 25% CON MODO ZZEN",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "message_6VjDVf",
+        "message_J7nPmJ"
+      ],
+      "name": "Scrolling banner",
+      "settings": {
+        "background_color": "#FFFFFF",
+        "text_color": "#000000",
+        "dot_color": "#000000",
+        "text_size_desktop": 14,
+        "text_size_mobile": 10,
+        "letter_spacing": 2,
+        "text_transform": "uppercase",
+        "font_weight": "400",
+        "speed": 75,
+        "pause_on_hover": true,
+        "spacing_desktop": 90,
+        "spacing_mobile": 25,
+        "dot_size": 4,
+        "padding_vertical": 10
+      }
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "logo_position": "middle-left",
+        "mobile_logo_position": "center",
+        "menu": "main-menu",
+        "menu_type_desktop": "dropdown",
+        "sticky_header_type": "on-scroll-up",
+        "show_line_separator": true,
+        "color_scheme": "scheme-1",
+        "menu_color_scheme": "scheme-1",
+        "enable_country_selector": true,
+        "enable_language_selector": true,
+        "enable_customer_avatar": true,
+        "margin_bottom": 0,
+        "padding_top": 20,
+        "padding_bottom": 20
+      }
+    }
+  },
+  "order": [
+    "scrolling_banner_fVENfU",
+    "header"
+  ]
+}
