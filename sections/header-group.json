@@ -17,21 +17,37 @@
         "message_6VjDVf": {
           "type": "message",
           "settings": {
-            "text": "ENVÍO GRATIS A PARTIR DE 50€",
+            "text": "SEGURIDAD",
             "link": ""
           }
         },
         "message_J7nPmJ": {
           "type": "message",
           "settings": {
-            "text": "SUSCRÍBETE Y AHORRA 25% CON MODO ZZEN",
+            "text": "CONFIANZA",
+            "link": ""
+          }
+        },
+        "message_Ye9aRL": {
+          "type": "message",
+          "settings": {
+            "text": "ENVÍOS",
+            "link": ""
+          }
+        },
+        "message_kRjeCH": {
+          "type": "message",
+          "settings": {
+            "text": "OFERTA",
             "link": ""
           }
         }
       },
       "block_order": [
         "message_6VjDVf",
-        "message_J7nPmJ"
+        "message_J7nPmJ",
+        "message_Ye9aRL",
+        "message_kRjeCH"
       ],
       "name": "Scrolling banner",
       "settings": {
