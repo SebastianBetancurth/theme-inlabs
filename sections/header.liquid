@@ -155,12 +155,19 @@
     color: rgba(var(--color-foreground), 0.55);
   }
 
-  .header__inline-menu .header__menu-item span,
-  .header__inline-menu .header__menu-item:hover span,
-  .header__inline-menu .header__active-menu-item,
-  .header__inline-menu .header__menu-item:hover .header__active-menu-item {
-    text-decoration: none !important;
-  }
+    .header__inline-menu a,
+    .header__inline-menu summary,
+    .header__inline-menu span,
+    .header__inline-menu a:hover,
+    .header__inline-menu a:focus,
+    .header__inline-menu a:active,
+    .header__inline-menu a:focus-visible,
+    .header__inline-menu summary:hover,
+    .header__inline-menu summary:focus,
+    .header__inline-menu details[open] > .header__menu-item,
+    .header__inline-menu details[open] > .header__menu-item span {
+      text-decoration: none !important;
+    }
 {%- endstyle -%}
 
 <script src="{{ 'cart-notification.js' | asset_url }}" defer="defer"></script>
