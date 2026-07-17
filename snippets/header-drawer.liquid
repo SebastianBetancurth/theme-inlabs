@@ -270,8 +270,11 @@
 
 {%- liquid
   assign drawer_menu = section.settings.menu
-  if section.settings.mobile_menu != blank
-    assign drawer_menu = section.settings.mobile_menu
+  if section.settings.mobile_menu_handle != blank
+    assign mobile_menu = linklists[section.settings.mobile_menu_handle]
+    if mobile_menu != blank and mobile_menu.links.size > 0
+      assign drawer_menu = mobile_menu
+    endif
   endif
 -%}
 
