@@ -214,6 +214,21 @@
   font-family: 'Helvetica neue', sans-serif;
   text-decoration: none;
 }
+.desktop-localization-wrapper button,
+.desktop-localization-wrapper button:hover,
+.desktop-localization-wrapper button:focus,
+.desktop-localization-wrapper button:active,
+.desktop-localization-wrapper button:focus-visible,
+.desktop-localization-wrapper a,
+.desktop-localization-wrapper a:hover,
+.desktop-localization-wrapper a:focus,
+.desktop-localization-wrapper a:active,
+.desktop-localization-wrapper span,
+.desktop-localization-wrapper details[open] button,
+.desktop-localization-wrapper details[open] span {
+  text-decoration: none !important;
+  text-underline-offset: 0;
+}
 {%- endstyle -%}
 
 <script src="{{ 'cart-notification.js' | asset_url }}" defer="defer"></script>
