@@ -51,7 +51,7 @@
       ],
       "name": "Scrolling banner",
       "settings": {
-        "background_color": "#FFFFFF",
+        "background_color": "#ffffff",
         "text_color": "#000000",
         "dot_color": "#000000",
         "text_size_desktop": 12,
