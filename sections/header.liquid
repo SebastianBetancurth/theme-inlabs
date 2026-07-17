@@ -74,6 +74,43 @@
       padding-top: 0.5rem;
     }
   }
+
+  .header__icons .header__search {
+    display: none !important;
+  }
+
+  .header__icons .desktop-localization-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 3.5rem;
+    margin-right: 2rem;
+  }
+
+  @media screen and (min-width: 990px) {
+    .header--middle-left {
+      grid-template-areas: 'heading navigation icons';
+      grid-template-columns: 1fr auto 1fr;
+      column-gap: 2rem;
+    }
+
+    .header--middle-left .header__heading {
+      justify-self: start;
+    }
+
+    .header--middle-left .header__inline-menu {
+      justify-self: center;
+      text-align: center;
+    }
+
+    .header--middle-left .header__inline-menu .list-menu--inline {
+      justify-content: center;
+      flex-wrap: nowrap;
+    }
+
+    .header--middle-left .header__icons {
+      justify-self: end;
+    }
+  }
 </style>
 
 {%- style -%}
@@ -98,32 +135,6 @@
       padding-bottom: {{ section.settings.padding_bottom }}px;
     }
   }
-
-  @media screen and (min-width: 990px) {
-  .header--middle-left {
-    grid-template-areas: 'heading navigation icons';
-    grid-template-columns: 1fr auto 1fr;
-    column-gap: 2rem;
-  }
-
-  .header--middle-left .header__heading {
-    justify-self: start;
-  }
-
-  .header--middle-left .header__inline-menu {
-    justify-self: center;
-    text-align: center;
-  }
-
-  .header--middle-left .header__inline-menu .list-menu--inline {
-    justify-content: center;
-    flex-wrap: nowrap;
-  }
-
-  .header--middle-left .header__icons {
-    justify-self: end;
-  }
-}
 {%- endstyle -%}
 
 <script src="{{ 'cart-notification.js' | asset_url }}" defer="defer"></script>
@@ -312,11 +323,12 @@
       {%- endfor -%}
 
       <a href="{{ routes.cart_url }}" class="header__icon header__icon--cart link focus-inset" id="cart-icon-bubble">
-        {% if cart == empty %}
-          <span class="svg-wrapper">{{ 'icon-cart-empty.svg' | inline_asset_content }}</span>
-        {% else %}
-          <span class="svg-wrapper">{{ 'icon-cart.svg' | inline_asset_content }}</span>
-        {% endif %}
+        <span class="svg-wrapper">
+          <svg role="presentation" stroke-width="2" focusable="false" width="22" height="22" class="icon icon-cart" viewBox="0 0 22 22">
+            <path d="M9.182 18.454a.91.91 0 1 1-1.818 0 .91.91 0 0 1 1.818 0Zm7.272 0a.91.91 0 1 1-1.818 0 .91.91 0 0 1 1.819 0Z" fill="currentColor"></path>
+            <path d="M5.336 6.636H21l-3.636 8.182H6.909L4.636 3H1m8.182 15.454a.91.91 0 1 1-1.818 0 .91.91 0 0 1 1.818 0Zm7.272 0a.91.91 0 1 1-1.818 0 .91.91 0 0 1 1.819 0Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </span>
         <span class="visually-hidden">{{ 'templates.cart.cart' | t }}</span>
         {%- if cart != empty -%}
           <div class="cart-count-bubble">
