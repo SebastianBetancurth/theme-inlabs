@@ -130,6 +130,79 @@
     margin-right: 2rem;
   }
 
+  .desktop-localization-wrapper .disclosure__button,
+  .desktop-localization-wrapper .disclosure__link,
+  .desktop-localization-wrapper .localization-form__select,
+  .desktop-localization-wrapper button,
+  .desktop-localization-wrapper span {
+    font-family: 'MiFuente', sans-serif;
+  }
+
+  .desktop-localization-wrapper button,
+  .desktop-localization-wrapper button:hover,
+  .desktop-localization-wrapper button:focus,
+  .desktop-localization-wrapper button:active,
+  .desktop-localization-wrapper button:focus-visible,
+  .desktop-localization-wrapper a,
+  .desktop-localization-wrapper a:hover,
+  .desktop-localization-wrapper a:focus,
+  .desktop-localization-wrapper a:active,
+  .desktop-localization-wrapper span,
+  .desktop-localization-wrapper details[open] button,
+  .desktop-localization-wrapper details[open] span {
+    text-decoration: none !important;
+    text-underline-offset: 0;
+  }
+
+  .desktop-localization-wrapper .disclosure__list-wrapper {
+    background: #ffffff !important;
+    border: none !important;
+    border-radius: 6px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    margin-top: 0.8rem;
+    overflow: hidden;
+  }
+
+  .desktop-localization-wrapper .disclosure__link {
+    display: flex;
+    align-items: center;
+    padding: 1.1rem 1.8rem;
+  }
+
+  .desktop-localization-wrapper .disclosure__link,
+  .desktop-localization-wrapper .disclosure__link span {
+    color: #1f1f1f !important;
+  }
+
+  .desktop-localization-wrapper .disclosure__link:hover,
+  .desktop-localization-wrapper .disclosure__link:hover span {
+    color: #000000 !important;
+  }
+
+  .desktop-localization-wrapper .localization-flag {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    margin-right: 1rem;
+  }
+
+  .desktop-localization-wrapper .localization-form__currency {
+    margin-left: 0.4rem;
+    opacity: 1;
+  }
+
+  .desktop-localization-wrapper .country-filter .field__input {
+    background: #ffffff;
+    color: #1f1f1f;
+  }
+
+  .header .icon-caret path {
+    stroke: currentColor;
+    stroke-width: 1.5;
+  }
+
   .header__inline-menu .header__submenu.list-menu {
     background: #0d0d0d !important;
     border: none !important;
@@ -178,54 +251,6 @@
       justify-self: end;
     }
   }
-  .desktop-localization-wrapper .disclosure__list-wrapper {
-  background: #ffffff !important;
-  border: none !important;
-  border-radius: 6px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  margin-top: 0.8rem;
-  overflow: hidden;
-}
-
-.desktop-localization-wrapper .disclosure__link {
-  display: flex;
-  align-items: center;
-  padding: 1.1rem 1.8rem;
-}
-
-.desktop-localization-wrapper .disclosure__link,
-.desktop-localization-wrapper .disclosure__link span {
-  color: #1f1f1f !important;
-}
-
-.desktop-localization-wrapper .disclosure__link:hover,
-.desktop-localization-wrapper .disclosure__link:hover span {
-  color: #000000 !important;
-}
-
-.desktop-localization-wrapper .localization-flag {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
-  margin-right: 1rem;
-}
-
-.desktop-localization-wrapper .localization-form__currency {
-  margin-left: 0.4rem;
-  opacity: 1;
-}
-
-.desktop-localization-wrapper .country-filter .field__input {
-  background: #ffffff;
-  color: #1f1f1f;
-}
-
-.header .icon-caret path {
-  stroke: currentColor;
-  stroke-width: 1.5;
-}
 </style>
 
 {%- style -%}
@@ -250,33 +275,6 @@
       padding-bottom: {{ section.settings.padding_bottom }}px;
     }
   }
-
-  .header__inline-menu .header__menu-item {
-  font-family: 'Helvetica neue', sans-serif;
-}
-.desktop-localization-wrapper .disclosure__button,
-.desktop-localization-wrapper .disclosure__link,
-.desktop-localization-wrapper .localization-form__select,
-.desktop-localization-wrapper button,
-.desktop-localization-wrapper span {
-  font-family: 'Helvetica neue', sans-serif;
-  text-decoration: none;
-}
-.desktop-localization-wrapper button,
-.desktop-localization-wrapper button:hover,
-.desktop-localization-wrapper button:focus,
-.desktop-localization-wrapper button:active,
-.desktop-localization-wrapper button:focus-visible,
-.desktop-localization-wrapper a,
-.desktop-localization-wrapper a:hover,
-.desktop-localization-wrapper a:focus,
-.desktop-localization-wrapper a:active,
-.desktop-localization-wrapper span,
-.desktop-localization-wrapper details[open] button,
-.desktop-localization-wrapper details[open] span {
-  text-decoration: none !important;
-  text-underline-offset: 0;
-}
 {%- endstyle -%}
 
 <script src="{{ 'cart-notification.js' | asset_url }}" defer="defer"></script>
@@ -708,6 +706,12 @@
       "id": "menu",
       "default": "main-menu",
       "label": "t:sections.header.settings.menu.label"
+    },
+    {
+      "type": "text",
+      "id": "mobile_menu_handle",
+      "label": "Menú móvil (identificador)",
+      "info": "Escribe el identificador del menú para móvil, por ejemplo: menu-movil. Lo encuentras en Navegación al editar el menú. Si se deja vacío, se usará el menú principal."
     },
     {
       "type": "select",
