@@ -319,6 +319,16 @@
         document.documentElement.classList.add('shopify-design-mode');
       }
     </script>
+
+    <style>
+  @font-face {
+    font-family: 'Helvetica neue';
+    src: url('{{ 'HelveticaNeueLight.otf' | asset_url }}') format('otf');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+</style>
   </head>
 
   <body class="gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}">
