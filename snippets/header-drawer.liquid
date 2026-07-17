@@ -241,6 +241,14 @@
   opacity: 1 !important;
   visibility: visible !important;
 }
+.section-header {
+  z-index: 4;
+}
+
+.shopify-section.section-scrolling-banner {
+  position: relative;
+  z-index: 1;
+}
 </style>
 
 <header-drawer data-breakpoint="{% if section.settings.menu_type_desktop == 'drawer' %}desktop{% else %}tablet{% endif %}">
