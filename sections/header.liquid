@@ -79,11 +79,78 @@
     display: none !important;
   }
 
+  .header__inline-menu .header__menu-item {
+    color: rgb(var(--color-foreground));
+  }
+
+  .header__inline-menu .header__menu-item span {
+    transition: color 0.15s ease;
+  }
+
+  .header__inline-menu .header__menu-item:hover,
+  .header__inline-menu .header__menu-item:hover span {
+    color: rgba(var(--color-foreground), 0.55);
+  }
+
+  .header__inline-menu a,
+  .header__inline-menu summary,
+  .header__inline-menu span,
+  .header__inline-menu a:hover,
+  .header__inline-menu a:focus,
+  .header__inline-menu a:active,
+  .header__inline-menu a:focus-visible,
+  .header__inline-menu summary:hover,
+  .header__inline-menu summary:focus,
+  .header__inline-menu details[open] > .header__menu-item,
+  .header__inline-menu details[open] > .header__menu-item span {
+    text-decoration: none !important;
+  }
+
+  .header__icon--cart .svg-wrapper,
+  .header__icon--cart .icon-cart {
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+
+  .header__icon--account,
+  .header__icon--account .svg-wrapper,
+  .header__icon--account svg {
+    color: rgb(var(--color-foreground));
+  }
+
+  .header__icon--account svg {
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+
   .header__icons .desktop-localization-wrapper {
     display: flex;
     align-items: center;
     gap: 3.5rem;
     margin-right: 2rem;
+  }
+
+  .header__inline-menu .header__submenu.list-menu {
+    background: #0d0d0d !important;
+    border: none !important;
+    border-radius: 12px;
+    overflow: hidden;
+    padding: 1.4rem 0;
+    margin-top: 1rem;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+    min-width: 19rem;
+  }
+
+  .header__inline-menu .header__submenu .header__menu-item {
+    color: rgba(255, 255, 255, 0.85);
+    padding: 1.1rem 2.6rem;
+    font-size: 1.3rem;
+  }
+
+  .header__inline-menu .header__submenu .header__menu-item:hover,
+  .header__inline-menu .header__submenu .header__menu-item:hover span {
+    color: #ffffff;
+    background: transparent;
   }
 
   @media screen and (min-width: 990px) {
@@ -135,54 +202,6 @@
       padding-bottom: {{ section.settings.padding_bottom }}px;
     }
   }
-
-  .header__icon--cart .svg-wrapper,
-    .header__icon--cart .icon-cart {
-      width: 2.2rem;
-      height: 2.2rem;
-    }
-
-    .header__inline-menu .header__menu-item {
-  color: rgb(var(--color-foreground));
-  }
-
-  .header__inline-menu .header__menu-item span {
-    transition: color 0.15s ease;
-  }
-
-  .header__inline-menu .header__menu-item:hover,
-  .header__inline-menu .header__menu-item:hover span {
-    color: rgba(var(--color-foreground), 0.55);
-  }
-
-    .header__inline-menu a,
-    .header__inline-menu summary,
-    .header__inline-menu span,
-    .header__inline-menu a:hover,
-    .header__inline-menu a:focus,
-    .header__inline-menu a:active,
-    .header__inline-menu a:focus-visible,
-    .header__inline-menu summary:hover,
-    .header__inline-menu summary:focus,
-    .header__inline-menu details[open] > .header__menu-item,
-    .header__inline-menu details[open] > .header__menu-item span {
-      text-decoration: none !important;
-    }
-    .header__icon--account,
-.header__icon--account .svg-wrapper,
-.header__icon--account svg {
-  color: rgb(var(--color-foreground));
-}
-
-.header__icon--account svg {
-  width: 2.2rem;
-  height: 2.2rem;
-}
-
-.header__icon--account svg path,
-.header__icon--account svg circle {
-  stroke-width: 2;
-}
 {%- endstyle -%}
 
 <script src="{{ 'cart-notification.js' | asset_url }}" defer="defer"></script>
@@ -345,11 +364,21 @@
               {%- if customer and customer.has_avatar? -%}
                 {{ customer | avatar }}
               {%- else -%}
-                <span class="svg-wrapper">{{ 'icon-account.svg' | inline_asset_content }}</span>
+                <span class="svg-wrapper">
+                  <svg role="presentation" stroke-width="2" focusable="false" width="22" height="22" class="icon icon-account" viewBox="0 0 22 22">
+                    <circle cx="11" cy="7" r="4" fill="none" stroke="currentColor"></circle>
+                    <path d="M3.5 19c1.421-2.974 4.247-5 7.5-5s6.079 2.026 7.5 5" fill="none" stroke="currentColor" stroke-linecap="round"></path>
+                  </svg>
+                </span>
               {%- endif -%}
             </account-icon>
           {%- else -%}
-            <span class="svg-wrapper">{{ 'icon-account.svg' | inline_asset_content }}</span>
+            <span class="svg-wrapper">
+              <svg role="presentation" stroke-width="2" focusable="false" width="22" height="22" class="icon icon-account" viewBox="0 0 22 22">
+                <circle cx="11" cy="7" r="4" fill="none" stroke="currentColor"></circle>
+                <path d="M3.5 19c1.421-2.974 4.247-5 7.5-5s6.079 2.026 7.5 5" fill="none" stroke="currentColor" stroke-linecap="round"></path>
+              </svg>
+            </span>
           {%- endif -%}
           <span class="visually-hidden">
             {%- liquid
