@@ -168,6 +168,21 @@
     .header__inline-menu details[open] > .header__menu-item span {
       text-decoration: none !important;
     }
+    .header__icon--account,
+.header__icon--account .svg-wrapper,
+.header__icon--account svg {
+  color: rgb(var(--color-foreground));
+}
+
+.header__icon--account svg {
+  width: 2.2rem;
+  height: 2.2rem;
+}
+
+.header__icon--account svg path,
+.header__icon--account svg circle {
+  stroke-width: 2;
+}
 {%- endstyle -%}
 
 <script src="{{ 'cart-notification.js' | asset_url }}" defer="defer"></script>
