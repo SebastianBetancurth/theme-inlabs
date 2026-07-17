@@ -1,9 +1,203 @@
-{% comment %}
-  Renders a header drawer menu for mobile and desktop.
+<style>
+  @media screen and (max-width: 989px) {
+    .js .menu-drawer,
+    .menu-drawer {
+      position: fixed;
+      top: auto;
+      bottom: 1rem;
+      left: 1rem;
+      right: 1rem;
+      width: auto;
+      height: 76dvh;
+      max-height: 72rem;
+      background: transparent;
+      border-radius: 1.6rem;
+      overflow: visible;
+      transform: translateY(120%);
+      visibility: hidden;
+      z-index: 30;
+      filter: none;
+    }
 
-  Usage:
-  {% render 'header-drawer' %}
-{% endcomment %}
+    .js details[open] > .menu-drawer {
+      transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1), visibility 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+
+    .js details[open].menu-opening > .menu-drawer {
+      transform: translateY(0);
+      visibility: visible;
+    }
+
+    .js menu-drawer > details > summary::before,
+    .js menu-drawer > details[open]:not(.menu-opening) > summary::before,
+    menu-drawer > details[open] > summary::before {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 20;
+    }
+
+    .menu-drawer__inner-container {
+      background: #ffffff;
+      border-radius: 1.6rem;
+      overflow: hidden;
+      height: 100%;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .menu-drawer__floating-close {
+      position: absolute;
+      top: -6.6rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4.8rem;
+      height: 4.8rem;
+      border-radius: 50%;
+      background: #ffffff;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      z-index: 31;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    }
+
+    .menu-drawer__floating-close svg {
+      width: 1.5rem;
+      height: 1.5rem;
+      color: #111111;
+    }
+
+    .menu-drawer__navigation {
+      padding: 1rem 0 2rem;
+    }
+
+    .js .menu-drawer__menu > li {
+      margin: 0 2.4rem;
+      border-bottom: 0.1rem solid rgba(0, 0, 0, 0.4);
+      position: relative;
+    }
+
+    .menu-drawer__menu-item,
+    .menu-drawer__menu-item--active,
+    .menu-drawer__menu-item:focus,
+    .menu-drawer__menu-item:hover,
+    .menu-drawer__menu-item--active:hover {
+      padding: 2rem 0;
+      font-size: 1.6rem;
+      color: #111111;
+      background-color: transparent;
+      text-decoration: none !important;
+    }
+
+    .menu-drawer summary.menu-drawer__menu-item {
+      padding-right: 4.6rem;
+    }
+
+    .menu-drawer summary.menu-drawer__menu-item > .svg-wrapper:nth-of-type(1) {
+      display: none;
+    }
+
+    .js .menu-drawer .menu-drawer__menu-item .icon-caret {
+      display: block;
+      position: static;
+      width: 1.1rem;
+      height: 1.1rem;
+    }
+
+    .menu-drawer summary.menu-drawer__menu-item > .svg-wrapper:nth-of-type(2) {
+      width: 3rem;
+      height: 3rem;
+      right: 0;
+      background: #f0f0f0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .js .menu-drawer__submenu {
+      background-color: #ffffff;
+      border-radius: 1.6rem;
+    }
+
+    .menu-drawer__close-button,
+    .menu-drawer__close-button:hover,
+    .menu-drawer__close-button:focus {
+      color: #111111;
+      background-color: transparent;
+      text-decoration: none !important;
+    }
+
+    .menu-drawer__utility-links {
+      background-color: transparent;
+      padding: 1.6rem 2.4rem 2rem !important;
+    }
+
+    .menu-drawer .list-social {
+      margin-left: -1.1rem;
+    }
+
+    .menu-drawer .list-social__link {
+      color: #111111;
+    }
+
+    .menu-drawer__bottom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 0.1rem solid rgba(0, 0, 0, 0.15);
+      padding-top: 1.6rem;
+      margin-top: 1.2rem;
+    }
+
+    .menu-drawer__localization {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .menu-drawer__localization .disclosure__button {
+      padding: 0;
+      font-size: 1.4rem;
+      color: #111111;
+      text-decoration: none !important;
+    }
+
+    .menu-drawer__localization .disclosure__button > svg,
+    .menu-drawer__localization .disclosure__button .icon-caret {
+      display: none;
+    }
+
+    .menu-drawer__loc-divider {
+      color: #111111;
+      font-size: 1.4rem;
+    }
+
+    .menu-drawer__account,
+    .menu-drawer__account:hover {
+      padding: 0;
+      font-size: 1.4rem;
+      color: #111111;
+      text-decoration: none !important;
+    }
+
+    .menu-drawer__account .svg-wrapper,
+    .menu-drawer__account account-icon {
+      display: none;
+    }
+
+    .menu-drawer__utility-links:has(.menu-drawer__localization) .menu-drawer__account {
+      margin: 0;
+    }
+  }
+</style>
 
 <header-drawer data-breakpoint="{% if section.settings.menu_type_desktop == 'drawer' %}desktop{% else %}tablet{% endif %}">
   <details id="Details-menu-drawer-container" class="menu-drawer-container">
@@ -17,6 +211,14 @@
       </span>
     </summary>
     <div id="menu-drawer" class="gradient menu-drawer motion-reduce color-{{ section.settings.menu_color_scheme }}">
+      <button
+        type="button"
+        class="menu-drawer__floating-close"
+        aria-label="{{ 'accessibility.close' | t }}"
+        onclick="this.closest('details').querySelector('summary').click()"
+      >
+        {{- 'icon-close.svg' | inline_asset_content -}}
+      </button>
       <div class="menu-drawer__inner-container">
         <div class="menu-drawer__navigation-container">
           <nav class="menu-drawer__navigation">
@@ -136,65 +338,6 @@
             </ul>
           </nav>
           <div class="menu-drawer__utility-links">
-            {%- if shop.customer_accounts_enabled -%}
-              <a
-                href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
-                class="menu-drawer__account link focus-inset h5 medium-hide large-up-hide"
-                rel="nofollow"
-              >
-                {%- if section.settings.enable_customer_avatar -%}
-                  <account-icon>
-                    {%- if customer and customer.has_avatar? -%}
-                      {{ customer | avatar }}
-                    {%- else -%}
-                      <span class="svg-wrapper">
-                        {{- 'icon-account.svg' | inline_asset_content -}}
-                      </span>
-                    {%- endif -%}
-                  </account-icon>
-                {%- else -%}
-                  <span class="svg-wrapper">
-                    {{- 'icon-account.svg' | inline_asset_content -}}
-                  </span>
-                {%- endif -%}
-                {%- liquid
-                  if customer
-                    echo 'customer.account_fallback' | t
-                  else
-                    echo 'customer.log_in' | t
-                  endif
-                -%}
-              </a>
-            {%- endif -%}
-            {%- if localization.available_countries or localization.available_languages -%}
-              <div class="menu-drawer__localization header-localization">
-                {%- if localization.available_countries and localization.available_countries.size > 1 -%}
-                  <localization-form>
-                    {%- form 'localization', id: 'HeaderCountryMobileForm', class: 'localization-form' -%}
-                      <div>
-                        <h2 class="visually-hidden" id="HeaderCountryMobileLabel">
-                          {{ 'localization.country_label' | t }}
-                        </h2>
-                        {%- render 'country-localization', localPosition: 'HeaderCountryMobile' -%}
-                      </div>
-                    {%- endform -%}
-                  </localization-form>
-                {% endif %}
-
-                {%- if localization.available_languages and localization.available_languages.size > 1 -%}
-                  <localization-form>
-                    {%- form 'localization', id: 'HeaderLanguageMobileForm', class: 'localization-form' -%}
-                      <div>
-                        <h2 class="visually-hidden" id="HeaderLanguageMobileLabel">
-                          {{ 'localization.language_label' | t }}
-                        </h2>
-                        {%- render 'language-localization', localPosition: 'HeaderLanguageMobile' -%}
-                      </div>
-                    {%- endform -%}
-                  </localization-form>
-                {%- endif -%}
-              </div>
-            {%- endif -%}
             <ul class="list list-social list-unstyled" role="list">
               {%- if settings.social_twitter_link != blank -%}
                 <li class="list-social__item">
@@ -287,6 +430,56 @@
                 </li>
               {%- endif -%}
             </ul>
+            <div class="menu-drawer__bottom-row">
+              {%- if localization.available_countries or localization.available_languages -%}
+                <div class="menu-drawer__localization header-localization">
+                  {%- if localization.available_countries and localization.available_countries.size > 1 -%}
+                    <localization-form>
+                      {%- form 'localization', id: 'HeaderCountryMobileForm', class: 'localization-form' -%}
+                        <div>
+                          <h2 class="visually-hidden" id="HeaderCountryMobileLabel">
+                            {{ 'localization.country_label' | t }}
+                          </h2>
+                          {%- render 'country-localization', localPosition: 'HeaderCountryMobile' -%}
+                        </div>
+                      {%- endform -%}
+                    </localization-form>
+                  {% endif %}
+
+                  {%- if localization.available_countries.size > 1 and localization.available_languages.size > 1 -%}
+                    <span class="menu-drawer__loc-divider">|</span>
+                  {%- endif -%}
+
+                  {%- if localization.available_languages and localization.available_languages.size > 1 -%}
+                    <localization-form>
+                      {%- form 'localization', id: 'HeaderLanguageMobileForm', class: 'localization-form' -%}
+                        <div>
+                          <h2 class="visually-hidden" id="HeaderLanguageMobileLabel">
+                            {{ 'localization.language_label' | t }}
+                          </h2>
+                          {%- render 'language-localization', localPosition: 'HeaderLanguageMobile' -%}
+                        </div>
+                      {%- endform -%}
+                    </localization-form>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+              {%- if shop.customer_accounts_enabled -%}
+                <a
+                  href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
+                  class="menu-drawer__account link focus-inset h5 medium-hide large-up-hide"
+                  rel="nofollow"
+                >
+                  {%- liquid
+                    if customer
+                      echo 'customer.account_fallback' | t
+                    else
+                      echo 'customer.log_in' | t
+                    endif
+                  -%}
+                </a>
+              {%- endif -%}
+            </div>
           </div>
         </div>
       </div>
