@@ -1,0 +1,303 @@
+<style>
+  .scrolling-banner-{{ section.id }} {
+    background-color: {{ section.settings.background_color }};
+    overflow: hidden;
+    position: relative;
+    padding-top: {{ section.settings.padding_vertical }}px;
+    padding-bottom: {{ section.settings.padding_vertical }}px;
+  }
+
+  .scrolling-banner-{{ section.id }} .scrolling-banner__wrapper {
+    display: flex;
+    width: max-content;
+    animation: scrolling-banner-{{ section.id }} {{ section.settings.speed }}s linear infinite;
+  }
+
+  {% if section.settings.pause_on_hover %}
+  .scrolling-banner-{{ section.id }}:hover .scrolling-banner__wrapper {
+    animation-play-state: paused;
+  }
+  {% endif %}
+
+  .scrolling-banner-{{ section.id }} .scrolling-banner__group {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .scrolling-banner-{{ section.id }} .scrolling-banner__item {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .scrolling-banner-{{ section.id }} .scrolling-banner__text {
+    color: {{ section.settings.text_color }};
+    font-size: {{ section.settings.text_size_mobile }}px;
+    letter-spacing: {{ section.settings.letter_spacing | divided_by: 100.0 }}em;
+    text-transform: {{ section.settings.text_transform }};
+    font-weight: {{ section.settings.font_weight }};
+    white-space: nowrap;
+    padding: 0 {{ section.settings.spacing_mobile }}px;
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  .scrolling-banner-{{ section.id }} .scrolling-banner__text a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .scrolling-banner-{{ section.id }} .scrolling-banner__text a:hover {
+    text-decoration: underline;
+  }
+
+  .scrolling-banner-{{ section.id }} .scrolling-banner__dot {
+    width: {{ section.settings.dot_size }}px;
+    height: {{ section.settings.dot_size }}px;
+    border-radius: 50%;
+    background-color: {{ section.settings.dot_color }};
+    flex-shrink: 0;
+  }
+
+  @keyframes scrolling-banner-{{ section.id }} {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media screen and (min-width: 750px) {
+    .scrolling-banner-{{ section.id }} .scrolling-banner__text {
+      font-size: {{ section.settings.text_size_desktop }}px;
+      padding: 0 {{ section.settings.spacing_desktop }}px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scrolling-banner-{{ section.id }} .scrolling-banner__wrapper {
+      animation-duration: {{ section.settings.speed | times: 3 }}s;
+    }
+  }
+</style>
+
+<div class="scrolling-banner-{{ section.id }}" role="region" aria-label="{{ 'sections.header.announcement' | t | default: 'Anuncio' }}">
+  <div class="scrolling-banner__wrapper">
+    {% for i in (1..2) %}
+      <div class="scrolling-banner__group" {% if i == 2 %}aria-hidden="true"{% endif %}>
+        {% for j in (1..4) %}
+          {% for block in section.blocks %}
+            <div class="scrolling-banner__item" {{ block.shopify_attributes }}>
+              <p class="scrolling-banner__text">
+                {%- if block.settings.link != blank -%}
+                  <a href="{{ block.settings.link }}">{{ block.settings.text }}</a>
+                {%- else -%}
+                  {{ block.settings.text }}
+                {%- endif -%}
+              </p>
+              <span class="scrolling-banner__dot"></span>
+            </div>
+          {% endfor %}
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Scrolling banner",
+  "tag": "section",
+  "class": "section-scrolling-banner",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Colores"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Color de fondo",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color del texto",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "dot_color",
+      "label": "Color de los puntos",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Texto"
+    },
+    {
+      "type": "range",
+      "id": "text_size_desktop",
+      "min": 8,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de texto en escritorio",
+      "default": 11
+    },
+    {
+      "type": "range",
+      "id": "text_size_mobile",
+      "min": 8,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de texto en móvil",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "letter_spacing",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "label": "Espaciado entre letras",
+      "default": 8
+    },
+    {
+      "type": "select",
+      "id": "text_transform",
+      "label": "Transformación del texto",
+      "options": [
+        { "value": "uppercase", "label": "Mayúsculas" },
+        { "value": "none", "label": "Normal" },
+        { "value": "capitalize", "label": "Capitalizado" }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "Grosor del texto",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medio" },
+        { "value": "600", "label": "Semi negrita" },
+        { "value": "700", "label": "Negrita" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "header",
+      "content": "Animación"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 5,
+      "max": 120,
+      "step": 5,
+      "unit": "s",
+      "label": "Duración de la animación",
+      "info": "Mayor número = más lento",
+      "default": 40
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pausar al pasar el cursor",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "spacing_desktop",
+      "min": 10,
+      "max": 150,
+      "step": 5,
+      "unit": "px",
+      "label": "Espacio entre textos en escritorio",
+      "default": 90
+    },
+    {
+      "type": "range",
+      "id": "spacing_mobile",
+      "min": 10,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Espacio entre textos en móvil",
+      "default": 25
+    },
+    {
+      "type": "range",
+      "id": "dot_size",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de los puntos",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "padding_vertical",
+      "min": 2,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Relleno vertical",
+      "default": 10
+    }
+  ],
+  "blocks": [
+    {
+      "type": "message",
+      "name": "Mensaje",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Texto",
+          "default": "ENVÍO GRATIS A PARTIR DE 50€"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Enlace (opcional)"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "Scrolling banner",
+      "blocks": [
+        {
+          "type": "message",
+          "settings": {
+            "text": "ENVÍO GRATIS A PARTIR DE 50€"
+          }
+        },
+        {
+          "type": "message",
+          "settings": {
+            "text": "SUSCRÍBETE Y AHORRA 25% CON MODO ZZEN"
+          }
+        }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "groups": ["header"],
+    "templates": ["*"]
+  }
+}
+{% endschema %}
