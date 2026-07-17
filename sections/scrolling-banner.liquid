@@ -81,6 +81,29 @@
       animation-duration: {{ section.settings.speed | times: 3 }}s;
     }
   }
+
+  .header__inline-menu .header__submenu.list-menu {
+  background: #0d0d0d !important;
+  border: none !important;
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 1.4rem 0;
+  margin-top: 1rem;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  min-width: 19rem;
+    }
+
+    .header__inline-menu .header__submenu .header__menu-item {
+    color: rgba(255, 255, 255, 0.85);
+    padding: 1.1rem 2.6rem;
+    font-size: 1.3rem;
+    }
+
+    .header__inline-menu .header__submenu .header__menu-item:hover,
+    .header__inline-menu .header__submenu .header__menu-item:hover span {
+    color: #ffffff;
+    background: transparent;
+    }
 </style>
 
 <div class="scrolling-banner-{{ section.id }}" role="region" aria-label="{{ 'sections.header.announcement' | t | default: 'Anuncio' }}">
