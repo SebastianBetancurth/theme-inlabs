@@ -141,6 +141,26 @@
       width: 2.2rem;
       height: 2.2rem;
     }
+
+    .header__inline-menu .header__menu-item {
+  color: rgb(var(--color-foreground));
+  }
+
+  .header__inline-menu .header__menu-item span {
+    transition: color 0.15s ease;
+  }
+
+  .header__inline-menu .header__menu-item:hover,
+  .header__inline-menu .header__menu-item:hover span {
+    color: rgba(var(--color-foreground), 0.55);
+  }
+
+  .header__inline-menu .header__menu-item span,
+  .header__inline-menu .header__menu-item:hover span,
+  .header__inline-menu .header__active-menu-item,
+  .header__inline-menu .header__menu-item:hover .header__active-menu-item {
+    text-decoration: none !important;
+  }
 {%- endstyle -%}
 
 <script src="{{ 'cart-notification.js' | asset_url }}" defer="defer"></script>
