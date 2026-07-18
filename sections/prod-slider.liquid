@@ -175,7 +175,8 @@
     position: relative;
     overflow: visible;
   }
-  .prod-slider-{{ section.id }} .prod-slider__progress-bar {
+  .prod-slider-{{ section.id }} .prod-slider__zzenfill {
+    display: block !important;
     position: absolute;
     top: -0.5px;
     left: 0;
@@ -394,7 +395,7 @@
     </div>
     <div class="prod-slider__footer">
       <div class="prod-slider__progress">
-        <div class="prod-slider__progress-bar" data-progress-bar></div>
+        <div class="prod-slider__zzenfill" data-zzen-bar></div>
       </div>
       <div class="prod-slider__nav">
         <button type="button" class="prod-slider__arrow prod-slider__arrow--prev" data-slider-prev aria-label="Anterior">
@@ -425,7 +426,7 @@
       root.dataset.sliderInit = 'true';
 
       var track = root.querySelector('[data-slider-track]');
-      var progressBar = root.querySelector('[data-progress-bar]');
+      var progressBar = root.querySelector('[data-zzen-bar]');
       var prevBtn = root.querySelector('[data-slider-prev]');
       var nextBtn = root.querySelector('[data-slider-next]');
       if (!track) return;
