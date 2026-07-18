@@ -92,6 +92,8 @@
         "title": "Modo ZZEN",
         "collection": "frontpage",
         "products_limit": 8,
+        "image_ratio": "4 / 5",
+        "image_fit": "cover",
         "button_text": "Añadir",
         "soon_badge_text": "Próximamente...",
         "soon_button_text": "Próximamente...",
