@@ -90,6 +90,14 @@
     "pills_slider_mFmy4m": {
       "type": "pills-slider",
       "blocks": {
+        "pill_Jwakrg": {
+          "type": "pill",
+          "settings": {
+            "label": "ETIQUETA",
+            "product": "modo-zzen",
+            "custom_link": ""
+          }
+        },
         "pill_zCwTdi": {
           "type": "pill",
           "settings": {
@@ -140,6 +148,7 @@
         }
       },
       "block_order": [
+        "pill_Jwakrg",
         "pill_zCwTdi",
         "pill_8A7LLX",
         "pill_rycf7x",
