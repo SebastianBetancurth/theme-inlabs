@@ -1,0 +1,572 @@
+{%- style -%}
+  @font-face {
+    font-family: 'thin2';
+    src: url('{{ 'lawrence-regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  .prod-slider-{{ section.id }} {
+    background-color: {{ section.settings.bg_color }};
+    padding: {{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px;
+  }
+  .prod-slider-{{ section.id }} .prod-slider__wrapper {
+    max-width: 144rem;
+    margin: 0 auto;
+    padding: 0 4rem;
+  }
+  .prod-slider-{{ section.id }} .prod-slider__title {
+    margin: 0 0 3.2rem;
+    font-family: var(--font-heading-family);
+    font-weight: 400;
+    font-size: {{ section.settings.title_size }}px;
+    line-height: 1.05;
+    color: #111111;
+  }
+  .prod-slider-{{ section.id }} .prod-slider__track {
+    display: flex;
+    gap: 2.4rem;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    scroll-snap-type: x mandatory;
+  }
+  .prod-slider-{{ section.id }} .prod-slider__track::-webkit-scrollbar {
+    display: none;
+  }
+  .prod-slider-{{ section.id }} .prod-card {
+    position: relative;
+    flex: 0 0 calc((100% - 4.8rem) / 3);
+    scroll-snap-align: start;
+    background: #ffffff;
+    border-radius: 1.2rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .prod-slider-{{ section.id }} .prod-card__link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .prod-slider-{{ section.id }} .prod-card__badge {
+    position: absolute;
+    top: 1.4rem;
+    left: 1.4rem;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: #ffffff;
+    color: #080808;
+    border-radius: 100px;
+    padding: 0.7rem 1.4rem;
+    font-size: 1.3rem;
+    line-height: 1;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  }
+  .prod-slider-{{ section.id }} .prod-card__badge svg {
+    display: block !important;
+    flex-shrink: 0;
+  }
+  .prod-slider-{{ section.id }} .prod-card__image {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+  }
+  .prod-slider-{{ section.id }} .prod-card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .prod-slider-{{ section.id }} .prod-card--soon .prod-card__image img {
+    filter: blur(10px);
+    transform: scale(1.08);
+  }
+  .prod-slider-{{ section.id }} .prod-card__info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 2.4rem 2.4rem 2.4rem;
+  }
+  .prod-slider-{{ section.id }} .prod-card__name {
+    margin: 0 0 2rem;
+    font-size: 1.8rem;
+    line-height: 1.3;
+    color: #111111;
+  }
+  .prod-slider-{{ section.id }} .prod-card__name .prod-card__name-sep {
+    margin: 0 0.4rem;
+  }
+  .prod-slider-{{ section.id }} .prod-card__benefits {
+    list-style: none;
+    margin: 0 0 2.4rem;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+  }
+  .prod-slider-{{ section.id }} .prod-card__benefit {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.6rem;
+    line-height: 1.3;
+    color: #111111;
+  }
+  .prod-slider-{{ section.id }} .prod-card__benefit svg {
+    flex-shrink: 0;
+  }
+  .prod-slider-{{ section.id }} .prod-card__atc {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2em;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    background: #0a0a0a;
+    color: #ffffff;
+    border-radius: 100px;
+    padding: 1.5rem 2rem;
+    font-size: 1.6rem;
+    line-height: 1;
+    transition: opacity 0.25s ease, background-color 0.25s ease;
+  }
+  .prod-slider-{{ section.id }} .prod-card__atc:hover {
+    opacity: 0.85;
+  }
+  .prod-slider-{{ section.id }} .prod-card__atc[disabled] {
+    background: #9a9a9a;
+    cursor: default;
+    opacity: 1;
+  }
+  .prod-slider-{{ section.id }} .prod-card__atc .prod-card__compare {
+    margin-left: 0.5em;
+    text-decoration: line-through;
+    opacity: 0.55;
+    font-size: 0.85em;
+  }
+  .prod-slider-{{ section.id }} .prod-card__atc.is-adding {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  .prod-slider-{{ section.id }} .prod-slider__footer {
+    display: flex;
+    align-items: center;
+    gap: 3.2rem;
+    margin-top: 4rem;
+  }
+  .prod-slider-{{ section.id }} .prod-slider__progress {
+    flex: 1;
+    height: 1px;
+    background: #d9d7d4;
+    position: relative;
+  }
+  .prod-slider-{{ section.id }} .prod-slider__progress-bar {
+    position: absolute;
+    top: -0.5px;
+    left: 0;
+    height: 2px;
+    background: #0a0a0a;
+    width: 0;
+    transition: width 0.3s ease;
+  }
+  .prod-slider-{{ section.id }} .prod-slider__nav {
+    display: flex;
+    gap: 1.2rem;
+  }
+  .prod-slider-{{ section.id }} .prod-slider__arrow {
+    position: relative;
+    width: 4.6rem;
+    height: 4.6rem;
+    border-radius: 50%;
+    border: 1px solid #c9c7c4;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+    color: #111111;
+  }
+  .prod-slider-{{ section.id }} .prod-slider__arrow:hover {
+    border-color: #111111;
+  }
+  .prod-slider-{{ section.id }} .prod-slider__arrow.is-disabled {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+  .prod-slider-{{ section.id }} .prod-slider__arrow svg {
+    position: absolute;
+    width: 1.4rem;
+    height: 1.4rem;
+    transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.35s ease;
+  }
+  .prod-slider-{{ section.id }} .prod-slider__arrow .arrow-chevron {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  .prod-slider-{{ section.id }} .prod-slider__arrow .arrow-line {
+    opacity: 0;
+  }
+  .prod-slider-{{ section.id }} .prod-slider__arrow--next .arrow-line {
+    transform: translateX(-2rem);
+  }
+  .prod-slider-{{ section.id }} .prod-slider__arrow--prev .arrow-line {
+    transform: translateX(2rem);
+  }
+  .prod-slider-{{ section.id }} .prod-slider__arrow--next:hover .arrow-chevron {
+    transform: translateX(2rem);
+    opacity: 0;
+  }
+  .prod-slider-{{ section.id }} .prod-slider__arrow--prev:hover .arrow-chevron {
+    transform: translateX(-2rem);
+    opacity: 0;
+  }
+  .prod-slider-{{ section.id }} .prod-slider__arrow:hover .arrow-line {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  .prod-slider-{{ section.id }} .prod-slider__title,
+  .prod-slider-{{ section.id }} .prod-card__name,
+  .prod-slider-{{ section.id }} .prod-card__benefit,
+  .prod-slider-{{ section.id }} .prod-card__badge,
+  .prod-slider-{{ section.id }} .prod-card__atc {
+    font-family: 'thin2', sans-serif;
+  }
+  @media screen and (max-width: 989px) {
+    .prod-slider-{{ section.id }} .prod-card {
+      flex: 0 0 calc((100% - 2.4rem) / 2);
+    }
+  }
+  @media screen and (max-width: 749px) {
+    .prod-slider-{{ section.id }} .prod-slider__wrapper {
+      padding: 0 1.6rem;
+    }
+    .prod-slider-{{ section.id }} .prod-slider__title {
+      font-size: {{ section.settings.title_size_mobile }}px;
+      margin-bottom: 2rem;
+    }
+    .prod-slider-{{ section.id }} .prod-card {
+      flex: 0 0 84%;
+    }
+    .prod-slider-{{ section.id }} .prod-card__name .prod-card__name-sep {
+      display: none;
+    }
+    .prod-slider-{{ section.id }} .prod-card__name .prod-card__name-part {
+      display: block;
+    }
+    .prod-slider-{{ section.id }} .prod-slider__nav {
+      display: none;
+    }
+    .prod-slider-{{ section.id }} .prod-slider__footer {
+      margin-top: 2.8rem;
+    }
+  }
+{%- endstyle -%}
+
+<div class="prod-slider-{{ section.id }}" id="ProdSlider-{{ section.id }}">
+  <div class="prod-slider__wrapper">
+    {%- if section.settings.title != blank -%}
+      <h2 class="prod-slider__title">{{ section.settings.title }}</h2>
+    {%- endif -%}
+    <div class="prod-slider__track" data-slider-track>
+      {%- for product in section.settings.collection.products limit: section.settings.products_limit -%}
+        {%- liquid
+          assign is_soon = false
+          if product.metafields.custom.proximamente == true
+            assign is_soon = true
+          endif
+          assign badge_text = product.metafields.custom.badge | strip
+          assign card_url = product.url
+          if is_soon and product.metafields.custom.proximamente_link != blank
+            assign card_url = product.metafields.custom.proximamente_link
+          endif
+          assign title_parts = product.title | split: ' | '
+        -%}
+        <div class="prod-card{% if is_soon %} prod-card--soon{% endif %}">
+          {%- if is_soon -%}
+            <span class="prod-card__badge">
+              <svg class="hide-desk" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9.4001 5.20001L6.1001 8.80001L4.6001 7.16365" stroke="#080808" stroke-width="0.8" stroke-linecap="square"></path>
+                <path d="M5.32114 12.1605C5.51779 12.1345 5.71644 12.1879 5.87309 12.3085L6.59503 12.8625C6.83368 13.0458 7.16565 13.0458 7.40363 12.8625L8.1529 12.2872C8.29289 12.1799 8.46954 12.1325 8.6442 12.1559L9.58145 12.2792C9.87943 12.3185 10.1667 12.1525 10.2821 11.8745L10.6427 11.0026C10.71 10.8392 10.8393 10.7099 11.0027 10.6426L11.8746 10.2819C12.1526 10.1672 12.3186 9.87925 12.2792 9.58126L12.1606 8.67795C12.1346 8.48129 12.1879 8.28263 12.3086 8.12597L12.8625 7.40399C13.0458 7.16533 13.0458 6.83334 12.8625 6.59534L12.2872 5.84603C12.1799 5.70604 12.1326 5.52937 12.1559 5.35471L12.2792 4.41741C12.3186 4.11941 12.1526 3.83209 11.8746 3.71676L11.0027 3.3561C10.8393 3.28877 10.71 3.15944 10.6427 2.99611L10.2821 2.12414C10.1674 1.84614 9.87943 1.68015 9.58145 1.71948L8.6442 1.84281C8.46954 1.86681 8.29289 1.81948 8.15357 1.71281L7.4043 1.1375C7.16565 0.954168 6.83368 0.954168 6.5957 1.1375L5.84643 1.71281C5.70644 1.81948 5.52979 1.86681 5.35514 1.84414L4.41788 1.72081C4.11991 1.68148 3.8326 1.84748 3.71727 2.12547L3.3573 2.99744C3.28931 3.16011 3.15999 3.28944 2.99733 3.35743L2.12541 3.71742C1.84743 3.83275 1.68144 4.12008 1.72077 4.41807L1.8441 5.35538C1.86676 5.53004 1.81943 5.7067 1.71277 5.84603L1.13749 6.59534C0.95417 6.834 0.95417 7.166 1.13749 7.40399L1.71277 8.1533C1.8201 8.2933 1.86743 8.46996 1.8441 8.64462L1.72077 9.58193C1.68144 9.87992 1.84743 10.1672 2.12541 10.2826L2.99733 10.6432C3.16065 10.7106 3.28998 10.8399 3.3573 11.0032L3.71794 11.8752C3.8326 12.1532 4.12057 12.3192 4.41855 12.2799L5.32114 12.1605Z" stroke="#080808" stroke-width="0.8" stroke-linecap="square"></path>
+              </svg>
+              {{ section.settings.soon_badge_text }}
+            </span>
+          {%- elsif badge_text != blank -%}
+            <span class="prod-card__badge">
+              <svg class="hide-desk" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9.4001 5.20001L6.1001 8.80001L4.6001 7.16365" stroke="#080808" stroke-width="0.8" stroke-linecap="square"></path>
+                <path d="M5.32114 12.1605C5.51779 12.1345 5.71644 12.1879 5.87309 12.3085L6.59503 12.8625C6.83368 13.0458 7.16565 13.0458 7.40363 12.8625L8.1529 12.2872C8.29289 12.1799 8.46954 12.1325 8.6442 12.1559L9.58145 12.2792C9.87943 12.3185 10.1667 12.1525 10.2821 11.8745L10.6427 11.0026C10.71 10.8392 10.8393 10.7099 11.0027 10.6426L11.8746 10.2819C12.1526 10.1672 12.3186 9.87925 12.2792 9.58126L12.1606 8.67795C12.1346 8.48129 12.1879 8.28263 12.3086 8.12597L12.8625 7.40399C13.0458 7.16533 13.0458 6.83334 12.8625 6.59534L12.2872 5.84603C12.1799 5.70604 12.1326 5.52937 12.1559 5.35471L12.2792 4.41741C12.3186 4.11941 12.1526 3.83209 11.8746 3.71676L11.0027 3.3561C10.8393 3.28877 10.71 3.15944 10.6427 2.99611L10.2821 2.12414C10.1674 1.84614 9.87943 1.68015 9.58145 1.71948L8.6442 1.84281C8.46954 1.86681 8.29289 1.81948 8.15357 1.71281L7.4043 1.1375C7.16565 0.954168 6.83368 0.954168 6.5957 1.1375L5.84643 1.71281C5.70644 1.81948 5.52979 1.86681 5.35514 1.84414L4.41788 1.72081C4.11991 1.68148 3.8326 1.84748 3.71727 2.12547L3.3573 2.99744C3.28931 3.16011 3.15999 3.28944 2.99733 3.35743L2.12541 3.71742C1.84743 3.83275 1.68144 4.12008 1.72077 4.41807L1.8441 5.35538C1.86676 5.53004 1.81943 5.7067 1.71277 5.84603L1.13749 6.59534C0.95417 6.834 0.95417 7.166 1.13749 7.40399L1.71277 8.1533C1.8201 8.2933 1.86743 8.46996 1.8441 8.64462L1.72077 9.58193C1.68144 9.87992 1.84743 10.1672 2.12541 10.2826L2.99733 10.6432C3.16065 10.7106 3.28998 10.8399 3.3573 11.0032L3.71794 11.8752C3.8326 12.1532 4.12057 12.3192 4.41855 12.2799L5.32114 12.1605Z" stroke="#080808" stroke-width="0.8" stroke-linecap="square"></path>
+              </svg>
+              {{ badge_text }}
+            </span>
+          {%- endif -%}
+          <a href="{{ card_url }}" class="prod-card__link">
+            <div class="prod-card__image">
+              {%- if product.featured_image != blank -%}
+                {{
+                  product.featured_image
+                  | image_url: width: 900
+                  | image_tag: widths: '450, 600, 900', alt: product.featured_image.alt, loading: 'lazy'
+                }}
+              {%- else -%}
+                {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+              {%- endif -%}
+            </div>
+            <div class="prod-card__info">
+              <h3 class="prod-card__name">
+                {%- if title_parts.size > 1 -%}
+                  <span class="prod-card__name-part">{{ title_parts[0] }}</span><span class="prod-card__name-sep">|</span><span class="prod-card__name-part">{{ title_parts[1] }}</span>
+                {%- else -%}
+                  {{ product.title }}
+                {%- endif -%}
+              </h3>
+              {%- assign benefits = product.metafields.custom.beneficios.value -%}
+              {%- if benefits != blank -%}
+                <ul class="prod-card__benefits">
+                  {%- for benefit in benefits limit: 3 -%}
+                    <li class="prod-card__benefit">
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 11L11 3M11 3H4.5M11 3V9.5" stroke="#111111" stroke-width="1.2" stroke-linecap="square"></path>
+                      </svg>
+                      {{ benefit }}
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              {%- endif -%}
+              {%- if is_soon -%}
+                <button type="button" class="prod-card__atc" disabled>
+                  <svg fill="#ffffff" version="1.1" xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 902.86 902.86" style="position: relative; top: 4px; margin-right: 0.4em;">
+                    <g transform="scale(-1,1) translate(-902.86,0)">
+                      <path d="M671.504,577.829l110.485-432.609H902.86v-68H729.174L703.128,179.2L0,178.697l74.753,399.129h596.751V577.829z M685.766,247.188l-67.077,262.64H131.199L81.928,246.756L685.766,247.188z"></path>
+                      <path d="M578.418,825.641c59.961,0,108.743-48.783,108.743-108.744s-48.782-108.742-108.743-108.742H168.717 c-59.961,0-108.744,48.781-108.744,108.742s48.782,108.744,108.744,108.744c59.962,0,108.743-48.783,108.743-108.744 c0-14.4-2.821-28.152-7.927-40.742h208.069c-5.107,12.59-7.928,26.342-7.928,40.742 C469.675,776.858,518.457,825.641,578.418,825.641z M209.46,716.897c0,22.467-18.277,40.744-40.743,40.744 c-22.466,0-40.744-18.277-40.744-40.744c0-22.465,18.277-40.742,40.744-40.742C191.183,676.155,209.46,694.432,209.46,716.897z M619.162,716.897c0,22.467-18.277,40.744-40.743,40.744s-40.743-18.277-40.743-40.744c0-22.465,18.277-40.742,40.743-40.742 S619.162,694.432,619.162,716.897z"></path>
+                    </g>
+                  </svg>
+                  {{ section.settings.soon_button_text }}
+                </button>
+              {%- else -%}
+                <button
+                  type="button"
+                  class="prod-card__atc"
+                  data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                  {% unless product.available %}disabled{% endunless %}
+                >
+                  <svg fill="#ffffff" version="1.1" xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 902.86 902.86" style="position: relative; top: 4px; margin-right: 0.4em;">
+                    <g transform="scale(-1,1) translate(-902.86,0)">
+                      <path d="M671.504,577.829l110.485-432.609H902.86v-68H729.174L703.128,179.2L0,178.697l74.753,399.129h596.751V577.829z M685.766,247.188l-67.077,262.64H131.199L81.928,246.756L685.766,247.188z"></path>
+                      <path d="M578.418,825.641c59.961,0,108.743-48.783,108.743-108.744s-48.782-108.742-108.743-108.742H168.717 c-59.961,0-108.744,48.781-108.744,108.742s48.782,108.744,108.744,108.744c59.962,0,108.743-48.783,108.743-108.744 c0-14.4-2.821-28.152-7.927-40.742h208.069c-5.107,12.59-7.928,26.342-7.928,40.742 C469.675,776.858,518.457,825.641,578.418,825.641z M209.46,716.897c0,22.467-18.277,40.744-40.743,40.744 c-22.466,0-40.744-18.277-40.744-40.744c0-22.465,18.277-40.742,40.744-40.742C191.183,676.155,209.46,694.432,209.46,716.897z M619.162,716.897c0,22.467-18.277,40.744-40.743,40.744s-40.743-18.277-40.743-40.744c0-22.465,18.277-40.742,40.743-40.742 S619.162,694.432,619.162,716.897z"></path>
+                    </g>
+                  </svg>
+                  <span>
+                    {%- if product.available -%}
+                      {{ section.settings.button_text }}: {{ product.selected_or_first_available_variant.price | money }}
+                      {%- if product.selected_or_first_available_variant.compare_at_price > product.selected_or_first_available_variant.price -%}
+                        <span class="prod-card__compare">{{ product.selected_or_first_available_variant.compare_at_price | money }}</span>
+                      {%- endif -%}
+                    {%- else -%}
+                      {{ 'products.product.sold_out' | t }}
+                    {%- endif -%}
+                  </span>
+                </button>
+              {%- endif -%}
+            </div>
+          </a>
+        </div>
+      {%- endfor -%}
+    </div>
+    <div class="prod-slider__footer">
+      <div class="prod-slider__progress">
+        <div class="prod-slider__progress-bar" data-progress-bar></div>
+      </div>
+      <div class="prod-slider__nav">
+        <button type="button" class="prod-slider__arrow prod-slider__arrow--prev" data-slider-prev aria-label="Anterior">
+          <svg class="arrow-chevron" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 2L4 7L9 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"></path>
+          </svg>
+          <svg class="arrow-line" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13 7H1M1 7L6 2M1 7L6 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"></path>
+          </svg>
+        </button>
+        <button type="button" class="prod-slider__arrow prod-slider__arrow--next" data-slider-next aria-label="Siguiente">
+          <svg class="arrow-chevron" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 2L10 7L5 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"></path>
+          </svg>
+          <svg class="arrow-line" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 7H13M13 7L8 2M13 7L8 12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    var root = document.getElementById('ProdSlider-{{ section.id }}');
+    if (!root) return;
+    var track = root.querySelector('[data-slider-track]');
+    var progressBar = root.querySelector('[data-progress-bar]');
+    var prevBtn = root.querySelector('[data-slider-prev]');
+    var nextBtn = root.querySelector('[data-slider-next]');
+
+    function cardStep() {
+      var card = track.querySelector('.prod-card');
+      if (!card) return 300;
+      var gap = parseFloat(getComputedStyle(track).gap) || 0;
+      return card.getBoundingClientRect().width + gap;
+    }
+
+    function updateUI() {
+      var maxScroll = track.scrollWidth - track.clientWidth;
+      if (progressBar) {
+        var visible = track.scrollWidth > 0 ? (track.scrollLeft + track.clientWidth) / track.scrollWidth : 1;
+        progressBar.style.width = (visible * 100) + '%';
+      }
+      if (prevBtn) prevBtn.classList.toggle('is-disabled', track.scrollLeft <= 5);
+      if (nextBtn) nextBtn.classList.toggle('is-disabled', track.scrollLeft >= maxScroll - 5);
+    }
+
+    if (prevBtn) prevBtn.addEventListener('click', function() { track.scrollBy({ left: -cardStep(), behavior: 'smooth' }); });
+    if (nextBtn) nextBtn.addEventListener('click', function() { track.scrollBy({ left: cardStep(), behavior: 'smooth' }); });
+    track.addEventListener('scroll', updateUI, { passive: true });
+    window.addEventListener('resize', updateUI);
+    updateUI();
+
+    root.querySelectorAll('.prod-card__atc[data-variant-id]').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (btn.classList.contains('is-adding')) return;
+        btn.classList.add('is-adding');
+
+        var cartDrawer = document.querySelector('cart-drawer');
+        var body = {
+          items: [{ id: parseInt(btn.dataset.variantId, 10), quantity: 1 }]
+        };
+        if (cartDrawer && typeof cartDrawer.getSectionsToRender === 'function') {
+          body.sections = cartDrawer.getSectionsToRender().map(function(s) { return s.id; });
+          body.sections_url = window.location.pathname;
+        }
+
+        fetch(window.Shopify.routes.root + 'cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(body)
+        })
+          .then(function(res) { return res.json(); })
+          .then(function(data) {
+            if (data.status && data.status !== 200) throw new Error(data.description || 'Error');
+            if (cartDrawer && typeof cartDrawer.renderContents === 'function') {
+              cartDrawer.renderContents(data);
+            } else {
+              window.location.href = window.Shopify.routes.root + 'cart';
+            }
+          })
+          .catch(function(err) { console.error(err); })
+          .finally(function() { btn.classList.remove('is-adding'); });
+      });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Slider de productos",
+  "tag": "section",
+  "class": "section-prod-slider",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título",
+      "default": "Modo ZZEN"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Colección"
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "label": "Máximo de productos",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Texto del botón",
+      "default": "Añadir"
+    },
+    {
+      "type": "text",
+      "id": "soon_badge_text",
+      "label": "Texto etiqueta próximamente",
+      "default": "Próximamente..."
+    },
+    {
+      "type": "text",
+      "id": "soon_button_text",
+      "label": "Texto botón próximamente",
+      "default": "Próximamente..."
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Tamaño título PC (px)",
+      "min": 28,
+      "max": 90,
+      "step": 2,
+      "default": 58
+    },
+    {
+      "type": "range",
+      "id": "title_size_mobile",
+      "label": "Tamaño título móvil (px)",
+      "min": 20,
+      "max": 50,
+      "step": 2,
+      "default": 32
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo",
+      "default": "#f6f5f3"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espaciado superior (px)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espaciado inferior (px)",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "default": 60
+    }
+  ],
+  "presets": [
+    {
+      "name": "Slider de productos"
+    }
+  ]
+}
+{% endschema %}
