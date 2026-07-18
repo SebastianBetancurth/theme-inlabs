@@ -170,18 +170,21 @@
   }
   .prod-slider-{{ section.id }} .prod-slider__progress {
     flex: 1;
-    height: 1px;
+    height: 2px;
     background: #d9d7d4;
     position: relative;
+    overflow: visible;
   }
   .prod-slider-{{ section.id }} .prod-slider__progress-bar {
     position: absolute;
     top: -0.5px;
     left: 0;
-    height: 2px;
+    height: 3px;
     background: #0a0a0a;
     width: 0;
+    z-index: 2;
     transition: width 0.15s linear;
+    pointer-events: none;
   }
   .prod-slider-{{ section.id }} .prod-slider__nav {
     display: flex;
@@ -501,7 +504,7 @@
     }
 
     function boot() {
-      initProdSlider(document.getElementById('ProdSlider-{{ section.id }}'));
+      document.querySelectorAll('[data-prod-slider]').forEach(initProdSlider);
     }
 
     if (document.readyState === 'loading') {
