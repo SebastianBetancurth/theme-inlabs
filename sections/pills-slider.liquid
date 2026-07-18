@@ -1,0 +1,210 @@
+{%- if request.page_type == 'index' -%}
+<style>
+  .pills-slider-{{ section.id }} {
+    background-color: {{ section.settings.bg_color }};
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+  .pills-slider-{{ section.id }} .pills-slider__track {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  .pills-slider-{{ section.id }} .pills-slider__track::-webkit-scrollbar {
+    display: none;
+  }
+  .pills-slider-{{ section.id }} .pills-slider__pill {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 22px;
+    border: 1px solid {{ section.settings.pill_border_color }};
+    border-radius: 100px;
+    background-color: transparent;
+    color: {{ section.settings.pill_text_color }};
+    font-size: {{ section.settings.font_size }}px;
+    font-family: var(--font-body-family);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    line-height: 1;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+  .pills-slider-{{ section.id }} .pills-slider__pill.is-active,
+  .pills-slider-{{ section.id }} .pills-slider__pill:active {
+    background-color: {{ section.settings.pill_active_bg }};
+    color: {{ section.settings.pill_active_text }};
+    border-color: {{ section.settings.pill_active_bg }};
+  }
+  {%- case section.settings.visibility -%}
+    {%- when 'mobile' -%}
+  @media screen and (min-width: 750px) {
+    .pills-slider-{{ section.id }} { display: none; }
+  }
+    {%- when 'desktop' -%}
+  @media screen and (max-width: 749px) {
+    .pills-slider-{{ section.id }} { display: none; }
+  }
+  {%- endcase -%}
+</style>
+
+<div class="pills-slider-{{ section.id }}" id="PillsSlider-{{ section.id }}">
+  <div class="pills-slider__track">
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign pill_url = '#'
+        if block.settings.product != blank
+          assign pill_url = block.settings.product.url
+        elsif block.settings.custom_link != blank
+          assign pill_url = block.settings.custom_link
+        endif
+      -%}
+      <a href="{{ pill_url }}" class="pills-slider__pill" {{ block.shopify_attributes }}>{{ block.settings.label | escape }}</a>
+    {%- endfor -%}
+  </div>
+</div>
+
+<script>
+  (function() {
+    var slider = document.getElementById('PillsSlider-{{ section.id }}');
+    if (!slider) return;
+    var pills = slider.querySelectorAll('.pills-slider__pill');
+    pills.forEach(function(pill) {
+      pill.addEventListener('click', function(e) {
+        e.preventDefault();
+        pills.forEach(function(p) { p.classList.remove('is-active'); });
+        pill.classList.add('is-active');
+        var url = pill.getAttribute('href');
+        if (url && url !== '#') {
+          setTimeout(function() {
+            window.location.href = url;
+          }, 250);
+        }
+      });
+    });
+  })();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Pills Slider",
+  "tag": "section",
+  "class": "section-pills-slider",
+  "settings": [
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Mostrar en",
+      "options": [
+        { "value": "mobile", "label": "Solo móvil" },
+        { "value": "desktop", "label": "Solo PC" },
+        { "value": "both", "label": "Móvil y PC" }
+      ],
+      "default": "mobile"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo",
+      "default": "#0a0a0a"
+    },
+    {
+      "type": "color",
+      "id": "pill_text_color",
+      "label": "Color texto pill",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "pill_border_color",
+      "label": "Color borde pill",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "pill_active_bg",
+      "label": "Fondo pill activa",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "pill_active_text",
+      "label": "Texto pill activa",
+      "default": "#0a0a0a"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Tamaño de fuente",
+      "min": 9,
+      "max": 18,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espaciado superior",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espaciado inferior",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "default": 14
+    }
+  ],
+  "blocks": [
+    {
+      "type": "pill",
+      "name": "Pill",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Etiqueta",
+          "default": "ETIQUETA"
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Producto"
+        },
+        {
+          "type": "url",
+          "id": "custom_link",
+          "label": "Enlace personalizado (opcional)",
+          "info": "Se usa solo si no hay producto seleccionado"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Pills Slider",
+      "blocks": [
+        { "type": "pill", "settings": { "label": "MODO ZZEN" } },
+        { "type": "pill", "settings": { "label": "FOCUS" } },
+        { "type": "pill", "settings": { "label": "CALM" } },
+        { "type": "pill", "settings": { "label": "SLEEP" } },
+        { "type": "pill", "settings": { "label": "MAGNESIUM 7+" } },
+        { "type": "pill", "settings": { "label": "OMEGA-3" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
