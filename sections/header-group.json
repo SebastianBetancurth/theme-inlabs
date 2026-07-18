@@ -90,19 +90,11 @@
     "pills_slider_mFmy4m": {
       "type": "pills-slider",
       "blocks": {
-        "pill_Jwakrg": {
-          "type": "pill",
-          "settings": {
-            "label": "ETIQUETA",
-            "product": "modo-zzen",
-            "custom_link": ""
-          }
-        },
         "pill_zCwTdi": {
           "type": "pill",
           "settings": {
             "label": "MODO ZZEN",
-            "product": "",
+            "product": "modo-zzen",
             "custom_link": ""
           }
         },
@@ -110,7 +102,7 @@
           "type": "pill",
           "settings": {
             "label": "FOCUS",
-            "product": "",
+            "product": "zzen-calm",
             "custom_link": ""
           }
         },
@@ -118,7 +110,7 @@
           "type": "pill",
           "settings": {
             "label": "CALM",
-            "product": "",
+            "product": "zzen-focus",
             "custom_link": ""
           }
         },
@@ -126,7 +118,7 @@
           "type": "pill",
           "settings": {
             "label": "SLEEP",
-            "product": "",
+            "product": "modo-zzen",
             "custom_link": ""
           }
         },
@@ -134,7 +126,7 @@
           "type": "pill",
           "settings": {
             "label": "MAGNESIUM 7+",
-            "product": "",
+            "product": "zzen-calm",
             "custom_link": ""
           }
         },
@@ -142,13 +134,12 @@
           "type": "pill",
           "settings": {
             "label": "OMEGA-3",
-            "product": "",
+            "product": "zzen-focus",
             "custom_link": ""
           }
         }
       },
       "block_order": [
-        "pill_Jwakrg",
         "pill_zCwTdi",
         "pill_8A7LLX",
         "pill_rycf7x",
