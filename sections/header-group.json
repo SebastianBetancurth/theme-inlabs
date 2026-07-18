@@ -150,9 +150,9 @@
       "name": "Pills Slider",
       "settings": {
         "visibility": "mobile",
-        "bg_color": "#0a0a0a",
+        "bg_color": "#0D0D0D",
         "pill_text_color": "#ffffff",
-        "pill_border_color": "#ffffff",
+        "pill_border_color": "#868686",
         "pill_active_bg": "#ffffff",
         "pill_active_text": "#0a0a0a",
         "font_size": 12,
