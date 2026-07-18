@@ -15,7 +15,7 @@
       "settings": {
         "image": "shopify://shop_images/hf_20260116_131949_2_40233a51-f6f4-4df6-8177-c1db8e8a3e07.webp",
         "image_mobile": "shopify://shop_images/hf_20260116_131949_3_7888bcdd-180a-4618-8c2a-84d0e7dcc7cf.webp",
-        "image_position_desktop": "center center",
+        "image_position_desktop": "left center",
         "image_position_mobile": "center top",
         "height_desktop": 95,
         "height_mobile": 75,
