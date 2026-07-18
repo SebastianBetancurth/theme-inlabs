@@ -43,6 +43,48 @@
         "button_text_color": "#000000"
       }
     },
+    "logo_bar_grKLiT": {
+      "type": "logo-bar",
+      "blocks": {
+        "logo_4X3Lcr": {
+          "type": "logo",
+          "settings": {
+            "logo": "shopify://shop_images/download_4fc202f3-cad6-4d5d-b95c-2928793d233d.webp",
+            "link": ""
+          }
+        },
+        "logo_3r9CAD": {
+          "type": "logo",
+          "settings": {
+            "logo": "shopify://shop_images/download_b09f80db-8b8e-4ece-ad42-0c76401cc08a.webp",
+            "link": ""
+          }
+        },
+        "logo_QjK7rE": {
+          "type": "logo",
+          "settings": {
+            "logo": "shopify://shop_images/download_46aa05fd-fa46-496e-a35c-76df9fc725ca.webp",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "logo_4X3Lcr",
+        "logo_3r9CAD",
+        "logo_QjK7rE"
+      ],
+      "name": "Barra de logos",
+      "settings": {
+        "bg_color": "#0a0a0a",
+        "force_white": true,
+        "logo_height_desktop": 42,
+        "logo_height_mobile": 20,
+        "gap_desktop": 40,
+        "gap_mobile": 16,
+        "padding_top": 16,
+        "padding_bottom": 24
+      }
+    },
     "featured_collection": {
       "type": "featured-collection",
       "settings": {
@@ -74,6 +116,7 @@
   },
   "order": [
     "hero_v2s_zA7pyF",
+    "logo_bar_grKLiT",
     "featured_collection"
   ]
 }
