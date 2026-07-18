@@ -78,7 +78,7 @@
         "bg_color": "#0a0a0a",
         "force_white": true,
         "logo_height_desktop": 42,
-        "logo_height_mobile": 20,
+        "logo_height_mobile": 18,
         "gap_desktop": 40,
         "gap_mobile": 16,
         "padding_top": 16,
