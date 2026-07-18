@@ -63,7 +63,7 @@
     color: #080808;
     border-radius: 100px;
     padding: 0.7rem 1.4rem;
-    font-size: 1.3rem;
+    font-size: {{ section.settings.badge_size }}px;
     line-height: 1;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   }
@@ -101,7 +101,7 @@
   }
   .prod-slider-{{ section.id }} .prod-card__name {
     margin: 0 0 2rem;
-    font-size: 1.8rem;
+    font-size: {{ section.settings.name_size }}px;
     line-height: 1.3;
     color: #111111;
   }
@@ -120,7 +120,7 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    font-size: 1.6rem;
+    font-size: {{ section.settings.benefit_size }}px;
     line-height: 1.3;
     color: #111111;
   }
@@ -140,7 +140,7 @@
     color: #ffffff;
     border-radius: 100px;
     padding: 1.5rem 2rem;
-    font-size: 1.6rem;
+    font-size: {{ section.settings.atc_size }}px;
     line-height: 1;
     transition: opacity 0.25s ease, background-color 0.25s ease;
   }
@@ -266,6 +266,15 @@
     }
     .prod-slider-{{ section.id }} .prod-card {
       flex: 0 0 84%;
+    }
+    .prod-slider-{{ section.id }} .prod-card__name {
+      font-size: {{ section.settings.name_size_mobile }}px;
+    }
+    .prod-slider-{{ section.id }} .prod-card__benefit {
+      font-size: {{ section.settings.benefit_size_mobile }}px;
+    }
+    .prod-slider-{{ section.id }} .prod-card__atc {
+      font-size: {{ section.settings.atc_size_mobile }}px;
     }
     .prod-slider-{{ section.id }} .prod-card__name .prod-card__name-sep {
       display: none;
@@ -612,6 +621,73 @@
       "max": 50,
       "step": 2,
       "default": 32
+    },
+    {
+      "type": "header",
+      "content": "Tamaños de texto de las tarjetas"
+    },
+    {
+      "type": "range",
+      "id": "name_size",
+      "label": "Nombre producto PC (px)",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "name_size_mobile",
+      "label": "Nombre producto móvil (px)",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "benefit_size",
+      "label": "Texto checks PC (px)",
+      "min": 11,
+      "max": 26,
+      "step": 1,
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "benefit_size_mobile",
+      "label": "Texto checks móvil (px)",
+      "min": 11,
+      "max": 22,
+      "step": 1,
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "atc_size",
+      "label": "Texto botón PC (px)",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "atc_size_mobile",
+      "label": "Texto botón móvil (px)",
+      "min": 12,
+      "max": 22,
+      "step": 1,
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "badge_size",
+      "label": "Texto etiqueta (px)",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "default": 13
     },
     {
       "type": "color",
