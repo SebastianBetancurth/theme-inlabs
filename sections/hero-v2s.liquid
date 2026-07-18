@@ -1,10 +1,17 @@
 {%- style -%}
+  @font-face {
+    font-family: 'thin2';
+    src: url('{{ 'lawrence-regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
   .hero-v2s-{{ section.id }} {
     position: relative;
     width: 100%;
     min-height: {{ section.settings.height_desktop }}vh;
     display: flex;
-    align-items: center;
+    align-items: {{ section.settings.content_position_vertical }};
     overflow: hidden;
     background-color: #0a0a0a;
   }
@@ -26,15 +33,30 @@
   .hero-v2s-{{ section.id }} .hero-v2s__media--mobile {
     display: none;
   }
-  .hero-v2s-{{ section.id }} .hero-v2s__content {
+  .hero-v2s-{{ section.id }} .hero-v2s__container {
     position: relative;
     z-index: 2;
+    width: 100%;
+    display: flex;
+    justify-content: {{ section.settings.content_position_desktop }};
+    padding: 6rem {{ section.settings.side_padding_desktop }}rem;
+  }
+  .hero-v2s-{{ section.id }} .hero-v2s__content {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    max-width: 62rem;
-    padding: 4rem 0 4rem 6.4rem;
+    max-width: {{ section.settings.content_max_width }}rem;
     color: {{ section.settings.text_color }};
+    {%- case section.settings.text_align_desktop -%}
+      {%- when 'left' -%}
+    align-items: flex-start;
+    text-align: left;
+      {%- when 'center' -%}
+    align-items: center;
+    text-align: center;
+      {%- when 'right' -%}
+    align-items: flex-end;
+    text-align: right;
+    {%- endcase -%}
   }
   .hero-v2s-{{ section.id }} .hero-v2s__rating {
     display: flex;
@@ -44,13 +66,13 @@
     margin-bottom: 1.6rem;
   }
   .hero-v2s-{{ section.id }} .hero-v2s__stars-svg {
-    width: 9rem;
+    width: {{ section.settings.rating_size | times: 6.5 | divided_by: 1.0 | round | divided_by: 10.0 }}rem;
     height: auto;
     color: {{ section.settings.text_color }};
     flex-shrink: 0;
   }
   .hero-v2s-{{ section.id }} .hero-v2s__rating-text {
-    font-size: 1.5rem;
+    font-size: {{ section.settings.rating_size }}px;
     line-height: 1.3;
   }
   .hero-v2s-{{ section.id }} .hero-v2s__heading {
@@ -58,7 +80,7 @@
     margin: 0 0 1.2rem;
     font-family: var(--font-heading-family);
     font-weight: 400;
-    font-size: 5.6rem;
+    font-size: {{ section.settings.heading_size }}px;
     line-height: 1.05;
     letter-spacing: -0.01em;
     color: {{ section.settings.text_color }};
@@ -67,7 +89,7 @@
     order: 3;
     margin: 0;
     max-width: 46rem;
-    font-size: 1.8rem;
+    font-size: {{ section.settings.subheading_size }}px;
     line-height: 1.4;
     color: {{ section.settings.text_color }};
   }
@@ -77,17 +99,23 @@
     align-items: center;
     justify-content: center;
     margin-top: 3.2rem;
-    padding: 1.5rem 3.6rem;
+    padding: {{ section.settings.button_padding_v }}px {{ section.settings.button_padding_h }}px;
     background-color: {{ section.settings.button_bg }};
     color: {{ section.settings.button_text_color }};
     border-radius: 100px;
-    font-size: 1.6rem;
+    font-size: {{ section.settings.button_size }}px;
     line-height: 1;
     text-decoration: none;
     transition: opacity 0.25s ease;
   }
   .hero-v2s-{{ section.id }} .hero-v2s__button:hover {
     opacity: 0.85;
+  }
+  .hero-v2s-{{ section.id }} .hero-v2s__rating-text,
+  .hero-v2s-{{ section.id }} .hero-v2s__heading,
+  .hero-v2s-{{ section.id }} .hero-v2s__subheading,
+  .hero-v2s-{{ section.id }} .hero-v2s__button {
+    font-family: 'thin2', sans-serif;
   }
   @media screen and (max-width: 749px) {
     .hero-v2s-{{ section.id }} {
@@ -108,12 +136,15 @@
     .hero-v2s-{{ section.id }} .hero-v2s__media::after {
       background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, {{ section.settings.overlay_opacity_mobile | divided_by: 100.0 }}) 100%);
     }
+    .hero-v2s-{{ section.id }} .hero-v2s__container {
+      justify-content: center;
+      padding: 0 2rem 4rem;
+    }
     .hero-v2s-{{ section.id }} .hero-v2s__content {
       align-items: center;
       text-align: center;
       max-width: 100%;
       width: 100%;
-      padding: 0 2rem 4rem;
     }
     .hero-v2s-{{ section.id }} .hero-v2s__rating {
       order: 3;
@@ -124,30 +155,23 @@
       width: 7.4rem;
     }
     .hero-v2s-{{ section.id }} .hero-v2s__rating-text {
-      font-size: 1.3rem;
+      font-size: 13px;
     }
     .hero-v2s-{{ section.id }} .hero-v2s__heading {
       order: 1;
-      font-size: 3.2rem;
+      font-size: {{ section.settings.heading_size_mobile }}px;
       margin-bottom: 1rem;
     }
     .hero-v2s-{{ section.id }} .hero-v2s__subheading {
       order: 2;
-      font-size: 1.5rem;
+      font-size: 15px;
       max-width: 34rem;
     }
     .hero-v2s-{{ section.id }} .hero-v2s__button {
       order: 4;
       margin-top: 2.6rem;
-      padding: 1.4rem 4rem;
+      padding: 14px 40px;
     }
-  }
-
-    .hero-v2s-{{ section.id }} .hero-v2s__rating-text,
-  .hero-v2s-{{ section.id }} .hero-v2s__heading,
-  .hero-v2s-{{ section.id }} .hero-v2s__subheading,
-  .hero-v2s-{{ section.id }} .hero-v2s__button {
-    font-family: 'thin2', sans-serif;
   }
 {%- endstyle -%}
 
@@ -172,28 +196,30 @@
       }}
     </div>
   {%- endif -%}
-  <div class="hero-v2s__content page-width">
-    {%- if section.settings.rating_text != blank -%}
-      <div class="hero-v2s__rating">
-        <svg class="hero-v2s__stars-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 16" fill="none" role="img" aria-hidden="true">
-          <path d="M8 0L9.79611 5.52786L15.6085 5.52786L10.9062 8.94427L12.7023 14.4721L8 11.0557L3.29772 14.4721L5.09383 8.94427L0.391548 5.52786L6.20389 5.52786L8 0Z" fill="currentColor"></path>
-          <path d="M23.7031 0L25.4322 5.52786L31.0277 5.52786L26.5009 8.94427L28.23 14.4721L23.7031 11.0557L19.1763 14.4721L20.9054 8.94427L16.3786 5.52786L21.974 5.52786L23.7031 0Z" fill="currentColor"></path>
-          <path d="M39.642 0L41.4918 5.52786L47.4776 5.52786L42.635 8.94427L44.4847 14.4721L39.642 11.0557L34.7994 14.4721L36.6491 8.94427L31.8065 5.52786L37.7923 5.52786L39.642 0Z" fill="currentColor"></path>
-          <path d="M55.5839 0L57.313 5.52786L62.9085 5.52786L58.3816 8.94427L60.1107 14.4721L55.5839 11.0557L51.0571 14.4721L52.7862 8.94427L48.2594 5.52786L53.8548 5.52786L55.5839 0Z" fill="currentColor"></path>
-          <path d="M71.284 0L73.0801 5.52786L78.8924 5.52786L74.1901 8.94427L75.9862 14.4721L71.284 11.0557L66.5817 14.4721L68.3778 8.94427L63.6755 5.52786L69.4879 5.52786L71.284 0Z" fill="currentColor"></path>
-        </svg>
-        <span class="hero-v2s__rating-text">{{ section.settings.rating_text }}</span>
-      </div>
-    {%- endif -%}
-    {%- if section.settings.heading != blank -%}
-      <h1 class="hero-v2s__heading">{{ section.settings.heading }}</h1>
-    {%- endif -%}
-    {%- if section.settings.subheading != blank -%}
-      <p class="hero-v2s__subheading">{{ section.settings.subheading }}</p>
-    {%- endif -%}
-    {%- if section.settings.button_label != blank -%}
-      <a href="{{ section.settings.button_link | default: '#' }}" class="hero-v2s__button">{{ section.settings.button_label | escape }}</a>
-    {%- endif -%}
+  <div class="hero-v2s__container">
+    <div class="hero-v2s__content">
+      {%- if section.settings.rating_text != blank -%}
+        <div class="hero-v2s__rating">
+          <svg class="hero-v2s__stars-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 16" fill="none" role="img" aria-hidden="true">
+            <path d="M8 0L9.79611 5.52786L15.6085 5.52786L10.9062 8.94427L12.7023 14.4721L8 11.0557L3.29772 14.4721L5.09383 8.94427L0.391548 5.52786L6.20389 5.52786L8 0Z" fill="currentColor"></path>
+            <path d="M23.7031 0L25.4322 5.52786L31.0277 5.52786L26.5009 8.94427L28.23 14.4721L23.7031 11.0557L19.1763 14.4721L20.9054 8.94427L16.3786 5.52786L21.974 5.52786L23.7031 0Z" fill="currentColor"></path>
+            <path d="M39.642 0L41.4918 5.52786L47.4776 5.52786L42.635 8.94427L44.4847 14.4721L39.642 11.0557L34.7994 14.4721L36.6491 8.94427L31.8065 5.52786L37.7923 5.52786L39.642 0Z" fill="currentColor"></path>
+            <path d="M55.5839 0L57.313 5.52786L62.9085 5.52786L58.3816 8.94427L60.1107 14.4721L55.5839 11.0557L51.0571 14.4721L52.7862 8.94427L48.2594 5.52786L53.8548 5.52786L55.5839 0Z" fill="currentColor"></path>
+            <path d="M71.284 0L73.0801 5.52786L78.8924 5.52786L74.1901 8.94427L75.9862 14.4721L71.284 11.0557L66.5817 14.4721L68.3778 8.94427L63.6755 5.52786L69.4879 5.52786L71.284 0Z" fill="currentColor"></path>
+          </svg>
+          <span class="hero-v2s__rating-text">{{ section.settings.rating_text }}</span>
+        </div>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h1 class="hero-v2s__heading">{{ section.settings.heading }}</h1>
+      {%- endif -%}
+      {%- if section.settings.subheading != blank -%}
+        <p class="hero-v2s__subheading">{{ section.settings.subheading }}</p>
+      {%- endif -%}
+      {%- if section.settings.button_label != blank -%}
+        <a href="{{ section.settings.button_link | default: '#' }}" class="hero-v2s__button">{{ section.settings.button_label | escape }}</a>
+      {%- endif -%}
+    </div>
   </div>
 </div>
 
@@ -203,6 +229,10 @@
   "tag": "section",
   "class": "section-hero-v2s",
   "settings": [
+    {
+      "type": "header",
+      "content": "Imágenes"
+    },
     {
       "type": "image_picker",
       "id": "image",
@@ -241,24 +271,6 @@
     },
     {
       "type": "range",
-      "id": "height_desktop",
-      "label": "Altura PC (vh)",
-      "min": 50,
-      "max": 100,
-      "step": 5,
-      "default": 95
-    },
-    {
-      "type": "range",
-      "id": "height_mobile",
-      "label": "Altura móvil (vh)",
-      "min": 50,
-      "max": 100,
-      "step": 5,
-      "default": 75
-    },
-    {
-      "type": "range",
       "id": "overlay_opacity",
       "label": "Oscurecer imagen PC (%)",
       "min": 0,
@@ -276,10 +288,100 @@
       "default": 60
     },
     {
+      "type": "header",
+      "content": "Posición del contenido (PC)"
+    },
+    {
+      "type": "select",
+      "id": "content_position_desktop",
+      "label": "Posición horizontal",
+      "options": [
+        { "value": "flex-start", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "flex-end", "label": "Derecha" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "select",
+      "id": "content_position_vertical",
+      "label": "Posición vertical",
+      "options": [
+        { "value": "flex-start", "label": "Arriba" },
+        { "value": "center", "label": "Centro" },
+        { "value": "flex-end", "label": "Abajo" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_align_desktop",
+      "label": "Alineación del texto",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "side_padding_desktop",
+      "label": "Margen lateral (rem)",
+      "min": 2,
+      "max": 16,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "label": "Ancho máximo del contenido (rem)",
+      "min": 40,
+      "max": 90,
+      "step": 2,
+      "default": 62
+    },
+    {
+      "type": "header",
+      "content": "Alturas"
+    },
+    {
+      "type": "range",
+      "id": "height_desktop",
+      "label": "Altura PC (vh)",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "default": 95
+    },
+    {
+      "type": "range",
+      "id": "height_mobile",
+      "label": "Altura móvil (vh)",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "default": 75
+    },
+    {
+      "type": "header",
+      "content": "Textos"
+    },
+    {
       "type": "text",
       "id": "rating_text",
       "label": "Texto de valoración",
       "default": "4.9/5 +100.000 clientes satisfechos"
+    },
+    {
+      "type": "range",
+      "id": "rating_size",
+      "label": "Tamaño valoración (px)",
+      "min": 11,
+      "max": 24,
+      "step": 1,
+      "default": 16
     },
     {
       "type": "text",
@@ -288,10 +390,41 @@
       "default": "Desbloquea tu potencial"
     },
     {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Tamaño título PC (px)",
+      "min": 30,
+      "max": 100,
+      "step": 2,
+      "default": 62
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Tamaño título móvil (px)",
+      "min": 22,
+      "max": 60,
+      "step": 2,
+      "default": 32
+    },
+    {
       "type": "textarea",
       "id": "subheading",
       "label": "Subtítulo",
       "default": "El sistema de suplementación diario con evidencia científica que potencia tu rendimiento"
+    },
+    {
+      "type": "range",
+      "id": "subheading_size",
+      "label": "Tamaño subtítulo PC (px)",
+      "min": 12,
+      "max": 30,
+      "step": 1,
+      "default": 19
+    },
+    {
+      "type": "header",
+      "content": "Botón"
     },
     {
       "type": "text",
@@ -303,6 +436,37 @@
       "type": "url",
       "id": "button_link",
       "label": "Enlace del botón"
+    },
+    {
+      "type": "range",
+      "id": "button_size",
+      "label": "Tamaño texto botón (px)",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "button_padding_v",
+      "label": "Alto del botón (px)",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "button_padding_h",
+      "label": "Ancho del botón (px)",
+      "min": 20,
+      "max": 80,
+      "step": 2,
+      "default": 44
+    },
+    {
+      "type": "header",
+      "content": "Colores"
     },
     {
       "type": "color",
