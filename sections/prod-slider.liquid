@@ -273,6 +273,9 @@
     .prod-slider-{{ section.id }} .prod-card__name .prod-card__name-part {
       display: block;
     }
+    .prod-slider-{{ section.id }} .prod-card__name .prod-card__name-part + .prod-card__name-part {
+      margin-top: 0.5rem;
+    }
     .prod-slider-{{ section.id }} .prod-slider__nav {
       display: none;
     }
@@ -332,8 +335,11 @@
               {%- endif -%}
             </div>
             <div class="prod-card__info">
+              {%- assign subtitle = product.metafields.custom.subtitulo | strip -%}
               <h3 class="prod-card__name">
-                {%- if title_parts.size > 1 -%}
+                {%- if subtitle != blank -%}
+                  <span class="prod-card__name-part">{{ product.title }}</span><span class="prod-card__name-sep">|</span><span class="prod-card__name-part">{{ subtitle }}</span>
+                {%- elsif title_parts.size > 1 -%}
                   <span class="prod-card__name-part">{{ title_parts[0] }}</span><span class="prod-card__name-sep">|</span><span class="prod-card__name-part">{{ title_parts[1] }}</span>
                 {%- else -%}
                   {{ product.title }}
