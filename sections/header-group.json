@@ -156,7 +156,7 @@
         "pill_active_bg": "#ffffff",
         "pill_active_text": "#0a0a0a",
         "font_size": 11,
-        "padding_top": 14,
+        "padding_top": 2,
         "padding_bottom": 14
       }
     }
