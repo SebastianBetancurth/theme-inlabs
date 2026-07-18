@@ -86,10 +86,84 @@
         "padding_top": 20,
         "padding_bottom": 20
       }
+    },
+    "pills_slider_mFmy4m": {
+      "type": "pills-slider",
+      "blocks": {
+        "pill_zCwTdi": {
+          "type": "pill",
+          "settings": {
+            "label": "MODO ZZEN",
+            "product": "",
+            "custom_link": ""
+          }
+        },
+        "pill_8A7LLX": {
+          "type": "pill",
+          "settings": {
+            "label": "FOCUS",
+            "product": "",
+            "custom_link": ""
+          }
+        },
+        "pill_rycf7x": {
+          "type": "pill",
+          "settings": {
+            "label": "CALM",
+            "product": "",
+            "custom_link": ""
+          }
+        },
+        "pill_7VLNae": {
+          "type": "pill",
+          "settings": {
+            "label": "SLEEP",
+            "product": "",
+            "custom_link": ""
+          }
+        },
+        "pill_nxx49B": {
+          "type": "pill",
+          "settings": {
+            "label": "MAGNESIUM 7+",
+            "product": "",
+            "custom_link": ""
+          }
+        },
+        "pill_Yxa6N3": {
+          "type": "pill",
+          "settings": {
+            "label": "OMEGA-3",
+            "product": "",
+            "custom_link": ""
+          }
+        }
+      },
+      "block_order": [
+        "pill_zCwTdi",
+        "pill_8A7LLX",
+        "pill_rycf7x",
+        "pill_7VLNae",
+        "pill_nxx49B",
+        "pill_Yxa6N3"
+      ],
+      "name": "Pills Slider",
+      "settings": {
+        "visibility": "mobile",
+        "bg_color": "#0a0a0a",
+        "pill_text_color": "#ffffff",
+        "pill_border_color": "#ffffff",
+        "pill_active_bg": "#ffffff",
+        "pill_active_text": "#0a0a0a",
+        "font_size": 12,
+        "padding_top": 14,
+        "padding_bottom": 14
+      }
     }
   },
   "order": [
     "scrolling_banner_fVENfU",
-    "header"
+    "header",
+    "pills_slider_mFmy4m"
   ]
 }
