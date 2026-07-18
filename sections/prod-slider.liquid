@@ -73,14 +73,21 @@
   }
   .prod-slider-{{ section.id }} .prod-card__image {
     position: relative;
-    aspect-ratio: 1 / 1;
+    width: 100%;
     overflow: hidden;
+    {%- if section.settings.image_ratio != 'adapt' -%}
+    aspect-ratio: {{ section.settings.image_ratio }};
+    {%- endif -%}
   }
   .prod-slider-{{ section.id }} .prod-card__image img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
     display: block;
+    {%- if section.settings.image_ratio == 'adapt' -%}
+    height: auto;
+    {%- else -%}
+    height: 100%;
+    object-fit: {{ section.settings.image_fit }};
+    {%- endif -%}
   }
   .prod-slider-{{ section.id }} .prod-card--soon .prod-card__image img {
     filter: blur(10px);
@@ -174,7 +181,7 @@
     height: 2px;
     background: #0a0a0a;
     width: 0;
-    transition: width 0.3s ease;
+    transition: width 0.15s linear;
   }
   .prod-slider-{{ section.id }} .prod-slider__nav {
     display: flex;
@@ -271,7 +278,7 @@
   }
 {%- endstyle -%}
 
-<div class="prod-slider-{{ section.id }}" id="ProdSlider-{{ section.id }}">
+<div class="prod-slider-{{ section.id }}" id="ProdSlider-{{ section.id }}" data-prod-slider>
   <div class="prod-slider__wrapper">
     {%- if section.settings.title != blank -%}
       <h2 class="prod-slider__title">{{ section.settings.title }}</h2>
@@ -291,21 +298,21 @@
           assign title_parts = product.title | split: ' | '
         -%}
         <div class="prod-card{% if is_soon %} prod-card--soon{% endif %}">
+          {%- assign show_badge = false -%}
           {%- if is_soon -%}
-            <span class="prod-card__badge">
-              <svg class="hide-desk" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9.4001 5.20001L6.1001 8.80001L4.6001 7.16365" stroke="#080808" stroke-width="0.8" stroke-linecap="square"></path>
-                <path d="M5.32114 12.1605C5.51779 12.1345 5.71644 12.1879 5.87309 12.3085L6.59503 12.8625C6.83368 13.0458 7.16565 13.0458 7.40363 12.8625L8.1529 12.2872C8.29289 12.1799 8.46954 12.1325 8.6442 12.1559L9.58145 12.2792C9.87943 12.3185 10.1667 12.1525 10.2821 11.8745L10.6427 11.0026C10.71 10.8392 10.8393 10.7099 11.0027 10.6426L11.8746 10.2819C12.1526 10.1672 12.3186 9.87925 12.2792 9.58126L12.1606 8.67795C12.1346 8.48129 12.1879 8.28263 12.3086 8.12597L12.8625 7.40399C13.0458 7.16533 13.0458 6.83334 12.8625 6.59534L12.2872 5.84603C12.1799 5.70604 12.1326 5.52937 12.1559 5.35471L12.2792 4.41741C12.3186 4.11941 12.1526 3.83209 11.8746 3.71676L11.0027 3.3561C10.8393 3.28877 10.71 3.15944 10.6427 2.99611L10.2821 2.12414C10.1674 1.84614 9.87943 1.68015 9.58145 1.71948L8.6442 1.84281C8.46954 1.86681 8.29289 1.81948 8.15357 1.71281L7.4043 1.1375C7.16565 0.954168 6.83368 0.954168 6.5957 1.1375L5.84643 1.71281C5.70644 1.81948 5.52979 1.86681 5.35514 1.84414L4.41788 1.72081C4.11991 1.68148 3.8326 1.84748 3.71727 2.12547L3.3573 2.99744C3.28931 3.16011 3.15999 3.28944 2.99733 3.35743L2.12541 3.71742C1.84743 3.83275 1.68144 4.12008 1.72077 4.41807L1.8441 5.35538C1.86676 5.53004 1.81943 5.7067 1.71277 5.84603L1.13749 6.59534C0.95417 6.834 0.95417 7.166 1.13749 7.40399L1.71277 8.1533C1.8201 8.2933 1.86743 8.46996 1.8441 8.64462L1.72077 9.58193C1.68144 9.87992 1.84743 10.1672 2.12541 10.2826L2.99733 10.6432C3.16065 10.7106 3.28998 10.8399 3.3573 11.0032L3.71794 11.8752C3.8326 12.1532 4.12057 12.3192 4.41855 12.2799L5.32114 12.1605Z" stroke="#080808" stroke-width="0.8" stroke-linecap="square"></path>
-              </svg>
-              {{ section.settings.soon_badge_text }}
-            </span>
+            {%- assign show_badge = true -%}
+            {%- assign badge_label = section.settings.soon_badge_text -%}
           {%- elsif badge_text != blank -%}
+            {%- assign show_badge = true -%}
+            {%- assign badge_label = badge_text -%}
+          {%- endif -%}
+          {%- if show_badge -%}
             <span class="prod-card__badge">
               <svg class="hide-desk" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M9.4001 5.20001L6.1001 8.80001L4.6001 7.16365" stroke="#080808" stroke-width="0.8" stroke-linecap="square"></path>
                 <path d="M5.32114 12.1605C5.51779 12.1345 5.71644 12.1879 5.87309 12.3085L6.59503 12.8625C6.83368 13.0458 7.16565 13.0458 7.40363 12.8625L8.1529 12.2872C8.29289 12.1799 8.46954 12.1325 8.6442 12.1559L9.58145 12.2792C9.87943 12.3185 10.1667 12.1525 10.2821 11.8745L10.6427 11.0026C10.71 10.8392 10.8393 10.7099 11.0027 10.6426L11.8746 10.2819C12.1526 10.1672 12.3186 9.87925 12.2792 9.58126L12.1606 8.67795C12.1346 8.48129 12.1879 8.28263 12.3086 8.12597L12.8625 7.40399C13.0458 7.16533 13.0458 6.83334 12.8625 6.59534L12.2872 5.84603C12.1799 5.70604 12.1326 5.52937 12.1559 5.35471L12.2792 4.41741C12.3186 4.11941 12.1526 3.83209 11.8746 3.71676L11.0027 3.3561C10.8393 3.28877 10.71 3.15944 10.6427 2.99611L10.2821 2.12414C10.1674 1.84614 9.87943 1.68015 9.58145 1.71948L8.6442 1.84281C8.46954 1.86681 8.29289 1.81948 8.15357 1.71281L7.4043 1.1375C7.16565 0.954168 6.83368 0.954168 6.5957 1.1375L5.84643 1.71281C5.70644 1.81948 5.52979 1.86681 5.35514 1.84414L4.41788 1.72081C4.11991 1.68148 3.8326 1.84748 3.71727 2.12547L3.3573 2.99744C3.28931 3.16011 3.15999 3.28944 2.99733 3.35743L2.12541 3.71742C1.84743 3.83275 1.68144 4.12008 1.72077 4.41807L1.8441 5.35538C1.86676 5.53004 1.81943 5.7067 1.71277 5.84603L1.13749 6.59534C0.95417 6.834 0.95417 7.166 1.13749 7.40399L1.71277 8.1533C1.8201 8.2933 1.86743 8.46996 1.8441 8.64462L1.72077 9.58193C1.68144 9.87992 1.84743 10.1672 2.12541 10.2826L2.99733 10.6432C3.16065 10.7106 3.28998 10.8399 3.3573 11.0032L3.71794 11.8752C3.8326 12.1532 4.12057 12.3192 4.41855 12.2799L5.32114 12.1605Z" stroke="#080808" stroke-width="0.8" stroke-linecap="square"></path>
               </svg>
-              {{ badge_text }}
+              {{ badge_label }}
             </span>
           {%- endif -%}
           <a href="{{ card_url }}" class="prod-card__link">
@@ -313,8 +320,8 @@
               {%- if product.featured_image != blank -%}
                 {{
                   product.featured_image
-                  | image_url: width: 900
-                  | image_tag: widths: '450, 600, 900', alt: product.featured_image.alt, loading: 'lazy'
+                  | image_url: width: 1200
+                  | image_tag: widths: '600, 900, 1200', sizes: '(max-width: 749px) 84vw, 33vw', alt: product.featured_image.alt, loading: 'lazy'
                 }}
               {%- else -%}
                 {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
@@ -333,8 +340,9 @@
                 <ul class="prod-card__benefits">
                   {%- for benefit in benefits limit: 3 -%}
                     <li class="prod-card__benefit">
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 11L11 3M11 3H4.5M11 3V9.5" stroke="#111111" stroke-width="1.2" stroke-linecap="square"></path>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M1 12.8213L12.2786 1.54272" stroke="#080808" stroke-width="1.5" stroke-linecap="round"></path>
+                        <path d="M12.3575 12.6636V1.46387H1" stroke="#080808" stroke-width="1.5" stroke-linecap="round"></path>
                       </svg>
                       {{ benefit }}
                     </li>
@@ -409,69 +417,104 @@
 
 <script>
   (function() {
-    var root = document.getElementById('ProdSlider-{{ section.id }}');
-    if (!root) return;
-    var track = root.querySelector('[data-slider-track]');
-    var progressBar = root.querySelector('[data-progress-bar]');
-    var prevBtn = root.querySelector('[data-slider-prev]');
-    var nextBtn = root.querySelector('[data-slider-next]');
+    function initProdSlider(root) {
+      if (!root || root.dataset.sliderInit === 'true') return;
+      root.dataset.sliderInit = 'true';
 
-    function cardStep() {
-      var card = track.querySelector('.prod-card');
-      if (!card) return 300;
-      var gap = parseFloat(getComputedStyle(track).gap) || 0;
-      return card.getBoundingClientRect().width + gap;
-    }
+      var track = root.querySelector('[data-slider-track]');
+      var progressBar = root.querySelector('[data-progress-bar]');
+      var prevBtn = root.querySelector('[data-slider-prev]');
+      var nextBtn = root.querySelector('[data-slider-next]');
+      if (!track) return;
 
-    function updateUI() {
-      var maxScroll = track.scrollWidth - track.clientWidth;
-      if (progressBar) {
-        var visible = track.scrollWidth > 0 ? (track.scrollLeft + track.clientWidth) / track.scrollWidth : 1;
-        progressBar.style.width = (visible * 100) + '%';
+      function cardStep() {
+        var card = track.querySelector('.prod-card');
+        if (!card) return 300;
+        var gap = parseFloat(getComputedStyle(track).gap) || 24;
+        return card.getBoundingClientRect().width + gap;
       }
-      if (prevBtn) prevBtn.classList.toggle('is-disabled', track.scrollLeft <= 5);
-      if (nextBtn) nextBtn.classList.toggle('is-disabled', track.scrollLeft >= maxScroll - 5);
+
+      var ticking = false;
+      function updateUI() {
+        var maxScroll = track.scrollWidth - track.clientWidth;
+        if (progressBar) {
+          var fraction = track.scrollWidth > 0 ? (track.scrollLeft + track.clientWidth) / track.scrollWidth : 1;
+          progressBar.style.width = Math.min(fraction * 100, 100) + '%';
+        }
+        if (prevBtn) prevBtn.classList.toggle('is-disabled', track.scrollLeft <= 5);
+        if (nextBtn) nextBtn.classList.toggle('is-disabled', maxScroll <= 5 || track.scrollLeft >= maxScroll - 5);
+        ticking = false;
+      }
+      function requestUpdate() {
+        if (!ticking) {
+          ticking = true;
+          window.requestAnimationFrame(updateUI);
+        }
+      }
+
+      if (prevBtn) prevBtn.addEventListener('click', function() { track.scrollBy({ left: -cardStep(), behavior: 'smooth' }); });
+      if (nextBtn) nextBtn.addEventListener('click', function() { track.scrollBy({ left: cardStep(), behavior: 'smooth' }); });
+      track.addEventListener('scroll', requestUpdate, { passive: true });
+      window.addEventListener('resize', requestUpdate);
+      if ('ResizeObserver' in window) {
+        new ResizeObserver(requestUpdate).observe(track);
+      }
+      track.querySelectorAll('img').forEach(function(img) {
+        if (!img.complete) img.addEventListener('load', requestUpdate, { once: true });
+      });
+      updateUI();
+
+      root.querySelectorAll('.prod-card__atc[data-variant-id]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (btn.classList.contains('is-adding')) return;
+          btn.classList.add('is-adding');
+
+          var cartDrawer = document.querySelector('cart-drawer');
+          var body = {
+            items: [{ id: parseInt(btn.dataset.variantId, 10), quantity: 1 }]
+          };
+          if (cartDrawer && typeof cartDrawer.getSectionsToRender === 'function') {
+            body.sections = cartDrawer.getSectionsToRender().map(function(s) { return s.id; });
+            body.sections_url = window.location.pathname;
+          }
+
+          fetch(window.Shopify.routes.root + 'cart/add.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(body)
+          })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+              if (data.status && data.status !== 200) throw new Error(data.description || 'Error');
+              if (cartDrawer && typeof cartDrawer.renderContents === 'function') {
+                cartDrawer.renderContents(data);
+              } else {
+                window.location.href = window.Shopify.routes.root + 'cart';
+              }
+            })
+            .catch(function(err) { console.error(err); })
+            .finally(function() { btn.classList.remove('is-adding'); });
+        });
+      });
     }
 
-    if (prevBtn) prevBtn.addEventListener('click', function() { track.scrollBy({ left: -cardStep(), behavior: 'smooth' }); });
-    if (nextBtn) nextBtn.addEventListener('click', function() { track.scrollBy({ left: cardStep(), behavior: 'smooth' }); });
-    track.addEventListener('scroll', updateUI, { passive: true });
-    window.addEventListener('resize', updateUI);
-    updateUI();
+    function boot() {
+      initProdSlider(document.getElementById('ProdSlider-{{ section.id }}'));
+    }
 
-    root.querySelectorAll('.prod-card__atc[data-variant-id]').forEach(function(btn) {
-      btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (btn.classList.contains('is-adding')) return;
-        btn.classList.add('is-adding');
-
-        var cartDrawer = document.querySelector('cart-drawer');
-        var body = {
-          items: [{ id: parseInt(btn.dataset.variantId, 10), quantity: 1 }]
-        };
-        if (cartDrawer && typeof cartDrawer.getSectionsToRender === 'function') {
-          body.sections = cartDrawer.getSectionsToRender().map(function(s) { return s.id; });
-          body.sections_url = window.location.pathname;
-        }
-
-        fetch(window.Shopify.routes.root + 'cart/add.js', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify(body)
-        })
-          .then(function(res) { return res.json(); })
-          .then(function(data) {
-            if (data.status && data.status !== 200) throw new Error(data.description || 'Error');
-            if (cartDrawer && typeof cartDrawer.renderContents === 'function') {
-              cartDrawer.renderContents(data);
-            } else {
-              window.location.href = window.Shopify.routes.root + 'cart';
-            }
-          })
-          .catch(function(err) { console.error(err); })
-          .finally(function() { btn.classList.remove('is-adding'); });
-      });
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', boot);
+    } else {
+      boot();
+    }
+    document.addEventListener('shopify:section:load', function(e) {
+      var el = e.target.querySelector('[data-prod-slider]');
+      if (el) {
+        el.dataset.sliderInit = 'false';
+        initProdSlider(el);
+      }
     });
   })();
 </script>
@@ -501,6 +544,28 @@
       "max": 12,
       "step": 1,
       "default": 8
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Formato de imagen",
+      "options": [
+        { "value": "adapt", "label": "Adaptar (imagen completa)" },
+        { "value": "1 / 1", "label": "Cuadrada" },
+        { "value": "4 / 5", "label": "Vertical 4:5" },
+        { "value": "3 / 4", "label": "Vertical 3:4" }
+      ],
+      "default": "adapt"
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "Ajuste de imagen (si no es Adaptar)",
+      "options": [
+        { "value": "cover", "label": "Rellenar (recorta)" },
+        { "value": "contain", "label": "Completa (sin recortar)" }
+      ],
+      "default": "cover"
     },
     {
       "type": "text",
