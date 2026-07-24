@@ -177,7 +177,7 @@
       ],
       "name": "Beneficios con imagen",
       "settings": {
-        "image_position": "left",
+        "image": "shopify://shop_images/Frame_1565_800x600_a9aea096-c189-41e3-a31f-72d424a4fee1.webp",
         "heading": "Potencia tu productividad",
         "intro": "<p>Una fórmula natural, equilibrada con ingredientes respaldados por la ciencia.</p>",
         "heading_size": 48,
@@ -188,7 +188,7 @@
         "intro_size_mobile": 16,
         "item_title_size_mobile": 18,
         "item_text_size_mobile": 14,
-        "bg_color": "#f6f5f3",
+        "bg_color": "#000000",
         "padding_top": 60,
         "padding_bottom": 60
       }
