@@ -10,7 +10,6 @@
     background-color: {{ section.settings.bg_color }};
     padding: {{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px;
     font-family: 'thin2', sans-serif;
-    color: #ffffff;
   }
   .benefits-{{ section.id }} .benefits__wrapper {
     max-width: 144rem;
@@ -23,31 +22,31 @@
     font-weight: 400;
     font-size: {{ section.settings.heading_size }}px;
     line-height: 1.05;
-    color: #ffffff;
+    color: {{ section.settings.heading_color }};
   }
   .benefits-{{ section.id }} .benefits__intro {
     margin: 0 0 4rem;
     font-size: {{ section.settings.intro_size }}px;
     line-height: 1.45;
-    color: rgba(255, 255, 255, 0.92);
+    color: {{ section.settings.intro_color }};
     max-width: 72rem;
   }
   .benefits-{{ section.id }} .benefits__intro p {
     margin: 0;
   }
-  .benefits-{{ section.id }} .benefits__header--mobile {
-    display: none;
-  }
   .benefits-{{ section.id }} .benefits__layout {
     display: flex;
-    gap: 1.2rem;
+    gap: {{ section.settings.grid_gap }}px;
     align-items: stretch;
+    {%- if section.settings.image_position == 'right' -%}
+    flex-direction: row-reverse;
+    {%- endif -%}
   }
   .benefits-{{ section.id }} .benefits__media {
-    flex: 0 0 42%;
+    flex: 0 0 {{ section.settings.image_width }}%;
     min-width: 0;
     position: relative;
-    border-radius: 0.6rem;
+    border-radius: {{ section.settings.image_radius }}px;
     overflow: hidden;
   }
   .benefits-{{ section.id }} .benefits__media img {
@@ -55,6 +54,9 @@
     height: 100%;
     object-fit: cover;
     display: block;
+  }
+  .benefits-{{ section.id }} .benefits__img--mobile {
+    display: none;
   }
   .benefits-{{ section.id }} .benefits__media-overlay {
     display: none;
@@ -64,11 +66,12 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-auto-rows: 1fr;
-    gap: 1.2rem;
+    gap: {{ section.settings.grid_gap }}px;
     min-width: 0;
   }
   .benefits-{{ section.id }} .benefit-card {
-    background: #131313;
+    background: {{ section.settings.card_bg_color }};
+    border-radius: {{ section.settings.card_radius }}px;
     padding: 2.4rem 2.4rem 2.8rem;
     display: flex;
     flex-direction: column;
@@ -92,14 +95,17 @@
   .benefits-{{ section.id }} .benefit-card__title {
     margin: 0 0 1.4rem;
     font-size: {{ section.settings.item_title_size }}px;
-    font-weight: 700;
+    font-weight: {% if section.settings.item_title_bold %}700{% else %}400{% endif %};
     line-height: 1.25;
-    color: #ffffff;
+    color: {{ section.settings.card_title_color }};
   }
   .benefits-{{ section.id }} .benefit-card__arrow {
     flex-shrink: 0;
     margin-top: 0.3em;
     transition: transform 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .benefits-{{ section.id }} .benefit-card__arrow path {
+    stroke: {{ section.settings.arrow_color }};
   }
   .benefits-{{ section.id }} .benefit-card__body-inner {
     overflow: hidden;
@@ -108,14 +114,14 @@
     margin: 0;
     font-size: {{ section.settings.item_text_size }}px;
     line-height: 1.55;
-    color: rgba(255, 255, 255, 0.85);
+    color: {{ section.settings.card_text_color }};
   }
   .benefits-{{ section.id }} .benefit-card__text p {
     margin: 0;
   }
   .benefits-{{ section.id }} .benefit-card__text b,
   .benefits-{{ section.id }} .benefit-card__text strong {
-    color: #ffffff;
+    color: {{ section.settings.card_text_bold_color }};
   }
   @media screen and (min-width: 750px) {
     .benefits-{{ section.id }} .benefit-card__body {
@@ -144,16 +150,24 @@
     }
     .benefits-{{ section.id }} .benefits__media {
       flex: 1 1 auto;
-      border-radius: 1.2rem;
-      aspect-ratio: 380 / 300;
+      border-radius: {{ section.settings.image_radius_mobile }}px;
+      aspect-ratio: 380 / {{ section.settings.image_height_mobile }};
     }
+    {%- if section.settings.image_mobile != blank -%}
+    .benefits-{{ section.id }} .benefits__img--desktop {
+      display: none;
+    }
+    .benefits-{{ section.id }} .benefits__img--mobile {
+      display: block;
+    }
+    {%- endif -%}
     .benefits-{{ section.id }} .benefits__media-overlay {
       display: block;
       position: absolute;
       inset: 0;
       z-index: 1;
       padding: 2rem 1.8rem;
-      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.42) 45%, rgba(0, 0, 0, 0) 75%);
+      background: linear-gradient(to bottom, {{ section.settings.overlay_color }} 0%, {{ section.settings.overlay_color | color_modify: 'alpha', 0.45 }} 45%, transparent 75%);
     }
     .benefits-{{ section.id }} .benefits__media-overlay .benefits__heading {
       font-size: {{ section.settings.heading_size_mobile }}px;
@@ -169,7 +183,7 @@
       gap: 1rem;
     }
     .benefits-{{ section.id }} .benefit-card {
-      border-radius: 0.8rem;
+      border-radius: {{ section.settings.card_radius_mobile }}px;
       padding: 0;
     }
     .benefits-{{ section.id }} .benefit-card__head {
@@ -234,10 +248,17 @@
           {{
             section.settings.image
             | image_url: width: 1400
-            | image_tag: widths: '600, 900, 1400', sizes: '(max-width: 749px) 100vw, 42vw', loading: 'lazy'
+            | image_tag: widths: '600, 900, 1400', sizes: '(max-width: 749px) 100vw, 42vw', loading: 'lazy', class: 'benefits__img--desktop'
           }}
         {%- else -%}
           {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+        {%- endif -%}
+        {%- if section.settings.image_mobile != blank -%}
+          {{
+            section.settings.image_mobile
+            | image_url: width: 900
+            | image_tag: widths: '400, 600, 900', sizes: '100vw', loading: 'lazy', class: 'benefits__img--mobile'
+          }}
         {%- endif -%}
       </div>
       <div class="benefits__grid">
@@ -246,8 +267,8 @@
             <button type="button" class="benefit-card__head" data-benefit-toggle aria-expanded="false">
               <h3 class="benefit-card__title">{{ block.settings.title }}</h3>
               <svg class="benefit-card__arrow" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 14 14" fill="none">
-                <path d="M1 12.8213L12.2786 1.54272" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"></path>
-                <path d="M12.3575 12.6636V1.46387H1" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"></path>
+                <path d="M1 12.8213L12.2786 1.54272" stroke-width="1.5" stroke-linecap="round"></path>
+                <path d="M12.3575 12.6636V1.46387H1" stroke-width="1.5" stroke-linecap="round"></path>
               </svg>
             </button>
             <div class="benefit-card__body">
@@ -312,9 +333,52 @@
   "class": "section-benefits-image",
   "settings": [
     {
+      "type": "header",
+      "content": "Imágenes"
+    },
+    {
       "type": "image_picker",
       "id": "image",
-      "label": "Imagen"
+      "label": "Imagen PC"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Imagen móvil",
+      "info": "Si se deja vacía, se usa la de PC."
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Posición de la imagen (PC)",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "image_width",
+      "label": "Ancho de imagen PC (%)",
+      "min": 30,
+      "max": 55,
+      "step": 1,
+      "default": 42
+    },
+    {
+      "type": "range",
+      "id": "image_height_mobile",
+      "label": "Altura de imagen móvil",
+      "min": 200,
+      "max": 480,
+      "step": 10,
+      "default": 300,
+      "info": "Proporción respecto al ancho de pantalla."
+    },
+    {
+      "type": "header",
+      "content": "Textos"
     },
     {
       "type": "text",
@@ -410,13 +474,117 @@
     },
     {
       "type": "header",
-      "content": "Estilo"
+      "content": "Colores"
     },
     {
       "type": "color",
       "id": "bg_color",
-      "label": "Color de fondo",
+      "label": "Fondo de la sección",
       "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color del título",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "intro_color",
+      "label": "Color del texto intro",
+      "default": "#ebebeb"
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Fondo de tarjetas",
+      "default": "#131313"
+    },
+    {
+      "type": "color",
+      "id": "card_title_color",
+      "label": "Título de tarjetas",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "card_text_color",
+      "label": "Texto de tarjetas",
+      "default": "#d9d9d9"
+    },
+    {
+      "type": "color",
+      "id": "card_text_bold_color",
+      "label": "Negritas de tarjetas",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "arrow_color",
+      "label": "Color de las flechas",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Degradado sobre imagen (móvil)",
+      "default": "#000000",
+      "info": "Se aplica de arriba hacia abajo detrás del título."
+    },
+    {
+      "type": "header",
+      "content": "Estilo"
+    },
+    {
+      "type": "checkbox",
+      "id": "item_title_bold",
+      "label": "Títulos de tarjeta en negrita",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "label": "Separación entre tarjetas PC (px)",
+      "min": 4,
+      "max": 32,
+      "step": 2,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Redondeo tarjetas PC (px)",
+      "min": 0,
+      "max": 24,
+      "step": 2,
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "card_radius_mobile",
+      "label": "Redondeo tarjetas móvil (px)",
+      "min": 0,
+      "max": 24,
+      "step": 2,
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "image_radius",
+      "label": "Redondeo imagen PC (px)",
+      "min": 0,
+      "max": 24,
+      "step": 2,
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "image_radius_mobile",
+      "label": "Redondeo imagen móvil (px)",
+      "min": 0,
+      "max": 24,
+      "step": 2,
+      "default": 12
     },
     {
       "type": "range",
