@@ -136,12 +136,69 @@
         "padding_top": 60,
         "padding_bottom": 60
       }
+    },
+    "beneficios_imagen_JHVhYw": {
+      "type": "beneficios-imagen",
+      "blocks": {
+        "benefit_DyLXRg": {
+          "type": "benefit",
+          "settings": {
+            "title": "Título del beneficio",
+            "text": "<p>Descripción corta del beneficio.</p>"
+          }
+        },
+        "benefit_3tyQfF": {
+          "type": "benefit",
+          "settings": {
+            "title": "Título del beneficio",
+            "text": "<p>Descripción corta del beneficio.</p>"
+          }
+        },
+        "benefit_TanQbK": {
+          "type": "benefit",
+          "settings": {
+            "title": "Título del beneficio",
+            "text": "<p>Descripción corta del beneficio.</p>"
+          }
+        },
+        "benefit_KWXhAg": {
+          "type": "benefit",
+          "settings": {
+            "title": "Título del beneficio",
+            "text": "<p>Descripción corta del beneficio.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "benefit_DyLXRg",
+        "benefit_3tyQfF",
+        "benefit_TanQbK",
+        "benefit_KWXhAg"
+      ],
+      "name": "Beneficios con imagen",
+      "settings": {
+        "image_position": "left",
+        "heading": "Potencia tu productividad",
+        "intro": "<p>Una fórmula natural, equilibrada con ingredientes respaldados por la ciencia.</p>",
+        "heading_size": 48,
+        "intro_size": 18,
+        "item_title_size": 20,
+        "item_text_size": 15,
+        "heading_size_mobile": 30,
+        "intro_size_mobile": 16,
+        "item_title_size_mobile": 18,
+        "item_text_size_mobile": 14,
+        "bg_color": "#f6f5f3",
+        "padding_top": 60,
+        "padding_bottom": 60
+      }
     }
   },
   "order": [
     "hero_v2s_zA7pyF",
     "logo_bar_grKLiT",
     "prod_slider_i9AiYx",
-    "prod_slider_yYbVex"
+    "prod_slider_yYbVex",
+    "beneficios_imagen_JHVhYw"
   ]
 }
