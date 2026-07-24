@@ -1,3 +1,21 @@
+{%- liquid
+  case section.settings.heading_font_mode
+    when 'theme'
+      assign heading_font_stack = 'var(--font-heading-family)'
+    when 'custom'
+      assign heading_font_stack = "'thin2', sans-serif"
+    else
+      assign heading_font_stack = section.settings.heading_font.family | append: ', ' | append: section.settings.heading_font.fallback_families
+  endcase
+  case section.settings.text_font_mode
+    when 'theme'
+      assign text_font_stack = 'var(--font-body-family)'
+    when 'custom'
+      assign text_font_stack = "'thin2', sans-serif"
+    else
+      assign text_font_stack = section.settings.text_font.family | append: ', ' | append: section.settings.text_font.fallback_families
+  endcase
+-%}
 {%- style -%}
   @font-face {
     font-family: 'thin2';
@@ -6,10 +24,16 @@
     font-style: normal;
     font-display: swap;
   }
+  {%- if section.settings.heading_font_mode == 'picker' -%}
+    {{ section.settings.heading_font | font_face: font_display: 'swap' }}
+  {%- endif -%}
+  {%- if section.settings.text_font_mode == 'picker' -%}
+    {{ section.settings.text_font | font_face: font_display: 'swap' }}
+  {%- endif -%}
   .benefits-{{ section.id }} {
     background-color: {{ section.settings.bg_color }};
     padding: {{ section.settings.padding_top }}px 0 {{ section.settings.padding_bottom }}px;
-    font-family: 'thin2', sans-serif;
+    font-family: {{ text_font_stack }};
   }
   .benefits-{{ section.id }} .benefits__wrapper {
     max-width: 144rem;
@@ -18,8 +42,8 @@
   }
   .benefits-{{ section.id }} .benefits__heading {
     margin: 0 0 0.8rem;
-    font-family: var(--font-heading-family);
-    font-weight: 400;
+    font-family: {{ heading_font_stack }};
+    font-weight: {% if section.settings.heading_font_mode == 'picker' %}{{ section.settings.heading_font.weight }}{% else %}400{% endif %};
     font-size: {{ section.settings.heading_size }}px;
     line-height: 1.05;
     color: {{ section.settings.heading_color }};
@@ -377,6 +401,46 @@
       "step": 10,
       "default": 300,
       "info": "Proporción respecto al ancho de pantalla."
+    },
+    {
+      "type": "header",
+      "content": "Fuentes"
+    },
+    {
+      "type": "select",
+      "id": "heading_font_mode",
+      "label": "Fuente del título",
+      "options": [
+        { "value": "theme", "label": "Fuente del tema (títulos)" },
+        { "value": "custom", "label": "Fuente personalizada (thin2)" },
+        { "value": "picker", "label": "Elegir de la lista" }
+      ],
+      "default": "theme"
+    },
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "Título — fuente de la lista",
+      "default": "helvetica_n4",
+      "info": "Solo aplica si elegiste 'Elegir de la lista'."
+    },
+    {
+      "type": "select",
+      "id": "text_font_mode",
+      "label": "Fuente de los textos",
+      "options": [
+        { "value": "theme", "label": "Fuente del tema (cuerpo)" },
+        { "value": "custom", "label": "Fuente personalizada (thin2)" },
+        { "value": "picker", "label": "Elegir de la lista" }
+      ],
+      "default": "custom"
+    },
+    {
+      "type": "font_picker",
+      "id": "text_font",
+      "label": "Textos — fuente de la lista",
+      "default": "helvetica_n4",
+      "info": "Solo aplica si elegiste 'Elegir de la lista'."
     },
     {
       "type": "header",
