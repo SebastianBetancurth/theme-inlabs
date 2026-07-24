@@ -483,7 +483,7 @@
       });
       updateUI();
 
-      root.querySelectorAll('.prod-card__atc[data-variant-id]').forEach(function(btn) {
+    root.querySelectorAll('.prod-card__atc[data-variant-id]').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
           e.preventDefault();
           e.stopPropagation();
@@ -491,26 +491,71 @@
           btn.classList.add('is-adding');
 
           var cartDrawer = document.querySelector('cart-drawer');
-          var body = {
-            items: [{ id: parseInt(btn.dataset.variantId, 10), quantity: 1 }]
-          };
+          var sectionIds = ['cart-drawer', 'cart-icon-bubble'];
           if (cartDrawer && typeof cartDrawer.getSectionsToRender === 'function') {
-            body.sections = cartDrawer.getSectionsToRender().map(function(s) { return s.id; });
-            body.sections_url = window.location.pathname;
+            sectionIds = cartDrawer.getSectionsToRender().map(function(s) { return s.id; });
           }
 
           fetch(window.Shopify.routes.root + 'cart/add.js', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify(body)
+            body: JSON.stringify({
+              items: [{ id: parseInt(btn.dataset.variantId, 10), quantity: 1 }],
+              sections: sectionIds,
+              sections_url: window.location.pathname
+            })
           })
             .then(function(res) { return res.json(); })
             .then(function(data) {
               if (data.status && data.status !== 200) throw new Error(data.description || 'Error');
-              if (cartDrawer && typeof cartDrawer.renderContents === 'function') {
-                cartDrawer.renderContents(data);
-              } else {
+
+              if (!cartDrawer || !data.sections) {
                 window.location.href = window.Shopify.routes.root + 'cart';
+                return;
+              }
+
+              // 1. Pintar el contenido del drawer
+              var drawerHTML = data.sections['cart-drawer'] || data.sections[sectionIds[0]];
+              if (drawerHTML) {
+                var doc = new DOMParser().parseFromString(drawerHTML, 'text/html');
+                var source = doc.querySelector('#CartDrawer');
+                var target = document.querySelector('#CartDrawer');
+                if (source && target) target.innerHTML = source.innerHTML;
+              }
+
+              // 2. Actualizar el contador del header
+              var bubbleHTML = data.sections['cart-icon-bubble'];
+              var bubbleTarget = document.getElementById('cart-icon-bubble');
+              if (bubbleHTML && bubbleTarget) {
+                var bDoc = new DOMParser().parseFromString(bubbleHTML, 'text/html');
+                var bSrc = bDoc.querySelector('.shopify-section') || bDoc.body;
+                bubbleTarget.innerHTML = bSrc.innerHTML;
+              }
+
+              // 3. Sacar is-empty (esto es lo que dejaba el panel en blanco)
+              cartDrawer.classList.remove('is-empty');
+              var inner = cartDrawer.querySelector('.drawer__inner');
+              if (inner) inner.classList.remove('is-empty');
+
+              // 4. Reenganchar el overlay y abrir
+              var overlay = cartDrawer.querySelector('#CartDrawer-Overlay');
+              if (overlay && typeof cartDrawer.close === 'function') {
+                overlay.addEventListener('click', cartDrawer.close.bind(cartDrawer));
+              }
+
+              // 5. Avisar al resto del tema que el carrito cambió
+              if (typeof window.publish === 'function' && window.PUB_SUB_EVENTS) {
+                window.publish(window.PUB_SUB_EVENTS.cartUpdate, {
+                  source: 'prod-slider',
+                  cartData: data
+                });
+              }
+
+              if (typeof cartDrawer.open === 'function') {
+                cartDrawer.open(btn);
+              } else {
+                cartDrawer.classList.add('animate', 'active');
+                document.body.classList.add('overflow-hidden');
               }
             })
             .catch(function(err) { console.error(err); })
