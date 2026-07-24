@@ -89,6 +89,31 @@
     object-fit: {{ section.settings.image_fit }};
     {%- endif -%}
   }
+  .prod-slider-{{ section.id }} .prod-card__image--has-hover {
+    {%- if section.settings.image_ratio == 'adapt' -%}
+    display: grid;
+    {%- endif -%}
+  }
+  .prod-slider-{{ section.id }} .prod-card__image--has-hover .prod-card__img {
+    {%- if section.settings.image_ratio == 'adapt' -%}
+    grid-area: 1 / 1;
+    {%- else -%}
+    position: absolute;
+    inset: 0;
+    {%- endif -%}
+    transition: opacity 0.4s ease;
+  }
+  .prod-slider-{{ section.id }} .prod-card__img--hover {
+    opacity: 0;
+  }
+  @media (hover: hover) {
+    .prod-slider-{{ section.id }} .prod-card:hover .prod-card__img--hover {
+      opacity: 1;
+    }
+    .prod-slider-{{ section.id }} .prod-card:hover .prod-card__image--has-hover .prod-card__img--main {
+      opacity: 0;
+    }
+  }
   .prod-slider-{{ section.id }} .prod-card--soon .prod-card__image img {
     filter: blur(10px);
     transform: scale(1.08);
@@ -336,13 +361,26 @@
             </span>
           {%- endif -%}
           <a href="{{ card_url }}" class="prod-card__link">
-            <div class="prod-card__image">
+            {%- liquid
+              assign hover_image = blank
+              if product.media.size > 1 and product.media[1].media_type == 'image'
+                assign hover_image = product.media[1].preview_image
+              endif
+            -%}
+            <div class="prod-card__image{% if hover_image != blank %} prod-card__image--has-hover{% endif %}">
               {%- if product.featured_image != blank -%}
                 {{
                   product.featured_image
                   | image_url: width: 1200
-                  | image_tag: widths: '600, 900, 1200', sizes: '(max-width: 749px) 84vw, 33vw', alt: product.featured_image.alt, loading: 'lazy'
+                  | image_tag: widths: '600, 900, 1200', sizes: '(max-width: 749px) 84vw, 33vw', alt: product.featured_image.alt, loading: 'lazy', class: 'prod-card__img prod-card__img--main'
                 }}
+                {%- if hover_image != blank -%}
+                  {{
+                    hover_image
+                    | image_url: width: 1200
+                    | image_tag: widths: '600, 900, 1200', sizes: '(max-width: 749px) 84vw, 33vw', alt: hover_image.alt, loading: 'lazy', class: 'prod-card__img prod-card__img--hover'
+                  }}
+                {%- endif -%}
               {%- else -%}
                 {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
               {%- endif -%}
