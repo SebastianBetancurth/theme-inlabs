@@ -43,6 +43,7 @@
   .benefits-{{ section.id }} .benefits__heading {
     margin: 0 0 0.8rem;
     font-family: {{ heading_font_stack }};
+    letter-spacing: -1.32px;
     font-weight: {% if section.settings.heading_font_mode == 'picker' %}{{ section.settings.heading_font.weight }}{% else %}400{% endif %};
     font-size: {{ section.settings.heading_size }}px;
     line-height: 1.05;
