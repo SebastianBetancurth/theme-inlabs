@@ -104,8 +104,9 @@
     margin-bottom: 2rem;
     padding-bottom: 1rem;
   }
-  /* Scrollbar fina y redondeada, igual a la del carrusel.
-     Solo aparece cuando hay más tabs de las que entran en el ancho. */
+  /* Scrollbar fina y redondeada, oculta por defecto.
+     Aparece solo mientras se desliza (clase .is-scrolling via JS).
+     La altura queda reservada para que no salte el layout. */
   #shopify-section-{{ sid }} .zi-tabs::-webkit-scrollbar {
     height: 5px;
   }
@@ -115,20 +116,26 @@
     height: 0;
   }
   #shopify-section-{{ sid }} .zi-tabs::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, .07);
+    background: transparent;
     border-radius: 100px;
   }
   #shopify-section-{{ sid }} .zi-tabs::-webkit-scrollbar-thumb {
-    background: #9c9c9c;
+    background: transparent;
     border-radius: 100px;
   }
-  #shopify-section-{{ sid }} .zi-tabs::-webkit-scrollbar-thumb:hover {
-    background: #7d7d7d;
+  #shopify-section-{{ sid }} .zi-tabs.is-scrolling::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, .07);
+  }
+  #shopify-section-{{ sid }} .zi-tabs.is-scrolling::-webkit-scrollbar-thumb {
+    background: #9c9c9c;
   }
   /* Fallback SOLO para Firefox */
   @supports not selector(::-webkit-scrollbar) {
     #shopify-section-{{ sid }} .zi-tabs {
       scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+    }
+    #shopify-section-{{ sid }} .zi-tabs.is-scrolling {
       scrollbar-color: #9c9c9c rgba(0, 0, 0, .07);
     }
   }
@@ -179,7 +186,8 @@
     {% endunless %}
   }
   {% if section.settings.show_scrollbar %}
-    /* Scrollbar fina y redondeada (Chrome / Edge / Safari).
+    /* Scrollbar fina y redondeada, oculta por defecto.
+       Aparece solo mientras se desliza (clase .is-scrolling via JS).
        IMPORTANTE: no usar scrollbar-width / scrollbar-color acá,
        porque Chrome 121+ ignora ::-webkit-scrollbar si están
        presentes y muestra su barra básica con flechas. */
@@ -192,21 +200,27 @@
       height: 0;
     }
     #shopify-section-{{ sid }} .zi-slider::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, .07);
+      background: transparent;
       border-radius: 100px;
       margin: 0 3rem;
     }
     #shopify-section-{{ sid }} .zi-slider::-webkit-scrollbar-thumb {
-      background: #9c9c9c;
+      background: transparent;
       border-radius: 100px;
     }
-    #shopify-section-{{ sid }} .zi-slider::-webkit-scrollbar-thumb:hover {
-      background: #7d7d7d;
+    #shopify-section-{{ sid }} .zi-slider.is-scrolling::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, .07);
+    }
+    #shopify-section-{{ sid }} .zi-slider.is-scrolling::-webkit-scrollbar-thumb {
+      background: #9c9c9c;
     }
     /* Fallback SOLO para Firefox (no soporta ::-webkit-scrollbar) */
     @supports not selector(::-webkit-scrollbar) {
       #shopify-section-{{ sid }} .zi-slider {
         scrollbar-width: thin;
+        scrollbar-color: transparent transparent;
+      }
+      #shopify-section-{{ sid }} .zi-slider.is-scrolling {
         scrollbar-color: #9c9c9c rgba(0, 0, 0, .07);
       }
     }
@@ -536,6 +550,24 @@
           this.tabs = Array.from(this.querySelectorAll('.zi-tab'));
           this.panels = Array.from(this.querySelectorAll('.zi-panel'));
           this.modal = this.querySelector('dialog.zi-modal');
+
+          /* Scrollbar que aparece solo al deslizar: agrega .is-scrolling
+             mientras hay scroll y la quita tras 900ms de inactividad. */
+          const attachScrollFade = (el) => {
+            let timer;
+            el.addEventListener(
+              'scroll',
+              () => {
+                el.classList.add('is-scrolling');
+                clearTimeout(timer);
+                timer = setTimeout(() => el.classList.remove('is-scrolling'), 900);
+              },
+              { passive: true }
+            );
+          };
+          const tabsRow = this.querySelector('.zi-tabs');
+          if (tabsRow) attachScrollFade(tabsRow);
+          this.querySelectorAll('.zi-slider').forEach(attachScrollFade);
 
           /* Tabs */
           this.tabs.forEach((tab) => {
