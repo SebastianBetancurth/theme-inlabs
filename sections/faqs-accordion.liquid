@@ -1,567 +1,767 @@
+{% comment %}theme-check-disable UndefinedObject{% endcomment %}
+{{ 'section-footer.css' | asset_url | stylesheet_tag }}
+{{ 'component-newsletter.css' | asset_url | stylesheet_tag }}
+{{ 'component-list-menu.css' | asset_url | stylesheet_tag }}
+{{ 'component-list-payment.css' | asset_url | stylesheet_tag }}
+{{ 'component-list-social.css' | asset_url | stylesheet_tag }}
+
 {% comment %}
   ============================================================
-  SECCIÓN: FAQs con acordeón animado
-  Theme: Dawn (compatible con cualquier theme OS 2.0)
-  Archivo: sections/faqs-accordion.liquid
+  FOOTER personalizado (basado en el footer de Dawn)
   ------------------------------------------------------------
-  - Título grande (ej: "FAQs") + subtítulo con enlace opcional.
-  - Cada pregunta es un bloque: pregunta + respuesta (richtext).
-  - Acordeón con apertura/cierre ANIMADO suave (técnica de
-    grid-template-rows 0fr -> 1fr, sin max-height hardcodeado).
-  - Chevron que rota al abrir.
-  - Opción "solo una abierta a la vez".
-  - Líneas divisorias finas entre preguntas.
-  - Todo editable: colores, textos, tamaños, paddings y
-    márgenes separados escritorio/móvil.
+  Layout desktop:
+  - Logo arriba a la izquierda.
+  - Grilla: columna de newsletter (título serif + input pill)
+    a la izquierda + una columna por cada bloque (texto/menú).
+  - Botón "Seguir en shop" debajo de la última columna.
+  - Fila: redes sociales (izq) / selector de país e idioma (der).
+  - Fila: copyright + políticas en línea (izq) / pagos (der).
+  - Imagen de sellos/certificaciones opcional abajo a la derecha.
+  Mobile: todo apilado en el mismo orden de la referencia.
   ============================================================
 {% endcomment %}
 
 {%- liquid
   assign sid = section.id
+  assign bcols = section.blocks.size
+  if bcols < 1
+    assign bcols = 1
+  endif
+  assign follow_col = bcols | plus: 1
 -%}
 
 {%- style -%}
-  #shopify-section-{{ sid }} .zf-section {
+  .footer {
+    margin-top: {{ section.settings.margin_top | times: 0.75 | round: 0 }}px;
+  }
+
+  .section-{{ sid }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .footer {
+      margin-top: {{ section.settings.margin_top }}px;
+    }
+
+    .section-{{ sid }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  /* ============ LOGO ============ */
+  #shopify-section-{{ sid }} .zf-logo {
     display: block;
-    --zf-bg: {{ section.settings.color_bg }};
-    --zf-heading: {{ section.settings.color_heading }};
-    --zf-subtext: {{ section.settings.color_subtext }};
-    --zf-question: {{ section.settings.color_question }};
-    --zf-answer: {{ section.settings.color_answer }};
-    --zf-line: {{ section.settings.color_line }};
-    --zf-chevron: {{ section.settings.color_chevron }};
-    --zf-heading-size: {{ section.settings.heading_size }}px;
-    --zf-heading-size-mobile: {{ section.settings.heading_size_mobile }}px;
-    --zf-question-size: {{ section.settings.question_size }}px;
-    --zf-question-size-mobile: {{ section.settings.question_size_mobile }}px;
-    --zf-max-width: {{ section.settings.max_width }}px;
-    padding-top: {{ section.settings.padding_top }}px;
-    padding-bottom: {{ section.settings.padding_bottom }}px;
-    margin-top: {{ section.settings.margin_top }}px;
-    margin-bottom: {{ section.settings.margin_bottom }}px;
-    background: var(--zf-bg);
-    font-family: 'Helvetica neue';
+    margin: 0 0 5rem;
+  }
+  #shopify-section-{{ sid }} .zf-logo img {
+    display: block;
+    height: auto;
   }
 
-  #shopify-section-{{ sid }} .zf-wrapper {
-    max-width: var(--zf-max-width);
-    margin: 0 auto;
-    padding: 0 {{ section.settings.padding_x }}px;
+  /* ============ GRILLA PRINCIPAL ============ */
+  #shopify-section-{{ sid }} .zf-grid {
+    display: grid;
+    grid-template-columns: minmax(26rem, 1.15fr) repeat({{ bcols }}, minmax(0, 1fr));
+    column-gap: 5rem;
+    row-gap: 3rem;
+    align-items: start;
   }
 
-  /* ============ ENCABEZADO ============ */
-  #shopify-section-{{ sid }} .zf-heading {
+  /* Columna de newsletter */
+  #shopify-section-{{ sid }} .zf-news-heading {
     font-family: "thin2", var(--font-heading-family), serif;
     font-style: var(--font-heading-style);
     font-weight: var(--font-heading-weight);
-    font-size: var(--zf-heading-size);
-    line-height: 1.05;
-    color: var(--zf-heading);
-    margin: 0 0 1.2rem;
+    font-size: 2.6rem;
+    line-height: 1.2;
+    margin: 0 0 2rem;
   }
-  #shopify-section-{{ sid }} .zf-subtext {
-    font-size: 1.5rem;
-    line-height: 1.5;
-    color: var(--zf-subtext);
-    margin: 0 0 {{ section.settings.gap_heading }}px;
+  #shopify-section-{{ sid }} .newsletter-form { max-width: 34rem; }
+  #shopify-section-{{ sid }} .newsletter-form .field:before,
+  #shopify-section-{{ sid }} .newsletter-form .field:after {
+    display: none;
   }
-  #shopify-section-{{ sid }} .zf-subtext a {
-    color: var(--zf-subtext);
-    text-decoration: underline;
-    text-underline-offset: 3px;
+  #shopify-section-{{ sid }} .newsletter-form .field__input {
+    background: transparent;
+    border: 1px solid rgba(128, 128, 128, .55);
+    border-radius: 10px;
+    box-shadow: none;
+  }
+  #shopify-section-{{ sid }} .newsletter-form .field__input:focus {
+    box-shadow: none;
+    border-color: currentColor;
+  }
+  #shopify-section-{{ sid }} .newsletter-form__button {
+    width: 3.2rem;
+    height: 3.2rem;
+    min-width: 3.2rem;
+    min-height: 3.2rem;
+    border: 1px solid rgba(128, 128, 128, .55);
+    border-radius: 50%;
+    right: .8rem;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
+  }
+  #shopify-section-{{ sid }} .newsletter-form .field__input {
+    padding-right: 5.4rem; /* que el texto no pase por debajo del botón */
+  }
+  #shopify-section-{{ sid }} .newsletter-form__button .svg-wrapper svg {
+    width: 1.4rem;
   }
 
-  /* ============ ACORDEÓN ============ */
-  #shopify-section-{{ sid }} .zf-item {
-    border-bottom: 1px solid var(--zf-line);
+  /* Bloques (texto / menús) */
+  #shopify-section-{{ sid }} .footer-block__heading {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0 0 2rem;
   }
-  #shopify-section-{{ sid }} .zf-question {
-    width: 100%;
+  #shopify-section-{{ sid }} .footer-block__details-content .list-menu__item--link {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  #shopify-section-{{ sid }} .footer-block__details-content > li {
+    margin-bottom: 1.7rem;
+  }
+  #shopify-section-{{ sid }} .footer-block__details-content.rte {
+    font-size: 1.5rem;
+    line-height: 1.6;
+  }
+
+  /* Botón "Seguir en shop" bajo la última columna */
+  #shopify-section-{{ sid }} .zf-follow {
+    grid-column: {{ follow_col }};
+    margin-top: -1rem;
+  }
+
+  /* ============ FILA: SOCIAL / LOCALIZACIÓN ============ */
+  #shopify-section-{{ sid }} .zf-row-social {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 2.4rem;
-    background: transparent;
-    border: 0;
-    cursor: pointer;
-    text-align: left;
-    padding: {{ section.settings.question_padding }}px 0;
-    font-family: 'Helvetica neue';
-    font-size: var(--zf-question-size);
-    line-height: 1.35;
-    color: var(--zf-question);
+    margin-top: 7rem;
+    padding-bottom: 2.4rem;
   }
-  #shopify-section-{{ sid }} .zf-question:hover { opacity: .8; }
-  #shopify-section-{{ sid }} .zf-chevron {
-    flex: 0 0 auto;
-    width: 1.6rem;
-    height: 1rem;
-    color: var(--zf-chevron);
-    transition: transform .35s cubic-bezier(.22, .9, .32, 1);
+  #shopify-section-{{ sid }} .zf-localization {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
   }
-  #shopify-section-{{ sid }} .zf-item.is-open .zf-chevron {
-    transform: rotate(180deg);
+  #shopify-section-{{ sid }} .zf-localization h2 {
+    display: none; /* solo el selector, sin etiqueta, como la referencia */
+  }
+  #shopify-section-{{ sid }} .zf-localization .localization-form {
+    padding: 0;
+    margin: 0;
   }
 
-  /* Apertura animada: grid-rows 0fr -> 1fr (altura automática) */
-  #shopify-section-{{ sid }} .zf-answer {
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows .4s cubic-bezier(.22, .9, .32, 1);
+  /* ============ FILA: COPYRIGHT + POLÍTICAS / PAGOS ============ */
+  #shopify-section-{{ sid }} .zf-row-bottom {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 3rem;
+    padding-top: 1rem;
   }
-  #shopify-section-{{ sid }} .zf-item.is-open .zf-answer {
-    grid-template-rows: 1fr;
+  #shopify-section-{{ sid }} .zf-copyright .copyright__content {
+    display: block;
+    margin-bottom: 1.2rem;
   }
-  #shopify-section-{{ sid }} .zf-answer-inner {
-    overflow: hidden;
-    min-height: 0;
+  #shopify-section-{{ sid }} .zf-policies {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .8rem 1rem;
+    align-items: center;
   }
-  #shopify-section-{{ sid }} .zf-answer-content {
-    font-size: 1.5rem;
-    line-height: 1.6;
-    color: var(--zf-answer);
-    padding: 0 3rem 2.2rem 0;
-    opacity: 0;
-    transform: translateY(-6px);
-    transition: opacity .35s ease .08s, transform .35s ease .08s;
+  #shopify-section-{{ sid }} .zf-policies li {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
   }
-  #shopify-section-{{ sid }} .zf-item.is-open .zf-answer-content {
-    opacity: 1;
-    transform: none;
+  #shopify-section-{{ sid }} .zf-policies li + li::before {
+    content: '•';
+    font-size: 1.1rem;
+    opacity: .9;
   }
-  #shopify-section-{{ sid }} .zf-answer-content p { margin: 0 0 1rem; }
-  #shopify-section-{{ sid }} .zf-answer-content p:last-child { margin-bottom: 0; }
-  #shopify-section-{{ sid }} .zf-answer-content a {
-    color: var(--zf-answer);
-    text-decoration: underline;
-    text-underline-offset: 3px;
+  #shopify-section-{{ sid }} .zf-policies a {
+    color: inherit;
+  }
+  #shopify-section-{{ sid }} .zf-payment .list-payment {
+    justify-content: flex-end;
+    margin: 0;
+  }
+
+  /* Sellos / certificaciones opcionales */
+  #shopify-section-{{ sid }} .zf-badges {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2.4rem;
+  }
+  #shopify-section-{{ sid }} .zf-badges img {
+    height: auto;
   }
 
   /* ============ MOBILE ============ */
   @media screen and (max-width: 749px) {
-    #shopify-section-{{ sid }} .zf-section {
-      padding-top: {{ section.settings.padding_top_mobile }}px;
-      padding-bottom: {{ section.settings.padding_bottom_mobile }}px;
-      margin-top: {{ section.settings.margin_top_mobile }}px;
-      margin-bottom: {{ section.settings.margin_bottom_mobile }}px;
+    #shopify-section-{{ sid }} .zf-logo { margin-bottom: 3rem; }
+    #shopify-section-{{ sid }} .zf-grid {
+      grid-template-columns: 1fr;
+      row-gap: 3.4rem;
     }
-    #shopify-section-{{ sid }} .zf-wrapper {
-      padding: 0 {{ section.settings.padding_x_mobile }}px;
+    #shopify-section-{{ sid }} .zf-follow {
+      grid-column: 1;
+      margin-top: -1.4rem;
     }
-    #shopify-section-{{ sid }} .zf-heading {
-      font-size: var(--zf-heading-size-mobile);
+    #shopify-section-{{ sid }} .zf-row-social {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2.6rem;
+      margin-top: 4rem;
     }
-    #shopify-section-{{ sid }} .zf-subtext {
-      margin-bottom: {{ section.settings.gap_heading_mobile }}px;
+    #shopify-section-{{ sid }} .zf-row-bottom {
+      flex-direction: column-reverse; /* pagos arriba, copyright abajo */
+      align-items: flex-start;
+      gap: 2.6rem;
     }
-    #shopify-section-{{ sid }} .zf-question {
-      font-size: var(--zf-question-size-mobile);
-      padding: {{ section.settings.question_padding_mobile }}px 0;
-      gap: 1.6rem;
+    #shopify-section-{{ sid }} .zf-payment .list-payment {
+      justify-content: flex-start;
     }
-    #shopify-section-{{ sid }} .zf-answer-content {
-      padding-right: 1rem;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    #shopify-section-{{ sid }} .zf-answer,
-    #shopify-section-{{ sid }} .zf-answer-content,
-    #shopify-section-{{ sid }} .zf-chevron {
-      transition: none;
+    #shopify-section-{{ sid }} .zf-badges {
+      justify-content: flex-start;
     }
   }
 {%- endstyle -%}
 
-<zi-faqs class="zf-section" data-section-id="{{ sid }}" {% if section.settings.single_open %}data-single{% endif %}>
-  <div class="zf-wrapper">
-    {%- if section.settings.heading != blank -%}
-      <h2 class="zf-heading">{{ section.settings.heading }}</h2>
-    {%- endif -%}
-    {%- if section.settings.subtext != blank -%}
-      <p class="zf-subtext">{{ section.settings.subtext }}</p>
+<footer class="footer color-{{ section.settings.color_scheme }} gradient section-{{ sid }}-padding">
+  {%- liquid
+    assign has_social_icons = true
+    if settings.social_facebook_link == blank and settings.social_instagram_link == blank and settings.social_youtube_link == blank and settings.social_tiktok_link == blank and settings.social_twitter_link == blank and settings.social_pinterest_link == blank and settings.social_snapchat_link == blank and settings.social_tumblr_link == blank and settings.social_vimeo_link == blank
+      assign has_social_icons = false
+    endif
+  -%}
+
+  <div class="page-width">
+    {%- comment -%} ---------- LOGO ---------- {%- endcomment -%}
+    {%- if section.settings.footer_logo != blank -%}
+      <a href="{{ routes.root_url }}" class="zf-logo" aria-label="{{ shop.name | escape }}">
+        {{
+          section.settings.footer_logo
+          | image_url: width: 300
+          | image_tag: loading: 'lazy', width: section.settings.footer_logo_width, alt: shop.name
+        }}
+      </a>
     {%- endif -%}
 
-    <div class="zf-list">
-      {%- for block in section.blocks -%}
-        <div class="zf-item" data-item {{ block.shopify_attributes }}>
-          <button
-            type="button"
-            class="zf-question"
-            data-toggle
-            aria-expanded="false"
-            aria-controls="ZfAnswer-{{ sid }}-{{ forloop.index }}"
-          >
-            <span>{{ block.settings.question | escape }}</span>
-            <svg class="zf-chevron" viewBox="0 0 16 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <path d="M1 1L8 8.5L15 1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-          <div class="zf-answer" id="ZfAnswer-{{ sid }}-{{ forloop.index }}">
-            <div class="zf-answer-inner">
-              <div class="zf-answer-content">{{ block.settings.answer }}</div>
+    {%- comment -%} ---------- GRILLA: NEWSLETTER + BLOQUES ---------- {%- endcomment -%}
+    <div class="zf-grid">
+      {%- if section.settings.newsletter_enable -%}
+        <div class="zf-newsletter">
+          {%- if section.settings.newsletter_heading != blank -%}
+            <h2 class="zf-news-heading inline-richtext">{{ section.settings.newsletter_heading }}</h2>
+          {%- endif -%}
+          {%- form 'customer', id: 'ContactFooter', class: 'footer__newsletter newsletter-form' -%}
+            <input type="hidden" name="contact[tags]" value="newsletter">
+            <div class="newsletter-form__field-wrapper">
+              <div class="field">
+                <input
+                  id="NewsletterForm--{{ sid }}"
+                  type="email"
+                  name="contact[email]"
+                  class="field__input"
+                  value="{{ form.email }}"
+                  aria-required="true"
+                  autocorrect="off"
+                  autocapitalize="off"
+                  autocomplete="email"
+                  {% if form.errors %}
+                    autofocus
+                    aria-invalid="true"
+                    aria-describedby="ContactFooter-error"
+                  {% elsif form.posted_successfully? %}
+                    aria-describedby="ContactFooter-success"
+                  {% endif %}
+                  placeholder="{{ 'newsletter.label' | t }}"
+                  required
+                >
+                <label class="field__label" for="NewsletterForm--{{ sid }}">
+                  {{ 'newsletter.label' | t }}
+                </label>
+                <button
+                  type="submit"
+                  class="newsletter-form__button field__button"
+                  name="commit"
+                  id="Subscribe"
+                  aria-label="{{ 'newsletter.button_label' | t }}"
+                >
+                  <span class="svg-wrapper">
+                    {{- 'icon-arrow.svg' | inline_asset_content -}}
+                  </span>
+                </button>
+              </div>
+              {%- if form.errors -%}
+                <small class="newsletter-form__message form__message" id="ContactFooter-error">
+                  <span class="svg-wrapper">
+                    {{- 'icon-error.svg' | inline_asset_content -}}
+                  </span>
+                  {{- form.errors.translated_fields.email | capitalize }}
+                  {{ form.errors.messages.email -}}
+                </small>
+              {%- endif -%}
             </div>
-          </div>
+            {%- if form.posted_successfully? -%}
+              <h3
+                class="newsletter-form__message newsletter-form__message--success form__message"
+                id="ContactFooter-success"
+                tabindex="-1"
+                autofocus
+              >
+                <span class="svg-wrapper">
+                  {{- 'icon-success.svg' | inline_asset_content -}}
+                </span>
+                {{- 'newsletter.success' | t }}
+              </h3>
+            {%- endif -%}
+          {%- endform -%}
+        </div>
+      {%- endif -%}
+
+      {%- for block in section.blocks -%}
+        <div
+          class="footer-block{% if block.type == 'link_list' %} footer-block--menu{% endif %}"
+          {{ block.shopify_attributes }}
+        >
+          {%- if block.settings.heading != blank -%}
+            <h2 class="footer-block__heading inline-richtext">{{- block.settings.heading -}}</h2>
+          {%- endif -%}
+
+          {%- case block.type -%}
+            {%- when '@app' -%}
+              {% render block %}
+            {%- when 'text' -%}
+              <div class="footer-block__details-content rte">
+                {{ block.settings.subtext }}
+              </div>
+            {%- when 'link_list' -%}
+              {%- if block.settings.menu != blank -%}
+                <ul class="footer-block__details-content list-unstyled">
+                  {%- for link in block.settings.menu.links -%}
+                    <li>
+                      <a
+                        href="{{ link.url }}"
+                        class="link link--text list-menu__item list-menu__item--link{% if link.active %} list-menu__item--active{% endif %}"
+                      >
+                        {{ link.title | escape }}
+                      </a>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              {%- endif -%}
+            {%- when 'brand_information' -%}
+              <div class="footer-block__brand-info">
+                {%- if settings.brand_image != blank -%}
+                  {%- assign brand_image_height = settings.brand_image_width
+                    | divided_by: settings.brand_image.aspect_ratio
+                  -%}
+                  <div
+                    class="footer-block__image-wrapper"
+                    style="max-width: min(100%, {{ settings.brand_image_width }}px);"
+                  >
+                    {{
+                      settings.brand_image
+                      | image_url: width: 1100
+                      | image_tag:
+                        loading: 'lazy',
+                        widths: '50, 100, 150, 200, 300, 400, 550, 800, 1100',
+                        height: brand_image_height,
+                        width: settings.brand_image_width
+                    }}
+                  </div>
+                {%- endif -%}
+                {%- if settings.brand_headline != blank -%}
+                  <h2 class="footer-block__heading rte">{{ settings.brand_headline }}</h2>
+                {%- endif -%}
+                {%- if settings.brand_description != blank -%}
+                  <div class="rte">{{ settings.brand_description }}</div>
+                {%- endif -%}
+              </div>
+            {%- when 'image' -%}
+              <div class="footer-block__details-content footer-block-image {{ block.settings.alignment }}">
+                {%- if block.settings.image != blank -%}
+                  {%- assign image_size_2x = block.settings.image_width | times: 2 | at_most: 5760 -%}
+                  <div
+                    class="footer-block__image-wrapper"
+                    style="max-width: min(100%, {{ block.settings.image_width }}px);"
+                  >
+                    <img
+                      srcset="{{ block.settings.image | image_url: width: block.settings.image_width }}, {{ block.settings.image | image_url: width: image_size_2x }} 2x"
+                      src="{{ block.settings.image | image_url: width: 760 }}"
+                      alt="{{ block.settings.image.alt | escape }}"
+                      loading="lazy"
+                      width="{{ block.settings.image.width }}"
+                      height="{{ block.settings.image.height }}"
+                    >
+                  </div>
+                {%- else -%}
+                  {{ 'image' | placeholder_svg_tag: 'placeholder-svg placeholder' }}
+                {%- endif -%}
+              </div>
+          {%- endcase -%}
         </div>
       {%- endfor -%}
+
+      {%- comment -%} Botón "Seguir en shop" bajo la última columna {%- endcomment -%}
+      {%- if shop.features.follow_on_shop? and section.settings.enable_follow_on_shop -%}
+        <div class="zf-follow footer__follow-on-shop">
+          {{ shop | login_button: action: 'follow' }}
+        </div>
+      {%- endif -%}
     </div>
+
+    {%- comment -%} ---------- REDES SOCIALES / PAÍS E IDIOMA ---------- {%- endcomment -%}
+    <div class="zf-row-social">
+      <div>
+        {%- if section.settings.show_social and has_social_icons -%}
+          {%- render 'social-icons', class: 'footer__list-social' -%}
+        {%- endif -%}
+      </div>
+      <div class="zf-localization isolate">
+        {%- if section.settings.enable_country_selector and localization.available_countries.size > 1 -%}
+          <localization-form>
+            {%- form 'localization', id: 'FooterCountryForm', class: 'localization-form' -%}
+              <div>
+                <h2 class="caption-large text-body" id="FooterCountryLabel">{{ 'localization.country_label' | t }}</h2>
+                {%- render 'country-localization', localPosition: 'FooterCountry' -%}
+              </div>
+            {%- endform -%}
+          </localization-form>
+        {%- endif -%}
+
+        {%- if section.settings.enable_language_selector and localization.available_languages.size > 1 -%}
+          <localization-form>
+            {%- form 'localization', id: 'FooterLanguageForm', class: 'localization-form' -%}
+              <div>
+                <h2 class="caption-large text-body" id="FooterLanguageLabel">
+                  {{ 'localization.language_label' | t }}
+                </h2>
+                {%- render 'language-localization', localPosition: 'FooterLanguage' -%}
+              </div>
+            {%- endform -%}
+          </localization-form>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- comment -%} ---------- COPYRIGHT + POLÍTICAS / PAGOS ---------- {%- endcomment -%}
+    <div class="zf-row-bottom">
+      <div class="zf-copyright caption">
+        <small class="copyright__content"
+          >&copy; {{ 'now' | date: '%Y' }}, {{ shop.name | link_to: routes.root_url -}}
+        </small>
+        {%- if section.settings.show_policy -%}
+          <ul class="zf-policies">
+            {%- for policy in shop.policies -%}
+              {%- if policy != blank -%}
+                <li>
+                  <small class="copyright__content"
+                    ><a href="{{ policy.url }}">{{ policy.title | escape }}</a></small
+                  >
+                </li>
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+      </div>
+
+      {%- if section.settings.payment_enable -%}
+        <div class="zf-payment footer__payment">
+          <span class="visually-hidden">{{ 'sections.footer.payment' | t }}</span>
+          <ul class="list list-payment" role="list">
+            {%- for type in shop.enabled_payment_types -%}
+              <li class="list-payment__item">
+                {{ type | payment_type_svg_tag: class: 'icon icon--full-color' }}
+              </li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} ---------- SELLOS / CERTIFICACIONES (opcional) ---------- {%- endcomment -%}
+    {%- if section.settings.badges_image != blank -%}
+      <div class="zf-badges">
+        {{
+          section.settings.badges_image
+          | image_url: width: 1000
+          | image_tag: loading: 'lazy', width: section.settings.badges_width, alt: ''
+        }}
+      </div>
+    {%- endif -%}
   </div>
-</zi-faqs>
-
-<script>
-  if (!customElements.get('zi-faqs')) {
-    customElements.define(
-      'zi-faqs',
-      class ZiFaqs extends HTMLElement {
-        connectedCallback() {
-          this.items = Array.from(this.querySelectorAll('[data-item]'));
-          this.single = this.hasAttribute('data-single');
-
-          this.items.forEach((item) => {
-            const btn = item.querySelector('[data-toggle]');
-            btn.addEventListener('click', () => {
-              const isOpen = item.classList.contains('is-open');
-              if (this.single && !isOpen) {
-                /* Cerrar las demás antes de abrir esta */
-                this.items.forEach((other) => {
-                  if (other !== item) this.close(other);
-                });
-              }
-              if (isOpen) {
-                this.close(item);
-              } else {
-                this.open(item);
-              }
-            });
-          });
-        }
-
-        open(item) {
-          item.classList.add('is-open');
-          const btn = item.querySelector('[data-toggle]');
-          if (btn) btn.setAttribute('aria-expanded', 'true');
-        }
-
-        close(item) {
-          item.classList.remove('is-open');
-          const btn = item.querySelector('[data-toggle]');
-          if (btn) btn.setAttribute('aria-expanded', 'false');
-        }
-      }
-    );
-  }
-</script>
+</footer>
 
 {% schema %}
 {
-  "name": "FAQs",
-  "tag": "section",
-  "class": "section",
+  "name": "t:sections.footer.name",
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "type": "link_list",
+      "name": "t:sections.footer.blocks.link_list.name",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "default": "t:sections.footer.blocks.link_list.settings.heading.default",
+          "label": "t:sections.footer.blocks.link_list.settings.heading.label"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "default": "footer",
+          "label": "t:sections.footer.blocks.link_list.settings.menu.label"
+        }
+      ]
+    },
+    {
+      "type": "brand_information",
+      "name": "t:sections.footer.blocks.brand_information.name",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "t:sections.footer.blocks.brand_information.settings.paragraph.content"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "t:sections.footer.blocks.text.name",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "default": "t:sections.footer.blocks.text.settings.heading.default",
+          "label": "t:sections.footer.blocks.text.settings.heading.label"
+        },
+        {
+          "type": "richtext",
+          "id": "subtext",
+          "default": "t:sections.footer.blocks.text.settings.subtext.default",
+          "label": "t:sections.footer.blocks.text.settings.subtext.label"
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "range",
+          "id": "image_width",
+          "min": 50,
+          "max": 550,
+          "step": 5,
+          "unit": "px",
+          "label": "Width",
+          "default": 100
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Alignment",
+          "options": [
+            {
+              "value": "",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "center"
+        }
+      ]
+    }
+  ],
   "settings": [
     {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.all.colors.label",
+      "default": "scheme-1"
+    },
+    {
       "type": "header",
-      "content": "Contenido"
+      "content": "Logo"
     },
     {
-      "type": "inline_richtext",
-      "id": "heading",
-      "label": "Título",
-      "default": "FAQs"
+      "type": "image_picker",
+      "id": "footer_logo",
+      "label": "Logo del footer"
     },
     {
-      "type": "inline_richtext",
-      "id": "subtext",
-      "label": "Subtítulo",
-      "info": "Podés incluir un enlace, ej: escribirnos <a href=\"/pages/contacto\">aquí</a>",
-      "default": "Si tienes alguna duda adicional puedes escribirnos aquí"
+      "type": "range",
+      "id": "footer_logo_width",
+      "label": "Ancho del logo",
+      "min": 30,
+      "max": 250,
+      "step": 5,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "t:sections.footer.settings.header__1.content",
+      "info": "t:sections.footer.settings.header__1.info"
     },
     {
       "type": "checkbox",
-      "id": "single_open",
-      "label": "Solo una pregunta abierta a la vez",
-      "default": false
+      "id": "newsletter_enable",
+      "default": true,
+      "label": "t:sections.footer.settings.newsletter_enable.label"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "newsletter_heading",
+      "default": "t:sections.footer.settings.newsletter_heading.default",
+      "label": "t:sections.footer.settings.newsletter_heading.label"
     },
     {
       "type": "header",
-      "content": "Tamaños"
+      "content": "t:sections.footer.settings.header__9.content"
     },
     {
-      "type": "range",
-      "id": "heading_size",
-      "label": "Tamaño del título (escritorio)",
-      "min": 24,
-      "max": 100,
-      "step": 2,
-      "unit": "px",
-      "default": 56
+      "type": "checkbox",
+      "id": "enable_follow_on_shop",
+      "default": true,
+      "label": "t:sections.footer.settings.enable_follow_on_shop.label",
+      "info": "t:sections.footer.settings.enable_follow_on_shop.info"
     },
     {
-      "type": "range",
-      "id": "heading_size_mobile",
-      "label": "Tamaño del título (móvil)",
-      "min": 18,
-      "max": 60,
-      "step": 1,
-      "unit": "px",
-      "default": 36
+      "type": "checkbox",
+      "id": "show_social",
+      "default": true,
+      "label": "t:sections.footer.settings.show_social.label",
+      "info": "t:sections.footer.settings.show_social.info"
     },
     {
-      "type": "range",
-      "id": "question_size",
-      "label": "Tamaño de las preguntas (escritorio)",
-      "min": 12,
-      "max": 32,
-      "step": 1,
-      "unit": "px",
-      "default": 17
+      "type": "checkbox",
+      "id": "enable_country_selector",
+      "default": true,
+      "label": "t:sections.footer.settings.enable_country_selector.label",
+      "info": "t:sections.footer.settings.enable_country_selector.info"
     },
     {
-      "type": "range",
-      "id": "question_size_mobile",
-      "label": "Tamaño de las preguntas (móvil)",
-      "min": 12,
-      "max": 26,
-      "step": 1,
-      "unit": "px",
-      "default": 16
+      "type": "checkbox",
+      "id": "enable_language_selector",
+      "default": true,
+      "label": "t:sections.footer.settings.enable_language_selector.label",
+      "info": "t:sections.footer.settings.enable_language_selector.info"
     },
     {
-      "type": "range",
-      "id": "question_padding",
-      "label": "Alto de cada pregunta (escritorio)",
-      "min": 10,
-      "max": 44,
-      "step": 2,
-      "unit": "px",
-      "default": 22
+      "type": "checkbox",
+      "id": "payment_enable",
+      "default": true,
+      "label": "t:sections.footer.settings.payment_enable.label"
     },
     {
-      "type": "range",
-      "id": "question_padding_mobile",
-      "label": "Alto de cada pregunta (móvil)",
-      "min": 10,
-      "max": 40,
-      "step": 2,
-      "unit": "px",
-      "default": 20
-    },
-    {
-      "type": "range",
-      "id": "max_width",
-      "label": "Ancho máximo del contenido",
-      "min": 600,
-      "max": 1400,
-      "step": 20,
-      "unit": "px",
-      "default": 940
+      "type": "checkbox",
+      "id": "show_policy",
+      "default": true,
+      "label": "t:sections.footer.settings.show_policy.label",
+      "info": "t:sections.footer.settings.show_policy.info"
     },
     {
       "type": "header",
-      "content": "Espaciado (escritorio)"
+      "content": "Sellos / certificaciones"
+    },
+    {
+      "type": "image_picker",
+      "id": "badges_image",
+      "label": "Imagen de sellos",
+      "info": "Ej: financiación UE, certificaciones. Se muestra abajo a la derecha."
     },
     {
       "type": "range",
-      "id": "padding_top",
-      "label": "Padding superior",
-      "min": 0,
-      "max": 200,
-      "step": 4,
+      "id": "badges_width",
+      "label": "Ancho de la imagen de sellos",
+      "min": 100,
+      "max": 800,
+      "step": 10,
       "unit": "px",
-      "default": 72
+      "default": 480
     },
     {
-      "type": "range",
-      "id": "padding_bottom",
-      "label": "Padding inferior",
-      "min": 0,
-      "max": 200,
-      "step": 4,
-      "unit": "px",
-      "default": 72
-    },
-    {
-      "type": "range",
-      "id": "padding_x",
-      "label": "Padding lateral",
-      "min": 0,
-      "max": 120,
-      "step": 4,
-      "unit": "px",
-      "default": 24
+      "type": "header",
+      "content": "t:sections.all.spacing"
     },
     {
       "type": "range",
       "id": "margin_top",
-      "label": "Margen superior",
-      "min": 0,
-      "max": 160,
-      "step": 4,
-      "unit": "px",
-      "default": 0
-    },
-    {
-      "type": "range",
-      "id": "margin_bottom",
-      "label": "Margen inferior",
-      "min": 0,
-      "max": 160,
-      "step": 4,
-      "unit": "px",
-      "default": 0
-    },
-    {
-      "type": "range",
-      "id": "gap_heading",
-      "label": "Espacio bajo el subtítulo",
       "min": 0,
       "max": 100,
-      "step": 2,
+      "step": 4,
       "unit": "px",
-      "default": 48
+      "label": "t:sections.footer.settings.margin_top.label",
+      "default": 0
     },
     {
       "type": "header",
-      "content": "Espaciado (móvil)"
+      "content": "t:sections.all.padding.section_padding_heading"
     },
     {
       "type": "range",
-      "id": "padding_top_mobile",
-      "label": "Padding superior",
+      "id": "padding_top",
       "min": 0,
-      "max": 160,
+      "max": 100,
       "step": 4,
       "unit": "px",
+      "label": "t:sections.all.padding.padding_top",
       "default": 48
     },
     {
       "type": "range",
-      "id": "padding_bottom_mobile",
-      "label": "Padding inferior",
+      "id": "padding_bottom",
       "min": 0,
-      "max": 160,
+      "max": 100,
       "step": 4,
       "unit": "px",
-      "default": 48
-    },
-    {
-      "type": "range",
-      "id": "padding_x_mobile",
-      "label": "Padding lateral",
-      "min": 0,
-      "max": 60,
-      "step": 2,
-      "unit": "px",
-      "default": 20
-    },
-    {
-      "type": "range",
-      "id": "margin_top_mobile",
-      "label": "Margen superior",
-      "min": 0,
-      "max": 120,
-      "step": 4,
-      "unit": "px",
-      "default": 0
-    },
-    {
-      "type": "range",
-      "id": "margin_bottom_mobile",
-      "label": "Margen inferior",
-      "min": 0,
-      "max": 120,
-      "step": 4,
-      "unit": "px",
-      "default": 0
-    },
-    {
-      "type": "range",
-      "id": "gap_heading_mobile",
-      "label": "Espacio bajo el subtítulo",
-      "min": 0,
-      "max": 80,
-      "step": 2,
-      "unit": "px",
+      "label": "t:sections.all.padding.padding_bottom",
       "default": 36
-    },
-    {
-      "type": "header",
-      "content": "Colores"
-    },
-    {
-      "type": "color",
-      "id": "color_bg",
-      "label": "Fondo de la sección",
-      "default": "#0B0B0B"
-    },
-    {
-      "type": "color",
-      "id": "color_heading",
-      "label": "Título",
-      "default": "#FFFFFF"
-    },
-    {
-      "type": "color",
-      "id": "color_subtext",
-      "label": "Subtítulo",
-      "default": "#FFFFFF"
-    },
-    {
-      "type": "color",
-      "id": "color_question",
-      "label": "Preguntas",
-      "default": "#FFFFFF"
-    },
-    {
-      "type": "color",
-      "id": "color_answer",
-      "label": "Respuestas",
-      "default": "#D6D6D6"
-    },
-    {
-      "type": "color",
-      "id": "color_line",
-      "label": "Líneas divisorias",
-      "default": "#3A3A3A"
-    },
-    {
-      "type": "color",
-      "id": "color_chevron",
-      "label": "Flechas (chevrons)",
-      "default": "#FFFFFF"
     }
   ],
-  "blocks": [
-    {
-      "type": "faq",
-      "name": "Pregunta",
-      "settings": [
-        {
-          "type": "text",
-          "id": "question",
-          "label": "Pregunta",
-          "default": "¿Qué diferencia a nuestra marca de otras?"
-        },
-        {
-          "type": "richtext",
-          "id": "answer",
-          "label": "Respuesta",
-          "default": "<p>Escribí aquí la respuesta a la pregunta.</p>"
-        }
-      ]
-    }
-  ],
-  "max_blocks": 40,
-  "presets": [
-    {
-      "name": "FAQs",
-      "blocks": [
-        { "type": "faq", "settings": { "question": "¿Qué diferencia a ZZEN de otras marcas?" } },
-        { "type": "faq", "settings": { "question": "¿Las fórmulas generan dependencia?" } },
-        { "type": "faq", "settings": { "question": "¿Las dosis son adecuadas?" } },
-        { "type": "faq", "settings": { "question": "¿Existen efectos secundarios?" } },
-        { "type": "faq", "settings": { "question": "¿Cuánto tiempo tarda el envío?" } }
-      ]
-    }
-  ]
+  "default": {
+    "blocks": [
+      {
+        "type": "text"
+      },
+      {
+        "type": "link_list"
+      },
+      {
+        "type": "link_list"
+      }
+    ]
+  }
 }
 {% endschema %}
