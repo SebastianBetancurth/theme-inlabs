@@ -1,0 +1,747 @@
+{% comment %}
+  ============================================================
+  SECCIÓN: Resultados con contadores animados (count-up)
+  Theme: Dawn (compatible con cualquier theme OS 2.0)
+  Archivo: sections/stats-results.liquid
+  ------------------------------------------------------------
+  - Fondo con imagen a pantalla completa + overlay opcional.
+  - Tarjetas efecto vidrio (glassmorphism) con estadísticas.
+  - ANIMACIÓN COUNT-UP: cuando la sección entra en pantalla,
+    cada número cuenta rápido desde 0 hasta su valor final.
+    Se anima solo la parte numérica: "+25%" cuenta +0% -> +25%,
+    "9/10" cuenta 0/10 -> 9/10, "+40'" cuenta +0' -> +40'.
+  - Dos tipos de bloque: tarjeta de estadística (con opción de
+    ancho completo) y círculo con estadística.
+  - Desktop: tarjetas a la izquierda, texto a la derecha
+    (invertible). Mobile: texto arriba, tarjetas abajo.
+  - Todo editable: colores, textos, tamaños, blur, opacidad,
+    paddings y márgenes separados escritorio/móvil.
+  ============================================================
+{% endcomment %}
+
+{%- liquid
+  assign sid = section.id
+  assign card_alpha = section.settings.card_opacity | divided_by: 100.0
+  assign card_bg = section.settings.color_card | color_modify: 'alpha', card_alpha
+  assign overlay_alpha = section.settings.overlay_opacity | divided_by: 100.0
+  assign overlay_bg = section.settings.color_overlay | color_modify: 'alpha', overlay_alpha
+-%}
+
+{%- style -%}
+  #shopify-section-{{ sid }} .zs-section {
+    display: block;
+    position: relative;
+    --zs-heading: {{ section.settings.color_heading }};
+    --zs-text: {{ section.settings.color_text }};
+    --zs-number: {{ section.settings.color_number }};
+    --zs-desc: {{ section.settings.color_desc }};
+    --zs-circle-border: {{ section.settings.color_circle_border }};
+    --zs-card-bg: {{ card_bg }};
+    --zs-card-blur: {{ section.settings.card_blur }}px;
+    --zs-card-radius: {{ section.settings.card_radius }}px;
+    --zs-heading-size: {{ section.settings.heading_size }}px;
+    --zs-heading-size-mobile: {{ section.settings.heading_size_mobile }}px;
+    --zs-number-size: {{ section.settings.number_size }}px;
+    --zs-number-size-mobile: {{ section.settings.number_size_mobile }}px;
+    --zs-max-width: {{ section.settings.max_width }}px;
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    margin-top: {{ section.settings.margin_top }}px;
+    margin-bottom: {{ section.settings.margin_bottom }}px;
+    background: {{ section.settings.color_bg }};
+    overflow: hidden;
+    font-family: var(--font-body-family);
+  }
+
+  /* ============ FONDO ============ */
+  #shopify-section-{{ sid }} .zs-bg,
+  #shopify-section-{{ sid }} .zs-bg img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+  }
+  #shopify-section-{{ sid }} .zs-overlay {
+    position: absolute;
+    inset: 0;
+    background: {{ overlay_bg }};
+    z-index: 1;
+  }
+
+  #shopify-section-{{ sid }} .zs-wrapper {
+    position: relative;
+    z-index: 2;
+    max-width: var(--zs-max-width);
+    margin: 0 auto;
+    padding: 0 {{ section.settings.padding_x }}px;
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    gap: 6rem;
+    align-items: center;
+  }
+  {% if section.settings.text_left %}
+    #shopify-section-{{ sid }} .zs-wrapper { grid-template-columns: 1fr 1.55fr; }
+    #shopify-section-{{ sid }} .zs-cards { order: 2; }
+    #shopify-section-{{ sid }} .zs-content { order: 1; }
+  {% endif %}
+
+  /* ============ TARJETAS ============ */
+  #shopify-section-{{ sid }} .zs-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: {{ section.settings.card_gap }}px;
+  }
+  #shopify-section-{{ sid }} .zs-card {
+    background: var(--zs-card-bg);
+    -webkit-backdrop-filter: blur(var(--zs-card-blur));
+    backdrop-filter: blur(var(--zs-card-blur));
+    border-radius: var(--zs-card-radius);
+    padding: 2.6rem 2.8rem 2.8rem;
+  }
+  #shopify-section-{{ sid }} .zs-card--wide {
+    grid-column: 1 / -1;
+  }
+  #shopify-section-{{ sid }} .zs-number {
+    font-size: var(--zs-number-size);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--zs-number);
+    margin: 0 0 1.2rem;
+    letter-spacing: -0.01em;
+  }
+  #shopify-section-{{ sid }} .zs-desc {
+    font-size: 1.5rem;
+    line-height: 1.55;
+    color: var(--zs-desc);
+    margin: 0;
+  }
+
+  /* Tarjeta con círculo */
+  #shopify-section-{{ sid }} .zs-card--circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3.2rem 2rem;
+  }
+  #shopify-section-{{ sid }} .zs-circle {
+    width: 13.5rem;
+    height: 13.5rem;
+    border-radius: 50%;
+    border: 1px solid var(--zs-circle-border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: .4rem;
+    padding: 1rem;
+  }
+  #shopify-section-{{ sid }} .zs-circle .zs-number {
+    font-size: calc(var(--zs-number-size) * 0.72);
+    margin: 0;
+  }
+  #shopify-section-{{ sid }} .zs-circle-label {
+    font-size: 1.3rem;
+    color: var(--zs-desc);
+    margin: 0;
+  }
+
+  /* ============ COLUMNA DE TEXTO ============ */
+  #shopify-section-{{ sid }} .zs-heading {
+    font-size: var(--zs-heading-size);
+    font-weight: 300;
+    line-height: 1.12;
+    color: var(--zs-heading);
+    margin: 0 0 2.6rem;
+    letter-spacing: -0.01em;
+  }
+  #shopify-section-{{ sid }} .zs-text {
+    font-size: 1.6rem;
+    line-height: 1.6;
+    color: var(--zs-text);
+    margin: 0 0 3rem;
+  }
+  #shopify-section-{{ sid }} .zs-text p { margin: 0 0 1rem; }
+  #shopify-section-{{ sid }} .zs-footnote {
+    font-size: 1.3rem;
+    font-style: italic;
+    line-height: 1.55;
+    color: var(--zs-text);
+    opacity: .85;
+    margin: 0;
+  }
+
+  /* ============ MOBILE ============ */
+  @media screen and (max-width: 899px) {
+    #shopify-section-{{ sid }} .zs-section {
+      padding-top: {{ section.settings.padding_top_mobile }}px;
+      padding-bottom: {{ section.settings.padding_bottom_mobile }}px;
+      margin-top: {{ section.settings.margin_top_mobile }}px;
+      margin-bottom: {{ section.settings.margin_bottom_mobile }}px;
+    }
+    #shopify-section-{{ sid }} .zs-wrapper {
+      grid-template-columns: 1fr;
+      gap: 3.6rem;
+      padding: 0 {{ section.settings.padding_x_mobile }}px;
+    }
+    /* En móvil el texto va ARRIBA y las tarjetas abajo */
+    #shopify-section-{{ sid }} .zs-content { order: 1; }
+    #shopify-section-{{ sid }} .zs-cards { order: 2; }
+    #shopify-section-{{ sid }} .zs-heading {
+      font-size: var(--zs-heading-size-mobile);
+      margin-bottom: 1.8rem;
+    }
+    #shopify-section-{{ sid }} .zs-number {
+      font-size: var(--zs-number-size-mobile);
+    }
+    #shopify-section-{{ sid }} .zs-circle .zs-number {
+      font-size: calc(var(--zs-number-size-mobile) * 0.8);
+    }
+    #shopify-section-{{ sid }} .zs-card {
+      padding: 2rem 2rem 2.2rem;
+    }
+    #shopify-section-{{ sid }} .zs-circle {
+      width: 11.5rem;
+      height: 11.5rem;
+    }
+  }
+{%- endstyle -%}
+
+<zi-stats class="zs-section" data-section-id="{{ sid }}" data-duration="{{ section.settings.count_duration }}">
+  {%- if section.settings.bg_image != blank -%}
+    <div class="zs-bg">
+      {{ section.settings.bg_image | image_url: width: 2400 | image_tag: loading: 'lazy', widths: '750, 1100, 1600, 2000, 2400', sizes: '100vw', alt: '' }}
+    </div>
+  {%- endif -%}
+  <div class="zs-overlay" aria-hidden="true"></div>
+
+  <div class="zs-wrapper">
+    <div class="zs-cards">
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'stat' -%}
+            <div class="zs-card{% if block.settings.wide %} zs-card--wide{% endif %}" {{ block.shopify_attributes }}>
+              <p class="zs-number" data-count>{{ block.settings.number | escape }}</p>
+              {%- if block.settings.description != blank -%}
+                <p class="zs-desc">{{ block.settings.description }}</p>
+              {%- endif -%}
+            </div>
+          {%- when 'circle' -%}
+            <div class="zs-card zs-card--circle" {{ block.shopify_attributes }}>
+              <div class="zs-circle">
+                <p class="zs-number" data-count>{{ block.settings.number | escape }}</p>
+                {%- if block.settings.label != blank -%}
+                  <p class="zs-circle-label">{{ block.settings.label | escape }}</p>
+                {%- endif -%}
+              </div>
+            </div>
+        {%- endcase -%}
+      {%- endfor -%}
+    </div>
+
+    <div class="zs-content">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="zs-heading">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+      {%- if section.settings.text != blank -%}
+        <div class="zs-text">{{ section.settings.text }}</div>
+      {%- endif -%}
+      {%- if section.settings.footnote != blank -%}
+        <p class="zs-footnote">{{ section.settings.footnote }}</p>
+      {%- endif -%}
+    </div>
+  </div>
+</zi-stats>
+
+<script>
+  if (!customElements.get('zi-stats')) {
+    customElements.define(
+      'zi-stats',
+      class ZiStats extends HTMLElement {
+        connectedCallback() {
+          this.counters = Array.from(this.querySelectorAll('[data-count]'));
+          this.duration = parseInt(this.dataset.duration, 10) || 1200;
+          this.done = false;
+
+          /* Respetar reduced motion: mostrar el valor final directo */
+          if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+          /* Preparar cada contador: separar prefijo + número + sufijo.
+             Ej: "+25%" => prefijo "+", número 25, sufijo "%".
+                 "9/10" => número 9, sufijo "/10".
+                 "+40'" => prefijo "+", número 40, sufijo "'". */
+          this.items = this.counters
+            .map((el) => {
+              const original = el.textContent.trim();
+              const match = original.match(/\d+/);
+              if (!match) return null;
+              return {
+                el: el,
+                prefix: original.slice(0, match.index),
+                target: parseInt(match[0], 10),
+                suffix: original.slice(match.index + match[0].length),
+              };
+            })
+            .filter(Boolean);
+
+          if (this.items.length === 0) return;
+
+          /* Poner los contadores en 0 hasta que la sección sea visible */
+          this.items.forEach((item) => {
+            item.el.textContent = item.prefix + '0' + item.suffix;
+          });
+
+          /* Disparar el conteo cuando la sección entra en pantalla */
+          this.observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting && !this.done) {
+                  this.done = true;
+                  this.runCounters();
+                  this.observer.disconnect();
+                }
+              });
+            },
+            { threshold: 0.3 }
+          );
+          this.observer.observe(this);
+        }
+
+        runCounters() {
+          const start = performance.now();
+          const duration = this.duration;
+          const tick = (now) => {
+            const t = Math.min((now - start) / duration, 1);
+            /* easeOutCubic: arranca rápido y frena al final */
+            const eased = 1 - Math.pow(1 - t, 3);
+            this.items.forEach((item) => {
+              const value = Math.round(item.target * eased);
+              item.el.textContent = item.prefix + value + item.suffix;
+            });
+            if (t < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        }
+
+        disconnectedCallback() {
+          if (this.observer) this.observer.disconnect();
+        }
+      }
+    );
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Resultados con contadores",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Contenido"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Título",
+      "default": "Resultados de nuestras encuestas"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Texto",
+      "default": "<p>Todos nuestros productos se desarrollan y evalúan siguiendo protocolos de observación real.<br>Las cifras que ves son resultados de personas que, como tú, buscan claridad y equilibrio cada día.</p>"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "footnote",
+      "label": "Nota al pie",
+      "default": "*Basado en resultados reportados por usuarios reales tras un uso continuado de nuestras fórmulas."
+    },
+    {
+      "type": "checkbox",
+      "id": "text_left",
+      "label": "Texto a la izquierda (escritorio)",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Imagen de fondo"
+    },
+    {
+      "type": "header",
+      "content": "Contadores"
+    },
+    {
+      "type": "range",
+      "id": "count_duration",
+      "label": "Duración del conteo",
+      "min": 400,
+      "max": 3000,
+      "step": 100,
+      "unit": "ms",
+      "default": 1200,
+      "info": "Los números cuentan de 0 a su valor cuando la sección entra en pantalla."
+    },
+    {
+      "type": "header",
+      "content": "Diseño"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Tamaño del título (escritorio)",
+      "min": 24,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Tamaño del título (móvil)",
+      "min": 18,
+      "max": 52,
+      "step": 1,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "number_size",
+      "label": "Tamaño de los números (escritorio)",
+      "min": 24,
+      "max": 90,
+      "step": 2,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "number_size_mobile",
+      "label": "Tamaño de los números (móvil)",
+      "min": 20,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "Espacio entre tarjetas",
+      "min": 8,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Radio de borde de tarjetas",
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "card_opacity",
+      "label": "Opacidad del fondo de tarjetas",
+      "min": 0,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "default": 35
+    },
+    {
+      "type": "range",
+      "id": "card_blur",
+      "label": "Desenfoque del vidrio (blur)",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Ancho máximo del contenido",
+      "min": 900,
+      "max": 1920,
+      "step": 20,
+      "unit": "px",
+      "default": 1500
+    },
+    {
+      "type": "header",
+      "content": "Espaciado (escritorio)"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding superior",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding inferior",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_x",
+      "label": "Padding lateral",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "label": "Margen superior",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "label": "Margen inferior",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Espaciado (móvil)"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding superior",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding inferior",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_x_mobile",
+      "label": "Padding lateral",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "margin_top_mobile",
+      "label": "Margen superior",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_mobile",
+      "label": "Margen inferior",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Colores"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Fondo (si no hay imagen)",
+      "default": "#1E2B1E"
+    },
+    {
+      "type": "color",
+      "id": "color_overlay",
+      "label": "Overlay sobre la imagen",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Opacidad del overlay",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 25
+    },
+    {
+      "type": "color",
+      "id": "color_card",
+      "label": "Fondo de tarjetas",
+      "default": "#0A0F0A"
+    },
+    {
+      "type": "color",
+      "id": "color_heading",
+      "label": "Título",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "color_text",
+      "label": "Texto",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "color_number",
+      "label": "Números",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "color_desc",
+      "label": "Descripciones",
+      "default": "#E8E8E8"
+    },
+    {
+      "type": "color",
+      "id": "color_circle_border",
+      "label": "Borde de los círculos",
+      "default": "#FFFFFF"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Estadística",
+      "settings": [
+        {
+          "type": "text",
+          "id": "number",
+          "label": "Número",
+          "info": "Se anima la parte numérica. Ej: +25%, 96%, x2",
+          "default": "+25%"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "description",
+          "label": "Descripción",
+          "default": "Los usuarios muestran una mejora del 25% en productividad tras un mes de uso."
+        },
+        {
+          "type": "checkbox",
+          "id": "wide",
+          "label": "Ancho completo",
+          "default": false,
+          "info": "La tarjeta ocupa las dos columnas."
+        }
+      ]
+    },
+    {
+      "type": "circle",
+      "name": "Círculo",
+      "settings": [
+        {
+          "type": "text",
+          "id": "number",
+          "label": "Número",
+          "info": "Se anima la parte numérica. Ej: 9/10, +40'",
+          "default": "9/10"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Etiqueta",
+          "default": "Menos fatiga"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    {
+      "name": "Resultados con contadores",
+      "blocks": [
+        {
+          "type": "stat",
+          "settings": {
+            "number": "+25% de productividad",
+            "description": "Los usuarios muestran una mejora del 25% en productividad y desempeño cognitivo tras un mes de uso.",
+            "wide": true
+          }
+        },
+        {
+          "type": "stat",
+          "settings": {
+            "number": "96%",
+            "description": "De los usuarios reportan una mejora notable en su concentración tras 2 semanas de uso."
+          }
+        },
+        {
+          "type": "stat",
+          "settings": {
+            "number": "89%",
+            "description": "Profesionales experimentaron menos estrés y ansiedad en su rutina diaria."
+          }
+        },
+        {
+          "type": "circle",
+          "settings": {
+            "number": "9/10",
+            "label": "Menos fatiga"
+          }
+        },
+        {
+          "type": "circle",
+          "settings": {
+            "number": "+40'",
+            "label": "Sueño profundo"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
