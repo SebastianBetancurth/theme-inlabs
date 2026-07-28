@@ -229,6 +229,26 @@
   {% endif %}
 
   /* ============ CARDS ============ */
+  /* Animación de entrada en cascada al cambiar de tab:
+     cada card hace fade + slide-up con un pequeño retraso
+     progresivo (--zi-i viene del Liquid). fill-mode backwards
+     mantiene la card invisible durante su delay, y al terminar
+     la animación no deja "fill" para no romper el hover. */
+  #shopify-section-{{ sid }} .zi-panel.zi-anim .zi-card {
+    animation: zi-card-in .55s cubic-bezier(.22, .9, .32, 1) backwards;
+    animation-delay: calc(var(--zi-i, 0) * 65ms);
+  }
+  @keyframes zi-card-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
   #shopify-section-{{ sid }} .zi-card {
     flex: 0 0 var(--zi-card-width);
     width: var(--zi-card-width);
@@ -420,6 +440,7 @@
     #ZiModal-{{ sid }}::backdrop { animation: none; }
     #shopify-section-{{ sid }} .zi-slider { scroll-behavior: auto; }
     #shopify-section-{{ sid }} .zi-card { transition: none; }
+    #shopify-section-{{ sid }} .zi-panel.zi-anim .zi-card { animation: none; }
   }
 {%- endstyle -%}
 
@@ -468,12 +489,14 @@
         {%- if tab == blank -%}{%- continue -%}{%- endif -%}
         <div class="zi-panel" role="tabpanel" data-panel-name="{{ tab | escape }}" {% unless first_panel %}hidden{% endunless %}>
           <div class="zi-slider">
+            {%- assign card_i = 0 -%}
             {%- for block in section.blocks -%}
               {%- assign btab = block.settings.tab | strip -%}
               {%- if btab == blank -%}{%- assign btab = 'General' -%}{%- endif -%}
               {%- if btab != tab -%}{%- continue -%}{%- endif -%}
 
-              <button type="button" class="zi-card" data-card {{ block.shopify_attributes }}>
+              <button type="button" class="zi-card" data-card style="--zi-i: {{ card_i }};" {{ block.shopify_attributes }}>
+                {%- assign card_i = card_i | plus: 1 -%}
                 <div class="zi-card__media">
                   {%- if block.settings.image != blank -%}
                     {{ block.settings.image | image_url: width: 900 | image_tag: loading: 'lazy', widths: '360, 540, 720, 900', sizes: '(max-width: 749px) 70vw, 320px', alt: block.settings.title | escape }}
@@ -569,6 +592,10 @@
           if (tabsRow) attachScrollFade(tabsRow);
           this.querySelectorAll('.zi-slider').forEach(attachScrollFade);
 
+          /* Animación de entrada también en la carga inicial */
+          const initialPanel = this.panels.find((p) => !p.hidden);
+          if (initialPanel) initialPanel.classList.add('zi-anim');
+
           /* Tabs */
           this.tabs.forEach((tab) => {
             tab.addEventListener('click', () => this.selectTab(tab));
@@ -615,6 +642,16 @@
           this.panels.forEach((p) => {
             p.hidden = p.dataset.panelName !== name;
           });
+
+          /* Reiniciar la animación en cascada del panel activo */
+          const active = this.panels.find((p) => !p.hidden);
+          if (active) {
+            const slider = active.querySelector('.zi-slider');
+            if (slider) slider.scrollTo({ left: 0, behavior: 'instant' });
+            active.classList.remove('zi-anim');
+            void active.offsetWidth; /* fuerza reflow para poder re-disparar la animación */
+            active.classList.add('zi-anim');
+          }
         }
 
         openModal(card) {
