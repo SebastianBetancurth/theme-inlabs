@@ -288,12 +288,12 @@
         "ingredient_FN3FAy"
       ],
       "custom_css": [
-        "{margin-top: 20PX;}"
+        "{margin-top: 20px;}"
       ],
       "name": "Ingredientes ciencia",
       "settings": {
         "heading": "Ingredientes avalados por la ciencia",
-        "heading_size": 48,
+        "heading_size": 68,
         "heading_size_mobile": 34,
         "more_label": "Ver más",
         "full_width": false,
