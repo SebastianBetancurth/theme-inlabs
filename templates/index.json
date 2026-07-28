@@ -654,13 +654,92 @@
         "margin_top_mobile": 0,
         "margin_bottom_mobile": 0,
         "gap_heading_mobile": 28,
-        "color_bg": "#FFFFFF",
+        "color_bg": "#ffffff",
         "color_heading": "#121212",
         "color_name": "#121212",
-        "color_specialty": "#3A3A3A",
+        "color_specialty": "#3a3a3a",
         "color_quote": "#121212",
         "color_link": "#121212",
         "color_arrow": "#121212"
+      }
+    },
+    "faqs_accordion_wBpPTR": {
+      "type": "faqs-accordion",
+      "blocks": {
+        "faq_AzHtzw": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Qué diferencia a ZZEN de otras marcas?",
+            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+          }
+        },
+        "faq_ywicgh": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Las fórmulas generan dependencia?",
+            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+          }
+        },
+        "faq_wVfwVC": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Las dosis son adecuadas?",
+            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+          }
+        },
+        "faq_EJ7PV4": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Existen efectos secundarios?",
+            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+          }
+        },
+        "faq_hLRNYG": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Cuánto tiempo tarda el envío?",
+            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "faq_AzHtzw",
+        "faq_ywicgh",
+        "faq_wVfwVC",
+        "faq_EJ7PV4",
+        "faq_hLRNYG"
+      ],
+      "name": "FAQs",
+      "settings": {
+        "heading": "FAQs",
+        "subtext": "Si tienes alguna duda adicional puedes escribirnos aquí",
+        "single_open": false,
+        "heading_size": 56,
+        "heading_size_mobile": 36,
+        "question_size": 17,
+        "question_size_mobile": 16,
+        "question_padding": 22,
+        "question_padding_mobile": 20,
+        "max_width": 940,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "padding_x": 24,
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "gap_heading": 48,
+        "padding_top_mobile": 48,
+        "padding_bottom_mobile": 48,
+        "padding_x_mobile": 20,
+        "margin_top_mobile": 0,
+        "margin_bottom_mobile": 0,
+        "gap_heading_mobile": 36,
+        "color_bg": "#0B0B0B",
+        "color_heading": "#FFFFFF",
+        "color_subtext": "#FFFFFF",
+        "color_question": "#FFFFFF",
+        "color_answer": "#D6D6D6",
+        "color_line": "#3A3A3A",
+        "color_chevron": "#FFFFFF"
       }
     }
   },
@@ -674,6 +753,7 @@
     "testimonials_slide_kCPKjM",
     "video_testimonials_8npFXK",
     "stats_results_FGgqhi",
-    "doctors_endorse_NQniVN"
+    "doctors_endorse_NQniVN",
+    "faqs_accordion_wBpPTR"
   ]
 }
