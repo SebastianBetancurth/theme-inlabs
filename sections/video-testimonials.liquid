@@ -1,0 +1,733 @@
+{% comment %}
+  ============================================================
+  SECCIÓN: Videos de clientes con barra de progreso
+  Theme: Dawn (compatible con cualquier theme OS 2.0)
+  Archivo: sections/video-testimonials.liquid
+  ------------------------------------------------------------
+  - Encabezado: estrellas + texto (ej: "100,000+ clientes
+    satisfechos") y título grande.
+  - Carrusel horizontal de videos verticales (9:16) con botón
+    de play. Click => reproduce con sonido; solo un video
+    suena a la vez; click de nuevo => pausa.
+  - BARRA DE PROGRESO que se va llenando a medida que se
+    desliza el carrusel (scroll táctil, flechas o trackpad).
+  - Flechas circulares abajo a la derecha (desktop).
+  - Todo editable: colores, textos, tamaños, paddings y
+    márgenes separados para escritorio y móvil.
+  ============================================================
+{% endcomment %}
+
+{%- liquid
+  assign sid = section.id
+-%}
+
+{%- style -%}
+  #shopify-section-{{ sid }} .zv-section {
+    display: block;
+    --zv-bg: {{ section.settings.color_bg }};
+    --zv-heading: {{ section.settings.color_heading }};
+    --zv-subtext: {{ section.settings.color_subtext }};
+    --zv-star: {{ section.settings.color_star }};
+    --zv-bar-track: {{ section.settings.color_bar_track }};
+    --zv-bar-fill: {{ section.settings.color_bar_fill }};
+    --zv-arrow: {{ section.settings.color_arrow }};
+    --zv-arrow-border: {{ section.settings.color_arrow_border }};
+    --zv-play-bg: {{ section.settings.color_play_bg }};
+    --zv-play-icon: {{ section.settings.color_play_icon }};
+    --zv-heading-size: {{ section.settings.heading_size }}px;
+    --zv-heading-size-mobile: {{ section.settings.heading_size_mobile }}px;
+    --zv-card-width: {{ section.settings.card_width }}px;
+    --zv-card-width-mobile: {{ section.settings.card_width_mobile }}px;
+    --zv-card-gap: {{ section.settings.card_gap }}px;
+    --zv-card-radius: {{ section.settings.card_radius }}px;
+    --zv-max-width: {{ section.settings.max_width }}px;
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    margin-top: {{ section.settings.margin_top }}px;
+    margin-bottom: {{ section.settings.margin_bottom }}px;
+    background: var(--zv-bg);
+    font-family: var(--font-body-family);
+  }
+
+  #shopify-section-{{ sid }} .zv-wrapper {
+    max-width: var(--zv-max-width);
+    margin: 0 auto;
+    padding: 0 {{ section.settings.padding_x }}px;
+  }
+
+  /* ============ ENCABEZADO ============ */
+  #shopify-section-{{ sid }} .zv-top {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    margin-bottom: 1.2rem;
+  }
+  #shopify-section-{{ sid }} .zv-stars {
+    display: flex;
+    gap: .3rem;
+    color: var(--zv-star);
+  }
+  #shopify-section-{{ sid }} .zv-stars svg {
+    width: 1.9rem;
+    height: 1.9rem;
+    fill: currentColor;
+  }
+  #shopify-section-{{ sid }} .zv-subtext {
+    font-size: 1.5rem;
+    color: var(--zv-subtext);
+    margin: 0;
+  }
+  #shopify-section-{{ sid }} .zv-heading {
+    font-family: "thin2", var(--font-heading-family), sans-serif;
+    font-style: var(--font-heading-style);
+    font-weight: var(--font-heading-weight);
+    color: var(--zv-heading);
+    font-size: var(--zv-heading-size);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin: 0 0 {{ section.settings.gap_heading }}px;
+  }
+
+  /* ============ CARRUSEL ============ */
+  #shopify-section-{{ sid }} .zv-slider {
+    display: flex;
+    gap: var(--zv-card-gap);
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  #shopify-section-{{ sid }} .zv-slider::-webkit-scrollbar { display: none; }
+
+  #shopify-section-{{ sid }} .zv-card {
+    position: relative;
+    flex: 0 0 var(--zv-card-width);
+    width: var(--zv-card-width);
+    aspect-ratio: 9 / 16;
+    border-radius: var(--zv-card-radius);
+    overflow: hidden;
+    background: #111;
+    cursor: pointer;
+  }
+  #shopify-section-{{ sid }} .zv-card video,
+  #shopify-section-{{ sid }} .zv-card svg.zv-placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Botón de play superpuesto */
+  #shopify-section-{{ sid }} .zv-play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 5.2rem;
+    height: 5.2rem;
+    border-radius: 50%;
+    border: 0;
+    background: var(--zv-play-bg);
+    color: var(--zv-play-icon);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform .2s ease, opacity .25s ease;
+    pointer-events: none; /* el click lo maneja la card completa */
+  }
+  #shopify-section-{{ sid }} .zv-card:hover .zv-play {
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+  #shopify-section-{{ sid }} .zv-card.is-playing .zv-play {
+    opacity: 0;
+  }
+  #shopify-section-{{ sid }} .zv-play svg {
+    width: 1.7rem;
+    height: 1.9rem;
+    margin-left: .3rem;
+  }
+
+  /* ============ BARRA DE PROGRESO + FLECHAS ============ */
+  #shopify-section-{{ sid }} .zv-bottom {
+    display: flex;
+    align-items: center;
+    gap: 4rem;
+    margin-top: {{ section.settings.gap_controls }}px;
+  }
+  #shopify-section-{{ sid }} .zv-progress {
+    flex: 1 1 auto;
+    height: 2px;
+    background: var(--zv-bar-track);
+    position: relative;
+    overflow: hidden;
+  }
+  #shopify-section-{{ sid }} .zv-progress-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0%;
+    background: var(--zv-bar-fill);
+    transition: width .15s linear;
+  }
+  #shopify-section-{{ sid }} .zv-arrows {
+    display: flex;
+    gap: 1.4rem;
+    flex: 0 0 auto;
+  }
+  #shopify-section-{{ sid }} .zv-arrow-btn {
+    width: 4.4rem;
+    height: 4.4rem;
+    border-radius: 50%;
+    border: 1px solid var(--zv-arrow-border);
+    background: transparent;
+    color: var(--zv-arrow);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s ease, color .2s ease;
+  }
+  #shopify-section-{{ sid }} .zv-arrow-btn svg {
+    width: 1rem;
+    height: 1.6rem;
+  }
+  #shopify-section-{{ sid }} .zv-arrow-btn:hover {
+    background: var(--zv-arrow);
+    color: var(--zv-bg);
+  }
+
+  /* ============ MOBILE ============ */
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ sid }} .zv-section {
+      padding-top: {{ section.settings.padding_top_mobile }}px;
+      padding-bottom: {{ section.settings.padding_bottom_mobile }}px;
+      margin-top: {{ section.settings.margin_top_mobile }}px;
+      margin-bottom: {{ section.settings.margin_bottom_mobile }}px;
+    }
+    #shopify-section-{{ sid }} .zv-wrapper {
+      padding: 0 {{ section.settings.padding_x_mobile }}px;
+    }
+    #shopify-section-{{ sid }} .zv-heading {
+      font-size: var(--zv-heading-size-mobile);
+      margin-bottom: {{ section.settings.gap_heading_mobile }}px;
+    }
+    #shopify-section-{{ sid }} .zv-card {
+      flex-basis: var(--zv-card-width-mobile);
+      width: var(--zv-card-width-mobile);
+    }
+    #shopify-section-{{ sid }} .zv-bottom {
+      margin-top: {{ section.settings.gap_controls_mobile }}px;
+      gap: 2.4rem;
+    }
+    {% unless section.settings.show_arrows_mobile %}
+      #shopify-section-{{ sid }} .zv-arrows { display: none; }
+    {% endunless %}
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #shopify-section-{{ sid }} .zv-slider { scroll-behavior: auto; }
+    #shopify-section-{{ sid }} .zv-progress-fill { transition: none; }
+  }
+{%- endstyle -%}
+
+<zi-video-carousel class="zv-section" data-section-id="{{ sid }}">
+  <div class="zv-wrapper">
+    {%- if section.settings.show_stars or section.settings.subtext != blank -%}
+      <div class="zv-top">
+        {%- if section.settings.show_stars -%}
+          <div class="zv-stars" aria-hidden="true">
+            {%- for i in (1..5) -%}
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 1.6l3.1 6.9 7.5.8-5.6 5.1 1.5 7.4L12 18l-6.5 3.8 1.5-7.4L1.4 9.3l7.5-.8L12 1.6z"/>
+              </svg>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+        {%- if section.settings.subtext != blank -%}
+          <p class="zv-subtext">{{ section.settings.subtext }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.heading != blank -%}
+      <h2 class="zv-heading">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+
+    <div class="zv-slider" data-slider>
+      {%- for block in section.blocks -%}
+        <div class="zv-card" data-card {{ block.shopify_attributes }}>
+          {%- if block.settings.video != blank -%}
+            {{ block.settings.video | video_tag: playsinline: true, preload: 'metadata', muted: false, loop: false, controls: false, class: 'zv-video' }}
+          {%- else -%}
+            {{ 'lifestyle-1' | placeholder_svg_tag: 'zv-placeholder' }}
+          {%- endif -%}
+          <button type="button" class="zv-play" tabindex="-1" aria-hidden="true">
+            <svg viewBox="0 0 14 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M13.2 7.13a1 1 0 0 1 0 1.74L1.9 15.4A1 1 0 0 1 .4 14.53V1.47A1 1 0 0 1 1.9.6l11.3 6.53z"/>
+            </svg>
+          </button>
+        </div>
+      {%- endfor -%}
+    </div>
+
+    <div class="zv-bottom">
+      <div class="zv-progress" aria-hidden="true">
+        <div class="zv-progress-fill" data-progress></div>
+      </div>
+      {%- if section.settings.show_arrows -%}
+        <div class="zv-arrows">
+          <button type="button" class="zv-arrow-btn" data-dir="-1" aria-label="Anterior">
+            <svg viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M8.5 1L1.5 8L8.5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button type="button" class="zv-arrow-btn" data-dir="1" aria-label="Siguiente">
+            <svg viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M1.5 1L8.5 8L1.5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</zi-video-carousel>
+
+<script>
+  if (!customElements.get('zi-video-carousel')) {
+    customElements.define(
+      'zi-video-carousel',
+      class ZiVideoCarousel extends HTMLElement {
+        connectedCallback() {
+          this.slider = this.querySelector('[data-slider]');
+          this.fill = this.querySelector('[data-progress]');
+          this.cards = Array.from(this.querySelectorAll('[data-card]'));
+
+          /* ---- BARRA DE PROGRESO: se llena según el scroll ---- */
+          this.updateProgress = this.updateProgress.bind(this);
+          this.slider.addEventListener('scroll', this.updateProgress, { passive: true });
+          window.addEventListener('resize', this.updateProgress);
+          this.updateProgress();
+
+          /* ---- Flechas ---- */
+          this.querySelectorAll('.zv-arrow-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              const dir = parseInt(btn.dataset.dir, 10);
+              const card = this.cards[0];
+              const step = card ? (card.offsetWidth + this.gap()) * 2 : this.slider.clientWidth * 0.8;
+              this.slider.scrollBy({ left: dir * step, behavior: 'smooth' });
+            });
+          });
+
+          /* ---- Play / pausa de videos ---- */
+          this.cards.forEach((card) => {
+            const video = card.querySelector('video');
+            if (!video) return;
+            card.addEventListener('click', () => {
+              if (video.paused) {
+                this.pauseAll();
+                video.muted = false;
+                video.play();
+                card.classList.add('is-playing');
+              } else {
+                video.pause();
+                card.classList.remove('is-playing');
+              }
+            });
+            video.addEventListener('ended', () => {
+              card.classList.remove('is-playing');
+              video.currentTime = 0;
+            });
+          });
+        }
+
+        gap() {
+          const styles = getComputedStyle(this.slider);
+          return parseFloat(styles.columnGap || styles.gap || '0') || 0;
+        }
+
+        updateProgress() {
+          const max = this.slider.scrollWidth - this.slider.clientWidth;
+          let pct;
+          if (max <= 0) {
+            pct = 100; /* todo visible: barra llena */
+          } else {
+            /* Arranca mostrando la fracción visible y llega al 100%
+               cuando se termina de deslizar */
+            pct = ((this.slider.scrollLeft + this.slider.clientWidth) / this.slider.scrollWidth) * 100;
+          }
+          this.fill.style.width = pct + '%';
+        }
+
+        pauseAll() {
+          this.cards.forEach((card) => {
+            const video = card.querySelector('video');
+            if (video && !video.paused) video.pause();
+            card.classList.remove('is-playing');
+          });
+        }
+
+        disconnectedCallback() {
+          window.removeEventListener('resize', this.updateProgress);
+          this.pauseAll();
+        }
+      }
+    );
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Videos de clientes",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Contenido"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_stars",
+      "label": "Mostrar estrellas",
+      "default": true
+    },
+    {
+      "type": "inline_richtext",
+      "id": "subtext",
+      "label": "Texto junto a las estrellas",
+      "default": "100,000+ clientes satisfechos"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Título",
+      "default": "Nuestros clientes opinan"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Tamaño del título (escritorio)",
+      "min": 24,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Tamaño del título (móvil)",
+      "min": 18,
+      "max": 56,
+      "step": 1,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "header",
+      "content": "Carrusel"
+    },
+    {
+      "type": "range",
+      "id": "card_width",
+      "label": "Ancho de video (escritorio)",
+      "min": 140,
+      "max": 360,
+      "step": 5,
+      "unit": "px",
+      "default": 210
+    },
+    {
+      "type": "range",
+      "id": "card_width_mobile",
+      "label": "Ancho de video (móvil)",
+      "min": 120,
+      "max": 300,
+      "step": 5,
+      "unit": "px",
+      "default": 180
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "Espacio entre videos",
+      "min": 4,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Radio de borde de videos",
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Mostrar flechas",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows_mobile",
+      "label": "Mostrar flechas en móvil",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Ancho máximo del contenido",
+      "min": 900,
+      "max": 1920,
+      "step": 20,
+      "unit": "px",
+      "default": 1500
+    },
+    {
+      "type": "header",
+      "content": "Espaciado (escritorio)"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding superior",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding inferior",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_x",
+      "label": "Padding lateral",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "label": "Margen superior",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "label": "Margen inferior",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "gap_heading",
+      "label": "Espacio bajo el título",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "gap_controls",
+      "label": "Espacio sobre la barra de progreso",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Espaciado (móvil)"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding superior",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding inferior",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_x_mobile",
+      "label": "Padding lateral",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "margin_top_mobile",
+      "label": "Margen superior",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_mobile",
+      "label": "Margen inferior",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "gap_heading_mobile",
+      "label": "Espacio bajo el título",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "gap_controls_mobile",
+      "label": "Espacio sobre la barra de progreso",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "header",
+      "content": "Colores"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Fondo de la sección",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "color_heading",
+      "label": "Título",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "color_subtext",
+      "label": "Texto junto a las estrellas",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "color_star",
+      "label": "Estrellas",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "color_bar_track",
+      "label": "Barra de progreso (fondo)",
+      "default": "#D9D9D9"
+    },
+    {
+      "type": "color",
+      "id": "color_bar_fill",
+      "label": "Barra de progreso (relleno)",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "color_arrow",
+      "label": "Flechas",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "color_arrow_border",
+      "label": "Borde de las flechas",
+      "default": "#B5B5B5"
+    },
+    {
+      "type": "color",
+      "id": "color_play_bg",
+      "label": "Fondo del botón de play",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "color",
+      "id": "color_play_icon",
+      "label": "Icono de play",
+      "default": "#FFFFFF"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "video",
+      "name": "Video",
+      "settings": [
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Video",
+          "info": "Recomendado: formato vertical 9:16 (tipo reel/TikTok)."
+        }
+      ]
+    }
+  ],
+  "max_blocks": 20,
+  "presets": [
+    {
+      "name": "Videos de clientes",
+      "blocks": [
+        { "type": "video" },
+        { "type": "video" },
+        { "type": "video" },
+        { "type": "video" },
+        { "type": "video" }
+      ]
+    }
+  ]
+}
+{% endschema %}
