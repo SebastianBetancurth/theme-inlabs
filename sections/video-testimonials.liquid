@@ -56,6 +56,10 @@
   }
 
   /* ============ ENCABEZADO ============ */
+  #shopify-section-{{ sid }} .zv-header {
+    display: flex;
+    flex-direction: column;
+  }
   #shopify-section-{{ sid }} .zv-top {
     display: flex;
     align-items: center;
@@ -209,6 +213,12 @@
     }
     #shopify-section-{{ sid }} .zv-heading {
       font-size: var(--zv-heading-size-mobile);
+      order: 1;
+      margin-bottom: 1.4rem;
+    }
+    /* En móvil las estrellas y el texto van DEBAJO del título */
+    #shopify-section-{{ sid }} .zv-top {
+      order: 2;
       margin-bottom: {{ section.settings.gap_heading_mobile }}px;
     }
     #shopify-section-{{ sid }} .zv-card {
@@ -232,26 +242,28 @@
 
 <zi-video-carousel class="zv-section" data-section-id="{{ sid }}">
   <div class="zv-wrapper">
-    {%- if section.settings.show_stars or section.settings.subtext != blank -%}
-      <div class="zv-top">
-        {%- if section.settings.show_stars -%}
-          <div class="zv-stars" aria-hidden="true">
-            {%- for i in (1..5) -%}
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 1.6l3.1 6.9 7.5.8-5.6 5.1 1.5 7.4L12 18l-6.5 3.8 1.5-7.4L1.4 9.3l7.5-.8L12 1.6z"/>
-              </svg>
-            {%- endfor -%}
-          </div>
-        {%- endif -%}
-        {%- if section.settings.subtext != blank -%}
-          <p class="zv-subtext">{{ section.settings.subtext }}</p>
-        {%- endif -%}
-      </div>
-    {%- endif -%}
+    <div class="zv-header">
+      {%- if section.settings.show_stars or section.settings.subtext != blank -%}
+        <div class="zv-top">
+          {%- if section.settings.show_stars -%}
+            <div class="zv-stars" aria-hidden="true">
+              {%- for i in (1..5) -%}
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 1.6l3.1 6.9 7.5.8-5.6 5.1 1.5 7.4L12 18l-6.5 3.8 1.5-7.4L1.4 9.3l7.5-.8L12 1.6z"/>
+                </svg>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+          {%- if section.settings.subtext != blank -%}
+            <p class="zv-subtext">{{ section.settings.subtext }}</p>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
 
-    {%- if section.settings.heading != blank -%}
-      <h2 class="zv-heading">{{ section.settings.heading }}</h2>
-    {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="zv-heading">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+    </div>
 
     <div class="zv-slider" data-slider>
       {%- for block in section.blocks -%}
