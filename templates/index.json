@@ -360,6 +360,59 @@
         "color_overlay": "#000000",
         "overlay_opacity": 60
       }
+    },
+    "testimonials_slide_kCPKjM": {
+      "type": "testimonials-slide",
+      "blocks": {
+        "testimonial_Vca3VF": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "quote": "\"Se notan mucho los beneficios!! Lo recomiendo 100%\"",
+            "author": "Borja A."
+          }
+        },
+        "testimonial_p8fUYB": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "quote": "“Un tremendo <strong>chute natural</strong>. Cumple con todos y cada uno de sus principios”",
+            "author": "Ivan M."
+          }
+        },
+        "testimonial_T7nHef": {
+          "type": "testimonial",
+          "settings": {
+            "rating": 5,
+            "quote": "\"Una mejoría increíblemente positiva en la concentración y la tranquilidad mental\"",
+            "author": "Silvia R."
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_Vca3VF",
+        "testimonial_p8fUYB",
+        "testimonial_T7nHef"
+      ],
+      "name": "Testimonios (vertical)",
+      "settings": {
+        "max_width": 1200,
+        "quote_size": 42,
+        "quote_size_mobile": 26,
+        "uppercase": true,
+        "padding_top": 96,
+        "padding_bottom": 96,
+        "autoplay": true,
+        "autoplay_speed": 6,
+        "color_bg": "#000000",
+        "color_text": "#0D0D0D",
+        "color_author": "#0D0D0D",
+        "color_star": "#000000",
+        "color_nav": "#0D0D0D",
+        "color_nav_border": "#5A5A5A",
+        "color_dot": "#4A4A4A",
+        "color_dot_active": "#000000"
+      }
     }
   },
   "order": [
@@ -368,6 +421,7 @@
     "prod_slider_i9AiYx",
     "prod_slider_yYbVex",
     "beneficios_imagen_JHVhYw",
-    "ingredientes_ciencia_EYQR44"
+    "ingredientes_ciencia_EYQR44",
+    "testimonials_slide_kCPKjM"
   ]
 }
