@@ -423,13 +423,84 @@
         "autoplay": true,
         "autoplay_speed": 6,
         "color_bg": "#000000",
-        "color_text": "#FFFFFF",
-        "color_author": "#FFFFFF",
-        "color_star": "#FFFFFF",
-        "color_nav": "#FFFFFF",
-        "color_nav_border": "#FFFFFF",
-        "color_dot": "#FFFFFF",
-        "color_dot_active": "#FFFFFF"
+        "color_text": "#ffffff",
+        "color_author": "#ffffff",
+        "color_star": "#ffffff",
+        "color_nav": "#ffffff",
+        "color_nav_border": "#ffffff",
+        "color_dot": "#ffffff",
+        "color_dot_active": "#ffffff"
+      }
+    },
+    "video_testimonials_8npFXK": {
+      "type": "video-testimonials",
+      "blocks": {
+        "video_LTEzU6": {
+          "type": "video",
+          "settings": {}
+        },
+        "video_jVf8JY": {
+          "type": "video",
+          "settings": {}
+        },
+        "video_7FCebM": {
+          "type": "video",
+          "settings": {}
+        },
+        "video_rhMpHJ": {
+          "type": "video",
+          "settings": {}
+        },
+        "video_qPAQeC": {
+          "type": "video",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "video_LTEzU6",
+        "video_jVf8JY",
+        "video_7FCebM",
+        "video_rhMpHJ",
+        "video_qPAQeC"
+      ],
+      "name": "Videos de clientes",
+      "settings": {
+        "show_stars": true,
+        "subtext": "100,000+ clientes satisfechos",
+        "heading": "Nuestros clientes opinan",
+        "heading_size": 56,
+        "heading_size_mobile": 32,
+        "card_width": 210,
+        "card_width_mobile": 180,
+        "card_gap": 20,
+        "card_radius": 4,
+        "show_arrows": true,
+        "show_arrows_mobile": false,
+        "max_width": 1500,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "padding_x": 48,
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "gap_heading": 44,
+        "gap_controls": 48,
+        "padding_top_mobile": 48,
+        "padding_bottom_mobile": 48,
+        "padding_x_mobile": 20,
+        "margin_top_mobile": 0,
+        "margin_bottom_mobile": 0,
+        "gap_heading_mobile": 28,
+        "gap_controls_mobile": 32,
+        "color_bg": "#FFFFFF",
+        "color_heading": "#121212",
+        "color_subtext": "#121212",
+        "color_star": "#121212",
+        "color_bar_track": "#D9D9D9",
+        "color_bar_fill": "#121212",
+        "color_arrow": "#121212",
+        "color_arrow_border": "#B5B5B5",
+        "color_play_bg": "#1A1A1A",
+        "color_play_icon": "#FFFFFF"
       }
     }
   },
@@ -440,6 +511,7 @@
     "prod_slider_yYbVex",
     "beneficios_imagen_JHVhYw",
     "ingredientes_ciencia_EYQR44",
-    "testimonials_slide_kCPKjM"
+    "testimonials_slide_kCPKjM",
+    "video_testimonials_8npFXK"
   ]
 }
