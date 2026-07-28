@@ -1,0 +1,592 @@
+{% comment %}
+  ============================================================
+  SECCIÓN: Testimonios con transición vertical
+  Theme: Dawn (compatible con cualquier theme OS 2.0)
+  Archivo: sections/testimonials-slide.liquid
+  ------------------------------------------------------------
+  - Slider de reseñas: la reseña actual se desliza hacia ARRIBA
+    desapareciendo con fade, y la nueva entra desde ABAJO
+    (al ir hacia atrás, la dirección se invierte).
+  - Estrellas configurables por reseña (1 a 5).
+  - Cita en richtext inline (permite negritas) + autor.
+  - Flechas circulares + puntos de navegación.
+  - Autoplay opcional con pausa al pasar el mouse.
+  - Desktop: contenido centrado. Mobile: alineado a la izquierda
+    (como la referencia), con navegación centrada.
+  - Todo editable desde el customizer.
+  ============================================================
+{% endcomment %}
+
+{%- liquid
+  assign sid = section.id
+-%}
+
+{%- style -%}
+  #shopify-section-{{ sid }} .zt-section {
+    --zt-bg: {{ section.settings.color_bg }};
+    --zt-text: {{ section.settings.color_text }};
+    --zt-author: {{ section.settings.color_author }};
+    --zt-star: {{ section.settings.color_star }};
+    --zt-nav: {{ section.settings.color_nav }};
+    --zt-nav-border: {{ section.settings.color_nav_border }};
+    --zt-dot: {{ section.settings.color_dot }};
+    --zt-dot-active: {{ section.settings.color_dot_active }};
+    --zt-quote-size: {{ section.settings.quote_size }}px;
+    --zt-quote-size-mobile: {{ section.settings.quote_size_mobile }}px;
+    --zt-max-width: {{ section.settings.max_width }}px;
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    background: var(--zt-bg);
+    overflow: hidden;
+  }
+
+  #shopify-section-{{ sid }} .zt-wrapper {
+    max-width: var(--zt-max-width);
+    margin: 0 auto;
+    padding: 0 5rem;
+    text-align: center;
+    font-family: var(--font-body-family);
+  }
+
+  /* ============ ESCENARIO (las slides van apiladas) ============ */
+  #shopify-section-{{ sid }} .zt-stage {
+    position: relative;
+    transition: height .35s ease;
+  }
+  #shopify-section-{{ sid }} .zt-slide {
+    position: absolute;
+    inset: 0 0 auto 0;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  #shopify-section-{{ sid }} .zt-slide.is-active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  /* ============ TRANSICIÓN VERTICAL ============ */
+  /* Siguiente: la actual sube y se va, la nueva entra desde abajo */
+  #shopify-section-{{ sid }} .zt-slide.zt-out-up {
+    animation: zt-out-up .55s cubic-bezier(.55, .06, .68, .19) both;
+  }
+  #shopify-section-{{ sid }} .zt-slide.zt-in-up {
+    animation: zt-in-up .55s cubic-bezier(.22, .9, .32, 1) both;
+    animation-delay: .12s;
+  }
+  /* Anterior: la actual baja y se va, la nueva entra desde arriba */
+  #shopify-section-{{ sid }} .zt-slide.zt-out-down {
+    animation: zt-out-down .55s cubic-bezier(.55, .06, .68, .19) both;
+  }
+  #shopify-section-{{ sid }} .zt-slide.zt-in-down {
+    animation: zt-in-down .55s cubic-bezier(.22, .9, .32, 1) both;
+    animation-delay: .12s;
+  }
+  @keyframes zt-out-up {
+    from { opacity: 1; transform: translateY(0); }
+    to   { opacity: 0; transform: translateY(-46px); }
+  }
+  @keyframes zt-in-up {
+    from { opacity: 0; transform: translateY(46px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes zt-out-down {
+    from { opacity: 1; transform: translateY(0); }
+    to   { opacity: 0; transform: translateY(46px); }
+  }
+  @keyframes zt-in-down {
+    from { opacity: 0; transform: translateY(-46px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ============ CONTENIDO DE LA SLIDE ============ */
+  #shopify-section-{{ sid }} .zt-stars {
+    display: flex;
+    justify-content: center;
+    gap: .8rem;
+    margin-bottom: 4rem;
+    color: var(--zt-star);
+  }
+  #shopify-section-{{ sid }} .zt-stars svg {
+    width: 2.6rem;
+    height: 2.6rem;
+    fill: currentColor;
+  }
+  #shopify-section-{{ sid }} .zt-quote {
+    font-size: var(--zt-quote-size);
+    line-height: 1.25;
+    font-weight: 300;
+    color: var(--zt-text);
+    margin: 0 auto 3.6rem;
+    max-width: 90rem;
+    {% if section.settings.uppercase %}text-transform: uppercase;{% endif %}
+  }
+  #shopify-section-{{ sid }} .zt-quote strong,
+  #shopify-section-{{ sid }} .zt-quote b {
+    font-weight: 700;
+  }
+  #shopify-section-{{ sid }} .zt-author {
+    font-size: 1.5rem;
+    color: var(--zt-author);
+    margin: 0;
+  }
+
+  /* ============ NAVEGACIÓN ============ */
+  #shopify-section-{{ sid }} .zt-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 5rem;
+  }
+  #shopify-section-{{ sid }} .zt-nav-btn {
+    width: 4.4rem;
+    height: 4.4rem;
+    border-radius: 50%;
+    border: 1px solid var(--zt-nav-border);
+    background: transparent;
+    color: var(--zt-nav);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    transition: background .2s ease, color .2s ease;
+  }
+  #shopify-section-{{ sid }} .zt-nav-btn svg {
+    width: 1rem;
+    height: 1.6rem;
+  }
+  #shopify-section-{{ sid }} .zt-nav-btn:hover {
+    background: var(--zt-nav);
+    color: var(--zt-bg);
+  }
+  #shopify-section-{{ sid }} .zt-dots {
+    display: flex;
+    gap: 1.1rem;
+  }
+  #shopify-section-{{ sid }} .zt-dot {
+    width: .7rem;
+    height: .7rem;
+    border-radius: 50%;
+    border: 0;
+    padding: 0;
+    background: var(--zt-dot);
+    cursor: pointer;
+    transition: background .25s ease, transform .25s ease;
+  }
+  #shopify-section-{{ sid }} .zt-dot[aria-current='true'] {
+    background: var(--zt-dot-active);
+    transform: scale(1.35);
+  }
+
+  /* ============ MOBILE ============ */
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ sid }} .zt-wrapper {
+      padding: 0 2rem;
+      text-align: left;
+    }
+    #shopify-section-{{ sid }} .zt-stars {
+      justify-content: flex-start;
+      margin-bottom: 2.6rem;
+    }
+    #shopify-section-{{ sid }} .zt-stars svg {
+      width: 2.2rem;
+      height: 2.2rem;
+    }
+    #shopify-section-{{ sid }} .zt-quote {
+      font-size: var(--zt-quote-size-mobile);
+      margin: 0 0 2.8rem;
+      max-width: 100%;
+    }
+    #shopify-section-{{ sid }} .zt-nav {
+      margin-top: 3.6rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #shopify-section-{{ sid }} .zt-slide.zt-out-up,
+    #shopify-section-{{ sid }} .zt-slide.zt-in-up,
+    #shopify-section-{{ sid }} .zt-slide.zt-out-down,
+    #shopify-section-{{ sid }} .zt-slide.zt-in-down {
+      animation: none;
+    }
+    #shopify-section-{{ sid }} .zt-stage { transition: none; }
+  }
+{%- endstyle -%}
+
+<zi-testimonials
+  class="zt-section"
+  data-section-id="{{ sid }}"
+  {% if section.settings.autoplay %}data-autoplay="{{ section.settings.autoplay_speed | times: 1000 }}"{% endif %}
+>
+  <div class="zt-wrapper">
+    <div class="zt-stage" role="region" aria-roledescription="carrusel" aria-label="Reseñas de clientes">
+      {%- for block in section.blocks -%}
+        <div
+          class="zt-slide{% if forloop.first %} is-active{% endif %}"
+          data-slide
+          role="group"
+          aria-roledescription="reseña"
+          aria-label="Reseña {{ forloop.index }} de {{ forloop.length }}"
+          {{ block.shopify_attributes }}
+        >
+          {%- if block.settings.rating > 0 -%}
+            <div class="zt-stars" aria-label="{{ block.settings.rating }} de 5 estrellas">
+              {%- for i in (1..block.settings.rating) -%}
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M12 1.6l3.1 6.9 7.5.8-5.6 5.1 1.5 7.4L12 18l-6.5 3.8 1.5-7.4L1.4 9.3l7.5-.8L12 1.6z"/>
+                </svg>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+          {%- if block.settings.quote != blank -%}
+            <p class="zt-quote">{{ block.settings.quote }}</p>
+          {%- endif -%}
+          {%- if block.settings.author != blank -%}
+            <p class="zt-author">{{ block.settings.author | escape }}</p>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+
+    {%- if section.blocks.size > 1 -%}
+      <div class="zt-nav">
+        <button type="button" class="zt-nav-btn" data-dir="-1" aria-label="Reseña anterior">
+          <svg viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M8.5 1L1.5 8L8.5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="zt-dots" role="tablist" aria-label="Elegir reseña">
+          {%- for block in section.blocks -%}
+            <button
+              type="button"
+              class="zt-dot"
+              data-dot="{{ forloop.index0 }}"
+              aria-label="Ir a la reseña {{ forloop.index }}"
+              aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+            ></button>
+          {%- endfor -%}
+        </div>
+        <button type="button" class="zt-nav-btn" data-dir="1" aria-label="Reseña siguiente">
+          <svg viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M1.5 1L8.5 8L1.5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    {%- endif -%}
+  </div>
+</zi-testimonials>
+
+<script>
+  if (!customElements.get('zi-testimonials')) {
+    customElements.define(
+      'zi-testimonials',
+      class ZiTestimonials extends HTMLElement {
+        connectedCallback() {
+          this.stage = this.querySelector('.zt-stage');
+          this.slides = Array.from(this.querySelectorAll('[data-slide]'));
+          this.dots = Array.from(this.querySelectorAll('[data-dot]'));
+          this.current = 0;
+          this.animating = false;
+          this.ANIM_MS = 700; /* .55s de animación + .12s de delay + margen */
+
+          if (this.slides.length === 0) return;
+
+          /* Altura del escenario = altura de la slide activa
+             (las slides están en position:absolute) */
+          this.setStageHeight();
+          this.onResize = () => this.setStageHeight();
+          window.addEventListener('resize', this.onResize);
+
+          /* Flechas */
+          this.querySelectorAll('.zt-nav-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              const dir = parseInt(btn.dataset.dir, 10);
+              const next = (this.current + dir + this.slides.length) % this.slides.length;
+              this.goTo(next, dir);
+              this.restartAutoplay();
+            });
+          });
+
+          /* Puntos */
+          this.dots.forEach((dot) => {
+            dot.addEventListener('click', () => {
+              const index = parseInt(dot.dataset.dot, 10);
+              if (index === this.current) return;
+              const dir = index > this.current ? 1 : -1;
+              this.goTo(index, dir);
+              this.restartAutoplay();
+            });
+          });
+
+          /* Autoplay opcional, con pausa al pasar el mouse */
+          this.autoplayMs = parseInt(this.dataset.autoplay || '0', 10);
+          if (this.autoplayMs > 0 && this.slides.length > 1) {
+            this.startAutoplay();
+            this.addEventListener('mouseenter', () => this.stopAutoplay());
+            this.addEventListener('mouseleave', () => this.startAutoplay());
+          }
+        }
+
+        setStageHeight() {
+          const active = this.slides[this.current];
+          if (active) this.stage.style.height = active.offsetHeight + 'px';
+        }
+
+        goTo(index, dir) {
+          if (this.animating || index === this.current) return;
+          this.animating = true;
+
+          const out = this.slides[this.current];
+          const inn = this.slides[index];
+          const outClass = dir > 0 ? 'zt-out-up' : 'zt-out-down';
+          const inClass = dir > 0 ? 'zt-in-up' : 'zt-in-down';
+
+          /* La entrante se activa y anima; la saliente anima su salida */
+          inn.classList.add('is-active', inClass);
+          out.classList.add(outClass);
+
+          /* Ajustar la altura del escenario a la slide entrante */
+          this.stage.style.height = inn.offsetHeight + 'px';
+
+          /* Puntos */
+          this.dots.forEach((d, i) => d.setAttribute('aria-current', i === index ? 'true' : 'false'));
+
+          this.current = index;
+
+          setTimeout(() => {
+            out.classList.remove('is-active', 'zt-out-up', 'zt-out-down');
+            inn.classList.remove('zt-in-up', 'zt-in-down');
+            this.animating = false;
+          }, this.ANIM_MS);
+        }
+
+        startAutoplay() {
+          if (!this.autoplayMs) return;
+          this.stopAutoplay();
+          this.timer = setInterval(() => {
+            const next = (this.current + 1) % this.slides.length;
+            this.goTo(next, 1);
+          }, this.autoplayMs);
+        }
+
+        stopAutoplay() {
+          if (this.timer) clearInterval(this.timer);
+          this.timer = null;
+        }
+
+        restartAutoplay() {
+          if (this.autoplayMs) this.startAutoplay();
+        }
+
+        disconnectedCallback() {
+          this.stopAutoplay();
+          window.removeEventListener('resize', this.onResize);
+        }
+      }
+    );
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Testimonios (vertical)",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Diseño y tamaños"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Ancho máximo del contenido",
+      "min": 700,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "quote_size",
+      "label": "Tamaño de la cita (escritorio)",
+      "min": 20,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "default": 42
+    },
+    {
+      "type": "range",
+      "id": "quote_size_mobile",
+      "label": "Tamaño de la cita (móvil)",
+      "min": 16,
+      "max": 44,
+      "step": 1,
+      "unit": "px",
+      "default": 26
+    },
+    {
+      "type": "checkbox",
+      "id": "uppercase",
+      "label": "Cita en mayúsculas",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espacio superior",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espacio inferior",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "header",
+      "content": "Autoplay"
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Cambiar de reseña automáticamente",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Segundos entre reseñas",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "unit": "s",
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "Colores"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Fondo de la sección",
+      "default": "#0B0B0B"
+    },
+    {
+      "type": "color",
+      "id": "color_text",
+      "label": "Texto de la cita",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "color_author",
+      "label": "Nombre del autor",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "color_star",
+      "label": "Estrellas",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "color_nav",
+      "label": "Flechas",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "color_nav_border",
+      "label": "Borde de las flechas",
+      "default": "#5A5A5A"
+    },
+    {
+      "type": "color",
+      "id": "color_dot",
+      "label": "Punto inactivo",
+      "default": "#4A4A4A"
+    },
+    {
+      "type": "color",
+      "id": "color_dot_active",
+      "label": "Punto activo",
+      "default": "#FFFFFF"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Reseña",
+      "settings": [
+        {
+          "type": "range",
+          "id": "rating",
+          "label": "Estrellas",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "inline_richtext",
+          "id": "quote",
+          "label": "Cita",
+          "info": "Podés poner partes en negrita.",
+          "default": "\"Se notan mucho los beneficios!! Lo recomiendo 100%\""
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Autor",
+          "default": "Borja A."
+        }
+      ]
+    }
+  ],
+  "max_blocks": 12,
+  "presets": [
+    {
+      "name": "Testimonios (vertical)",
+      "blocks": [
+        {
+          "type": "testimonial",
+          "settings": {
+            "quote": "\"Se notan mucho los beneficios!! Lo recomiendo 100%\"",
+            "author": "Borja A."
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "quote": "“Un tremendo <strong>chute natural</strong>. Cumple con todos y cada uno de sus principios”",
+            "author": "Ivan M."
+          }
+        },
+        {
+          "type": "testimonial",
+          "settings": {
+            "quote": "\"Una mejoría increíblemente positiva en la concentración y la tranquilidad mental\"",
+            "author": "Silvia R."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
