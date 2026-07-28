@@ -1,0 +1,780 @@
+{% comment %}
+  ============================================================
+  SECCIÓN: Footer personalizado (clon)
+  Theme: Dawn (compatible con cualquier theme OS 2.0)
+  Archivo: sections/footer-custom.liquid
+  ------------------------------------------------------------
+  Sección de footer AUTÓNOMA (no depende del footer de Dawn).
+  Se agrega desde el customizer en el grupo Footer.
+
+  DESKTOP:
+  - Logo arriba a la izquierda.
+  - Grilla: newsletter (título serif + input pill con flecha
+    centrada) a la izquierda + una columna por bloque
+    (texto o menú). Botón "Seguir en shop" bajo la última.
+  - Fila: redes sociales (izq) / selector de país (der).
+  - Fila: copyright + políticas con puntos (izq) / pagos (der).
+  - Franja inferior opcional con sellos/certificaciones.
+
+  MOBILE: todo apilado en el mismo orden de la referencia.
+  ============================================================
+{% endcomment %}
+
+{%- liquid
+  assign sid = section.id
+  assign bcols = section.blocks.size
+  if bcols < 1
+    assign bcols = 1
+  endif
+  assign follow_col = bcols | plus: 1
+-%}
+
+{%- style -%}
+  #shopify-section-{{ sid }} .zft {
+    display: block;
+    background: {{ section.settings.color_bg }};
+    color: {{ section.settings.color_text }};
+    font-family: var(--font-body-family);
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+  #shopify-section-{{ sid }} .zft a {
+    color: inherit;
+  }
+  #shopify-section-{{ sid }} .zft-wrapper {
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding: 0 {{ section.settings.padding_x }}px;
+  }
+
+  /* ============ LOGO ============ */
+  #shopify-section-{{ sid }} .zft-logo {
+    display: inline-block;
+    margin: 0 0 6rem;
+  }
+  #shopify-section-{{ sid }} .zft-logo img {
+    display: block;
+    height: auto;
+  }
+
+  /* ============ GRILLA PRINCIPAL ============ */
+  #shopify-section-{{ sid }} .zft-grid {
+    display: grid;
+    grid-template-columns: minmax(28rem, 1.2fr) repeat({{ bcols }}, minmax(0, 1fr));
+    column-gap: 5rem;
+    row-gap: 3rem;
+    align-items: start;
+  }
+
+  /* --- Newsletter --- */
+  #shopify-section-{{ sid }} .zft-news-heading {
+    font-family: "thin2", var(--font-heading-family), serif;
+    font-style: var(--font-heading-style);
+    font-weight: var(--font-heading-weight);
+    font-size: 2.7rem;
+    line-height: 1.2;
+    color: {{ section.settings.color_heading }};
+    margin: 0 0 2.2rem;
+  }
+  #shopify-section-{{ sid }} .zft-field {
+    position: relative;
+    max-width: 32rem;
+  }
+  #shopify-section-{{ sid }} .zft-input {
+    width: 100%;
+    background: transparent;
+    border: 1px solid {{ section.settings.color_line }};
+    border-radius: 10px;
+    color: {{ section.settings.color_text }};
+    font-family: inherit;
+    font-size: 1.5rem;
+    padding: 1.6rem 5.6rem 1.6rem 1.8rem;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  #shopify-section-{{ sid }} .zft-input::placeholder {
+    color: {{ section.settings.color_text | color_modify: 'alpha', 0.65 }};
+  }
+  #shopify-section-{{ sid }} .zft-input:focus {
+    outline: none;
+    border-color: {{ section.settings.color_text }};
+  }
+  #shopify-section-{{ sid }} .zft-submit {
+    position: absolute;
+    top: 50%;
+    right: .9rem;
+    transform: translateY(-50%);
+    width: 3.2rem;
+    height: 3.2rem;
+    border-radius: 50%;
+    border: 1px solid {{ section.settings.color_line }};
+    background: transparent;
+    color: {{ section.settings.color_text }};
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s ease, color .2s ease;
+  }
+  #shopify-section-{{ sid }} .zft-submit:hover {
+    background: {{ section.settings.color_text }};
+    color: {{ section.settings.color_bg }};
+  }
+  #shopify-section-{{ sid }} .zft-submit svg {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+  #shopify-section-{{ sid }} .zft-form-msg {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    font-size: 1.4rem;
+    margin-top: 1.2rem;
+  }
+
+  /* --- Columnas de bloques --- */
+  #shopify-section-{{ sid }} .zft-block-heading {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: {{ section.settings.color_heading }};
+    margin: 0 0 2.2rem;
+  }
+  #shopify-section-{{ sid }} .zft-text {
+    font-size: 1.5rem;
+    line-height: 1.65;
+    margin: 0;
+  }
+  #shopify-section-{{ sid }} .zft-text p { margin: 0 0 1rem; }
+  #shopify-section-{{ sid }} .zft-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  #shopify-section-{{ sid }} .zft-menu li {
+    margin-bottom: 1.8rem;
+  }
+  #shopify-section-{{ sid }} .zft-menu a {
+    font-size: 1.5rem;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  #shopify-section-{{ sid }} .zft-menu a:hover { opacity: .75; }
+
+  /* Botón "Seguir en shop" bajo la última columna */
+  #shopify-section-{{ sid }} .zft-follow {
+    grid-column: {{ follow_col }};
+    margin-top: -1.2rem;
+  }
+
+  /* ============ FILA: SOCIAL / PAÍS ============ */
+  #shopify-section-{{ sid }} .zft-row-social {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2.4rem;
+    margin-top: 8rem;
+  }
+  #shopify-section-{{ sid }} .zft-social {
+    display: flex;
+    align-items: center;
+    gap: 2.2rem;
+  }
+  #shopify-section-{{ sid }} .zft-social a {
+    display: flex;
+    line-height: 0;
+  }
+  #shopify-section-{{ sid }} .zft-social svg {
+    width: 2rem;
+    height: 2rem;
+    fill: currentColor;
+  }
+  #shopify-section-{{ sid }} .zft-social a:hover { opacity: .7; }
+
+  /* Selector de país minimalista (solo texto + chevron) */
+  #shopify-section-{{ sid }} .zft-locale {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+  #shopify-section-{{ sid }} .zft-locale select {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    border: 0;
+    color: {{ section.settings.color_text }};
+    font-family: inherit;
+    font-size: 1.4rem;
+    padding: .6rem 2.4rem .6rem 0;
+    cursor: pointer;
+  }
+  #shopify-section-{{ sid }} .zft-locale select:focus { outline: none; }
+  #shopify-section-{{ sid }} .zft-locale option {
+    color: #111;
+    background: #fff;
+  }
+  #shopify-section-{{ sid }} .zft-locale svg {
+    position: absolute;
+    right: .4rem;
+    width: 1rem;
+    height: .7rem;
+    pointer-events: none;
+  }
+
+  /* ============ FILA: COPYRIGHT + POLÍTICAS / PAGOS ============ */
+  #shopify-section-{{ sid }} .zft-row-bottom {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 3rem;
+    margin-top: 4.5rem;
+  }
+  #shopify-section-{{ sid }} .zft-copy {
+    font-size: 1.3rem;
+    margin: 0 0 1.4rem;
+  }
+  #shopify-section-{{ sid }} .zft-policies {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .8rem 1.1rem;
+    align-items: center;
+    font-size: 1.3rem;
+  }
+  #shopify-section-{{ sid }} .zft-policies li {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+  }
+  #shopify-section-{{ sid }} .zft-policies li + li::before {
+    content: '•';
+    font-size: 1.2rem;
+  }
+  #shopify-section-{{ sid }} .zft-policies a {
+    text-decoration: none;
+  }
+  #shopify-section-{{ sid }} .zft-policies a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  #shopify-section-{{ sid }} .zft-payments {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: .6rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  #shopify-section-{{ sid }} .zft-payments svg {
+    display: block;
+    width: 3.8rem;
+    height: 2.4rem;
+  }
+
+  /* ============ FRANJA DE SELLOS ============ */
+  #shopify-section-{{ sid }} .zft-badges {
+    background: {{ section.settings.badges_bg }};
+    margin-top: {{ section.settings.padding_bottom }}px;
+    margin-bottom: -{{ section.settings.padding_bottom }}px;
+    padding: 1.2rem 0;
+  }
+  #shopify-section-{{ sid }} .zft-badges .zft-wrapper {
+    display: flex;
+    justify-content: flex-end;
+  }
+  #shopify-section-{{ sid }} .zft-badges img {
+    height: auto;
+    display: block;
+  }
+
+  /* ============ MOBILE ============ */
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ sid }} .zft {
+      padding-top: {{ section.settings.padding_top_mobile }}px;
+      padding-bottom: {{ section.settings.padding_bottom_mobile }}px;
+    }
+    #shopify-section-{{ sid }} .zft-wrapper {
+      padding: 0 {{ section.settings.padding_x_mobile }}px;
+    }
+    #shopify-section-{{ sid }} .zft-logo { margin-bottom: 3.4rem; }
+    #shopify-section-{{ sid }} .zft-news-heading { font-size: 2.2rem; }
+    #shopify-section-{{ sid }} .zft-field { max-width: 100%; }
+    #shopify-section-{{ sid }} .zft-grid {
+      grid-template-columns: 1fr;
+      row-gap: 3.8rem;
+    }
+    #shopify-section-{{ sid }} .zft-follow {
+      grid-column: 1;
+      margin-top: -1.6rem;
+    }
+    #shopify-section-{{ sid }} .zft-row-social {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 3rem;
+      margin-top: 4.5rem;
+    }
+    #shopify-section-{{ sid }} .zft-row-bottom {
+      flex-direction: column-reverse; /* pagos arriba, copyright abajo */
+      align-items: flex-start;
+      gap: 3rem;
+    }
+    #shopify-section-{{ sid }} .zft-payments { justify-content: flex-start; }
+    #shopify-section-{{ sid }} .zft-badges { margin-top: {{ section.settings.padding_bottom_mobile }}px; margin-bottom: -{{ section.settings.padding_bottom_mobile }}px; }
+    #shopify-section-{{ sid }} .zft-badges .zft-wrapper { justify-content: flex-start; }
+  }
+{%- endstyle -%}
+
+<footer class="zft" data-section-id="{{ sid }}">
+  <div class="zft-wrapper">
+    {%- comment -%} ---------- LOGO ---------- {%- endcomment -%}
+    {%- if section.settings.logo != blank -%}
+      <a href="{{ routes.root_url }}" class="zft-logo" aria-label="{{ shop.name | escape }}">
+        {{ section.settings.logo | image_url: width: 400 | image_tag: loading: 'lazy', width: section.settings.logo_width, alt: shop.name }}
+      </a>
+    {%- endif -%}
+
+    {%- comment -%} ---------- GRILLA: NEWSLETTER + COLUMNAS ---------- {%- endcomment -%}
+    <div class="zft-grid">
+      {%- if section.settings.newsletter_enable -%}
+        <div class="zft-newsletter">
+          {%- if section.settings.newsletter_heading != blank -%}
+            <h2 class="zft-news-heading">{{ section.settings.newsletter_heading }}</h2>
+          {%- endif -%}
+          {%- form 'customer', id: 'ZftNewsletter-' | append: sid, class: 'zft-form' -%}
+            <input type="hidden" name="contact[tags]" value="newsletter">
+            <div class="zft-field">
+              <label class="visually-hidden" for="ZftEmail-{{ sid }}">{{ section.settings.newsletter_placeholder | escape }}</label>
+              <input
+                id="ZftEmail-{{ sid }}"
+                type="email"
+                name="contact[email]"
+                class="zft-input"
+                value="{{ form.email }}"
+                placeholder="{{ section.settings.newsletter_placeholder | escape }}"
+                autocorrect="off"
+                autocapitalize="off"
+                autocomplete="email"
+                required
+              >
+              <button type="submit" class="zft-submit" name="commit" aria-label="Suscribirse">
+                <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M1 7H13M13 7L7.5 1.5M13 7L7.5 12.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+            {%- if form.errors -%}
+              <p class="zft-form-msg">
+                {{ form.errors.translated_fields.email | capitalize }}
+                {{ form.errors.messages.email }}
+              </p>
+            {%- endif -%}
+            {%- if form.posted_successfully? -%}
+              <p class="zft-form-msg">{{ 'newsletter.success' | t }}</p>
+            {%- endif -%}
+          {%- endform -%}
+        </div>
+      {%- endif -%}
+
+      {%- for block in section.blocks -%}
+        <div class="zft-col" {{ block.shopify_attributes }}>
+          {%- if block.settings.heading != blank -%}
+            <h3 class="zft-block-heading">{{ block.settings.heading }}</h3>
+          {%- endif -%}
+          {%- case block.type -%}
+            {%- when 'text' -%}
+              <div class="zft-text">{{ block.settings.text }}</div>
+            {%- when 'menu' -%}
+              {%- if block.settings.menu != blank -%}
+                <ul class="zft-menu">
+                  {%- for link in block.settings.menu.links -%}
+                    <li><a href="{{ link.url }}">{{ link.title | escape }}</a></li>
+                  {%- endfor -%}
+                </ul>
+              {%- endif -%}
+          {%- endcase -%}
+        </div>
+      {%- endfor -%}
+
+      {%- if shop.features.follow_on_shop? and section.settings.enable_follow_on_shop -%}
+        <div class="zft-follow">
+          {{ shop | login_button: action: 'follow' }}
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} ---------- REDES SOCIALES / PAÍS ---------- {%- endcomment -%}
+    <div class="zft-row-social">
+      <div class="zft-social">
+        {%- if section.settings.instagram_url != blank -%}
+          <a href="{{ section.settings.instagram_url }}" aria-label="Instagram" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.8.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.81s-.01 3.54-.07 4.81c-.05 1.17-.25 1.8-.41 2.23a3.7 3.7 0 0 1-.9 1.38c-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.81.07s-3.54-.01-4.81-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.2 15.54 2.2 15.16 2.2 12s.01-3.54.07-4.81c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.46 2.2 8.84 2.2 12 2.2zm0 1.8c-3.1 0-3.47.01-4.7.07-1.08.05-1.67.23-2.06.38-.52.2-.89.44-1.28.83-.39.39-.63.76-.83 1.28-.15.39-.33.98-.38 2.06-.06 1.23-.07 1.6-.07 4.7s.01 3.47.07 4.7c.05 1.08.23 1.67.38 2.06.2.52.44.89.83 1.28.39.39.76.63 1.28.83.39.15.98.33 2.06.38 1.23.06 1.6.07 4.7.07s3.47-.01 4.7-.07c1.08-.05 1.67-.23 2.06-.38.52-.2.89-.44 1.28-.83.39-.39.63-.76.83-1.28.15-.39.33-.98.38-2.06.06-1.23.07-1.6.07-4.7s-.01-3.47-.07-4.7c-.05-1.08-.23-1.67-.38-2.06-.2-.52-.44-.89-.83-1.28a3.44 3.44 0 0 0-1.28-.83c-.39-.15-.98-.33-2.06-.38-1.23-.06-1.6-.07-4.7-.07zm0 3.06a4.94 4.94 0 1 1 0 9.88 4.94 4.94 0 0 1 0-9.88zm0 8.14a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zm6.29-8.34a1.15 1.15 0 1 1-2.3 0 1.15 1.15 0 0 1 2.3 0z"/></svg>
+          </a>
+        {%- endif -%}
+        {%- if section.settings.youtube_url != blank -%}
+          <a href="{{ section.settings.youtube_url }}" aria-label="YouTube" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M23.5 6.5a3 3 0 0 0-2.11-2.12C19.5 3.87 12 3.87 12 3.87s-7.5 0-9.39.51A3 3 0 0 0 .5 6.5 31.3 31.3 0 0 0 0 12a31.3 31.3 0 0 0 .5 5.5 3 3 0 0 0 2.11 2.12c1.89.51 9.39.51 9.39.51s7.5 0 9.39-.51a3 3 0 0 0 2.11-2.12A31.3 31.3 0 0 0 24 12a31.3 31.3 0 0 0-.5-5.5zM9.6 15.6V8.4l6.27 3.6L9.6 15.6z"/></svg>
+          </a>
+        {%- endif -%}
+        {%- if section.settings.tiktok_url != blank -%}
+          <a href="{{ section.settings.tiktok_url }}" aria-label="TikTok" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M17.3 2h-3.05v13.13a2.78 2.78 0 0 1-2.77 2.79 2.78 2.78 0 0 1-2.77-2.79 2.79 2.79 0 0 1 2.77-2.78c.29 0 .57.05.83.13V9.35a5.9 5.9 0 0 0-.83-.06A5.87 5.87 0 0 0 5.63 15.2a5.87 5.87 0 0 0 5.85 5.87 5.87 5.87 0 0 0 5.85-5.87V8.6a7.5 7.5 0 0 0 4.34 1.38V6.93A4.43 4.43 0 0 1 17.3 2z"/></svg>
+          </a>
+        {%- endif -%}
+        {%- if section.settings.facebook_url != blank -%}
+          <a href="{{ section.settings.facebook_url }}" aria-label="Facebook" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07c0 6.02 4.39 11.01 10.12 11.93v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.79-4.7 4.53-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.95.93-1.95 1.89v2.26h3.32l-.53 3.49h-2.79V24C19.61 23.08 24 18.09 24 12.07z"/></svg>
+          </a>
+        {%- endif -%}
+        {%- if section.settings.x_url != blank -%}
+          <a href="{{ section.settings.x_url }}" aria-label="X" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M18.9 1.15h3.68l-8.04 9.2L24 22.85h-7.41l-5.8-7.59-6.64 7.59H.47l8.6-9.83L0 1.15h7.59l5.24 6.94 6.07-6.94zm-1.29 19.5h2.04L6.49 3.24H4.3l13.31 17.41z"/></svg>
+          </a>
+        {%- endif -%}
+      </div>
+
+      {%- if section.settings.enable_country_selector and localization.available_countries.size > 1 -%}
+        <div class="zft-locale">
+          {%- form 'localization', id: 'ZftLocale-' | append: sid -%}
+            <select name="country_code" aria-label="{{ 'localization.country_label' | t }}" onchange="this.form.submit()">
+              {%- for country in localization.available_countries -%}
+                <option value="{{ country.iso_code }}" {% if country.iso_code == localization.country.iso_code %}selected{% endif %}>
+                  {{ country.name }} ({{ country.currency.iso_code }} {{ country.currency.symbol }})
+                </option>
+              {%- endfor -%}
+            </select>
+            <svg viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          {%- endform -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} ---------- COPYRIGHT + POLÍTICAS / PAGOS ---------- {%- endcomment -%}
+    <div class="zft-row-bottom">
+      <div>
+        <p class="zft-copy">&copy; {{ 'now' | date: '%Y' }}, {{ shop.name | link_to: routes.root_url }}</p>
+        {%- if section.settings.show_policy -%}
+          <ul class="zft-policies">
+            {%- for policy in shop.policies -%}
+              {%- if policy != blank -%}
+                <li><a href="{{ policy.url }}">{{ policy.title | escape }}</a></li>
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+      </div>
+
+      {%- if section.settings.payment_enable -%}
+        <ul class="zft-payments" role="list" aria-label="{{ 'sections.footer.payment' | t | default: 'Métodos de pago' }}">
+          {%- for type in shop.enabled_payment_types -%}
+            <li>{{ type | payment_type_svg_tag: class: 'icon icon--full-color' }}</li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- comment -%} ---------- FRANJA DE SELLOS (opcional) ---------- {%- endcomment -%}
+  {%- if section.settings.badges_image != blank -%}
+    <div class="zft-badges">
+      <div class="zft-wrapper">
+        {{ section.settings.badges_image | image_url: width: 1200 | image_tag: loading: 'lazy', width: section.settings.badges_width, alt: '' }}
+      </div>
+    </div>
+  {%- endif -%}
+</footer>
+
+{% schema %}
+{
+  "name": "Footer personalizado",
+  "tag": "section",
+  "class": "section",
+  "enabled_on": {
+    "groups": ["footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Ancho del logo",
+      "min": 30,
+      "max": 250,
+      "step": 5,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Newsletter"
+    },
+    {
+      "type": "checkbox",
+      "id": "newsletter_enable",
+      "label": "Mostrar newsletter",
+      "default": true
+    },
+    {
+      "type": "inline_richtext",
+      "id": "newsletter_heading",
+      "label": "Título del newsletter",
+      "default": "Desbloquea tu descuento secreto"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_placeholder",
+      "label": "Placeholder del campo",
+      "default": "Correo electrónico"
+    },
+    {
+      "type": "header",
+      "content": "Redes sociales"
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram"
+    },
+    {
+      "type": "url",
+      "id": "youtube_url",
+      "label": "YouTube"
+    },
+    {
+      "type": "url",
+      "id": "tiktok_url",
+      "label": "TikTok"
+    },
+    {
+      "type": "url",
+      "id": "facebook_url",
+      "label": "Facebook"
+    },
+    {
+      "type": "url",
+      "id": "x_url",
+      "label": "X (Twitter)"
+    },
+    {
+      "type": "header",
+      "content": "Opciones"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_follow_on_shop",
+      "label": "Botón Seguir en Shop",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_country_selector",
+      "label": "Selector de país",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "payment_enable",
+      "label": "Mostrar iconos de pago",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_policy",
+      "label": "Mostrar políticas",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Sellos / certificaciones"
+    },
+    {
+      "type": "image_picker",
+      "id": "badges_image",
+      "label": "Imagen de sellos",
+      "info": "Franja al final del footer, alineada a la derecha en escritorio."
+    },
+    {
+      "type": "range",
+      "id": "badges_width",
+      "label": "Ancho de la imagen de sellos",
+      "min": 100,
+      "max": 900,
+      "step": 10,
+      "unit": "px",
+      "default": 480
+    },
+    {
+      "type": "color",
+      "id": "badges_bg",
+      "label": "Fondo de la franja de sellos",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Colores"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Fondo",
+      "default": "#0B0B0B"
+    },
+    {
+      "type": "color",
+      "id": "color_text",
+      "label": "Texto",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "color_heading",
+      "label": "Títulos",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "color_line",
+      "label": "Bordes (input y botón)",
+      "default": "#6E6E6E"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado (escritorio)"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Ancho máximo del contenido",
+      "min": 1000,
+      "max": 1920,
+      "step": 20,
+      "unit": "px",
+      "default": 1600
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding superior",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding inferior",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_x",
+      "label": "Padding lateral",
+      "min": 0,
+      "max": 140,
+      "step": 4,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Espaciado (móvil)"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding superior",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding inferior",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_x_mobile",
+      "label": "Padding lateral",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Columna de texto",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "label": "Título",
+          "default": "Sobre nosotros"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "<p>Tu aliado diario para potenciar tu rendimiento mental. Una fórmula natural, equilibrada y respaldada por la ciencia.</p>"
+        }
+      ]
+    },
+    {
+      "type": "menu",
+      "name": "Columna de menú",
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "label": "Título",
+          "default": "Contacto"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menú",
+          "default": "footer"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 4,
+  "presets": [
+    {
+      "name": "Footer personalizado",
+      "blocks": [
+        { "type": "text" },
+        { "type": "menu" },
+        { "type": "menu", "settings": { "heading": "Pruébanos" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
