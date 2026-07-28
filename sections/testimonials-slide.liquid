@@ -11,9 +11,9 @@
   - Cita en richtext inline (permite negritas) + autor.
   - Flechas circulares + puntos de navegación.
   - Autoplay opcional con pausa al pasar el mouse.
-  - Desktop: contenido centrado. Mobile: alineado a la izquierda
-    (como la referencia), con navegación centrada.
-  - Todo editable desde el customizer.
+  - TODO editable desde el customizer: colores, textos,
+    tamaños, paddings, márgenes y espacios internos,
+    con controles separados para escritorio y móvil.
   ============================================================
 {% endcomment %}
 
@@ -23,6 +23,9 @@
 
 {%- style -%}
   #shopify-section-{{ sid }} .zt-section {
+    /* display:block es OBLIGATORIO: los custom elements son
+       inline por defecto y el fondo/padding no se aplican */
+    display: block;
     --zt-bg: {{ section.settings.color_bg }};
     --zt-text: {{ section.settings.color_text }};
     --zt-author: {{ section.settings.color_author }};
@@ -33,9 +36,14 @@
     --zt-dot-active: {{ section.settings.color_dot_active }};
     --zt-quote-size: {{ section.settings.quote_size }}px;
     --zt-quote-size-mobile: {{ section.settings.quote_size_mobile }}px;
+    --zt-author-size: {{ section.settings.author_size }}px;
+    --zt-star-size: {{ section.settings.star_size }}px;
+    --zt-star-size-mobile: {{ section.settings.star_size_mobile }}px;
     --zt-max-width: {{ section.settings.max_width }}px;
     padding-top: {{ section.settings.padding_top }}px;
     padding-bottom: {{ section.settings.padding_bottom }}px;
+    margin-top: {{ section.settings.margin_top }}px;
+    margin-bottom: {{ section.settings.margin_bottom }}px;
     background: var(--zt-bg);
     overflow: hidden;
   }
@@ -43,7 +51,7 @@
   #shopify-section-{{ sid }} .zt-wrapper {
     max-width: var(--zt-max-width);
     margin: 0 auto;
-    padding: 0 5rem;
+    padding: 0 {{ section.settings.padding_x }}px;
     text-align: center;
     font-family: var(--font-body-family);
   }
@@ -105,12 +113,12 @@
     display: flex;
     justify-content: center;
     gap: .8rem;
-    margin-bottom: 4rem;
+    margin-bottom: {{ section.settings.gap_stars }}px;
     color: var(--zt-star);
   }
   #shopify-section-{{ sid }} .zt-stars svg {
-    width: 2.6rem;
-    height: 2.6rem;
+    width: var(--zt-star-size);
+    height: var(--zt-star-size);
     fill: currentColor;
   }
   #shopify-section-{{ sid }} .zt-quote {
@@ -118,7 +126,7 @@
     line-height: 1.25;
     font-weight: 300;
     color: var(--zt-text);
-    margin: 0 auto 3.6rem;
+    margin: 0 auto {{ section.settings.gap_quote }}px;
     max-width: 90rem;
     {% if section.settings.uppercase %}text-transform: uppercase;{% endif %}
   }
@@ -127,7 +135,7 @@
     font-weight: 700;
   }
   #shopify-section-{{ sid }} .zt-author {
-    font-size: 1.5rem;
+    font-size: var(--zt-author-size);
     color: var(--zt-author);
     margin: 0;
   }
@@ -138,7 +146,7 @@
     align-items: center;
     justify-content: center;
     gap: 2rem;
-    margin-top: 5rem;
+    margin-top: {{ section.settings.gap_nav }}px;
   }
   #shopify-section-{{ sid }} .zt-nav-btn {
     width: 4.4rem;
@@ -183,25 +191,34 @@
 
   /* ============ MOBILE ============ */
   @media screen and (max-width: 749px) {
-    #shopify-section-{{ sid }} .zt-wrapper {
-      padding: 0 2rem;
-      text-align: left;
+    #shopify-section-{{ sid }} .zt-section {
+      padding-top: {{ section.settings.padding_top_mobile }}px;
+      padding-bottom: {{ section.settings.padding_bottom_mobile }}px;
+      margin-top: {{ section.settings.margin_top_mobile }}px;
+      margin-bottom: {{ section.settings.margin_bottom_mobile }}px;
     }
+    #shopify-section-{{ sid }} .zt-wrapper {
+      padding: 0 {{ section.settings.padding_x_mobile }}px;
+      {% if section.settings.align_left_mobile %}text-align: left;{% endif %}
+    }
+    {% if section.settings.align_left_mobile %}
+      #shopify-section-{{ sid }} .zt-stars { justify-content: flex-start; }
+      #shopify-section-{{ sid }} .zt-quote { margin-left: 0; margin-right: 0; }
+    {% endif %}
     #shopify-section-{{ sid }} .zt-stars {
-      justify-content: flex-start;
-      margin-bottom: 2.6rem;
+      margin-bottom: {{ section.settings.gap_stars_mobile }}px;
     }
     #shopify-section-{{ sid }} .zt-stars svg {
-      width: 2.2rem;
-      height: 2.2rem;
+      width: var(--zt-star-size-mobile);
+      height: var(--zt-star-size-mobile);
     }
     #shopify-section-{{ sid }} .zt-quote {
       font-size: var(--zt-quote-size-mobile);
-      margin: 0 0 2.8rem;
+      margin-bottom: {{ section.settings.gap_quote_mobile }}px;
       max-width: 100%;
     }
     #shopify-section-{{ sid }} .zt-nav {
-      margin-top: 3.6rem;
+      margin-top: {{ section.settings.gap_nav_mobile }}px;
     }
   }
 
@@ -398,17 +415,7 @@
   "settings": [
     {
       "type": "header",
-      "content": "Diseño y tamaños"
-    },
-    {
-      "type": "range",
-      "id": "max_width",
-      "label": "Ancho máximo del contenido",
-      "min": 700,
-      "max": 1800,
-      "step": 20,
-      "unit": "px",
-      "default": 1200
+      "content": "Textos y tamaños"
     },
     {
       "type": "range",
@@ -431,17 +438,67 @@
       "default": 26
     },
     {
+      "type": "range",
+      "id": "author_size",
+      "label": "Tamaño del autor",
+      "min": 10,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "star_size",
+      "label": "Tamaño de estrellas (escritorio)",
+      "min": 14,
+      "max": 44,
+      "step": 2,
+      "unit": "px",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "star_size_mobile",
+      "label": "Tamaño de estrellas (móvil)",
+      "min": 12,
+      "max": 36,
+      "step": 2,
+      "unit": "px",
+      "default": 22
+    },
+    {
       "type": "checkbox",
       "id": "uppercase",
       "label": "Cita en mayúsculas",
       "default": true
     },
     {
+      "type": "checkbox",
+      "id": "align_left_mobile",
+      "label": "Alinear a la izquierda en móvil",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Ancho máximo del contenido",
+      "min": 700,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "default": 1200
+    },
+    {
+      "type": "header",
+      "content": "Espaciado (escritorio)"
+    },
+    {
       "type": "range",
       "id": "padding_top",
-      "label": "Espacio superior",
+      "label": "Padding superior",
       "min": 0,
-      "max": 160,
+      "max": 200,
       "step": 4,
       "unit": "px",
       "default": 96
@@ -449,12 +506,164 @@
     {
       "type": "range",
       "id": "padding_bottom",
-      "label": "Espacio inferior",
+      "label": "Padding inferior",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_x",
+      "label": "Padding lateral",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "label": "Margen superior",
       "min": 0,
       "max": 160,
       "step": 4,
       "unit": "px",
-      "default": 96
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "label": "Margen inferior",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Espaciado (móvil)"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding superior",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding inferior",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_x_mobile",
+      "label": "Padding lateral",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "margin_top_mobile",
+      "label": "Margen superior",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_mobile",
+      "label": "Margen inferior",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Espacios internos (escritorio)"
+    },
+    {
+      "type": "range",
+      "id": "gap_stars",
+      "label": "Espacio bajo las estrellas",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "gap_quote",
+      "label": "Espacio bajo la cita",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "gap_nav",
+      "label": "Espacio sobre la navegación",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "Espacios internos (móvil)"
+    },
+    {
+      "type": "range",
+      "id": "gap_stars_mobile",
+      "label": "Espacio bajo las estrellas",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "gap_quote_mobile",
+      "label": "Espacio bajo la cita",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "gap_nav_mobile",
+      "label": "Espacio sobre la navegación",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 36
     },
     {
       "type": "header",
