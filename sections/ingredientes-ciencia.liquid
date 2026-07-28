@@ -18,6 +18,9 @@
 
 {%- style -%}
   #IngSci-{{ section.id }} {
+    --is-content-max: {{ s.content_max_width }}px;
+    --is-pad-x: {{ s.padding_x }}px;
+    --is-pad-x-m: {{ s.padding_x_mobile }}px;
     --is-section-bg: {{ s.section_bg }};
     --is-heading-color: {{ s.heading_color }};
     --is-heading-size: {{ s.heading_size }}px;
@@ -106,7 +109,7 @@
 {%- assign tabs = tab_list | split: '|||' -%}
 
 <div id="IngSci-{{ section.id }}" class="ing-sci-bg">
-  <ingredients-science class="ing-sci {% unless s.full_width %}page-width{% endunless %} ing-sci__padding">
+  <ingredients-science class="ing-sci{% if s.full_width %} ing-sci--full{% endif %} ing-sci__padding">
 
     {%- if s.heading != blank -%}
       <h2 class="ing-sci__heading" style="text-align: {{ s.heading_align }};">
@@ -247,10 +250,29 @@
 <style>
   .ing-sci-bg { background: var(--is-section-bg); }
 
-  .ing-sci__heading {
+  /* Contenedor centrado (no depende del tema) */
+  ingredients-science.ing-sci {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: var(--is-content-max);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--is-pad-x-m);
+    padding-right: var(--is-pad-x-m);
+  }
+  ingredients-science.ing-sci--full { max-width: 100%; }
+  @media screen and (min-width: 750px) {
+    ingredients-science.ing-sci {
+      padding-left: var(--is-pad-x);
+      padding-right: var(--is-pad-x);
+    }
+  }
+
+  .ing-sci h2.ing-sci__heading {
     margin: 0 0 var(--is-heading-spacing);
-    font-family: var(--font-heading-family);
-    font-style: var(--font-heading-style);
+    font-family: var(--font-heading-family, inherit);
+    font-style: var(--font-heading-style, normal);
     font-weight: var(--is-heading-weight);
     font-size: var(--is-heading-size-m);
     line-height: 1.1;
@@ -547,7 +569,7 @@
 
   /* ---------- Desktop ---------- */
   @media screen and (min-width: 750px) {
-    .ing-sci__heading { font-size: var(--is-heading-size); }
+    .ing-sci h2.ing-sci__heading { font-size: var(--is-heading-size); }
     .ing-sci__tab { font-size: var(--is-tab-size); }
     .ing-sci__tabs { margin-bottom: 24px; }
     .ing-sci__card-wrap { width: var(--is-card-width); }
@@ -776,7 +798,10 @@
 
     { "type": "header", "content": "📐 Sección" },
     { "type": "color", "id": "section_bg", "label": "Fondo de la sección", "default": "#FFFFFF" },
-    { "type": "checkbox", "id": "full_width", "label": "Ancho completo (sin márgenes laterales)", "default": false },
+    { "type": "range", "id": "content_max_width", "min": 800, "max": 1800, "step": 20, "unit": "px", "label": "Ancho máximo del contenido", "default": 1300, "info": "El contenido se centra automáticamente. Ajusta hasta alinearlo con las demás secciones de tu tema (Dawn suele usar 1200-1300px)." },
+    { "type": "checkbox", "id": "full_width", "label": "Ancho completo (sin límite de ancho)", "default": false },
+    { "type": "range", "id": "padding_x", "min": 0, "max": 100, "step": 5, "unit": "px", "label": "Margen lateral (PC)", "default": 50 },
+    { "type": "range", "id": "padding_x_mobile", "min": 0, "max": 50, "step": 2, "unit": "px", "label": "Margen lateral (móvil)", "default": 16 },
     { "type": "range", "id": "padding_top", "min": 0, "max": 120, "step": 4, "unit": "px", "label": "Espacio superior (PC)", "default": 48 },
     { "type": "range", "id": "padding_bottom", "min": 0, "max": 120, "step": 4, "unit": "px", "label": "Espacio inferior (PC)", "default": 48 },
     { "type": "range", "id": "padding_top_mobile", "min": 0, "max": 100, "step": 4, "unit": "px", "label": "Espacio superior (móvil)", "default": 32 },
