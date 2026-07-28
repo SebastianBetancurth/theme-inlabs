@@ -560,9 +560,10 @@
       "name": "Resultados con contadores",
       "settings": {
         "heading": "Resultados de nuestras encuestas",
-        "text": "<p>Todos nuestros productos se desarrollan y evalúan siguiendo protocolos de observación real.<br>Las cifras que ves son resultados de personas que, como tú, buscan claridad y equilibrio cada día.</p>",
+        "text": "<p>Todos nuestros productos se desarrollan y evalúan siguiendo protocolos de observación real.<br/>Las cifras que ves son resultados de personas que, como tú, buscan claridad y equilibrio cada día.</p>",
         "footnote": "*Basado en resultados reportados por usuarios reales tras un uso continuado de nuestras fórmulas.",
         "text_left": false,
+        "bg_image": "shopify://shop_images/bg-deskto-estudios.jpg",
         "count_duration": 1200,
         "heading_size": 44,
         "heading_size_mobile": 30,
