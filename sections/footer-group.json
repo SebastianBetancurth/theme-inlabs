@@ -13,6 +13,18 @@
   "sections": {
     "footer": {
       "type": "footer",
+      "blocks": {
+        "image_wm7hnj": {
+          "type": "image",
+          "settings": {
+            "image_width": 100,
+            "alignment": "center"
+          }
+        }
+      },
+      "block_order": [
+        "image_wm7hnj"
+      ],
       "settings": {
         "color_scheme": "scheme-4",
         "footer_logo_width": 60,
