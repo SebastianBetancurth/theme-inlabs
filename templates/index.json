@@ -218,6 +218,36 @@
     "ingredientes_ciencia_EYQR44": {
       "type": "ingredientes-premium",
       "blocks": {
+        "ingredient_p8Uyz7": {
+          "type": "ingredient",
+          "settings": {
+            "tab": "Focus",
+            "title": "Ingrediente",
+            "dosage": "100mg",
+            "description": "<p>Describí aquí el ingrediente, su función y en qué alimentos está presente.</p>",
+            "benefits": "Contribuye al metabolismo energético\nAyuda a reducir el cansancio\nApoya el sistema inmunitario\nFavorece la función psicológica normal"
+          }
+        },
+        "ingredient_qQzxm7": {
+          "type": "ingredient",
+          "settings": {
+            "tab": "Magnesium +´7",
+            "title": "Ingrediente",
+            "dosage": "100mg",
+            "description": "<p>Describí aquí el ingrediente, su función y en qué alimentos está presente.</p>",
+            "benefits": "Contribuye al metabolismo energético\nAyuda a reducir el cansancio\nApoya el sistema inmunitario\nFavorece la función psicológica normal"
+          }
+        },
+        "ingredient_hdTtAF": {
+          "type": "ingredient",
+          "settings": {
+            "tab": "Omega 3",
+            "title": "Ingrediente",
+            "dosage": "100mg",
+            "description": "<p>Describí aquí el ingrediente, su función y en qué alimentos está presente.</p>",
+            "benefits": "Contribuye al metabolismo energético\nAyuda a reducir el cansancio\nApoya el sistema inmunitario\nFavorece la función psicológica normal"
+          }
+        },
         "ingredient_Lxkfjk": {
           "type": "ingredient",
           "settings": {
@@ -280,6 +310,9 @@
         }
       },
       "block_order": [
+        "ingredient_p8Uyz7",
+        "ingredient_qQzxm7",
+        "ingredient_hdTtAF",
         "ingredient_Lxkfjk",
         "ingredient_LUajBg",
         "ingredient_x33wJG",
