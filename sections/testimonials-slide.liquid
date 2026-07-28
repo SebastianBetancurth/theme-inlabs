@@ -74,38 +74,40 @@
     pointer-events: auto;
   }
 
-  /* ============ TRANSICIÓN VERTICAL ============ */
-  /* Siguiente: la actual sube y se va, la nueva entra desde abajo */
-  #shopify-section-{{ sid }} .zt-slide.zt-out-up {
-    animation: zt-out-up .55s cubic-bezier(.55, .06, .68, .19) both;
+  /* ============ TRANSICIÓN SUAVE (crossfade + blur) ============ */
+  /* La reseña actual se desvanece difuminándose, y la nueva
+     aparece enfocándose desde el desenfoque con un zoom sutil.
+     Sin movimientos bruscos: elegante y cinemático. */
+  #shopify-section-{{ sid }} .zt-slide.zt-out {
+    animation: zt-fade-out .5s ease both;
   }
-  #shopify-section-{{ sid }} .zt-slide.zt-in-up {
-    animation: zt-in-up .55s cubic-bezier(.22, .9, .32, 1) both;
-    animation-delay: .12s;
+  #shopify-section-{{ sid }} .zt-slide.zt-in {
+    animation: zt-fade-in .75s cubic-bezier(.22, .9, .32, 1) both;
+    animation-delay: .18s;
   }
-  /* Anterior: la actual baja y se va, la nueva entra desde arriba */
-  #shopify-section-{{ sid }} .zt-slide.zt-out-down {
-    animation: zt-out-down .55s cubic-bezier(.55, .06, .68, .19) both;
+  @keyframes zt-fade-out {
+    from {
+      opacity: 1;
+      filter: blur(0);
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      filter: blur(10px);
+      transform: scale(.985);
+    }
   }
-  #shopify-section-{{ sid }} .zt-slide.zt-in-down {
-    animation: zt-in-down .55s cubic-bezier(.22, .9, .32, 1) both;
-    animation-delay: .12s;
-  }
-  @keyframes zt-out-up {
-    from { opacity: 1; transform: translateY(0); }
-    to   { opacity: 0; transform: translateY(-46px); }
-  }
-  @keyframes zt-in-up {
-    from { opacity: 0; transform: translateY(46px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes zt-out-down {
-    from { opacity: 1; transform: translateY(0); }
-    to   { opacity: 0; transform: translateY(46px); }
-  }
-  @keyframes zt-in-down {
-    from { opacity: 0; transform: translateY(-46px); }
-    to   { opacity: 1; transform: translateY(0); }
+  @keyframes zt-fade-in {
+    from {
+      opacity: 0;
+      filter: blur(8px);
+      transform: scale(1.015);
+    }
+    to {
+      opacity: 1;
+      filter: blur(0);
+      transform: scale(1);
+    }
   }
 
   /* ============ CONTENIDO DE LA SLIDE ============ */
@@ -223,10 +225,8 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    #shopify-section-{{ sid }} .zt-slide.zt-out-up,
-    #shopify-section-{{ sid }} .zt-slide.zt-in-up,
-    #shopify-section-{{ sid }} .zt-slide.zt-out-down,
-    #shopify-section-{{ sid }} .zt-slide.zt-in-down {
+    #shopify-section-{{ sid }} .zt-slide.zt-out,
+    #shopify-section-{{ sid }} .zt-slide.zt-in {
       animation: none;
     }
     #shopify-section-{{ sid }} .zt-stage { transition: none; }
@@ -307,7 +307,7 @@
           this.dots = Array.from(this.querySelectorAll('[data-dot]'));
           this.current = 0;
           this.animating = false;
-          this.ANIM_MS = 700; /* .55s de animación + .12s de delay + margen */
+          this.ANIM_MS = 950; /* .75s de entrada + .18s de delay + margen */
 
           if (this.slides.length === 0) return;
 
@@ -322,7 +322,7 @@
             btn.addEventListener('click', () => {
               const dir = parseInt(btn.dataset.dir, 10);
               const next = (this.current + dir + this.slides.length) % this.slides.length;
-              this.goTo(next, dir);
+              this.goTo(next);
               this.restartAutoplay();
             });
           });
@@ -331,9 +331,7 @@
           this.dots.forEach((dot) => {
             dot.addEventListener('click', () => {
               const index = parseInt(dot.dataset.dot, 10);
-              if (index === this.current) return;
-              const dir = index > this.current ? 1 : -1;
-              this.goTo(index, dir);
+              this.goTo(index);
               this.restartAutoplay();
             });
           });
@@ -352,18 +350,16 @@
           if (active) this.stage.style.height = active.offsetHeight + 'px';
         }
 
-        goTo(index, dir) {
+        goTo(index) {
           if (this.animating || index === this.current) return;
           this.animating = true;
 
           const out = this.slides[this.current];
           const inn = this.slides[index];
-          const outClass = dir > 0 ? 'zt-out-up' : 'zt-out-down';
-          const inClass = dir > 0 ? 'zt-in-up' : 'zt-in-down';
 
-          /* La entrante se activa y anima; la saliente anima su salida */
-          inn.classList.add('is-active', inClass);
-          out.classList.add(outClass);
+          /* La entrante se activa y aparece; la saliente se desvanece */
+          inn.classList.add('is-active', 'zt-in');
+          out.classList.add('zt-out');
 
           /* Ajustar la altura del escenario a la slide entrante */
           this.stage.style.height = inn.offsetHeight + 'px';
@@ -374,8 +370,8 @@
           this.current = index;
 
           setTimeout(() => {
-            out.classList.remove('is-active', 'zt-out-up', 'zt-out-down');
-            inn.classList.remove('zt-in-up', 'zt-in-down');
+            out.classList.remove('is-active', 'zt-out');
+            inn.classList.remove('zt-in');
             this.animating = false;
           }, this.ANIM_MS);
         }
@@ -385,7 +381,7 @@
           this.stopAutoplay();
           this.timer = setInterval(() => {
             const next = (this.current + 1) % this.slides.length;
-            this.goTo(next, 1);
+            this.goTo(next);
           }, this.autoplayMs);
         }
 
