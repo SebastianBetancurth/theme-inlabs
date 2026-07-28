@@ -17,8 +17,8 @@
         "text_t83Ufr": {
           "type": "text",
           "settings": {
-            "heading": "Sobre nosotros",
-            "text": "<p>Tu aliado diario para potenciar tu rendimiento mental. Una fórmula natural, equilibrada y respaldada por la ciencia.</p>"
+            "heading": "in labs.",
+            "text": "<p>in labs es tu aliado diario para potenciar tu rendimiento mental. Una fórmula<em>natural</em>, equilibrada con nootrópicos respaldados por la ciencia</p>"
           }
         },
         "menu_B7TgMt": {
@@ -43,6 +43,7 @@
       ],
       "name": "Footer personalizado",
       "settings": {
+        "logo": "shopify://shop_images/LOGO_IN_LABS.png",
         "logo_width": 60,
         "newsletter_enable": true,
         "newsletter_heading": "Desbloquea tu descuento secreto",
