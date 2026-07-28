@@ -733,13 +733,13 @@
         "margin_top_mobile": 0,
         "margin_bottom_mobile": 0,
         "gap_heading_mobile": 36,
-        "color_bg": "#0B0B0B",
-        "color_heading": "#FFFFFF",
-        "color_subtext": "#FFFFFF",
-        "color_question": "#FFFFFF",
-        "color_answer": "#D6D6D6",
-        "color_line": "#3A3A3A",
-        "color_chevron": "#FFFFFF"
+        "color_bg": "#000000",
+        "color_heading": "#ffffff",
+        "color_subtext": "#ffffff",
+        "color_question": "#ffffff",
+        "color_answer": "#d6d6d6",
+        "color_line": "#3a3a3a",
+        "color_chevron": "#ffffff"
       }
     }
   },
