@@ -1,693 +1,573 @@
-{%- comment -%}
-  =====================================================================
-  SECCIÓN PRO: Ingredientes avalados por la ciencia
-  ---------------------------------------------------------------------
-  100% editable desde el personalizador:
-  - Colores individuales de TODO (sin esquemas de color)
-  - Tamaños de texto separados para PC y móvil
-  - Espaciados, bordes, radios, sombras, flechas, barra de progreso
-  - Pestañas (badges) generadas automáticamente desde los blocks
-  - Modal con imagen, descripción y beneficios con flecha ↗
-  Archivo: sections/ingredientes-ciencia.liquid
-  =====================================================================
-{%- endcomment -%}
+{% comment %}
+  ============================================================
+  SECCIÓN: Ingredientes con Tabs + Carrusel + Modal
+  Theme: Dawn (compatible con cualquier theme OS 2.0)
+  Archivo: sections/ingredients-tabs.liquid
+  ------------------------------------------------------------
+  - Tabs generadas automáticamente según el campo "Tab" de
+    cada bloque de ingrediente (escribí el mismo nombre de tab
+    en varios ingredientes y se agrupan solos).
+  - Carrusel horizontal con flechas (desktop) y scroll táctil
+    (mobile) + scrollbar fina.
+  - Click en la card => modal con overlay oscuro. Se cierra
+    haciendo click fuera, con la flecha <- o con la tecla Esc.
+  - Todo editable desde el customizer: textos, tamaños,
+    colores, anchos, radios, opacidad del overlay, etc.
+  ============================================================
+{% endcomment %}
 
 {%- liquid
-  assign s = section.settings
+  assign sid = section.id
+  assign ratio = '1 / 1'
+  if section.settings.image_ratio == 'portrait'
+    assign ratio = '4 / 5'
+  elsif section.settings.image_ratio == 'landscape'
+    assign ratio = '4 / 3'
+  endif
+
+  comment
+    Construir lista de tabs únicas en orden de aparición
+  endcomment
+  assign tabs_raw = '||'
+  for block in section.blocks
+    assign tname = block.settings.tab | strip
+    if tname == blank
+      assign tname = 'General'
+    endif
+    assign token = '||' | append: tname | append: '||'
+    unless tabs_raw contains token
+      assign tabs_raw = tabs_raw | append: tname | append: '||'
+    endunless
+  endfor
+  assign tab_list = tabs_raw | split: '||'
 -%}
 
 {%- style -%}
-  #IngSci-{{ section.id }} {
-    --is-content-max: {{ s.content_max_width }}px;
-    --is-pad-x: {{ s.padding_x }}px;
-    --is-pad-x-m: {{ s.padding_x_mobile }}px;
-    --is-section-bg: {{ s.section_bg }};
-    --is-heading-color: {{ s.heading_color }};
-    --is-heading-size: {{ s.heading_size }}px;
-    --is-heading-size-m: {{ s.heading_size_mobile }}px;
-    --is-heading-weight: {{ s.heading_weight }};
-    --is-heading-spacing: {{ s.heading_spacing }}px;
-
-    --is-tab-size: {{ s.tab_font_size }}px;
-    --is-tab-size-m: {{ s.tab_font_size_mobile }}px;
-    --is-tab-pad-v: {{ s.tab_padding_v }}px;
-    --is-tab-pad-h: {{ s.tab_padding_h }}px;
-    --is-tab-radius: {{ s.tab_radius }}px;
-    --is-tab-gap: {{ s.tab_gap }}px;
-    --is-tab-bg: {{ s.tab_bg }};
-    --is-tab-text: {{ s.tab_text }};
-    --is-tab-border: {{ s.tab_border }};
-    --is-tab-active-bg: {{ s.tab_active_bg }};
-    --is-tab-active-text: {{ s.tab_active_text }};
-
-    --is-carousel-bg: {{ s.carousel_bg }};
-    --is-carousel-radius: {{ s.carousel_radius }}px;
-    --is-card-width: {{ s.card_width }}px;
-    --is-card-width-m: {{ s.card_width_mobile }}vw;
-    --is-card-gap: {{ s.card_gap }}px;
-    --is-card-bg: {{ s.card_bg }};
-    --is-card-border: {{ s.card_border }};
-    --is-card-radius: {{ s.card_radius }}px;
-    --is-card-img-radius: {{ s.card_img_radius }}px;
-
-    --is-card-title-size: {{ s.card_title_size }}px;
-    --is-card-title-size-m: {{ s.card_title_size_mobile }}px;
-    --is-card-title-color: {{ s.card_title_color }};
-    --is-card-dosage-size: {{ s.card_dosage_size }}px;
-    --is-card-dosage-color: {{ s.card_dosage_color }};
-    --is-card-more-size: {{ s.card_more_size }}px;
-    --is-card-more-color: {{ s.card_more_color }};
-
-    --is-arrow-color: {{ s.arrow_color }};
-    --is-arrow-size: {{ s.arrow_size }}px;
-
-    --is-progress-track: {{ s.progress_track }};
-    --is-progress-bar: {{ s.progress_bar }};
-    --is-progress-height: {{ s.progress_height }}px;
-
-    --is-overlay: {{ s.modal_overlay_color }};
-    --is-overlay-opacity: {{ s.modal_overlay_opacity | divided_by: 100.0 }};
-    --is-modal-bg: {{ s.modal_bg }};
-    --is-modal-radius: {{ s.modal_radius }}px;
-    --is-modal-width: {{ s.modal_width }}px;
-    --is-modal-title-size: {{ s.modal_title_size }}px;
-    --is-modal-title-color: {{ s.modal_title_color }};
-    --is-modal-dosage-color: {{ s.modal_dosage_color }};
-    --is-modal-text-size: {{ s.modal_text_size }}px;
-    --is-modal-text-color: {{ s.modal_text_color }};
-    --is-benefit-size: {{ s.benefit_size }}px;
-    --is-benefit-color: {{ s.benefit_color }};
-    --is-benefit-icon: {{ s.benefit_icon_color }};
+  #shopify-section-{{ sid }} .zi-section {
+    --zi-bg: {{ section.settings.color_bg }};
+    --zi-heading-color: {{ section.settings.color_heading }};
+    --zi-heading-size: {{ section.settings.heading_size }}px;
+    --zi-heading-size-mobile: {{ section.settings.heading_size_mobile }}px;
+    --zi-tab-bg: {{ section.settings.color_tab_bg }};
+    --zi-tab-text: {{ section.settings.color_tab_text }};
+    --zi-tab-border: {{ section.settings.color_tab_border }};
+    --zi-tab-active-bg: {{ section.settings.color_tab_active_bg }};
+    --zi-tab-active-text: {{ section.settings.color_tab_active_text }};
+    --zi-carousel-bg: {{ section.settings.color_carousel_bg }};
+    --zi-card-bg: {{ section.settings.color_card_bg }};
+    --zi-card-title: {{ section.settings.color_card_title }};
+    --zi-card-dose: {{ section.settings.color_card_dose }};
+    --zi-link: {{ section.settings.color_link }};
+    --zi-arrow: {{ section.settings.color_arrow }};
+    --zi-modal-bg: {{ section.settings.color_modal_bg }};
+    --zi-modal-text: {{ section.settings.color_modal_text }};
+    --zi-modal-secondary: {{ section.settings.color_modal_secondary }};
+    --zi-overlay: {{ section.settings.color_overlay | color_modify: 'alpha', section.settings.overlay_opacity | divided_by: 100.0 }};
+    --zi-card-width: {{ section.settings.card_width }}px;
+    --zi-card-width-mobile: {{ section.settings.card_width_mobile }}px;
+    --zi-card-gap: {{ section.settings.card_gap }}px;
+    --zi-card-radius: {{ section.settings.card_radius }}px;
+    --zi-container-radius: {{ section.settings.container_radius }}px;
+    --zi-image-ratio: {{ ratio }};
+    --zi-max-width: {{ section.settings.max_width }}px;
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    background: var(--zi-bg);
   }
 
-  #IngSci-{{ section.id }} .ing-sci__padding {
-    padding-top: {{ s.padding_top_mobile }}px;
-    padding-bottom: {{ s.padding_bottom_mobile }}px;
+  /* ============ LAYOUT GENERAL ============ */
+  #shopify-section-{{ sid }} .zi-wrapper {
+    max-width: var(--zi-max-width);
+    margin: 0 auto;
+    padding: 0 5rem;
+    position: relative;
   }
-  @media screen and (min-width: 750px) {
-    #IngSci-{{ section.id }} .ing-sci__padding {
-      padding-top: {{ s.padding_top }}px;
-      padding-bottom: {{ s.padding_bottom }}px;
-    }
-  }
-{%- endstyle -%}
+  {% if section.settings.full_width %}
+    #shopify-section-{{ sid }} .zi-wrapper { max-width: 100%; }
+  {% endif %}
 
-{%- comment -%} Pestañas únicas en orden de aparición {%- endcomment -%}
-{%- assign tab_list = '' -%}
-{%- for block in section.blocks -%}
-  {%- assign t = block.settings.tab | strip -%}
-  {%- if t == blank -%}{%- assign t = 'General' -%}{%- endif -%}
-  {%- assign existing = tab_list | split: '|||' -%}
-  {%- unless existing contains t -%}
-    {%- if tab_list == blank -%}
-      {%- assign tab_list = t -%}
-    {%- else -%}
-      {%- assign tab_list = tab_list | append: '|||' | append: t -%}
-    {%- endif -%}
-  {%- endunless -%}
-{%- endfor -%}
-{%- assign tabs = tab_list | split: '|||' -%}
-
-<div id="IngSci-{{ section.id }}" class="ing-sci-bg">
-  <ingredients-science class="ing-sci{% if s.full_width %} ing-sci--full{% endif %} ing-sci__padding">
-
-    {%- if s.heading != blank -%}
-      <h2 class="ing-sci__heading" style="text-align: {{ s.heading_align }};">
-        {{ s.heading }}
-      </h2>
-    {%- endif -%}
-
-    {%- if tabs.size > 0 and s.show_tabs -%}
-      <div class="ing-sci__tabs" role="tablist" aria-label="{{ s.heading | default: 'Ingredientes' | escape }}" style="justify-content: {{ s.tabs_align }};">
-        {%- for tab in tabs -%}
-          <button
-            type="button"
-            class="ing-sci__tab{% if forloop.first %} is-active{% endif %}"
-            role="tab"
-            aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
-            data-tab="{{ tab | handleize }}"
-          >
-            {{ tab }}
-          </button>
-        {%- endfor -%}
-      </div>
-    {%- endif -%}
-
-    <div class="ing-sci__carousel-wrapper">
-      {%- if s.show_arrows -%}
-        <button type="button" class="ing-sci__arrow ing-sci__arrow--prev" aria-label="Anterior">
-          <svg viewBox="0 0 12 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M11 1L1 11L11 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-        </button>
-      {%- endif -%}
-
-      <div class="ing-sci__viewport">
-        <ul class="ing-sci__track" role="list">
-          {%- for block in section.blocks -%}
-            {%- assign t = block.settings.tab | strip -%}
-            {%- if t == blank -%}{%- assign t = 'General' -%}{%- endif -%}
-            {%- assign first_tab = tabs | first -%}
-            <li
-              class="ing-sci__card-wrap{% unless t == first_tab %} is-hidden{% endunless %}"
-              data-tab="{{ t | handleize }}"
-              {{ block.shopify_attributes }}
-            >
-              <button type="button" class="ing-sci__card" aria-haspopup="dialog">
-                <div class="ing-sci__card-media">
-                  {%- if block.settings.image != blank -%}
-                    {{
-                      block.settings.image
-                      | image_url: width: 800
-                      | image_tag: loading: 'lazy', widths: '360, 540, 720, 800', sizes: '(min-width: 990px) 300px, 75vw', class: 'ing-sci__card-img'
-                    }}
-                  {%- else -%}
-                    {{ 'product-1' | placeholder_svg_tag: 'ing-sci__card-img placeholder' }}
-                  {%- endif -%}
-                </div>
-                <div class="ing-sci__card-info">
-                  <span class="ing-sci__card-title">{{ block.settings.title }}</span>
-                  {%- if block.settings.dosage != blank -%}
-                    <span class="ing-sci__card-dosage">{{ block.settings.dosage }}</span>
-                  {%- endif -%}
-                  {%- if s.more_label != blank -%}
-                    <span class="ing-sci__card-more">{{ s.more_label }}</span>
-                  {%- endif -%}
-                </div>
-              </button>
-
-              <template class="ing-sci__modal-template">
-                <div class="ing-sci__modal-media">
-                  {%- assign modal_img = block.settings.modal_image | default: block.settings.image -%}
-                  {%- if modal_img != blank -%}
-                    {{ modal_img | image_url: width: 900 | image_tag: loading: 'lazy', class: 'ing-sci__modal-img' }}
-                  {%- endif -%}
-                </div>
-                <div class="ing-sci__modal-head">
-                  <div>
-                    <h3 class="ing-sci__modal-title">{{ block.settings.title }}</h3>
-                    {%- if block.settings.dosage != blank -%}
-                      <p class="ing-sci__modal-dosage">{{ block.settings.dosage }}</p>
-                    {%- endif -%}
-                  </div>
-                  <button type="button" class="ing-sci__modal-back" aria-label="Cerrar">
-                    <svg width="26" height="16" viewBox="0 0 26 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                      <path d="M8.5 1L1.5 8L8.5 15" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-                      <path d="M1.5 8H25" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-                    </svg>
-                  </button>
-                </div>
-                {%- if block.settings.description != blank -%}
-                  <div class="ing-sci__modal-desc">{{ block.settings.description }}</div>
-                {%- endif -%}
-                {%- if block.settings.benefits != blank -%}
-                  {%- assign benefits = block.settings.benefits | newline_to_br | split: '<br />' -%}
-                  <ul class="ing-sci__modal-benefits" role="list">
-                    {%- for benefit in benefits -%}
-                      {%- assign b = benefit | strip -%}
-                      {%- if b != blank -%}
-                        <li>
-                          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path d="M1 13L13 1M13 1H3.4M13 1V10.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-                          </svg>
-                          <span>{{ b }}</span>
-                        </li>
-                      {%- endif -%}
-                    {%- endfor -%}
-                  </ul>
-                {%- endif -%}
-              </template>
-            </li>
-          {%- endfor -%}
-        </ul>
-      </div>
-
-      {%- if s.show_arrows -%}
-        <button type="button" class="ing-sci__arrow ing-sci__arrow--next" aria-label="Siguiente">
-          <svg viewBox="0 0 12 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M1 1L11 11L1 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-        </button>
-      {%- endif -%}
-
-      {%- if s.show_progress -%}
-        <div class="ing-sci__progress" aria-hidden="true">
-          <div class="ing-sci__progress-bar"></div>
-        </div>
-      {%- endif -%}
-    </div>
-
-    <div class="ing-sci__modal" role="dialog" aria-modal="true" aria-hidden="true" tabindex="-1">
-      <div class="ing-sci__modal-overlay" data-close></div>
-      <div class="ing-sci__modal-box">
-        <div class="ing-sci__modal-content"></div>
-      </div>
-    </div>
-
-  </ingredients-science>
-</div>
-
-<style>
-  .ing-sci-bg { background: var(--is-section-bg); }
-
-  /* Contenedor centrado (no depende del tema) */
-  ingredients-science.ing-sci {
-    display: block;
-    box-sizing: border-box;
-    width: 100%;
-    max-width: var(--is-content-max);
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: var(--is-pad-x-m);
-    padding-right: var(--is-pad-x-m);
-  }
-  ingredients-science.ing-sci--full { max-width: 100%; }
-  @media screen and (min-width: 750px) {
-    ingredients-science.ing-sci {
-      padding-left: var(--is-pad-x);
-      padding-right: var(--is-pad-x);
-    }
-  }
-
-  .ing-sci h2.ing-sci__heading {
-    margin: 0 0 var(--is-heading-spacing);
-    font-family: var(--font-heading-family, inherit);
-    font-style: var(--font-heading-style, normal);
-    font-weight: var(--is-heading-weight);
-    font-size: var(--is-heading-size-m);
-    line-height: 1.1;
-    color: var(--is-heading-color);
+  #shopify-section-{{ sid }} .zi-heading {
+    font-family: var(--font-heading-family);
+    font-style: var(--font-heading-style);
+    font-weight: var(--font-heading-weight);
+    color: var(--zi-heading-color);
+    font-size: var(--zi-heading-size);
+    line-height: 1.05;
     letter-spacing: -0.02em;
+    margin: 0 0 2.4rem;
   }
 
-  /* ---------- Pestañas ---------- */
-  .ing-sci__tabs {
+  /* ============ TABS ============ */
+  #shopify-section-{{ sid }} .zi-tabs {
     display: flex;
+    gap: 1.2rem;
     flex-wrap: nowrap;
-    gap: var(--is-tab-gap);
-    margin-bottom: 20px;
     overflow-x: auto;
+    -ms-overflow-style: none;
     scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
+    margin-bottom: 2rem;
+    padding-bottom: .4rem;
   }
-  .ing-sci__tabs::-webkit-scrollbar { display: none; }
+  #shopify-section-{{ sid }} .zi-tabs::-webkit-scrollbar { display: none; }
 
-  .ing-sci__tab {
+  #shopify-section-{{ sid }} .zi-tab {
     flex: 0 0 auto;
     font-family: var(--font-body-family);
-    font-size: var(--is-tab-size-m);
+    font-size: 1.5rem;
     line-height: 1;
-    padding: var(--is-tab-pad-v) var(--is-tab-pad-h);
-    background: var(--is-tab-bg);
-    color: var(--is-tab-text);
-    border: 1px solid var(--is-tab-border);
-    border-radius: var(--is-tab-radius);
+    padding: 1.3rem 2.6rem;
+    background: var(--zi-tab-bg);
+    color: var(--zi-tab-text);
+    border: 1px solid var(--zi-tab-border);
+    border-radius: 6px;
     cursor: pointer;
-    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    transition: background .2s ease, color .2s ease;
     white-space: nowrap;
   }
-  .ing-sci__tab:hover { filter: brightness(0.96); }
-  .ing-sci__tab.is-active {
-    background: var(--is-tab-active-bg);
-    color: var(--is-tab-active-text);
-    border-color: var(--is-tab-active-bg);
-    font-weight: 500;
+  #shopify-section-{{ sid }} .zi-tab:hover {
+    background: var(--zi-tab-active-bg);
+    color: var(--zi-tab-active-text);
+    border-color: var(--zi-tab-active-bg);
+  }
+  #shopify-section-{{ sid }} .zi-tab[aria-selected='true'] {
+    background: var(--zi-tab-active-bg);
+    color: var(--zi-tab-active-text);
+    border-color: var(--zi-tab-active-bg);
   }
 
-  /* ---------- Carrusel ---------- */
-  .ing-sci__carousel-wrapper {
+  /* ============ CARRUSEL ============ */
+  #shopify-section-{{ sid }} .zi-carousel {
     position: relative;
-    background: var(--is-carousel-bg);
-    border-radius: var(--is-carousel-radius);
-    padding: 20px 0 28px;
   }
-
-  .ing-sci__viewport {
+  #shopify-section-{{ sid }} .zi-panel {
+    background: var(--zi-carousel-bg);
+    border-radius: var(--zi-container-radius);
+    padding: 3rem 0 1.6rem;
+  }
+  #shopify-section-{{ sid }} .zi-slider {
+    display: flex;
+    gap: var(--zi-card-gap);
     overflow-x: auto;
-    overflow-y: hidden;
     scroll-behavior: smooth;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
+    padding: 0 3rem 1.4rem;
+    {% if section.settings.show_scrollbar %}
+      scrollbar-width: thin;
+      scrollbar-color: #9a9a9a transparent;
+    {% else %}
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    {% endif %}
   }
-  .ing-sci__viewport::-webkit-scrollbar { display: none; }
+  {% if section.settings.show_scrollbar %}
+    #shopify-section-{{ sid }} .zi-slider::-webkit-scrollbar { height: 4px; }
+    #shopify-section-{{ sid }} .zi-slider::-webkit-scrollbar-track { background: transparent; margin: 0 3rem; }
+    #shopify-section-{{ sid }} .zi-slider::-webkit-scrollbar-thumb { background: #9a9a9a; border-radius: 4px; }
+  {% else %}
+    #shopify-section-{{ sid }} .zi-slider::-webkit-scrollbar { display: none; }
+  {% endif %}
 
-  .ing-sci__track {
-    display: flex;
-    gap: var(--is-card-gap);
-    list-style: none;
-    margin: 0;
-    padding: 0 12px;
-    width: max-content;
-  }
-
-  .ing-sci__card-wrap {
-    flex: 0 0 auto;
-    width: var(--is-card-width-m);
-    scroll-snap-align: start;
-  }
-  .ing-sci__card-wrap.is-hidden { display: none; }
-
-  .ing-sci__card {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    padding: 10px;
-    background: var(--is-card-bg);
-    border: 1px solid var(--is-card-border);
-    border-radius: var(--is-card-radius);
+  /* ============ CARDS ============ */
+  #shopify-section-{{ sid }} .zi-card {
+    flex: 0 0 var(--zi-card-width);
+    width: var(--zi-card-width);
+    background: var(--zi-card-bg);
+    border: 1px solid rgba(0,0,0,.06);
+    border-radius: var(--zi-card-radius);
+    padding: 1.2rem 1.2rem 1.4rem;
     cursor: pointer;
     text-align: left;
-    font: inherit;
-    transition: box-shadow 0.25s ease, transform 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    transition: transform .25s ease, box-shadow .25s ease;
+    -webkit-appearance: none;
+    appearance: none;
+    font-family: var(--font-body-family);
   }
-  .ing-sci__card:hover {
-    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.12);
-    transform: translateY(-2px);
+  #shopify-section-{{ sid }} .zi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,.08);
   }
-
-  .ing-sci__card-media {
-    aspect-ratio: 1 / 1.15;
+  #shopify-section-{{ sid }} .zi-card__media {
+    width: 100%;
+    aspect-ratio: var(--zi-image-ratio);
+    border-radius: calc(var(--zi-card-radius) - 4px);
     overflow: hidden;
-    border-radius: var(--is-card-img-radius);
-    background: rgba(0, 0, 0, 0.04);
+    background: #eee;
+    margin-bottom: 1.6rem;
   }
-  .ing-sci__card-img {
+  #shopify-section-{{ sid }} .zi-card__media img,
+  #shopify-section-{{ sid }} .zi-card__media svg {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
   }
-
-  .ing-sci__card-info {
-    display: flex;
-    flex-direction: column;
-    padding: 14px 6px 8px;
+  #shopify-section-{{ sid }} .zi-card__title {
+    font-size: 2rem;
+    color: var(--zi-card-title);
+    margin: 0 0 .4rem;
+    font-weight: 400;
+    line-height: 1.2;
   }
-  .ing-sci__card-title {
-    font-size: var(--is-card-title-size-m);
-    line-height: 1.25;
-    color: var(--is-card-title-color);
+  #shopify-section-{{ sid }} .zi-card__dose {
+    font-size: 1.5rem;
+    color: var(--zi-card-dose);
+    margin: 0 0 1.6rem;
   }
-  .ing-sci__card-dosage {
-    font-size: var(--is-card-dosage-size);
-    color: var(--is-card-dosage-color);
-    margin-top: 3px;
-  }
-  .ing-sci__card-more {
+  #shopify-section-{{ sid }} .zi-card__more {
+    margin-top: auto;
     align-self: flex-end;
-    font-size: var(--is-card-more-size);
-    color: var(--is-card-more-color);
+    font-size: 1.2rem;
+    color: var(--zi-link);
     text-decoration: underline;
     text-underline-offset: 3px;
-    margin-top: 16px;
   }
 
-  /* ---------- Flechas ---------- */
-  .ing-sci__arrow {
+  /* ============ FLECHAS ============ */
+  #shopify-section-{{ sid }} .zi-arrow-btn {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 2;
-    width: calc(var(--is-arrow-size) * 2);
-    height: calc(var(--is-arrow-size) * 2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
     background: transparent;
-    border: none;
+    border: 0;
     cursor: pointer;
-    color: var(--is-arrow-color);
-    transition: opacity 0.2s ease;
+    padding: 1rem;
+    color: var(--zi-arrow);
+    z-index: 2;
+    line-height: 0;
   }
-  .ing-sci__arrow svg { width: calc(var(--is-arrow-size) * 0.55); height: var(--is-arrow-size); }
-  .ing-sci__arrow--prev { left: calc(var(--is-arrow-size) * -2.1); }
-  .ing-sci__arrow--next { right: calc(var(--is-arrow-size) * -2.1); }
-  .ing-sci__arrow[disabled] { opacity: 0.25; cursor: default; }
+  #shopify-section-{{ sid }} .zi-arrow-btn svg { width: 2rem; height: 3.4rem; }
+  #shopify-section-{{ sid }} .zi-arrow-btn--prev { left: 1rem; }
+  #shopify-section-{{ sid }} .zi-arrow-btn--next { right: 1rem; }
+  #shopify-section-{{ sid }} .zi-arrow-btn:hover { opacity: .6; }
 
-  @media screen and (max-width: 1200px) {
-    .ing-sci__arrow--prev { left: -8px; }
-    .ing-sci__arrow--next { right: -8px; }
-  }
-
-  /* ---------- Barra de progreso ---------- */
-  .ing-sci__progress {
-    position: absolute;
-    left: 16px;
-    right: 16px;
-    bottom: 12px;
-    height: var(--is-progress-height);
-    background: var(--is-progress-track);
-    border-radius: 999px;
-    overflow: hidden;
-  }
-  .ing-sci__progress-bar {
-    width: 20%;
-    height: 100%;
-    background: var(--is-progress-bar);
-    border-radius: 999px;
-    transform: translateX(0);
-    transition: transform 0.15s linear, width 0.15s linear;
-  }
-
-  /* ---------- Modal ---------- */
-  .ing-sci__modal {
+  /* ============ MODAL ============ */
+  #shopify-section-{{ sid }} .zi-modal {
     position: fixed;
     inset: 0;
     z-index: 999;
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 2rem;
   }
-  .ing-sci__modal.is-open { display: flex; }
-
-  .ing-sci__modal-overlay {
+  #shopify-section-{{ sid }} .zi-modal[hidden] { display: none; }
+  #shopify-section-{{ sid }} .zi-modal__overlay {
     position: absolute;
     inset: 0;
-    background: var(--is-overlay);
-    opacity: var(--is-overlay-opacity);
-    animation: ingSciFade 0.25s ease;
+    background: var(--zi-overlay);
+    animation: zi-fade .25s ease;
   }
-
-  .ing-sci__modal-box {
+  #shopify-section-{{ sid }} .zi-modal__dialog {
     position: relative;
-    z-index: 1;
+    background: var(--zi-modal-bg);
+    color: var(--zi-modal-text);
     width: 100%;
-    max-width: var(--is-modal-width);
-    max-height: min(86vh, 86dvh);
+    max-width: 60rem;
+    max-height: 90vh;
     overflow-y: auto;
-    background: var(--is-modal-bg);
-    border-radius: var(--is-modal-radius);
-    padding: 20px;
-    animation: ingSciUp 0.3s ease;
+    border-radius: 14px;
+    animation: zi-pop .28s cubic-bezier(.2,.9,.3,1.1);
+    font-family: var(--font-body-family);
   }
+  @keyframes zi-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes zi-pop { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
 
-  @keyframes ingSciFade { from { opacity: 0; } to { opacity: var(--is-overlay-opacity); } }
-  @keyframes ingSciUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .ing-sci__modal-overlay, .ing-sci__modal-box { animation: none; }
-    .ing-sci__viewport { scroll-behavior: auto; }
-  }
-
-  .ing-sci__modal-media {
-    border-radius: calc(var(--is-modal-radius) * 0.7);
-    overflow: hidden;
-    background: rgba(0, 0, 0, 0.04);
-    margin-bottom: 18px;
-  }
-  .ing-sci__modal-img {
+  #shopify-section-{{ sid }} .zi-modal__media {
     width: 100%;
-    height: auto;
-    max-height: 260px;
+    aspect-ratio: 2 / 1;
+    overflow: hidden;
+    border-radius: 14px 14px 0 0;
+    background: #eee;
+  }
+  #shopify-section-{{ sid }} .zi-modal__media img,
+  #shopify-section-{{ sid }} .zi-modal__media svg {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     display: block;
   }
-
-  .ing-sci__modal-head {
+  #shopify-section-{{ sid }} .zi-modal__body { padding: 2.4rem 3rem 3rem; }
+  #shopify-section-{{ sid }} .zi-modal__head {
     display: flex;
+    align-items: flex-start;
     justify-content: space-between;
-    align-items: flex-start;
-    gap: 10px;
+    gap: 2rem;
+    margin-bottom: 1.8rem;
   }
-  .ing-sci__modal-title {
-    margin: 0;
-    font-family: var(--font-body-family);
-    font-size: var(--is-modal-title-size);
+  #shopify-section-{{ sid }} .zi-modal__title {
+    font-size: 2.6rem;
+    margin: 0 0 .3rem;
     font-weight: 400;
-    line-height: 1.2;
-    color: var(--is-modal-title-color);
+    line-height: 1.15;
   }
-  .ing-sci__modal-dosage {
-    margin: 3px 0 0;
-    font-size: calc(var(--is-modal-text-size) + 1px);
-    color: var(--is-modal-dosage-color);
+  #shopify-section-{{ sid }} .zi-modal__dose {
+    font-size: 1.5rem;
+    color: var(--zi-modal-secondary);
+    margin: 0;
   }
-  .ing-sci__modal-back {
-    background: none;
-    border: none;
+  #shopify-section-{{ sid }} .zi-modal__close {
+    background: transparent;
+    border: 0;
     cursor: pointer;
-    padding: 6px;
-    color: var(--is-modal-title-color);
+    padding: .6rem;
+    color: var(--zi-modal-text);
+    line-height: 0;
     flex: 0 0 auto;
   }
-
-  .ing-sci__modal-desc {
-    margin-top: 16px;
-    font-size: var(--is-modal-text-size);
-    line-height: 1.6;
-    color: var(--is-modal-text-color);
+  #shopify-section-{{ sid }} .zi-modal__close svg { width: 3.2rem; height: 2.2rem; }
+  #shopify-section-{{ sid }} .zi-modal__close:hover { opacity: .6; }
+  #shopify-section-{{ sid }} .zi-modal__desc {
+    font-size: 1.5rem;
+    line-height: 1.55;
+    margin-bottom: 2rem;
   }
-  .ing-sci__modal-desc p { margin: 0 0 8px; }
-
-  .ing-sci__modal-benefits {
+  #shopify-section-{{ sid }} .zi-modal__desc p { margin: 0 0 1rem; }
+  #shopify-section-{{ sid }} .zi-benefits {
     list-style: none;
-    margin: 20px 0 0;
+    margin: 0;
     padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.4rem 2.4rem;
   }
-  .ing-sci__modal-benefits li {
+  #shopify-section-{{ sid }} .zi-benefits li {
     display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    font-size: var(--is-benefit-size);
-    line-height: 1.45;
-    color: var(--is-benefit-color);
+    gap: 1rem;
+    font-size: 1.5rem;
+    line-height: 1.4;
   }
-  .ing-sci__modal-benefits svg {
+  #shopify-section-{{ sid }} .zi-benefits svg {
     flex: 0 0 auto;
-    margin-top: 4px;
-    color: var(--is-benefit-icon);
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-top: .3rem;
   }
 
-  body.ing-sci-modal-open { overflow: hidden; }
-
-  /* ---------- Desktop ---------- */
-  @media screen and (min-width: 750px) {
-    .ing-sci h2.ing-sci__heading { font-size: var(--is-heading-size); }
-    .ing-sci__tab { font-size: var(--is-tab-size); }
-    .ing-sci__tabs { margin-bottom: 24px; }
-    .ing-sci__card-wrap { width: var(--is-card-width); }
-    .ing-sci__card-title { font-size: var(--is-card-title-size); }
-    .ing-sci__carousel-wrapper { padding: 30px 0 34px; }
-    .ing-sci__track { padding: 0 16px; }
-  }
+  /* ============ MOBILE ============ */
   @media screen and (max-width: 749px) {
-    .ing-sci__arrow { display: none; }
+    #shopify-section-{{ sid }} .zi-wrapper { padding: 0 1.5rem; }
+    #shopify-section-{{ sid }} .zi-heading { font-size: var(--zi-heading-size-mobile); margin-bottom: 1.8rem; }
+    #shopify-section-{{ sid }} .zi-card { flex-basis: var(--zi-card-width-mobile); width: var(--zi-card-width-mobile); }
+    #shopify-section-{{ sid }} .zi-panel { padding: 1.8rem 0 1rem; }
+    #shopify-section-{{ sid }} .zi-slider { padding: 0 1.6rem 1.2rem; }
+    #shopify-section-{{ sid }} .zi-arrow-btn { display: none; }
+    #shopify-section-{{ sid }} .zi-modal { padding: 1.2rem; }
+    #shopify-section-{{ sid }} .zi-modal__body { padding: 2rem 2rem 2.4rem; }
+    #shopify-section-{{ sid }} .zi-benefits { grid-template-columns: 1fr; }
+    #shopify-section-{{ sid }} .zi-modal__title { font-size: 2.2rem; }
   }
-</style>
+
+  @media (prefers-reduced-motion: reduce) {
+    #shopify-section-{{ sid }} .zi-modal__overlay,
+    #shopify-section-{{ sid }} .zi-modal__dialog { animation: none; }
+    #shopify-section-{{ sid }} .zi-slider { scroll-behavior: auto; }
+    #shopify-section-{{ sid }} .zi-card { transition: none; }
+  }
+{%- endstyle -%}
+
+<ingredients-tabs class="zi-section" data-section-id="{{ sid }}">
+  <div class="zi-wrapper">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="zi-heading">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+
+    {%- comment -%} ---------- TABS ---------- {%- endcomment -%}
+    <div class="zi-tabs" role="tablist" aria-label="{{ section.settings.heading | strip_html | escape }}">
+      {%- assign first_tab = true -%}
+      {%- for tab in tab_list -%}
+        {%- if tab == blank -%}{%- continue -%}{%- endif -%}
+        <button
+          type="button"
+          class="zi-tab"
+          role="tab"
+          data-tab-index="{{ forloop.index0 }}"
+          data-tab-name="{{ tab | escape }}"
+          aria-selected="{% if first_tab %}true{% else %}false{% endif %}"
+        >
+          {{ tab }}
+        </button>
+        {%- assign first_tab = false -%}
+      {%- endfor -%}
+    </div>
+
+    {%- comment -%} ---------- PANELES (uno por tab) ---------- {%- endcomment -%}
+    <div class="zi-carousel">
+      {%- if section.settings.show_arrows -%}
+        <button type="button" class="zi-arrow-btn zi-arrow-btn--prev" data-dir="-1" aria-label="{{ 'general.slider.previous_slide' | t | default: 'Anterior' }}">
+          <svg viewBox="0 0 12 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M11 1L1 11L11 21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button type="button" class="zi-arrow-btn zi-arrow-btn--next" data-dir="1" aria-label="{{ 'general.slider.next_slide' | t | default: 'Siguiente' }}">
+          <svg viewBox="0 0 12 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M1 1L11 11L1 21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      {%- endif -%}
+
+      {%- assign first_panel = true -%}
+      {%- for tab in tab_list -%}
+        {%- if tab == blank -%}{%- continue -%}{%- endif -%}
+        <div class="zi-panel" role="tabpanel" data-panel-name="{{ tab | escape }}" {% unless first_panel %}hidden{% endunless %}>
+          <div class="zi-slider">
+            {%- for block in section.blocks -%}
+              {%- assign btab = block.settings.tab | strip -%}
+              {%- if btab == blank -%}{%- assign btab = 'General' -%}{%- endif -%}
+              {%- if btab != tab -%}{%- continue -%}{%- endif -%}
+
+              <button type="button" class="zi-card" data-card {{ block.shopify_attributes }}>
+                <div class="zi-card__media">
+                  {%- if block.settings.image != blank -%}
+                    {{ block.settings.image | image_url: width: 900 | image_tag: loading: 'lazy', widths: '360, 540, 720, 900', sizes: '(max-width: 749px) 70vw, 320px', alt: block.settings.title | escape }}
+                  {%- else -%}
+                    {{ 'image' | placeholder_svg_tag }}
+                  {%- endif -%}
+                </div>
+                <h3 class="zi-card__title">{{ block.settings.title | escape }}</h3>
+                <p class="zi-card__dose">{{ block.settings.dosage | escape }}</p>
+                <span class="zi-card__more">{{ section.settings.more_label | escape }}</span>
+
+                {%- comment -%} Contenido del modal de esta card {%- endcomment -%}
+                <template data-modal-content>
+                  <div class="zi-modal__media">
+                    {%- assign modal_img = block.settings.modal_image | default: block.settings.image -%}
+                    {%- if modal_img != blank -%}
+                      {{ modal_img | image_url: width: 1200 | image_tag: loading: 'lazy', widths: '600, 900, 1200', sizes: '(max-width: 749px) 92vw, 600px', alt: block.settings.title | escape }}
+                    {%- else -%}
+                      {{ 'image' | placeholder_svg_tag }}
+                    {%- endif -%}
+                  </div>
+                  <div class="zi-modal__body">
+                    <div class="zi-modal__head">
+                      <div>
+                        <h3 class="zi-modal__title">{{ block.settings.title | escape }}</h3>
+                        <p class="zi-modal__dose">{{ block.settings.dosage | escape }}</p>
+                      </div>
+                      <button type="button" class="zi-modal__close" aria-label="Cerrar">
+                        <svg viewBox="0 0 32 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <path d="M11 1L1 11L11 21M1 11H31" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                    {%- if block.settings.description != blank -%}
+                      <div class="zi-modal__desc">{{ block.settings.description }}</div>
+                    {%- endif -%}
+                    {%- if block.settings.benefits != blank -%}
+                      {%- assign benefits_html = block.settings.benefits | strip | newline_to_br | replace: '<br/>', '<br />' -%}
+                      {%- assign benefits = benefits_html | split: '<br />' -%}
+                      <ul class="zi-benefits">
+                        {%- for benefit in benefits -%}
+                          {%- assign b = benefit | strip -%}
+                          {%- if b == blank -%}{%- continue -%}{%- endif -%}
+                          <li>
+                            <svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                              <path d="M2 13L13 2M13 2H4M13 2V11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>{{ b }}</span>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    {%- endif -%}
+                  </div>
+                </template>
+              </button>
+            {%- endfor -%}
+          </div>
+        </div>
+        {%- assign first_panel = false -%}
+      {%- endfor -%}
+    </div>
+  </div>
+
+  {%- comment -%} ---------- MODAL (vacío, se llena por JS) ---------- {%- endcomment -%}
+  <div class="zi-modal" hidden>
+    <div class="zi-modal__overlay" data-modal-close></div>
+    <div class="zi-modal__dialog" role="dialog" aria-modal="true"></div>
+  </div>
+</ingredients-tabs>
 
 <script>
-  if (!customElements.get('ingredients-science')) {
+  if (!customElements.get('ingredients-tabs')) {
     customElements.define(
-      'ingredients-science',
-      class IngredientsScience extends HTMLElement {
+      'ingredients-tabs',
+      class IngredientsTabs extends HTMLElement {
         connectedCallback() {
-          this.viewport = this.querySelector('.ing-sci__viewport');
-          this.track = this.querySelector('.ing-sci__track');
-          this.cards = Array.from(this.querySelectorAll('.ing-sci__card-wrap'));
-          this.tabs = Array.from(this.querySelectorAll('.ing-sci__tab'));
-          this.prevBtn = this.querySelector('.ing-sci__arrow--prev');
-          this.nextBtn = this.querySelector('.ing-sci__arrow--next');
-          this.progressBar = this.querySelector('.ing-sci__progress-bar');
-          this.modal = this.querySelector('.ing-sci__modal');
-          this.modalContent = this.querySelector('.ing-sci__modal-content');
-          this.lastFocused = null;
+          this.tabs = Array.from(this.querySelectorAll('.zi-tab'));
+          this.panels = Array.from(this.querySelectorAll('.zi-panel'));
+          this.modal = this.querySelector('.zi-modal');
+          this.dialog = this.querySelector('.zi-modal__dialog');
+          this.onKeydown = this.onKeydown.bind(this);
 
-          this.tabs.forEach((tab) => tab.addEventListener('click', () => this.setTab(tab)));
-          if (this.prevBtn) this.prevBtn.addEventListener('click', () => this.scrollByCard(-1));
-          if (this.nextBtn) this.nextBtn.addEventListener('click', () => this.scrollByCard(1));
-
-          this.viewport.addEventListener('scroll', () => this.updateUI(), { passive: true });
-          window.addEventListener('resize', () => this.updateUI());
-
-          this.cards.forEach((wrap) => {
-            const card = wrap.querySelector('.ing-sci__card');
-            card.addEventListener('click', () => this.openModal(wrap));
+          /* Tabs */
+          this.tabs.forEach((tab) => {
+            tab.addEventListener('click', () => this.selectTab(tab));
           });
 
+          /* Flechas */
+          this.querySelectorAll('.zi-arrow-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              const slider = this.activeSlider();
+              if (!slider) return;
+              const dir = parseInt(btn.dataset.dir, 10);
+              slider.scrollBy({ left: dir * slider.clientWidth * 0.75, behavior: 'smooth' });
+            });
+          });
+
+          /* Abrir modal al hacer click en cualquier card */
+          this.querySelectorAll('[data-card]').forEach((card) => {
+            card.addEventListener('click', () => this.openModal(card));
+          });
+
+          /* Cerrar: click fuera del contenido (overlay o cualquier zona fuera del diálogo) */
           this.modal.addEventListener('click', (e) => {
-            if (e.target.hasAttribute('data-close') || e.target.closest('.ing-sci__modal-back')) {
+            if (!e.target.closest('.zi-modal__dialog') || e.target.closest('.zi-modal__close')) {
               this.closeModal();
             }
           });
-          document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && this.modal.classList.contains('is-open')) this.closeModal();
+        }
+
+        activeSlider() {
+          const panel = this.panels.find((p) => !p.hidden);
+          return panel ? panel.querySelector('.zi-slider') : null;
+        }
+
+        selectTab(tab) {
+          const name = tab.dataset.tabName;
+          this.tabs.forEach((t) => t.setAttribute('aria-selected', t === tab ? 'true' : 'false'));
+          this.panels.forEach((p) => {
+            p.hidden = p.dataset.panelName !== name;
           });
-
-          this.updateUI();
         }
 
-        setTab(activeTab) {
-          const key = activeTab.dataset.tab;
-          this.tabs.forEach((t) => {
-            const isActive = t === activeTab;
-            t.classList.toggle('is-active', isActive);
-            t.setAttribute('aria-selected', isActive ? 'true' : 'false');
-          });
-          this.cards.forEach((c) => c.classList.toggle('is-hidden', c.dataset.tab !== key));
-          this.viewport.scrollTo({ left: 0, behavior: 'auto' });
-          this.updateUI();
-        }
-
-        visibleCards() {
-          return this.cards.filter((c) => !c.classList.contains('is-hidden'));
-        }
-
-        scrollByCard(direction) {
-          const card = this.visibleCards()[0];
-          if (!card) return;
-          const gap = parseFloat(getComputedStyle(this.track).gap) || 20;
-          const step = card.getBoundingClientRect().width + gap;
-          this.viewport.scrollBy({ left: step * direction, behavior: 'smooth' });
-        }
-
-        updateUI() {
-          const max = this.viewport.scrollWidth - this.viewport.clientWidth;
-          const pos = this.viewport.scrollLeft;
-
-          if (this.prevBtn) this.prevBtn.toggleAttribute('disabled', pos <= 2);
-          if (this.nextBtn) this.nextBtn.toggleAttribute('disabled', pos >= max - 2);
-
-          if (this.progressBar) {
-            if (max <= 0) {
-              this.progressBar.style.width = '100%';
-              this.progressBar.style.transform = 'translateX(0)';
-            } else {
-              const ratio = this.viewport.clientWidth / this.viewport.scrollWidth;
-              const barWidth = Math.max(ratio * 100, 8);
-              const trackWidth = this.progressBar.parentElement.clientWidth;
-              const barPx = (barWidth / 100) * trackWidth;
-              const x = (pos / max) * (trackWidth - barPx);
-              this.progressBar.style.width = barWidth + '%';
-              this.progressBar.style.transform = 'translateX(' + x + 'px)';
-            }
-          }
-        }
-
-        openModal(wrap) {
-          const template = wrap.querySelector('.ing-sci__modal-template');
-          if (!template) return;
-          this.lastFocused = document.activeElement;
-          this.modalContent.innerHTML = '';
-          this.modalContent.appendChild(template.content.cloneNode(true));
-          this.modal.classList.add('is-open');
-          this.modal.setAttribute('aria-hidden', 'false');
-          document.body.classList.add('ing-sci-modal-open');
-          const backBtn = this.modal.querySelector('.ing-sci__modal-back');
-          if (backBtn) backBtn.focus();
+        openModal(card) {
+          const tpl = card.querySelector('[data-modal-content]');
+          if (!tpl) return;
+          this.dialog.innerHTML = '';
+          this.dialog.appendChild(tpl.content.cloneNode(true));
+          this.modal.hidden = false;
+          this.prevOverflow = document.body.style.overflow;
+          document.body.style.overflow = 'hidden';
+          document.addEventListener('keydown', this.onKeydown);
+          const closeBtn = this.dialog.querySelector('.zi-modal__close');
+          if (closeBtn) closeBtn.focus({ preventScroll: true });
         }
 
         closeModal() {
-          this.modal.classList.remove('is-open');
-          this.modal.setAttribute('aria-hidden', 'true');
-          document.body.classList.remove('ing-sci-modal-open');
-          if (this.lastFocused) this.lastFocused.focus();
+          this.modal.hidden = true;
+          this.dialog.innerHTML = '';
+          document.body.style.overflow = this.prevOverflow || '';
+          document.removeEventListener('keydown', this.onKeydown);
+        }
+
+        onKeydown(e) {
+          if (e.key === 'Escape') this.closeModal();
+        }
+
+        disconnectedCallback() {
+          document.removeEventListener('keydown', this.onKeydown);
+          document.body.style.overflow = this.prevOverflow || '';
         }
       }
     );
@@ -696,116 +576,287 @@
 
 {% schema %}
 {
-  "name": "Ingredientes ciencia PRO",
+  "name": "Ingredientes con tabs",
   "tag": "section",
   "class": "section",
   "settings": [
-    { "type": "header", "content": "🏷️ Título" },
-    { "type": "text", "id": "heading", "label": "Título", "default": "Ingredientes avalados por la ciencia" },
-    { "type": "color", "id": "heading_color", "label": "Color del título", "default": "#111111" },
-    { "type": "range", "id": "heading_size", "min": 20, "max": 90, "step": 2, "unit": "px", "label": "Tamaño título (PC)", "default": 54 },
-    { "type": "range", "id": "heading_size_mobile", "min": 16, "max": 60, "step": 2, "unit": "px", "label": "Tamaño título (móvil)", "default": 32 },
     {
-      "type": "select", "id": "heading_weight", "label": "Grosor del título",
-      "options": [
-        { "value": "300", "label": "Fino" },
-        { "value": "400", "label": "Normal" },
-        { "value": "500", "label": "Medio" },
-        { "value": "700", "label": "Negrita" }
-      ],
-      "default": "400"
+      "type": "header",
+      "content": "Contenido"
     },
     {
-      "type": "select", "id": "heading_align", "label": "Alineación del título",
-      "options": [
-        { "value": "left", "label": "Izquierda" },
-        { "value": "center", "label": "Centro" },
-        { "value": "right", "label": "Derecha" }
-      ],
-      "default": "left"
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Título",
+      "default": "Ingredientes avalados por la ciencia"
     },
-    { "type": "range", "id": "heading_spacing", "min": 0, "max": 80, "step": 4, "unit": "px", "label": "Espacio bajo el título", "default": 24 },
-
-    { "type": "header", "content": "🔘 Badges / Pestañas" },
-    { "type": "checkbox", "id": "show_tabs", "label": "Mostrar pestañas", "default": true },
     {
-      "type": "select", "id": "tabs_align", "label": "Alineación de pestañas",
-      "options": [
-        { "value": "flex-start", "label": "Izquierda" },
-        { "value": "center", "label": "Centro" },
-        { "value": "flex-end", "label": "Derecha" }
-      ],
-      "default": "flex-start"
+      "type": "range",
+      "id": "heading_size",
+      "label": "Tamaño del título (escritorio)",
+      "min": 24,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "default": 64
     },
-    { "type": "range", "id": "tab_font_size", "min": 10, "max": 24, "step": 1, "unit": "px", "label": "Tamaño texto (PC)", "default": 15 },
-    { "type": "range", "id": "tab_font_size_mobile", "min": 10, "max": 20, "step": 1, "unit": "px", "label": "Tamaño texto (móvil)", "default": 13 },
-    { "type": "range", "id": "tab_padding_v", "min": 4, "max": 24, "step": 1, "unit": "px", "label": "Alto interno", "default": 12 },
-    { "type": "range", "id": "tab_padding_h", "min": 8, "max": 50, "step": 2, "unit": "px", "label": "Ancho interno", "default": 28 },
-    { "type": "range", "id": "tab_radius", "min": 0, "max": 40, "step": 1, "unit": "px", "label": "Redondeo", "default": 6 },
-    { "type": "range", "id": "tab_gap", "min": 4, "max": 32, "step": 2, "unit": "px", "label": "Separación entre badges", "default": 12 },
-    { "type": "color", "id": "tab_bg", "label": "Fondo (inactivo)", "default": "#FFFFFF" },
-    { "type": "color", "id": "tab_text", "label": "Texto (inactivo)", "default": "#111111" },
-    { "type": "color", "id": "tab_border", "label": "Borde (inactivo)", "default": "#111111" },
-    { "type": "color", "id": "tab_active_bg", "label": "Fondo (activo)", "default": "#111111" },
-    { "type": "color", "id": "tab_active_text", "label": "Texto (activo)", "default": "#FFFFFF" },
-
-    { "type": "header", "content": "🎠 Carrusel" },
-    { "type": "color", "id": "carousel_bg", "label": "Fondo del carrusel", "default": "#F2F2F0" },
-    { "type": "range", "id": "carousel_radius", "min": 0, "max": 40, "step": 2, "unit": "px", "label": "Redondeo del carrusel", "default": 4 },
-    { "type": "range", "id": "card_width", "min": 180, "max": 460, "step": 10, "unit": "px", "label": "Ancho de tarjeta (PC)", "default": 300 },
-    { "type": "range", "id": "card_width_mobile", "min": 50, "max": 95, "step": 1, "unit": "vw", "label": "Ancho de tarjeta (móvil, % de pantalla)", "default": 74 },
-    { "type": "range", "id": "card_gap", "min": 8, "max": 48, "step": 2, "unit": "px", "label": "Separación entre tarjetas", "default": 20 },
-
-    { "type": "header", "content": "🃏 Tarjetas" },
-    { "type": "color", "id": "card_bg", "label": "Fondo de tarjeta", "default": "#FFFFFF" },
-    { "type": "color", "id": "card_border", "label": "Borde de tarjeta", "default": "#E8E8E6" },
-    { "type": "range", "id": "card_radius", "min": 0, "max": 32, "step": 2, "unit": "px", "label": "Redondeo de tarjeta", "default": 8 },
-    { "type": "range", "id": "card_img_radius", "min": 0, "max": 32, "step": 2, "unit": "px", "label": "Redondeo de imagen", "default": 4 },
-    { "type": "range", "id": "card_title_size", "min": 12, "max": 32, "step": 1, "unit": "px", "label": "Tamaño nombre (PC)", "default": 20 },
-    { "type": "range", "id": "card_title_size_mobile", "min": 12, "max": 26, "step": 1, "unit": "px", "label": "Tamaño nombre (móvil)", "default": 18 },
-    { "type": "color", "id": "card_title_color", "label": "Color del nombre", "default": "#111111" },
-    { "type": "range", "id": "card_dosage_size", "min": 10, "max": 22, "step": 1, "unit": "px", "label": "Tamaño dosis", "default": 15 },
-    { "type": "color", "id": "card_dosage_color", "label": "Color de la dosis", "default": "#6B6B6B" },
-    { "type": "text", "id": "more_label", "label": "Texto del enlace", "default": "Ver más" },
-    { "type": "range", "id": "card_more_size", "min": 10, "max": 20, "step": 1, "unit": "px", "label": "Tamaño del enlace", "default": 13 },
-    { "type": "color", "id": "card_more_color", "label": "Color del enlace", "default": "#111111" },
-
-    { "type": "header", "content": "◀▶ Flechas" },
-    { "type": "checkbox", "id": "show_arrows", "label": "Mostrar flechas (PC)", "default": true },
-    { "type": "color", "id": "arrow_color", "label": "Color de flechas", "default": "#111111" },
-    { "type": "range", "id": "arrow_size", "min": 14, "max": 40, "step": 2, "unit": "px", "label": "Tamaño de flechas", "default": 22 },
-
-    { "type": "header", "content": "➖ Barra de progreso" },
-    { "type": "checkbox", "id": "show_progress", "label": "Mostrar barra de progreso", "default": true },
-    { "type": "color", "id": "progress_track", "label": "Color del fondo de la barra", "default": "#DDDDDB" },
-    { "type": "color", "id": "progress_bar", "label": "Color de la barra", "default": "#6B6B6B" },
-    { "type": "range", "id": "progress_height", "min": 2, "max": 10, "step": 1, "unit": "px", "label": "Grosor de la barra", "default": 3 },
-
-    { "type": "header", "content": "🪟 Popup / Modal" },
-    { "type": "color", "id": "modal_bg", "label": "Fondo del popup", "default": "#FFFFFF" },
-    { "type": "color", "id": "modal_overlay_color", "label": "Color del fondo oscuro", "default": "#000000" },
-    { "type": "range", "id": "modal_overlay_opacity", "min": 10, "max": 95, "step": 5, "unit": "%", "label": "Opacidad del fondo oscuro", "default": 65 },
-    { "type": "range", "id": "modal_radius", "min": 0, "max": 32, "step": 2, "unit": "px", "label": "Redondeo del popup", "default": 12 },
-    { "type": "range", "id": "modal_width", "min": 320, "max": 720, "step": 20, "unit": "px", "label": "Ancho máximo del popup", "default": 440 },
-    { "type": "range", "id": "modal_title_size", "min": 16, "max": 36, "step": 1, "unit": "px", "label": "Tamaño del título", "default": 22 },
-    { "type": "color", "id": "modal_title_color", "label": "Color del título", "default": "#111111" },
-    { "type": "color", "id": "modal_dosage_color", "label": "Color de la dosis", "default": "#6B6B6B" },
-    { "type": "range", "id": "modal_text_size", "min": 12, "max": 22, "step": 1, "unit": "px", "label": "Tamaño de la descripción", "default": 15 },
-    { "type": "color", "id": "modal_text_color", "label": "Color de la descripción", "default": "#333333" },
-    { "type": "range", "id": "benefit_size", "min": 12, "max": 22, "step": 1, "unit": "px", "label": "Tamaño de beneficios", "default": 15 },
-    { "type": "color", "id": "benefit_color", "label": "Color de beneficios", "default": "#111111" },
-    { "type": "color", "id": "benefit_icon_color", "label": "Color de las flechas ↗", "default": "#111111" },
-
-    { "type": "header", "content": "📐 Sección" },
-    { "type": "color", "id": "section_bg", "label": "Fondo de la sección", "default": "#FFFFFF" },
-    { "type": "range", "id": "content_max_width", "min": 800, "max": 1800, "step": 20, "unit": "px", "label": "Ancho máximo del contenido", "default": 1300, "info": "El contenido se centra automáticamente. Ajusta hasta alinearlo con las demás secciones de tu tema (Dawn suele usar 1200-1300px)." },
-    { "type": "checkbox", "id": "full_width", "label": "Ancho completo (sin límite de ancho)", "default": false },
-    { "type": "range", "id": "padding_x", "min": 0, "max": 100, "step": 5, "unit": "px", "label": "Margen lateral (PC)", "default": 50 },
-    { "type": "range", "id": "padding_x_mobile", "min": 0, "max": 50, "step": 2, "unit": "px", "label": "Margen lateral (móvil)", "default": 16 },
-    { "type": "range", "id": "padding_top", "min": 0, "max": 120, "step": 4, "unit": "px", "label": "Espacio superior (PC)", "default": 48 },
-    { "type": "range", "id": "padding_bottom", "min": 0, "max": 120, "step": 4, "unit": "px", "label": "Espacio inferior (PC)", "default": 48 },
-    { "type": "range", "id": "padding_top_mobile", "min": 0, "max": 100, "step": 4, "unit": "px", "label": "Espacio superior (móvil)", "default": 32 },
-    { "type": "range", "id": "padding_bottom_mobile", "min": 0, "max": 100, "step": 4, "unit": "px", "label": "Espacio inferior (móvil)", "default": 32 }
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Tamaño del título (móvil)",
+      "min": 18,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 34
+    },
+    {
+      "type": "text",
+      "id": "more_label",
+      "label": "Texto del enlace en la tarjeta",
+      "default": "Ver más"
+    },
+    {
+      "type": "header",
+      "content": "Diseño y tamaños"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Ancho completo",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Ancho máximo del contenido",
+      "min": 900,
+      "max": 1920,
+      "step": 20,
+      "unit": "px",
+      "default": 1500
+    },
+    {
+      "type": "range",
+      "id": "card_width",
+      "label": "Ancho de tarjeta (escritorio)",
+      "min": 200,
+      "max": 420,
+      "step": 10,
+      "unit": "px",
+      "default": 300
+    },
+    {
+      "type": "range",
+      "id": "card_width_mobile",
+      "label": "Ancho de tarjeta (móvil)",
+      "min": 180,
+      "max": 340,
+      "step": 10,
+      "unit": "px",
+      "default": 270
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "Espacio entre tarjetas",
+      "min": 8,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Proporción de imagen de tarjeta",
+      "options": [
+        { "value": "square", "label": "Cuadrada (1:1)" },
+        { "value": "portrait", "label": "Vertical (4:5)" },
+        { "value": "landscape", "label": "Horizontal (4:3)" }
+      ],
+      "default": "square"
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Radio de borde de tarjetas",
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "container_radius",
+      "label": "Radio de borde del contenedor gris",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Mostrar flechas (escritorio)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_scrollbar",
+      "label": "Mostrar barra de scroll",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espacio superior",
+      "min": 0,
+      "max": 140,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espacio inferior",
+      "min": 0,
+      "max": 140,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Colores generales"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Fondo de la sección",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "color_heading",
+      "label": "Color del título",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "color_carousel_bg",
+      "label": "Fondo del contenedor del carrusel",
+      "default": "#F0F0F0"
+    },
+    {
+      "type": "color",
+      "id": "color_arrow",
+      "label": "Color de las flechas",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Colores de tabs"
+    },
+    {
+      "type": "color",
+      "id": "color_tab_bg",
+      "label": "Fondo tab inactiva",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "color_tab_text",
+      "label": "Texto tab inactiva",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "color_tab_border",
+      "label": "Borde tab inactiva",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "color_tab_active_bg",
+      "label": "Fondo tab activa",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "color_tab_active_text",
+      "label": "Texto tab activa",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Colores de tarjetas"
+    },
+    {
+      "type": "color",
+      "id": "color_card_bg",
+      "label": "Fondo de tarjeta",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "color_card_title",
+      "label": "Título de tarjeta",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "color_card_dose",
+      "label": "Dosis (texto secundario)",
+      "default": "#6A6A6A"
+    },
+    {
+      "type": "color",
+      "id": "color_link",
+      "label": "Enlace \"Ver más\"",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Colores del modal"
+    },
+    {
+      "type": "color",
+      "id": "color_modal_bg",
+      "label": "Fondo del modal",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "color_modal_text",
+      "label": "Texto del modal",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "color_modal_secondary",
+      "label": "Texto secundario del modal",
+      "default": "#6A6A6A"
+    },
+    {
+      "type": "color",
+      "id": "color_overlay",
+      "label": "Color del overlay",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Opacidad del overlay",
+      "min": 10,
+      "max": 95,
+      "step": 5,
+      "unit": "%",
+      "default": 60
+    }
   ],
   "blocks": [
     {
@@ -815,40 +866,59 @@
         {
           "type": "text",
           "id": "tab",
-          "label": "Pestaña (badge)",
-          "info": "Ej: Focus. Los ingredientes con la misma pestaña se agrupan. Las pestañas se crean solas.",
+          "label": "Tab a la que pertenece",
+          "info": "Escribí el mismo nombre en varios ingredientes para agruparlos en la misma pestaña. Las tabs se crean solas en orden de aparición.",
           "default": "Focus"
         },
-        { "type": "image_picker", "id": "image", "label": "Imagen de la tarjeta" },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen de la tarjeta"
+        },
         {
           "type": "image_picker",
           "id": "modal_image",
-          "label": "Imagen del popup (opcional)",
-          "info": "Si se deja vacía, se usa la de la tarjeta."
+          "label": "Imagen del modal (opcional)",
+          "info": "Si la dejás vacía se usa la imagen de la tarjeta."
         },
-        { "type": "text", "id": "title", "label": "Nombre del ingrediente", "default": "Bacopa Monieri" },
-        { "type": "text", "id": "dosage", "label": "Dosis", "default": "300MG" },
-        { "type": "richtext", "id": "description", "label": "Descripción (popup)" },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Nombre del ingrediente",
+          "default": "Ingrediente"
+        },
+        {
+          "type": "text",
+          "id": "dosage",
+          "label": "Dosis",
+          "default": "100mg"
+        },
+        {
+          "type": "richtext",
+          "id": "description",
+          "label": "Descripción (dentro del modal)",
+          "default": "<p>Describí aquí el ingrediente, su función y en qué alimentos está presente.</p>"
+        },
         {
           "type": "textarea",
           "id": "benefits",
-          "label": "Beneficios (popup)",
-          "info": "Un beneficio por línea. Cada línea sale con flecha ↗.",
-          "default": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
+          "label": "Beneficios (uno por línea)",
+          "info": "Cada línea se muestra como un beneficio con el icono de flecha, en dos columnas en escritorio.",
+          "default": "Contribuye al metabolismo energético\nAyuda a reducir el cansancio\nApoya el sistema inmunitario\nFavorece la función psicológica normal"
         }
       ]
     }
   ],
+  "max_blocks": 50,
   "presets": [
     {
-      "name": "Ingredientes ciencia PRO",
+      "name": "Ingredientes con tabs",
       "blocks": [
-        { "type": "ingredient", "settings": { "tab": "Focus", "title": "Bacopa Monieri", "dosage": "300MG" } },
-        { "type": "ingredient", "settings": { "tab": "Focus", "title": "Rhodiola rosea", "dosage": "200mg" } },
-        { "type": "ingredient", "settings": { "tab": "Focus", "title": "Cafeína", "dosage": "120MG" } },
-        { "type": "ingredient", "settings": { "tab": "Focus", "title": "L-teanina", "dosage": "120mg" } },
-        { "type": "ingredient", "settings": { "tab": "Calm", "title": "Ashwagandha", "dosage": "300mg" } },
-        { "type": "ingredient", "settings": { "tab": "Sleep", "title": "Melatonina", "dosage": "1,9mg" } }
+        { "type": "ingredient", "settings": { "tab": "Focus", "title": "Ginkgo Biloba", "dosage": "80mg" } },
+        { "type": "ingredient", "settings": { "tab": "Focus", "title": "Zinc", "dosage": "10mg" } },
+        { "type": "ingredient", "settings": { "tab": "Focus", "title": "Vitamina B6", "dosage": "1,4mg" } },
+        { "type": "ingredient", "settings": { "tab": "Calm", "title": "Ashwagandha", "dosage": "600mg" } },
+        { "type": "ingredient", "settings": { "tab": "Sleep", "title": "L-triptófano", "dosage": "300mg" } }
       ]
     }
   ]
