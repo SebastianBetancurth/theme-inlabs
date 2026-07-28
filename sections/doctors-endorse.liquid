@@ -1,0 +1,727 @@
+{% comment %}
+  ============================================================
+  SECCIÓN: Doctores que avalan el producto
+  Theme: Dawn (compatible con cualquier theme OS 2.0)
+  Archivo: sections/doctors-endorse.liquid
+  ------------------------------------------------------------
+  - Cada doctor es un bloque: foto, nombre, especialidad,
+    cita y enlace opcional.
+  - DESKTOP: foto grande + texto al lado, flechas finas a los
+    costados y miniaturas clickeables debajo de la foto.
+  - MOBILE: la foto es un carrusel deslizable con la siguiente
+    foto asomando al costado; las flechas van junto al nombre.
+    El texto se sincroniza automáticamente con la foto visible.
+  - El texto cambia con un fade suave.
+  - Todo editable: colores, textos, tamaños, paddings y
+    márgenes separados escritorio/móvil.
+  ============================================================
+{% endcomment %}
+
+{%- liquid
+  assign sid = section.id
+  assign ratio = '1 / 1'
+  if section.settings.image_ratio == 'portrait'
+    assign ratio = '4 / 5'
+  elsif section.settings.image_ratio == 'landscape'
+    assign ratio = '4 / 3'
+  endif
+-%}
+
+{%- style -%}
+  #shopify-section-{{ sid }} .zd-section {
+    display: block;
+    --zd-bg: {{ section.settings.color_bg }};
+    --zd-heading: {{ section.settings.color_heading }};
+    --zd-name: {{ section.settings.color_name }};
+    --zd-specialty: {{ section.settings.color_specialty }};
+    --zd-quote: {{ section.settings.color_quote }};
+    --zd-link: {{ section.settings.color_link }};
+    --zd-arrow: {{ section.settings.color_arrow }};
+    --zd-heading-size: {{ section.settings.heading_size }}px;
+    --zd-heading-size-mobile: {{ section.settings.heading_size_mobile }}px;
+    --zd-ratio: {{ ratio }};
+    --zd-max-width: {{ section.settings.max_width }}px;
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    margin-top: {{ section.settings.margin_top }}px;
+    margin-bottom: {{ section.settings.margin_bottom }}px;
+    background: var(--zd-bg);
+    font-family: var(--font-body-family);
+  }
+
+  #shopify-section-{{ sid }} .zd-wrapper {
+    max-width: var(--zd-max-width);
+    margin: 0 auto;
+    padding: 0 {{ section.settings.padding_x }}px;
+    position: relative;
+  }
+
+  #shopify-section-{{ sid }} .zd-heading {
+    font-size: var(--zd-heading-size);
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--zd-heading);
+    margin: 0 0 {{ section.settings.gap_heading }}px;
+  }
+
+  /* ============ LAYOUT PRINCIPAL ============ */
+  #shopify-section-{{ sid }} .zd-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 4.4rem;
+    align-items: start;
+  }
+
+  /* ============ FOTOS (carrusel con snap) ============ */
+  #shopify-section-{{ sid }} .zd-media {
+    min-width: 0;
+  }
+  #shopify-section-{{ sid }} .zd-track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    border-radius: {{ section.settings.image_radius }}px;
+  }
+  #shopify-section-{{ sid }} .zd-track::-webkit-scrollbar { display: none; }
+  #shopify-section-{{ sid }} .zd-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    scroll-snap-align: start;
+    aspect-ratio: var(--zd-ratio);
+    overflow: hidden;
+  }
+  #shopify-section-{{ sid }} .zd-slide img,
+  #shopify-section-{{ sid }} .zd-slide svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Miniaturas (solo desktop) */
+  #shopify-section-{{ sid }} .zd-thumbs {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.4rem;
+  }
+  #shopify-section-{{ sid }} .zd-thumb {
+    width: 6rem;
+    height: 6rem;
+    padding: 0;
+    border: 1px solid transparent;
+    background: none;
+    cursor: pointer;
+    overflow: hidden;
+    opacity: .55;
+    transition: opacity .2s ease, border-color .2s ease;
+  }
+  #shopify-section-{{ sid }} .zd-thumb img,
+  #shopify-section-{{ sid }} .zd-thumb svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  #shopify-section-{{ sid }} .zd-thumb[aria-current='true'] {
+    opacity: 1;
+    border-color: var(--zd-name);
+  }
+  #shopify-section-{{ sid }} .zd-thumb:hover { opacity: 1; }
+
+  /* ============ TEXTOS (apilados, cambian con fade) ============ */
+  #shopify-section-{{ sid }} .zd-texts {
+    display: grid;
+  }
+  #shopify-section-{{ sid }} .zd-text {
+    grid-area: 1 / 1;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .4s ease, visibility .4s ease;
+  }
+  #shopify-section-{{ sid }} .zd-text.is-active {
+    opacity: 1;
+    visibility: visible;
+  }
+  #shopify-section-{{ sid }} .zd-text-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.6rem;
+  }
+  #shopify-section-{{ sid }} .zd-name {
+    font-size: 2.6rem;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--zd-name);
+    margin: 0 0 .3rem;
+  }
+  #shopify-section-{{ sid }} .zd-specialty {
+    font-size: 1.7rem;
+    color: var(--zd-specialty);
+    margin: 0 0 2rem;
+  }
+  #shopify-section-{{ sid }} .zd-quote {
+    font-size: 1.6rem;
+    line-height: 1.6;
+    color: var(--zd-quote);
+    margin: 0 0 2.2rem;
+  }
+  #shopify-section-{{ sid }} .zd-quote p { margin: 0 0 1rem; }
+  #shopify-section-{{ sid }} .zd-link {
+    display: inline-block;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--zd-link);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* ============ FLECHAS ============ */
+  /* Desktop: finas, a los costados de toda la sección */
+  #shopify-section-{{ sid }} .zd-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    padding: 1rem;
+    color: var(--zd-arrow);
+    line-height: 0;
+    z-index: 2;
+  }
+  #shopify-section-{{ sid }} .zd-arrow svg { width: 1.8rem; height: 3.2rem; }
+  #shopify-section-{{ sid }} .zd-arrow--prev { left: -1rem; }
+  #shopify-section-{{ sid }} .zd-arrow--next { right: -1rem; }
+  #shopify-section-{{ sid }} .zd-arrow:hover { opacity: .55; }
+
+  /* Mobile: chicas, junto al nombre */
+  #shopify-section-{{ sid }} .zd-mini-arrows {
+    display: none;
+    gap: 1.6rem;
+    flex: 0 0 auto;
+    padding-top: .6rem;
+  }
+  #shopify-section-{{ sid }} .zd-mini-arrows button {
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    padding: .2rem;
+    color: var(--zd-arrow);
+    line-height: 0;
+  }
+  #shopify-section-{{ sid }} .zd-mini-arrows svg { width: 1.1rem; height: 1.8rem; }
+
+  /* ============ MOBILE ============ */
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ sid }} .zd-section {
+      padding-top: {{ section.settings.padding_top_mobile }}px;
+      padding-bottom: {{ section.settings.padding_bottom_mobile }}px;
+      margin-top: {{ section.settings.margin_top_mobile }}px;
+      margin-bottom: {{ section.settings.margin_bottom_mobile }}px;
+    }
+    #shopify-section-{{ sid }} .zd-wrapper {
+      padding: 0 {{ section.settings.padding_x_mobile }}px;
+    }
+    #shopify-section-{{ sid }} .zd-heading {
+      font-size: var(--zd-heading-size-mobile);
+      margin-bottom: {{ section.settings.gap_heading_mobile }}px;
+    }
+    #shopify-section-{{ sid }} .zd-main {
+      grid-template-columns: 1fr;
+      gap: 2.4rem;
+    }
+    /* La siguiente foto asoma al costado */
+    #shopify-section-{{ sid }} .zd-track {
+      gap: 1.4rem;
+      margin-right: -{{ section.settings.padding_x_mobile }}px;
+      padding-right: {{ section.settings.padding_x_mobile }}px;
+    }
+    #shopify-section-{{ sid }} .zd-slide {
+      flex-basis: 86%;
+      width: 86%;
+    }
+    #shopify-section-{{ sid }} .zd-thumbs { display: none; }
+    #shopify-section-{{ sid }} .zd-arrow { display: none; }
+    #shopify-section-{{ sid }} .zd-mini-arrows { display: flex; }
+    #shopify-section-{{ sid }} .zd-name { font-size: 2.2rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #shopify-section-{{ sid }} .zd-track { scroll-behavior: auto; }
+    #shopify-section-{{ sid }} .zd-text { transition: none; }
+  }
+{%- endstyle -%}
+
+<zi-doctors class="zd-section" data-section-id="{{ sid }}">
+  <div class="zd-wrapper">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="zd-heading">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+
+    {%- if section.blocks.size > 1 -%}
+      <button type="button" class="zd-arrow zd-arrow--prev" data-dir="-1" aria-label="Doctor anterior">
+        <svg viewBox="0 0 12 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M11 1L1 11L11 21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button type="button" class="zd-arrow zd-arrow--next" data-dir="1" aria-label="Doctor siguiente">
+        <svg viewBox="0 0 12 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M1 1L11 11L1 21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    {%- endif -%}
+
+    <div class="zd-main">
+      <div class="zd-media">
+        <div class="zd-track" data-track>
+          {%- for block in section.blocks -%}
+            <div class="zd-slide" data-slide {{ block.shopify_attributes }}>
+              {%- if block.settings.image != blank -%}
+                {{ block.settings.image | image_url: width: 1100 | image_tag: loading: 'lazy', widths: '440, 660, 880, 1100', sizes: '(max-width: 749px) 86vw, 550px', alt: block.settings.name | escape }}
+              {%- else -%}
+                {{ 'detailed-apparel-1' | placeholder_svg_tag }}
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        </div>
+
+        {%- if section.blocks.size > 1 -%}
+          <div class="zd-thumbs">
+            {%- for block in section.blocks -%}
+              <button
+                type="button"
+                class="zd-thumb"
+                data-thumb="{{ forloop.index0 }}"
+                aria-label="Ver a {{ block.settings.name | escape }}"
+                aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+              >
+                {%- if block.settings.image != blank -%}
+                  {{ block.settings.image | image_url: width: 120 | image_tag: loading: 'lazy', alt: '' }}
+                {%- else -%}
+                  {{ 'detailed-apparel-1' | placeholder_svg_tag }}
+                {%- endif -%}
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      <div class="zd-texts">
+        {%- for block in section.blocks -%}
+          <div class="zd-text{% if forloop.first %} is-active{% endif %}" data-text>
+            <div class="zd-text-head">
+              <div>
+                <h3 class="zd-name">{{ block.settings.name | escape }}</h3>
+                <p class="zd-specialty">{{ block.settings.specialty | escape }}</p>
+              </div>
+              {%- if section.blocks.size > 1 -%}
+                <div class="zd-mini-arrows">
+                  <button type="button" data-dir="-1" aria-label="Doctor anterior">
+                    <svg viewBox="0 0 12 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M11 1L1 11L11 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                  <button type="button" data-dir="1" aria-label="Doctor siguiente">
+                    <svg viewBox="0 0 12 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M1 1L11 11L1 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+              {%- endif -%}
+            </div>
+            {%- if block.settings.quote != blank -%}
+              <div class="zd-quote">{{ block.settings.quote }}</div>
+            {%- endif -%}
+            {%- if block.settings.link_label != blank and block.settings.link_url != blank -%}
+              <a class="zd-link" href="{{ block.settings.link_url }}">{{ block.settings.link_label | escape }}</a>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</zi-doctors>
+
+<script>
+  if (!customElements.get('zi-doctors')) {
+    customElements.define(
+      'zi-doctors',
+      class ZiDoctors extends HTMLElement {
+        connectedCallback() {
+          this.track = this.querySelector('[data-track]');
+          this.slides = Array.from(this.querySelectorAll('[data-slide]'));
+          this.texts = Array.from(this.querySelectorAll('[data-text]'));
+          this.thumbs = Array.from(this.querySelectorAll('[data-thumb]'));
+          this.current = 0;
+
+          if (this.slides.length === 0) return;
+
+          /* Flechas (desktop y las mini de mobile) */
+          this.querySelectorAll('[data-dir]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              const dir = parseInt(btn.dataset.dir, 10);
+              const next = (this.current + dir + this.slides.length) % this.slides.length;
+              this.goTo(next);
+            });
+          });
+
+          /* Miniaturas */
+          this.thumbs.forEach((thumb) => {
+            thumb.addEventListener('click', () => {
+              this.goTo(parseInt(thumb.dataset.thumb, 10));
+            });
+          });
+
+          /* Deslizamiento táctil: detectar la slide visible y
+             sincronizar texto, miniaturas y estado */
+          this.onScroll = () => {
+            if (this.scrollRaf) return;
+            this.scrollRaf = requestAnimationFrame(() => {
+              this.scrollRaf = null;
+              this.syncFromScroll();
+            });
+          };
+          this.track.addEventListener('scroll', this.onScroll, { passive: true });
+        }
+
+        goTo(index) {
+          const slide = this.slides[index];
+          if (!slide) return;
+          this.track.scrollTo({ left: slide.offsetLeft - this.track.offsetLeft, behavior: 'smooth' });
+          this.setActive(index);
+        }
+
+        syncFromScroll() {
+          /* Slide más cercana al borde izquierdo visible */
+          const pos = this.track.scrollLeft;
+          let nearest = 0;
+          let minDist = Infinity;
+          this.slides.forEach((slide, i) => {
+            const dist = Math.abs(slide.offsetLeft - this.track.offsetLeft - pos);
+            if (dist < minDist) {
+              minDist = dist;
+              nearest = i;
+            }
+          });
+          if (nearest !== this.current) this.setActive(nearest);
+        }
+
+        setActive(index) {
+          this.current = index;
+          this.texts.forEach((t, i) => t.classList.toggle('is-active', i === index));
+          this.thumbs.forEach((t, i) => t.setAttribute('aria-current', i === index ? 'true' : 'false'));
+        }
+
+        disconnectedCallback() {
+          if (this.track) this.track.removeEventListener('scroll', this.onScroll);
+        }
+      }
+    );
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Doctores que avalan",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Contenido"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Título",
+      "default": "Doctores que avalan nuestro producto"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Tamaño del título (escritorio)",
+      "min": 20,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "default": 38
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Tamaño del título (móvil)",
+      "min": 16,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "header",
+      "content": "Imagen"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Proporción de la foto",
+      "options": [
+        { "value": "square", "label": "Cuadrada (1:1)" },
+        { "value": "portrait", "label": "Vertical (4:5)" },
+        { "value": "landscape", "label": "Horizontal (4:3)" }
+      ],
+      "default": "square"
+    },
+    {
+      "type": "range",
+      "id": "image_radius",
+      "label": "Radio de borde de la foto",
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Ancho máximo del contenido",
+      "min": 800,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "default": 1100
+    },
+    {
+      "type": "header",
+      "content": "Espaciado (escritorio)"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding superior",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding inferior",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_x",
+      "label": "Padding lateral",
+      "min": 0,
+      "max": 140,
+      "step": 4,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "label": "Margen superior",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom",
+      "label": "Margen inferior",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "gap_heading",
+      "label": "Espacio bajo el título",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Espaciado (móvil)"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding superior",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding inferior",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_x_mobile",
+      "label": "Padding lateral",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "margin_top_mobile",
+      "label": "Margen superior",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_mobile",
+      "label": "Margen inferior",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "gap_heading_mobile",
+      "label": "Espacio bajo el título",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "header",
+      "content": "Colores"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Fondo de la sección",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "color_heading",
+      "label": "Título",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "color_name",
+      "label": "Nombre del doctor",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "color_specialty",
+      "label": "Especialidad",
+      "default": "#3A3A3A"
+    },
+    {
+      "type": "color",
+      "id": "color_quote",
+      "label": "Cita",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "color_link",
+      "label": "Enlace",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "color_arrow",
+      "label": "Flechas",
+      "default": "#121212"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "doctor",
+      "name": "Doctor",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Foto"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Nombre",
+          "default": "Dra. Isabel Belaustegui"
+        },
+        {
+          "type": "text",
+          "id": "specialty",
+          "label": "Especialidad",
+          "default": "Medicina Integrativa"
+        },
+        {
+          "type": "richtext",
+          "id": "quote",
+          "label": "Cita",
+          "default": "<p>\"El descanso nocturno es una parte esencial del bienestar. Combina ingredientes con respaldo científico para favorecer un sueño profundo y de calidad.\"</p>"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Texto del enlace",
+          "default": "Conoce Modo ZZEN."
+        },
+        {
+          "type": "url",
+          "id": "link_url",
+          "label": "URL del enlace"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 10,
+  "presets": [
+    {
+      "name": "Doctores que avalan",
+      "blocks": [
+        { "type": "doctor" },
+        { "type": "doctor", "settings": { "name": "Dr. Marcos Bodoque", "specialty": "Nutrición y Medicina Funcional" } },
+        { "type": "doctor", "settings": { "name": "Dr. Carlos Jaramillo", "specialty": "Medicina Funcional" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
