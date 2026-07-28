@@ -214,6 +214,88 @@
         "padding_top": 60,
         "padding_bottom": 60
       }
+    },
+    "ingredientes_ciencia_EYQR44": {
+      "type": "ingredientes-ciencia",
+      "blocks": {
+        "ingredient_Lxkfjk": {
+          "type": "ingredient",
+          "settings": {
+            "tab": "Focus",
+            "title": "Bacopa Monieri",
+            "dosage": "300MG",
+            "description": "",
+            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
+          }
+        },
+        "ingredient_LUajBg": {
+          "type": "ingredient",
+          "settings": {
+            "tab": "Focus",
+            "title": "Rhodiola rosea",
+            "dosage": "200mg",
+            "description": "",
+            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
+          }
+        },
+        "ingredient_x33wJG": {
+          "type": "ingredient",
+          "settings": {
+            "tab": "Focus",
+            "title": "Cafeína",
+            "dosage": "120MG",
+            "description": "",
+            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
+          }
+        },
+        "ingredient_fBddnx": {
+          "type": "ingredient",
+          "settings": {
+            "tab": "Focus",
+            "title": "L-teanina",
+            "dosage": "120mg",
+            "description": "",
+            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
+          }
+        },
+        "ingredient_YdLc3E": {
+          "type": "ingredient",
+          "settings": {
+            "tab": "Calm",
+            "title": "Ashwagandha",
+            "dosage": "300mg",
+            "description": "",
+            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
+          }
+        },
+        "ingredient_FN3FAy": {
+          "type": "ingredient",
+          "settings": {
+            "tab": "Sleep",
+            "title": "Melatonina",
+            "dosage": "1,9mg",
+            "description": "",
+            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
+          }
+        }
+      },
+      "block_order": [
+        "ingredient_Lxkfjk",
+        "ingredient_LUajBg",
+        "ingredient_x33wJG",
+        "ingredient_fBddnx",
+        "ingredient_YdLc3E",
+        "ingredient_FN3FAy"
+      ],
+      "name": "Ingredientes ciencia",
+      "settings": {
+        "heading": "Ingredientes avalados por la ciencia",
+        "heading_size": "h1",
+        "more_label": "Ver más",
+        "color_scheme": "",
+        "padding_top": 48,
+        "padding_bottom": 48
+      }
     }
   },
   "order": [
@@ -221,6 +303,7 @@
     "logo_bar_grKLiT",
     "prod_slider_i9AiYx",
     "prod_slider_yYbVex",
-    "beneficios_imagen_JHVhYw"
+    "beneficios_imagen_JHVhYw",
+    "ingredientes_ciencia_EYQR44"
   ]
 }
