@@ -216,7 +216,7 @@
       }
     },
     "ingredientes_ciencia_EYQR44": {
-      "type": "ingredientes-ciencia",
+      "type": "ingredientes-premium",
       "blocks": {
         "ingredient_Lxkfjk": {
           "type": "ingredient",
@@ -290,11 +290,39 @@
       "name": "Ingredientes ciencia",
       "settings": {
         "heading": "Ingredientes avalados por la ciencia",
-        "heading_size": "h1",
+        "heading_size": 64,
+        "heading_size_mobile": 34,
         "more_label": "Ver más",
-        "color_scheme": "",
+        "full_width": false,
+        "max_width": 1500,
+        "card_width": 300,
+        "card_width_mobile": 270,
+        "card_gap": 24,
+        "image_ratio": "square",
+        "card_radius": 10,
+        "container_radius": 12,
+        "show_arrows": true,
+        "show_scrollbar": true,
         "padding_top": 48,
-        "padding_bottom": 48
+        "padding_bottom": 48,
+        "color_bg": "#FFFFFF",
+        "color_heading": "#121212",
+        "color_carousel_bg": "#F0F0F0",
+        "color_arrow": "#121212",
+        "color_tab_bg": "#FFFFFF",
+        "color_tab_text": "#121212",
+        "color_tab_border": "#121212",
+        "color_tab_active_bg": "#000000",
+        "color_tab_active_text": "#FFFFFF",
+        "color_card_bg": "#FFFFFF",
+        "color_card_title": "#121212",
+        "color_card_dose": "#6A6A6A",
+        "color_link": "#121212",
+        "color_modal_bg": "#FFFFFF",
+        "color_modal_text": "#121212",
+        "color_modal_secondary": "#6A6A6A",
+        "color_overlay": "#000000",
+        "overlay_opacity": 60
       }
     }
   },
