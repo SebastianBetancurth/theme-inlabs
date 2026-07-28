@@ -5,16 +5,14 @@
   Archivo: sections/ingredients-tabs.liquid
   ------------------------------------------------------------
   - Tabs generadas automáticamente según el campo "Tab" de
-    cada bloque de ingrediente (escribí el mismo nombre de tab
-    en varios ingredientes y se agrupan solos).
+    cada bloque de ingrediente.
   - Carrusel horizontal con flechas (desktop) y scroll táctil
     (mobile) + scrollbar fina.
-  - Click en la card => modal con overlay oscuro. Se cierra
-    haciendo click fuera, con la flecha <- o con la tecla Esc.
-  - El modal se mueve a <body> por JS para que position:fixed
-    no se rompa con los transforms de las animaciones de Dawn.
-  - Todo editable desde el customizer: textos, tamaños,
-    colores, anchos, radios, opacidad del overlay, etc.
+  - Modal implementado con <dialog> nativo + showModal():
+    se renderiza en el TOP LAYER del navegador, por encima de
+    todo, inmune a z-index, transforms y overflow del theme.
+    El overlay oscuro es el ::backdrop nativo del dialog.
+  - Se cierra con click fuera, flecha <- o tecla Esc (nativo).
   ============================================================
 {% endcomment %}
 
@@ -242,40 +240,27 @@
   #shopify-section-{{ sid }} .zi-arrow-btn--next { right: 1rem; }
   #shopify-section-{{ sid }} .zi-arrow-btn:hover { opacity: .6; }
 
-  /* ============ MODAL ============ */
-  /* El modal vive en <body> (lo mueve el JS), por eso se
-     selecciona por id y define sus propias variables. */
+  /* ============ MODAL (dialog nativo, top layer) ============ */
   #ZiModal-{{ sid }} {
-    --zi-overlay: {{ overlay_color }};
-    --zi-modal-bg: {{ section.settings.color_modal_bg }};
-    --zi-modal-text: {{ section.settings.color_modal_text }};
-    --zi-modal-secondary: {{ section.settings.color_modal_secondary }};
-    position: fixed;
-    inset: 0;
-    z-index: 100000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-    font-family: var(--font-body-family);
-  }
-  #ZiModal-{{ sid }}[hidden] { display: none; }
-  #ZiModal-{{ sid }} .zi-modal__overlay {
-    position: absolute;
-    inset: 0;
-    background: var(--zi-overlay);
-    animation: zi-fade .25s ease;
-  }
-  #ZiModal-{{ sid }} .zi-modal__dialog {
-    position: relative;
-    background: var(--zi-modal-bg);
-    color: var(--zi-modal-text);
-    width: 100%;
+    border: 0;
+    padding: 0;
+    margin: auto; /* centra el dialog en el viewport */
+    background: {{ section.settings.color_modal_bg }};
+    color: {{ section.settings.color_modal_text }};
+    width: calc(100% - 3rem);
     max-width: 60rem;
     max-height: 90vh;
     overflow-y: auto;
     border-radius: 14px;
+    font-family: var(--font-body-family);
+  }
+  #ZiModal-{{ sid }}[open] {
     animation: zi-pop .28s cubic-bezier(.2,.9,.3,1.1);
+  }
+  /* Overlay oscuro nativo del dialog: nada del theme puede taparlo */
+  #ZiModal-{{ sid }}::backdrop {
+    background: {{ overlay_color }};
+    animation: zi-fade .25s ease;
   }
   @keyframes zi-fade { from { opacity: 0; } to { opacity: 1; } }
   @keyframes zi-pop { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
@@ -310,7 +295,7 @@
   }
   #ZiModal-{{ sid }} .zi-modal__dose {
     font-size: 1.5rem;
-    color: var(--zi-modal-secondary);
+    color: {{ section.settings.color_modal_secondary }};
     margin: 0;
   }
   #ZiModal-{{ sid }} .zi-modal__close {
@@ -318,7 +303,7 @@
     border: 0;
     cursor: pointer;
     padding: .6rem;
-    color: var(--zi-modal-text);
+    color: {{ section.settings.color_modal_text }};
     line-height: 0;
     flex: 0 0 auto;
   }
@@ -359,21 +344,21 @@
     #shopify-section-{{ sid }} .zi-panel { padding: 1.8rem 0 1rem; }
     #shopify-section-{{ sid }} .zi-slider { padding: 0 1.6rem 1.2rem; }
     #shopify-section-{{ sid }} .zi-arrow-btn { display: none; }
-    #ZiModal-{{ sid }} { padding: 1.2rem; }
+    #ZiModal-{{ sid }} { width: calc(100% - 2rem); }
     #ZiModal-{{ sid }} .zi-modal__body { padding: 2rem 2rem 2.4rem; }
     #ZiModal-{{ sid }} .zi-benefits { grid-template-columns: 1fr; }
     #ZiModal-{{ sid }} .zi-modal__title { font-size: 2.2rem; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    #ZiModal-{{ sid }} .zi-modal__overlay,
-    #ZiModal-{{ sid }} .zi-modal__dialog { animation: none; }
+    #ZiModal-{{ sid }}[open],
+    #ZiModal-{{ sid }}::backdrop { animation: none; }
     #shopify-section-{{ sid }} .zi-slider { scroll-behavior: auto; }
     #shopify-section-{{ sid }} .zi-card { transition: none; }
   }
 {%- endstyle -%}
 
-<ingredients-tabs class="zi-section" data-section-id="{{ sid }}">
+<zi-ingredients-tabs class="zi-section" data-section-id="{{ sid }}">
   <div class="zi-wrapper">
     {%- if section.settings.heading != blank -%}
       <h2 class="zi-heading">{{ section.settings.heading }}</h2>
@@ -487,30 +472,19 @@
     </div>
   </div>
 
-  {%- comment -%} ---------- MODAL (vacío, se llena por JS y se mueve a <body>) ---------- {%- endcomment -%}
-  <div class="zi-modal" id="ZiModal-{{ sid }}" hidden>
-    <div class="zi-modal__overlay" data-modal-close></div>
-    <div class="zi-modal__dialog" role="dialog" aria-modal="true"></div>
-  </div>
-</ingredients-tabs>
+  {%- comment -%} ---------- MODAL: dialog nativo, se llena por JS ---------- {%- endcomment -%}
+  <dialog class="zi-modal" id="ZiModal-{{ sid }}" aria-label="{{ 'Detalle del ingrediente' }}"></dialog>
+</zi-ingredients-tabs>
 
 <script>
-  if (!customElements.get('ingredients-tabs')) {
+  if (!customElements.get('zi-ingredients-tabs')) {
     customElements.define(
-      'ingredients-tabs',
-      class IngredientsTabs extends HTMLElement {
+      'zi-ingredients-tabs',
+      class ZiIngredientsTabs extends HTMLElement {
         connectedCallback() {
           this.tabs = Array.from(this.querySelectorAll('.zi-tab'));
           this.panels = Array.from(this.querySelectorAll('.zi-panel'));
-          this.modal = this.querySelector('.zi-modal');
-          this.dialog = this.modal.querySelector('.zi-modal__dialog');
-          this.onKeydown = this.onKeydown.bind(this);
-
-          /* Mover el modal al <body> para que position:fixed no se
-             rompa por los transforms de las animaciones de Dawn
-             (scroll-trigger / animate--slide-in crean un containing
-             block y el fixed queda relativo a la sección). */
-          document.body.appendChild(this.modal);
+          this.modal = this.querySelector('dialog.zi-modal');
 
           /* Tabs */
           this.tabs.forEach((tab) => {
@@ -532,11 +506,18 @@
             card.addEventListener('click', () => this.openModal(card));
           });
 
-          /* Cerrar: click fuera del contenido (overlay o cualquier zona fuera del diálogo) */
+          /* Cerrar: click en el backdrop (target === dialog) o en el botón de cerrar.
+             Esc lo maneja el dialog nativamente. */
           this.modal.addEventListener('click', (e) => {
-            if (!e.target.closest('.zi-modal__dialog') || e.target.closest('.zi-modal__close')) {
-              this.closeModal();
+            if (e.target === this.modal || e.target.closest('.zi-modal__close')) {
+              this.modal.close();
             }
+          });
+
+          /* Al cerrarse (por cualquier vía) restaurar el scroll del body */
+          this.modal.addEventListener('close', () => {
+            this.modal.innerHTML = '';
+            document.body.style.overflow = this.prevOverflow || '';
           });
         }
 
@@ -556,34 +537,16 @@
         openModal(card) {
           const tpl = card.querySelector('[data-modal-content]');
           if (!tpl) return;
-          this.dialog.innerHTML = '';
-          this.dialog.appendChild(tpl.content.cloneNode(true));
-          this.modal.hidden = false;
+          this.modal.innerHTML = '';
+          this.modal.appendChild(tpl.content.cloneNode(true));
           this.prevOverflow = document.body.style.overflow;
           document.body.style.overflow = 'hidden';
-          document.addEventListener('keydown', this.onKeydown);
-          const closeBtn = this.dialog.querySelector('.zi-modal__close');
-          if (closeBtn) closeBtn.focus({ preventScroll: true });
-        }
-
-        closeModal() {
-          this.modal.hidden = true;
-          this.dialog.innerHTML = '';
-          document.body.style.overflow = this.prevOverflow || '';
-          document.removeEventListener('keydown', this.onKeydown);
-        }
-
-        onKeydown(e) {
-          if (e.key === 'Escape') this.closeModal();
+          this.modal.showModal(); /* top layer: por encima de TODO */
         }
 
         disconnectedCallback() {
-          document.removeEventListener('keydown', this.onKeydown);
+          if (this.modal && this.modal.open) this.modal.close();
           document.body.style.overflow = this.prevOverflow || '';
-          /* Como el modal fue movido a <body>, hay que limpiarlo
-             manualmente (importante en el editor de temas, que
-             desconecta/reconecta la sección al editarla). */
-          if (this.modal) this.modal.remove();
         }
       }
     );
