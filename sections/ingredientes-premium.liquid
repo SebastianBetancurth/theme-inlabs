@@ -1,0 +1,926 @@
+{% comment %}
+  ============================================================
+  SECCIÓN: Ingredientes con Tabs + Carrusel + Modal
+  Theme: Dawn (compatible con cualquier theme OS 2.0)
+  Archivo: sections/ingredients-tabs.liquid
+  ------------------------------------------------------------
+  - Tabs generadas automáticamente según el campo "Tab" de
+    cada bloque de ingrediente (escribí el mismo nombre de tab
+    en varios ingredientes y se agrupan solos).
+  - Carrusel horizontal con flechas (desktop) y scroll táctil
+    (mobile) + scrollbar fina.
+  - Click en la card => modal con overlay oscuro. Se cierra
+    haciendo click fuera, con la flecha <- o con la tecla Esc.
+  - Todo editable desde el customizer: textos, tamaños,
+    colores, anchos, radios, opacidad del overlay, etc.
+  ============================================================
+{% endcomment %}
+
+{%- liquid
+  assign sid = section.id
+  assign ratio = '1 / 1'
+  if section.settings.image_ratio == 'portrait'
+    assign ratio = '4 / 5'
+  elsif section.settings.image_ratio == 'landscape'
+    assign ratio = '4 / 3'
+  endif
+
+  comment
+    Construir lista de tabs únicas en orden de aparición
+  endcomment
+  assign tabs_raw = '||'
+  for block in section.blocks
+    assign tname = block.settings.tab | strip
+    if tname == blank
+      assign tname = 'General'
+    endif
+    assign token = '||' | append: tname | append: '||'
+    unless tabs_raw contains token
+      assign tabs_raw = tabs_raw | append: tname | append: '||'
+    endunless
+  endfor
+  assign tab_list = tabs_raw | split: '||'
+-%}
+
+{%- style -%}
+  #shopify-section-{{ sid }} .zi-section {
+    --zi-bg: {{ section.settings.color_bg }};
+    --zi-heading-color: {{ section.settings.color_heading }};
+    --zi-heading-size: {{ section.settings.heading_size }}px;
+    --zi-heading-size-mobile: {{ section.settings.heading_size_mobile }}px;
+    --zi-tab-bg: {{ section.settings.color_tab_bg }};
+    --zi-tab-text: {{ section.settings.color_tab_text }};
+    --zi-tab-border: {{ section.settings.color_tab_border }};
+    --zi-tab-active-bg: {{ section.settings.color_tab_active_bg }};
+    --zi-tab-active-text: {{ section.settings.color_tab_active_text }};
+    --zi-carousel-bg: {{ section.settings.color_carousel_bg }};
+    --zi-card-bg: {{ section.settings.color_card_bg }};
+    --zi-card-title: {{ section.settings.color_card_title }};
+    --zi-card-dose: {{ section.settings.color_card_dose }};
+    --zi-link: {{ section.settings.color_link }};
+    --zi-arrow: {{ section.settings.color_arrow }};
+    --zi-modal-bg: {{ section.settings.color_modal_bg }};
+    --zi-modal-text: {{ section.settings.color_modal_text }};
+    --zi-modal-secondary: {{ section.settings.color_modal_secondary }};
+    --zi-overlay: {{ section.settings.color_overlay | color_modify: 'alpha', section.settings.overlay_opacity | divided_by: 100.0 }};
+    --zi-card-width: {{ section.settings.card_width }}px;
+    --zi-card-width-mobile: {{ section.settings.card_width_mobile }}px;
+    --zi-card-gap: {{ section.settings.card_gap }}px;
+    --zi-card-radius: {{ section.settings.card_radius }}px;
+    --zi-container-radius: {{ section.settings.container_radius }}px;
+    --zi-image-ratio: {{ ratio }};
+    --zi-max-width: {{ section.settings.max_width }}px;
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    background: var(--zi-bg);
+  }
+
+  /* ============ LAYOUT GENERAL ============ */
+  #shopify-section-{{ sid }} .zi-wrapper {
+    max-width: var(--zi-max-width);
+    margin: 0 auto;
+    padding: 0 5rem;
+    position: relative;
+  }
+  {% if section.settings.full_width %}
+    #shopify-section-{{ sid }} .zi-wrapper { max-width: 100%; }
+  {% endif %}
+
+  #shopify-section-{{ sid }} .zi-heading {
+    font-family: var(--font-heading-family);
+    font-style: var(--font-heading-style);
+    font-weight: var(--font-heading-weight);
+    color: var(--zi-heading-color);
+    font-size: var(--zi-heading-size);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin: 0 0 2.4rem;
+  }
+
+  /* ============ TABS ============ */
+  #shopify-section-{{ sid }} .zi-tabs {
+    display: flex;
+    gap: 1.2rem;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    margin-bottom: 2rem;
+    padding-bottom: .4rem;
+  }
+  #shopify-section-{{ sid }} .zi-tabs::-webkit-scrollbar { display: none; }
+
+  #shopify-section-{{ sid }} .zi-tab {
+    flex: 0 0 auto;
+    font-family: var(--font-body-family);
+    font-size: 1.5rem;
+    line-height: 1;
+    padding: 1.3rem 2.6rem;
+    background: var(--zi-tab-bg);
+    color: var(--zi-tab-text);
+    border: 1px solid var(--zi-tab-border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background .2s ease, color .2s ease;
+    white-space: nowrap;
+  }
+  #shopify-section-{{ sid }} .zi-tab:hover {
+    background: var(--zi-tab-active-bg);
+    color: var(--zi-tab-active-text);
+    border-color: var(--zi-tab-active-bg);
+  }
+  #shopify-section-{{ sid }} .zi-tab[aria-selected='true'] {
+    background: var(--zi-tab-active-bg);
+    color: var(--zi-tab-active-text);
+    border-color: var(--zi-tab-active-bg);
+  }
+
+  /* ============ CARRUSEL ============ */
+  #shopify-section-{{ sid }} .zi-carousel {
+    position: relative;
+  }
+  #shopify-section-{{ sid }} .zi-panel {
+    background: var(--zi-carousel-bg);
+    border-radius: var(--zi-container-radius);
+    padding: 3rem 0 1.6rem;
+  }
+  #shopify-section-{{ sid }} .zi-slider {
+    display: flex;
+    gap: var(--zi-card-gap);
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 0 3rem 1.4rem;
+    {% if section.settings.show_scrollbar %}
+      scrollbar-width: thin;
+      scrollbar-color: #9a9a9a transparent;
+    {% else %}
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    {% endif %}
+  }
+  {% if section.settings.show_scrollbar %}
+    #shopify-section-{{ sid }} .zi-slider::-webkit-scrollbar { height: 4px; }
+    #shopify-section-{{ sid }} .zi-slider::-webkit-scrollbar-track { background: transparent; margin: 0 3rem; }
+    #shopify-section-{{ sid }} .zi-slider::-webkit-scrollbar-thumb { background: #9a9a9a; border-radius: 4px; }
+  {% else %}
+    #shopify-section-{{ sid }} .zi-slider::-webkit-scrollbar { display: none; }
+  {% endif %}
+
+  /* ============ CARDS ============ */
+  #shopify-section-{{ sid }} .zi-card {
+    flex: 0 0 var(--zi-card-width);
+    width: var(--zi-card-width);
+    background: var(--zi-card-bg);
+    border: 1px solid rgba(0,0,0,.06);
+    border-radius: var(--zi-card-radius);
+    padding: 1.2rem 1.2rem 1.4rem;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    transition: transform .25s ease, box-shadow .25s ease;
+    -webkit-appearance: none;
+    appearance: none;
+    font-family: var(--font-body-family);
+  }
+  #shopify-section-{{ sid }} .zi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,.08);
+  }
+  #shopify-section-{{ sid }} .zi-card__media {
+    width: 100%;
+    aspect-ratio: var(--zi-image-ratio);
+    border-radius: calc(var(--zi-card-radius) - 4px);
+    overflow: hidden;
+    background: #eee;
+    margin-bottom: 1.6rem;
+  }
+  #shopify-section-{{ sid }} .zi-card__media img,
+  #shopify-section-{{ sid }} .zi-card__media svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  #shopify-section-{{ sid }} .zi-card__title {
+    font-size: 2rem;
+    color: var(--zi-card-title);
+    margin: 0 0 .4rem;
+    font-weight: 400;
+    line-height: 1.2;
+  }
+  #shopify-section-{{ sid }} .zi-card__dose {
+    font-size: 1.5rem;
+    color: var(--zi-card-dose);
+    margin: 0 0 1.6rem;
+  }
+  #shopify-section-{{ sid }} .zi-card__more {
+    margin-top: auto;
+    align-self: flex-end;
+    font-size: 1.2rem;
+    color: var(--zi-link);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* ============ FLECHAS ============ */
+  #shopify-section-{{ sid }} .zi-arrow-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    padding: 1rem;
+    color: var(--zi-arrow);
+    z-index: 2;
+    line-height: 0;
+  }
+  #shopify-section-{{ sid }} .zi-arrow-btn svg { width: 2rem; height: 3.4rem; }
+  #shopify-section-{{ sid }} .zi-arrow-btn--prev { left: 1rem; }
+  #shopify-section-{{ sid }} .zi-arrow-btn--next { right: 1rem; }
+  #shopify-section-{{ sid }} .zi-arrow-btn:hover { opacity: .6; }
+
+  /* ============ MODAL ============ */
+  #shopify-section-{{ sid }} .zi-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+  #shopify-section-{{ sid }} .zi-modal[hidden] { display: none; }
+  #shopify-section-{{ sid }} .zi-modal__overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--zi-overlay);
+    animation: zi-fade .25s ease;
+  }
+  #shopify-section-{{ sid }} .zi-modal__dialog {
+    position: relative;
+    background: var(--zi-modal-bg);
+    color: var(--zi-modal-text);
+    width: 100%;
+    max-width: 60rem;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 14px;
+    animation: zi-pop .28s cubic-bezier(.2,.9,.3,1.1);
+    font-family: var(--font-body-family);
+  }
+  @keyframes zi-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes zi-pop { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
+
+  #shopify-section-{{ sid }} .zi-modal__media {
+    width: 100%;
+    aspect-ratio: 2 / 1;
+    overflow: hidden;
+    border-radius: 14px 14px 0 0;
+    background: #eee;
+  }
+  #shopify-section-{{ sid }} .zi-modal__media img,
+  #shopify-section-{{ sid }} .zi-modal__media svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  #shopify-section-{{ sid }} .zi-modal__body { padding: 2.4rem 3rem 3rem; }
+  #shopify-section-{{ sid }} .zi-modal__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 1.8rem;
+  }
+  #shopify-section-{{ sid }} .zi-modal__title {
+    font-size: 2.6rem;
+    margin: 0 0 .3rem;
+    font-weight: 400;
+    line-height: 1.15;
+  }
+  #shopify-section-{{ sid }} .zi-modal__dose {
+    font-size: 1.5rem;
+    color: var(--zi-modal-secondary);
+    margin: 0;
+  }
+  #shopify-section-{{ sid }} .zi-modal__close {
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    padding: .6rem;
+    color: var(--zi-modal-text);
+    line-height: 0;
+    flex: 0 0 auto;
+  }
+  #shopify-section-{{ sid }} .zi-modal__close svg { width: 3.2rem; height: 2.2rem; }
+  #shopify-section-{{ sid }} .zi-modal__close:hover { opacity: .6; }
+  #shopify-section-{{ sid }} .zi-modal__desc {
+    font-size: 1.5rem;
+    line-height: 1.55;
+    margin-bottom: 2rem;
+  }
+  #shopify-section-{{ sid }} .zi-modal__desc p { margin: 0 0 1rem; }
+  #shopify-section-{{ sid }} .zi-benefits {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.4rem 2.4rem;
+  }
+  #shopify-section-{{ sid }} .zi-benefits li {
+    display: flex;
+    gap: 1rem;
+    font-size: 1.5rem;
+    line-height: 1.4;
+  }
+  #shopify-section-{{ sid }} .zi-benefits svg {
+    flex: 0 0 auto;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-top: .3rem;
+  }
+
+  /* ============ MOBILE ============ */
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ sid }} .zi-wrapper { padding: 0 1.5rem; }
+    #shopify-section-{{ sid }} .zi-heading { font-size: var(--zi-heading-size-mobile); margin-bottom: 1.8rem; }
+    #shopify-section-{{ sid }} .zi-card { flex-basis: var(--zi-card-width-mobile); width: var(--zi-card-width-mobile); }
+    #shopify-section-{{ sid }} .zi-panel { padding: 1.8rem 0 1rem; }
+    #shopify-section-{{ sid }} .zi-slider { padding: 0 1.6rem 1.2rem; }
+    #shopify-section-{{ sid }} .zi-arrow-btn { display: none; }
+    #shopify-section-{{ sid }} .zi-modal { padding: 1.2rem; }
+    #shopify-section-{{ sid }} .zi-modal__body { padding: 2rem 2rem 2.4rem; }
+    #shopify-section-{{ sid }} .zi-benefits { grid-template-columns: 1fr; }
+    #shopify-section-{{ sid }} .zi-modal__title { font-size: 2.2rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #shopify-section-{{ sid }} .zi-modal__overlay,
+    #shopify-section-{{ sid }} .zi-modal__dialog { animation: none; }
+    #shopify-section-{{ sid }} .zi-slider { scroll-behavior: auto; }
+    #shopify-section-{{ sid }} .zi-card { transition: none; }
+  }
+{%- endstyle -%}
+
+<ingredients-tabs class="zi-section" data-section-id="{{ sid }}">
+  <div class="zi-wrapper">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="zi-heading">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+
+    {%- comment -%} ---------- TABS ---------- {%- endcomment -%}
+    <div class="zi-tabs" role="tablist" aria-label="{{ section.settings.heading | strip_html | escape }}">
+      {%- assign first_tab = true -%}
+      {%- for tab in tab_list -%}
+        {%- if tab == blank -%}{%- continue -%}{%- endif -%}
+        <button
+          type="button"
+          class="zi-tab"
+          role="tab"
+          data-tab-index="{{ forloop.index0 }}"
+          data-tab-name="{{ tab | escape }}"
+          aria-selected="{% if first_tab %}true{% else %}false{% endif %}"
+        >
+          {{ tab }}
+        </button>
+        {%- assign first_tab = false -%}
+      {%- endfor -%}
+    </div>
+
+    {%- comment -%} ---------- PANELES (uno por tab) ---------- {%- endcomment -%}
+    <div class="zi-carousel">
+      {%- if section.settings.show_arrows -%}
+        <button type="button" class="zi-arrow-btn zi-arrow-btn--prev" data-dir="-1" aria-label="{{ 'general.slider.previous_slide' | t | default: 'Anterior' }}">
+          <svg viewBox="0 0 12 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M11 1L1 11L11 21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button type="button" class="zi-arrow-btn zi-arrow-btn--next" data-dir="1" aria-label="{{ 'general.slider.next_slide' | t | default: 'Siguiente' }}">
+          <svg viewBox="0 0 12 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M1 1L11 11L1 21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      {%- endif -%}
+
+      {%- assign first_panel = true -%}
+      {%- for tab in tab_list -%}
+        {%- if tab == blank -%}{%- continue -%}{%- endif -%}
+        <div class="zi-panel" role="tabpanel" data-panel-name="{{ tab | escape }}" {% unless first_panel %}hidden{% endunless %}>
+          <div class="zi-slider">
+            {%- for block in section.blocks -%}
+              {%- assign btab = block.settings.tab | strip -%}
+              {%- if btab == blank -%}{%- assign btab = 'General' -%}{%- endif -%}
+              {%- if btab != tab -%}{%- continue -%}{%- endif -%}
+
+              <button type="button" class="zi-card" data-card {{ block.shopify_attributes }}>
+                <div class="zi-card__media">
+                  {%- if block.settings.image != blank -%}
+                    {{ block.settings.image | image_url: width: 900 | image_tag: loading: 'lazy', widths: '360, 540, 720, 900', sizes: '(max-width: 749px) 70vw, 320px', alt: block.settings.title | escape }}
+                  {%- else -%}
+                    {{ 'image' | placeholder_svg_tag }}
+                  {%- endif -%}
+                </div>
+                <h3 class="zi-card__title">{{ block.settings.title | escape }}</h3>
+                <p class="zi-card__dose">{{ block.settings.dosage | escape }}</p>
+                <span class="zi-card__more">{{ section.settings.more_label | escape }}</span>
+
+                {%- comment -%} Contenido del modal de esta card {%- endcomment -%}
+                <template data-modal-content>
+                  <div class="zi-modal__media">
+                    {%- assign modal_img = block.settings.modal_image | default: block.settings.image -%}
+                    {%- if modal_img != blank -%}
+                      {{ modal_img | image_url: width: 1200 | image_tag: loading: 'lazy', widths: '600, 900, 1200', sizes: '(max-width: 749px) 92vw, 600px', alt: block.settings.title | escape }}
+                    {%- else -%}
+                      {{ 'image' | placeholder_svg_tag }}
+                    {%- endif -%}
+                  </div>
+                  <div class="zi-modal__body">
+                    <div class="zi-modal__head">
+                      <div>
+                        <h3 class="zi-modal__title">{{ block.settings.title | escape }}</h3>
+                        <p class="zi-modal__dose">{{ block.settings.dosage | escape }}</p>
+                      </div>
+                      <button type="button" class="zi-modal__close" aria-label="Cerrar">
+                        <svg viewBox="0 0 32 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <path d="M11 1L1 11L11 21M1 11H31" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                    {%- if block.settings.description != blank -%}
+                      <div class="zi-modal__desc">{{ block.settings.description }}</div>
+                    {%- endif -%}
+                    {%- if block.settings.benefits != blank -%}
+                      {%- assign benefits_html = block.settings.benefits | strip | newline_to_br | replace: '<br/>', '<br />' -%}
+                      {%- assign benefits = benefits_html | split: '<br />' -%}
+                      <ul class="zi-benefits">
+                        {%- for benefit in benefits -%}
+                          {%- assign b = benefit | strip -%}
+                          {%- if b == blank -%}{%- continue -%}{%- endif -%}
+                          <li>
+                            <svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                              <path d="M2 13L13 2M13 2H4M13 2V11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>{{ b }}</span>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    {%- endif -%}
+                  </div>
+                </template>
+              </button>
+            {%- endfor -%}
+          </div>
+        </div>
+        {%- assign first_panel = false -%}
+      {%- endfor -%}
+    </div>
+  </div>
+
+  {%- comment -%} ---------- MODAL (vacío, se llena por JS) ---------- {%- endcomment -%}
+  <div class="zi-modal" hidden>
+    <div class="zi-modal__overlay" data-modal-close></div>
+    <div class="zi-modal__dialog" role="dialog" aria-modal="true"></div>
+  </div>
+</ingredients-tabs>
+
+<script>
+  if (!customElements.get('ingredients-tabs')) {
+    customElements.define(
+      'ingredients-tabs',
+      class IngredientsTabs extends HTMLElement {
+        connectedCallback() {
+          this.tabs = Array.from(this.querySelectorAll('.zi-tab'));
+          this.panels = Array.from(this.querySelectorAll('.zi-panel'));
+          this.modal = this.querySelector('.zi-modal');
+          this.dialog = this.querySelector('.zi-modal__dialog');
+          this.onKeydown = this.onKeydown.bind(this);
+
+          /* Tabs */
+          this.tabs.forEach((tab) => {
+            tab.addEventListener('click', () => this.selectTab(tab));
+          });
+
+          /* Flechas */
+          this.querySelectorAll('.zi-arrow-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              const slider = this.activeSlider();
+              if (!slider) return;
+              const dir = parseInt(btn.dataset.dir, 10);
+              slider.scrollBy({ left: dir * slider.clientWidth * 0.75, behavior: 'smooth' });
+            });
+          });
+
+          /* Abrir modal al hacer click en cualquier card */
+          this.querySelectorAll('[data-card]').forEach((card) => {
+            card.addEventListener('click', () => this.openModal(card));
+          });
+
+          /* Cerrar: click fuera del contenido (overlay o cualquier zona fuera del diálogo) */
+          this.modal.addEventListener('click', (e) => {
+            if (!e.target.closest('.zi-modal__dialog') || e.target.closest('.zi-modal__close')) {
+              this.closeModal();
+            }
+          });
+        }
+
+        activeSlider() {
+          const panel = this.panels.find((p) => !p.hidden);
+          return panel ? panel.querySelector('.zi-slider') : null;
+        }
+
+        selectTab(tab) {
+          const name = tab.dataset.tabName;
+          this.tabs.forEach((t) => t.setAttribute('aria-selected', t === tab ? 'true' : 'false'));
+          this.panels.forEach((p) => {
+            p.hidden = p.dataset.panelName !== name;
+          });
+        }
+
+        openModal(card) {
+          const tpl = card.querySelector('[data-modal-content]');
+          if (!tpl) return;
+          this.dialog.innerHTML = '';
+          this.dialog.appendChild(tpl.content.cloneNode(true));
+          this.modal.hidden = false;
+          this.prevOverflow = document.body.style.overflow;
+          document.body.style.overflow = 'hidden';
+          document.addEventListener('keydown', this.onKeydown);
+          const closeBtn = this.dialog.querySelector('.zi-modal__close');
+          if (closeBtn) closeBtn.focus({ preventScroll: true });
+        }
+
+        closeModal() {
+          this.modal.hidden = true;
+          this.dialog.innerHTML = '';
+          document.body.style.overflow = this.prevOverflow || '';
+          document.removeEventListener('keydown', this.onKeydown);
+        }
+
+        onKeydown(e) {
+          if (e.key === 'Escape') this.closeModal();
+        }
+
+        disconnectedCallback() {
+          document.removeEventListener('keydown', this.onKeydown);
+          document.body.style.overflow = this.prevOverflow || '';
+        }
+      }
+    );
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Ingredientes con tabs",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Contenido"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Título",
+      "default": "Ingredientes avalados por la ciencia"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Tamaño del título (escritorio)",
+      "min": 24,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Tamaño del título (móvil)",
+      "min": 18,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 34
+    },
+    {
+      "type": "text",
+      "id": "more_label",
+      "label": "Texto del enlace en la tarjeta",
+      "default": "Ver más"
+    },
+    {
+      "type": "header",
+      "content": "Diseño y tamaños"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Ancho completo",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Ancho máximo del contenido",
+      "min": 900,
+      "max": 1920,
+      "step": 20,
+      "unit": "px",
+      "default": 1500
+    },
+    {
+      "type": "range",
+      "id": "card_width",
+      "label": "Ancho de tarjeta (escritorio)",
+      "min": 200,
+      "max": 420,
+      "step": 10,
+      "unit": "px",
+      "default": 300
+    },
+    {
+      "type": "range",
+      "id": "card_width_mobile",
+      "label": "Ancho de tarjeta (móvil)",
+      "min": 180,
+      "max": 340,
+      "step": 10,
+      "unit": "px",
+      "default": 270
+    },
+    {
+      "type": "range",
+      "id": "card_gap",
+      "label": "Espacio entre tarjetas",
+      "min": 8,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Proporción de imagen de tarjeta",
+      "options": [
+        { "value": "square", "label": "Cuadrada (1:1)" },
+        { "value": "portrait", "label": "Vertical (4:5)" },
+        { "value": "landscape", "label": "Horizontal (4:3)" }
+      ],
+      "default": "square"
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Radio de borde de tarjetas",
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "container_radius",
+      "label": "Radio de borde del contenedor gris",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Mostrar flechas (escritorio)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_scrollbar",
+      "label": "Mostrar barra de scroll",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Espacio superior",
+      "min": 0,
+      "max": 140,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Espacio inferior",
+      "min": 0,
+      "max": 140,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "header",
+      "content": "Colores generales"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Fondo de la sección",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "color_heading",
+      "label": "Color del título",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "color_carousel_bg",
+      "label": "Fondo del contenedor del carrusel",
+      "default": "#F0F0F0"
+    },
+    {
+      "type": "color",
+      "id": "color_arrow",
+      "label": "Color de las flechas",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Colores de tabs"
+    },
+    {
+      "type": "color",
+      "id": "color_tab_bg",
+      "label": "Fondo tab inactiva",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "color_tab_text",
+      "label": "Texto tab inactiva",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "color_tab_border",
+      "label": "Borde tab inactiva",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "color_tab_active_bg",
+      "label": "Fondo tab activa",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "color_tab_active_text",
+      "label": "Texto tab activa",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Colores de tarjetas"
+    },
+    {
+      "type": "color",
+      "id": "color_card_bg",
+      "label": "Fondo de tarjeta",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "color_card_title",
+      "label": "Título de tarjeta",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "color_card_dose",
+      "label": "Dosis (texto secundario)",
+      "default": "#6A6A6A"
+    },
+    {
+      "type": "color",
+      "id": "color_link",
+      "label": "Enlace \"Ver más\"",
+      "default": "#121212"
+    },
+    {
+      "type": "header",
+      "content": "Colores del modal"
+    },
+    {
+      "type": "color",
+      "id": "color_modal_bg",
+      "label": "Fondo del modal",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "color_modal_text",
+      "label": "Texto del modal",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "color_modal_secondary",
+      "label": "Texto secundario del modal",
+      "default": "#6A6A6A"
+    },
+    {
+      "type": "color",
+      "id": "color_overlay",
+      "label": "Color del overlay",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Opacidad del overlay",
+      "min": 10,
+      "max": 95,
+      "step": 5,
+      "unit": "%",
+      "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "ingredient",
+      "name": "Ingrediente",
+      "settings": [
+        {
+          "type": "text",
+          "id": "tab",
+          "label": "Tab a la que pertenece",
+          "info": "Escribí el mismo nombre en varios ingredientes para agruparlos en la misma pestaña. Las tabs se crean solas en orden de aparición.",
+          "default": "Focus"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen de la tarjeta"
+        },
+        {
+          "type": "image_picker",
+          "id": "modal_image",
+          "label": "Imagen del modal (opcional)",
+          "info": "Si la dejás vacía se usa la imagen de la tarjeta."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Nombre del ingrediente",
+          "default": "Ingrediente"
+        },
+        {
+          "type": "text",
+          "id": "dosage",
+          "label": "Dosis",
+          "default": "100mg"
+        },
+        {
+          "type": "richtext",
+          "id": "description",
+          "label": "Descripción (dentro del modal)",
+          "default": "<p>Describí aquí el ingrediente, su función y en qué alimentos está presente.</p>"
+        },
+        {
+          "type": "textarea",
+          "id": "benefits",
+          "label": "Beneficios (uno por línea)",
+          "info": "Cada línea se muestra como un beneficio con el icono de flecha, en dos columnas en escritorio.",
+          "default": "Contribuye al metabolismo energético\nAyuda a reducir el cansancio\nApoya el sistema inmunitario\nFavorece la función psicológica normal"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 50,
+  "presets": [
+    {
+      "name": "Ingredientes con tabs",
+      "blocks": [
+        { "type": "ingredient", "settings": { "tab": "Focus", "title": "Ginkgo Biloba", "dosage": "80mg" } },
+        { "type": "ingredient", "settings": { "tab": "Focus", "title": "Zinc", "dosage": "10mg" } },
+        { "type": "ingredient", "settings": { "tab": "Focus", "title": "Vitamina B6", "dosage": "1,4mg" } },
+        { "type": "ingredient", "settings": { "tab": "Calm", "title": "Ashwagandha", "dosage": "600mg" } },
+        { "type": "ingredient", "settings": { "tab": "Sleep", "title": "L-triptófano", "dosage": "300mg" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
