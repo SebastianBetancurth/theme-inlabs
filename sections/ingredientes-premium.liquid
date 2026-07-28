@@ -11,12 +11,16 @@
     (mobile) + scrollbar fina.
   - Click en la card => modal con overlay oscuro. Se cierra
     haciendo click fuera, con la flecha <- o con la tecla Esc.
+  - El modal se mueve a <body> por JS para que position:fixed
+    no se rompa con los transforms de las animaciones de Dawn.
   - Todo editable desde el customizer: textos, tamaños,
     colores, anchos, radios, opacidad del overlay, etc.
   ============================================================
 {% endcomment %}
 
 {%- liquid
+  assign overlay_alpha = section.settings.overlay_opacity | divided_by: 100.0
+  assign overlay_color = section.settings.color_overlay | color_modify: 'alpha', overlay_alpha
   assign sid = section.id
   assign ratio = '1 / 1'
   if section.settings.image_ratio == 'portrait'
@@ -59,10 +63,6 @@
     --zi-card-dose: {{ section.settings.color_card_dose }};
     --zi-link: {{ section.settings.color_link }};
     --zi-arrow: {{ section.settings.color_arrow }};
-    --zi-modal-bg: {{ section.settings.color_modal_bg }};
-    --zi-modal-text: {{ section.settings.color_modal_text }};
-    --zi-modal-secondary: {{ section.settings.color_modal_secondary }};
-    --zi-overlay: {{ section.settings.color_overlay | color_modify: 'alpha', section.settings.overlay_opacity | divided_by: 100.0 }};
     --zi-card-width: {{ section.settings.card_width }}px;
     --zi-card-width-mobile: {{ section.settings.card_width_mobile }}px;
     --zi-card-gap: {{ section.settings.card_gap }}px;
@@ -243,23 +243,30 @@
   #shopify-section-{{ sid }} .zi-arrow-btn:hover { opacity: .6; }
 
   /* ============ MODAL ============ */
-  #shopify-section-{{ sid }} .zi-modal {
+  /* El modal vive en <body> (lo mueve el JS), por eso se
+     selecciona por id y define sus propias variables. */
+  #ZiModal-{{ sid }} {
+    --zi-overlay: {{ overlay_color }};
+    --zi-modal-bg: {{ section.settings.color_modal_bg }};
+    --zi-modal-text: {{ section.settings.color_modal_text }};
+    --zi-modal-secondary: {{ section.settings.color_modal_secondary }};
     position: fixed;
     inset: 0;
-    z-index: 999;
+    z-index: 100000;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 2rem;
+    font-family: var(--font-body-family);
   }
-  #shopify-section-{{ sid }} .zi-modal[hidden] { display: none; }
-  #shopify-section-{{ sid }} .zi-modal__overlay {
+  #ZiModal-{{ sid }}[hidden] { display: none; }
+  #ZiModal-{{ sid }} .zi-modal__overlay {
     position: absolute;
     inset: 0;
     background: var(--zi-overlay);
     animation: zi-fade .25s ease;
   }
-  #shopify-section-{{ sid }} .zi-modal__dialog {
+  #ZiModal-{{ sid }} .zi-modal__dialog {
     position: relative;
     background: var(--zi-modal-bg);
     color: var(--zi-modal-text);
@@ -269,45 +276,44 @@
     overflow-y: auto;
     border-radius: 14px;
     animation: zi-pop .28s cubic-bezier(.2,.9,.3,1.1);
-    font-family: var(--font-body-family);
   }
   @keyframes zi-fade { from { opacity: 0; } to { opacity: 1; } }
   @keyframes zi-pop { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
 
-  #shopify-section-{{ sid }} .zi-modal__media {
+  #ZiModal-{{ sid }} .zi-modal__media {
     width: 100%;
     aspect-ratio: 2 / 1;
     overflow: hidden;
     border-radius: 14px 14px 0 0;
     background: #eee;
   }
-  #shopify-section-{{ sid }} .zi-modal__media img,
-  #shopify-section-{{ sid }} .zi-modal__media svg {
+  #ZiModal-{{ sid }} .zi-modal__media img,
+  #ZiModal-{{ sid }} .zi-modal__media svg {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
   }
-  #shopify-section-{{ sid }} .zi-modal__body { padding: 2.4rem 3rem 3rem; }
-  #shopify-section-{{ sid }} .zi-modal__head {
+  #ZiModal-{{ sid }} .zi-modal__body { padding: 2.4rem 3rem 3rem; }
+  #ZiModal-{{ sid }} .zi-modal__head {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 2rem;
     margin-bottom: 1.8rem;
   }
-  #shopify-section-{{ sid }} .zi-modal__title {
+  #ZiModal-{{ sid }} .zi-modal__title {
     font-size: 2.6rem;
     margin: 0 0 .3rem;
     font-weight: 400;
     line-height: 1.15;
   }
-  #shopify-section-{{ sid }} .zi-modal__dose {
+  #ZiModal-{{ sid }} .zi-modal__dose {
     font-size: 1.5rem;
     color: var(--zi-modal-secondary);
     margin: 0;
   }
-  #shopify-section-{{ sid }} .zi-modal__close {
+  #ZiModal-{{ sid }} .zi-modal__close {
     background: transparent;
     border: 0;
     cursor: pointer;
@@ -316,15 +322,15 @@
     line-height: 0;
     flex: 0 0 auto;
   }
-  #shopify-section-{{ sid }} .zi-modal__close svg { width: 3.2rem; height: 2.2rem; }
-  #shopify-section-{{ sid }} .zi-modal__close:hover { opacity: .6; }
-  #shopify-section-{{ sid }} .zi-modal__desc {
+  #ZiModal-{{ sid }} .zi-modal__close svg { width: 3.2rem; height: 2.2rem; }
+  #ZiModal-{{ sid }} .zi-modal__close:hover { opacity: .6; }
+  #ZiModal-{{ sid }} .zi-modal__desc {
     font-size: 1.5rem;
     line-height: 1.55;
     margin-bottom: 2rem;
   }
-  #shopify-section-{{ sid }} .zi-modal__desc p { margin: 0 0 1rem; }
-  #shopify-section-{{ sid }} .zi-benefits {
+  #ZiModal-{{ sid }} .zi-modal__desc p { margin: 0 0 1rem; }
+  #ZiModal-{{ sid }} .zi-benefits {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -332,13 +338,13 @@
     grid-template-columns: 1fr 1fr;
     gap: 1.4rem 2.4rem;
   }
-  #shopify-section-{{ sid }} .zi-benefits li {
+  #ZiModal-{{ sid }} .zi-benefits li {
     display: flex;
     gap: 1rem;
     font-size: 1.5rem;
     line-height: 1.4;
   }
-  #shopify-section-{{ sid }} .zi-benefits svg {
+  #ZiModal-{{ sid }} .zi-benefits svg {
     flex: 0 0 auto;
     width: 1.5rem;
     height: 1.5rem;
@@ -353,15 +359,15 @@
     #shopify-section-{{ sid }} .zi-panel { padding: 1.8rem 0 1rem; }
     #shopify-section-{{ sid }} .zi-slider { padding: 0 1.6rem 1.2rem; }
     #shopify-section-{{ sid }} .zi-arrow-btn { display: none; }
-    #shopify-section-{{ sid }} .zi-modal { padding: 1.2rem; }
-    #shopify-section-{{ sid }} .zi-modal__body { padding: 2rem 2rem 2.4rem; }
-    #shopify-section-{{ sid }} .zi-benefits { grid-template-columns: 1fr; }
-    #shopify-section-{{ sid }} .zi-modal__title { font-size: 2.2rem; }
+    #ZiModal-{{ sid }} { padding: 1.2rem; }
+    #ZiModal-{{ sid }} .zi-modal__body { padding: 2rem 2rem 2.4rem; }
+    #ZiModal-{{ sid }} .zi-benefits { grid-template-columns: 1fr; }
+    #ZiModal-{{ sid }} .zi-modal__title { font-size: 2.2rem; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    #shopify-section-{{ sid }} .zi-modal__overlay,
-    #shopify-section-{{ sid }} .zi-modal__dialog { animation: none; }
+    #ZiModal-{{ sid }} .zi-modal__overlay,
+    #ZiModal-{{ sid }} .zi-modal__dialog { animation: none; }
     #shopify-section-{{ sid }} .zi-slider { scroll-behavior: auto; }
     #shopify-section-{{ sid }} .zi-card { transition: none; }
   }
@@ -481,8 +487,8 @@
     </div>
   </div>
 
-  {%- comment -%} ---------- MODAL (vacío, se llena por JS) ---------- {%- endcomment -%}
-  <div class="zi-modal" hidden>
+  {%- comment -%} ---------- MODAL (vacío, se llena por JS y se mueve a <body>) ---------- {%- endcomment -%}
+  <div class="zi-modal" id="ZiModal-{{ sid }}" hidden>
     <div class="zi-modal__overlay" data-modal-close></div>
     <div class="zi-modal__dialog" role="dialog" aria-modal="true"></div>
   </div>
@@ -497,8 +503,14 @@
           this.tabs = Array.from(this.querySelectorAll('.zi-tab'));
           this.panels = Array.from(this.querySelectorAll('.zi-panel'));
           this.modal = this.querySelector('.zi-modal');
-          this.dialog = this.querySelector('.zi-modal__dialog');
+          this.dialog = this.modal.querySelector('.zi-modal__dialog');
           this.onKeydown = this.onKeydown.bind(this);
+
+          /* Mover el modal al <body> para que position:fixed no se
+             rompa por los transforms de las animaciones de Dawn
+             (scroll-trigger / animate--slide-in crean un containing
+             block y el fixed queda relativo a la sección). */
+          document.body.appendChild(this.modal);
 
           /* Tabs */
           this.tabs.forEach((tab) => {
@@ -568,6 +580,10 @@
         disconnectedCallback() {
           document.removeEventListener('keydown', this.onKeydown);
           document.body.style.overflow = this.prevOverflow || '';
+          /* Como el modal fue movido a <body>, hay que limpiarlo
+             manualmente (importante en el editor de temas, que
+             desconecta/reconecta la sección al editarla). */
+          if (this.modal) this.modal.remove();
         }
       }
     );
