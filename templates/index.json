@@ -287,6 +287,9 @@
         "ingredient_YdLc3E",
         "ingredient_FN3FAy"
       ],
+      "custom_css": [
+        "{margin-top: 20PX;}"
+      ],
       "name": "Ingredientes ciencia",
       "settings": {
         "heading": "Ingredientes avalados por la ciencia",
