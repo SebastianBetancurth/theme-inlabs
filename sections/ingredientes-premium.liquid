@@ -147,19 +147,44 @@
     gap: var(--zi-card-gap);
     overflow-x: auto;
     scroll-behavior: smooth;
-    padding: 0 3rem 1.4rem;
-    {% if section.settings.show_scrollbar %}
-      scrollbar-width: thin;
-      scrollbar-color: #9a9a9a transparent;
-    {% else %}
+    padding: 0 3rem 1.8rem;
+    {% unless section.settings.show_scrollbar %}
       scrollbar-width: none;
       -ms-overflow-style: none;
-    {% endif %}
+    {% endunless %}
   }
   {% if section.settings.show_scrollbar %}
-    #shopify-section-{{ sid }} .zi-slider::-webkit-scrollbar { height: 4px; }
-    #shopify-section-{{ sid }} .zi-slider::-webkit-scrollbar-track { background: transparent; margin: 0 3rem; }
-    #shopify-section-{{ sid }} .zi-slider::-webkit-scrollbar-thumb { background: #9a9a9a; border-radius: 4px; }
+    /* Scrollbar fina y redondeada (Chrome / Edge / Safari).
+       IMPORTANTE: no usar scrollbar-width / scrollbar-color acá,
+       porque Chrome 121+ ignora ::-webkit-scrollbar si están
+       presentes y muestra su barra básica con flechas. */
+    #shopify-section-{{ sid }} .zi-slider::-webkit-scrollbar {
+      height: 5px;
+    }
+    #shopify-section-{{ sid }} .zi-slider::-webkit-scrollbar-button {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+    #shopify-section-{{ sid }} .zi-slider::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, .07);
+      border-radius: 100px;
+      margin: 0 3rem;
+    }
+    #shopify-section-{{ sid }} .zi-slider::-webkit-scrollbar-thumb {
+      background: #9c9c9c;
+      border-radius: 100px;
+    }
+    #shopify-section-{{ sid }} .zi-slider::-webkit-scrollbar-thumb:hover {
+      background: #7d7d7d;
+    }
+    /* Fallback SOLO para Firefox (no soporta ::-webkit-scrollbar) */
+    @supports not selector(::-webkit-scrollbar) {
+      #shopify-section-{{ sid }} .zi-slider {
+        scrollbar-width: thin;
+        scrollbar-color: #9c9c9c rgba(0, 0, 0, .07);
+      }
+    }
   {% else %}
     #shopify-section-{{ sid }} .zi-slider::-webkit-scrollbar { display: none; }
   {% endif %}
@@ -342,7 +367,8 @@
     #shopify-section-{{ sid }} .zi-heading { font-size: var(--zi-heading-size-mobile); margin-bottom: 1.8rem; }
     #shopify-section-{{ sid }} .zi-card { flex-basis: var(--zi-card-width-mobile); width: var(--zi-card-width-mobile); }
     #shopify-section-{{ sid }} .zi-panel { padding: 1.8rem 0 1rem; }
-    #shopify-section-{{ sid }} .zi-slider { padding: 0 1.6rem 1.2rem; }
+    #shopify-section-{{ sid }} .zi-slider { padding: 0 1.6rem 1.6rem; }
+    #shopify-section-{{ sid }} .zi-slider::-webkit-scrollbar-track { margin: 0 1.6rem; }
     #shopify-section-{{ sid }} .zi-arrow-btn { display: none; }
     #ZiModal-{{ sid }} { width: calc(100% - 2rem); }
     #ZiModal-{{ sid }} .zi-modal__body { padding: 2rem 2rem 2.4rem; }
