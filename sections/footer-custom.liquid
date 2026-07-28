@@ -342,7 +342,8 @@
           {%- if section.settings.newsletter_heading != blank -%}
             <h2 class="zft-news-heading">{{ section.settings.newsletter_heading }}</h2>
           {%- endif -%}
-          {%- form 'customer', id: 'ZftNewsletter-' | append: sid, class: 'zft-form' -%}
+          {%- assign newsletter_form_id = 'ZftNewsletter-' | append: sid -%}
+          {%- form 'customer', id: newsletter_form_id, class: 'zft-form' -%}
             <input type="hidden" name="contact[tags]" value="newsletter">
             <div class="zft-field">
               <label class="visually-hidden" for="ZftEmail-{{ sid }}">{{ section.settings.newsletter_placeholder | escape }}</label>
@@ -436,7 +437,8 @@
 
       {%- if section.settings.enable_country_selector and localization.available_countries.size > 1 -%}
         <div class="zft-locale">
-          {%- form 'localization', id: 'ZftLocale-' | append: sid -%}
+          {%- assign locale_form_id = 'ZftLocale-' | append: sid -%}
+          {%- form 'localization', id: locale_form_id -%}
             <select name="country_code" aria-label="{{ 'localization.country_label' | t }}" onchange="this.form.submit()">
               {%- for country in localization.available_countries -%}
                 <option value="{{ country.iso_code }}" {% if country.iso_code == localization.country.iso_code %}selected{% endif %}>
