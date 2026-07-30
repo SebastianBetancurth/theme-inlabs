@@ -9,9 +9,53 @@
  */
 {
   "sections": {
+    "product_announcement_bar_Nd8zcC": {
+      "type": "product-announcement-bar",
+      "name": "Banner producto",
+      "settings": {
+        "text": "Recomendamos tomarlo durante 3 meses para resultados óptimos",
+        "link": "",
+        "bg_color": "#dff2e4",
+        "text_color": "#111111",
+        "text_size": 13,
+        "text_size_mobile": 12,
+        "text_weight": "400",
+        "padding_vertical": 8,
+        "padding_vertical_mobile": 7
+      }
+    },
     "main": {
       "type": "main-product",
       "blocks": {
+        "zzen_rating_Wf3NeA": {
+          "type": "zzen_rating",
+          "settings": {
+            "hoist_mobile": true,
+            "rating_value": "4.9",
+            "star_count": 5,
+            "text": "4.9/5 de +100.000 clientes verificados",
+            "link": "",
+            "show_desktop": true,
+            "show_mobile": true,
+            "star_color": "#111111",
+            "star_color_empty": "#d9d9d9",
+            "text_color": "#111111",
+            "use_theme_font": true,
+            "custom_font_stack": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+            "text_weight": "400",
+            "letter_spacing": 0,
+            "star_size_desktop": 14,
+            "text_size_desktop": 15,
+            "align_desktop": "flex-start",
+            "margin_bottom_desktop": 10,
+            "star_size_mobile": 12,
+            "text_size_mobile": 13,
+            "align_mobile": "flex-start",
+            "margin_bottom_mobile": 8,
+            "gap_stars": 1,
+            "gap_stars_text": 8
+          }
+        },
         "vendor": {
           "type": "text",
           "settings": {
@@ -57,6 +101,7 @@
         }
       },
       "block_order": [
+        "zzen_rating_Wf3NeA",
         "vendor",
         "title",
         "price",
@@ -68,6 +113,8 @@
       ],
       "settings": {
         "enable_sticky_info": true,
+        "hero_gap_desktop": 24,
+        "hero_gap_mobile": 20,
         "color_scheme": "scheme-1",
         "media_size": "large",
         "constrain_to_viewport": true,
@@ -109,21 +156,6 @@
         "show_rating": false,
         "padding_top": 36,
         "padding_bottom": 28
-      }
-    },
-    "product_announcement_bar_Nd8zcC": {
-      "type": "product-announcement-bar",
-      "name": "Banner producto",
-      "settings": {
-        "text": "Recomendamos tomarlo durante 3 meses para resultados óptimos",
-        "link": "",
-        "bg_color": "#DFF2E4",
-        "text_color": "#111111",
-        "text_size": 13,
-        "text_size_mobile": 12,
-        "text_weight": "400",
-        "padding_vertical": 8,
-        "padding_vertical_mobile": 7
       }
     }
   },
