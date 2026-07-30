@@ -6,14 +6,7 @@
 {%- liquid
   assign b = block.settings
 
-  assign items = ''
-  assign items = items | append: b.text_1 | append: '~|~'
-  assign items = items | append: b.text_2 | append: '~|~'
-  assign items = items | append: b.text_3 | append: '~|~'
-  assign items = items | append: b.text_4 | append: '~|~'
-  assign items = items | append: b.text_5 | append: '~|~'
-  assign items = items | append: b.text_6
-  assign items_array = items | split: '~|~'
+
 
   case b.text_font
     when 'heading'
@@ -182,10 +175,14 @@
 {%- endcapture -%}
 
 <div class="zzen-bullets zzen-bullets-{{ block.id }}" {{ block.shopify_attributes }}>
-  <ul class="zzen-bullets-{{ block.id }}__list" role="list">
-    {%- for item in items_array -%}
-      {%- assign item_text = item | strip -%}
-      {%- if item_text != blank -%}
+ <ul class="zzen-bullets-{{ block.id }}__list" role="list">
+    {%- for i in (1..6) -%}
+      {%- liquid
+        assign key = 'text_' | append: i
+        assign item_text = b[key]
+        assign item_plain = item_text | strip_html | replace: '&nbsp;', ' ' | strip
+      -%}
+      {%- if item_plain != blank -%}
         <li class="zzen-bullets-{{ block.id }}__item">
           {{ bullet_icon }}
           <span class="zzen-bullets-{{ block.id }}__text">{{ item_text }}</span>
