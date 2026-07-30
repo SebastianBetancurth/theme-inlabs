@@ -27,7 +27,7 @@
 
   {%- liquid
   # Tipos de bloque personalizados que renderiza el snippet zzen-product-blocks
-  assign zzen_block_types = 'zzen_rating' | split: ','
+  assign zzen_block_types = 'zzen_rating,zzen_badge' | split: ','
 
   # ¿Hay algún bloque marcado para subir arriba de la galería en móvil?
   assign has_hoisted = false
@@ -62,10 +62,34 @@
     }
   }
 
+
   /* ===== HERO HEADER (contenido arriba de la galería en móvil) ===== */
   #MainProduct-{{ section.id }} .product__hero-header {
     width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
     margin-bottom: {{ section.settings.hero_gap_mobile | default: 20 }}px;
+  }
+
+  /* Por defecto cada bloque ocupa su propia línea */
+  #MainProduct-{{ section.id }} .product__hero-header > * {
+    flex: 0 0 100%;
+    min-width: 0;
+  }
+
+  /* Móvil: la etiqueta marcada como "junto al bloque anterior"
+     comparte línea y se pega a la derecha */
+  @media screen and (max-width: 749px) {
+    #MainProduct-{{ section.id }} .product__hero-header > .zzen-badge--inline-mobile {
+      flex: 0 0 auto;
+      margin-left: auto;
+    }
+
+    #MainProduct-{{ section.id }} .product__hero-header > *:has(+ .zzen-badge--inline-mobile) {
+      flex: 1 1 auto;
+      margin-bottom: 0;
+    }
   }
 
   @media screen and (min-width: 750px) {
@@ -1093,6 +1117,324 @@
           "step": 1,
           "unit": "px",
           "default": 8
+        }
+      ]
+    },
+    {
+      "type": "zzen_badge",
+      "name": "◇ Etiqueta / Badge",
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "hoist_mobile",
+          "label": "Mostrar arriba de la galería en móvil",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "Contenido"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Texto",
+          "default": "Bestseller"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Enlace (opcional)"
+        },
+        {
+          "type": "header",
+          "content": "Icono"
+        },
+        {
+          "type": "select",
+          "id": "icon_style",
+          "label": "Icono integrado",
+          "options": [
+            { "value": "none", "label": "Sin icono" },
+            { "value": "check_circle", "label": "Check en círculo" },
+            { "value": "check", "label": "Check simple" },
+            { "value": "star", "label": "Estrella" },
+            { "value": "fire", "label": "Llama" }
+          ],
+          "default": "check_circle"
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_image",
+          "label": "Icono propio (SVG/PNG)",
+          "info": "Si subes una imagen, sustituye al icono integrado."
+        },
+        {
+          "type": "range",
+          "id": "gap_icon_text",
+          "label": "Separación icono ↔ texto",
+          "min": 0,
+          "max": 20,
+          "step": 1,
+          "unit": "px",
+          "default": 7
+        },
+        {
+          "type": "header",
+          "content": "Comportamiento en móvil"
+        },
+        {
+          "type": "select",
+          "id": "mobile_layout",
+          "label": "Colocación en móvil",
+          "options": [
+            { "value": "block", "label": "En su propia línea" },
+            { "value": "inline", "label": "Junto al bloque anterior (derecha)" }
+          ],
+          "default": "inline",
+          "info": "Para que salga a la derecha del título, coloca este bloque justo DEBAJO del bloque del título en la lista."
+        },
+        {
+          "type": "header",
+          "content": "Visibilidad"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_desktop",
+          "label": "Mostrar en escritorio",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_mobile",
+          "label": "Mostrar en móvil",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "Colores"
+        },
+        {
+          "type": "color",
+          "id": "bg_color",
+          "label": "Fondo",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "color",
+          "id": "border_color",
+          "label": "Borde",
+          "default": "#111111"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Texto",
+          "default": "#111111"
+        },
+        {
+          "type": "color",
+          "id": "icon_color",
+          "label": "Icono",
+          "default": "#111111"
+        },
+        {
+          "type": "header",
+          "content": "Forma"
+        },
+        {
+          "type": "range",
+          "id": "border_width",
+          "label": "Grosor del borde",
+          "min": 0,
+          "max": 4,
+          "step": 1,
+          "unit": "px",
+          "default": 1
+        },
+        {
+          "type": "range",
+          "id": "border_radius",
+          "label": "Redondeo",
+          "min": 0,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "default": 30
+        },
+        {
+          "type": "header",
+          "content": "Tipografía"
+        },
+        {
+          "type": "checkbox",
+          "id": "use_theme_font",
+          "label": "Usar la fuente del tema",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "custom_font_stack",
+          "label": "Fuente personalizada (stack CSS)",
+          "default": "'Helvetica Neue', Helvetica, Arial, sans-serif"
+        },
+        {
+          "type": "select",
+          "id": "text_weight",
+          "label": "Grosor del texto",
+          "options": [
+            { "value": "300", "label": "Light" },
+            { "value": "400", "label": "Normal" },
+            { "value": "500", "label": "Medio" },
+            { "value": "600", "label": "Semi-negrita" },
+            { "value": "700", "label": "Negrita" }
+          ],
+          "default": "400"
+        },
+        {
+          "type": "range",
+          "id": "letter_spacing",
+          "label": "Espaciado entre letras",
+          "min": -1,
+          "max": 4,
+          "step": 0.1,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "checkbox",
+          "id": "uppercase",
+          "label": "Texto en mayúsculas",
+          "default": false
+        },
+        {
+          "type": "header",
+          "content": "Escritorio"
+        },
+        {
+          "type": "range",
+          "id": "text_size_desktop",
+          "label": "Tamaño texto",
+          "min": 9,
+          "max": 26,
+          "step": 1,
+          "unit": "px",
+          "default": 15
+        },
+        {
+          "type": "range",
+          "id": "icon_size_desktop",
+          "label": "Tamaño icono",
+          "min": 8,
+          "max": 34,
+          "step": 1,
+          "unit": "px",
+          "default": 17
+        },
+        {
+          "type": "range",
+          "id": "padding_x_desktop",
+          "label": "Padding horizontal",
+          "min": 4,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "default": 16
+        },
+        {
+          "type": "range",
+          "id": "padding_y_desktop",
+          "label": "Padding vertical",
+          "min": 2,
+          "max": 26,
+          "step": 1,
+          "unit": "px",
+          "default": 9
+        },
+        {
+          "type": "select",
+          "id": "align_desktop",
+          "label": "Alineación",
+          "options": [
+            { "value": "flex-start", "label": "Izquierda" },
+            { "value": "center", "label": "Centro" },
+            { "value": "flex-end", "label": "Derecha" }
+          ],
+          "default": "flex-start"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom_desktop",
+          "label": "Espacio inferior",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "default": 16
+        },
+        {
+          "type": "header",
+          "content": "Móvil"
+        },
+        {
+          "type": "range",
+          "id": "text_size_mobile",
+          "label": "Tamaño texto",
+          "min": 8,
+          "max": 22,
+          "step": 1,
+          "unit": "px",
+          "default": 12
+        },
+        {
+          "type": "range",
+          "id": "icon_size_mobile",
+          "label": "Tamaño icono",
+          "min": 8,
+          "max": 28,
+          "step": 1,
+          "unit": "px",
+          "default": 13
+        },
+        {
+          "type": "range",
+          "id": "padding_x_mobile",
+          "label": "Padding horizontal",
+          "min": 4,
+          "max": 34,
+          "step": 1,
+          "unit": "px",
+          "default": 11
+        },
+        {
+          "type": "range",
+          "id": "padding_y_mobile",
+          "label": "Padding vertical",
+          "min": 2,
+          "max": 22,
+          "step": 1,
+          "unit": "px",
+          "default": 6
+        },
+        {
+          "type": "select",
+          "id": "align_mobile",
+          "label": "Alineación (si va en su propia línea)",
+          "options": [
+            { "value": "flex-start", "label": "Izquierda" },
+            { "value": "center", "label": "Centro" },
+            { "value": "flex-end", "label": "Derecha" }
+          ],
+          "default": "flex-start"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom_mobile",
+          "label": "Espacio inferior",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "default": 10
         }
       ]
     },
