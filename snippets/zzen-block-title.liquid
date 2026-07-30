@@ -6,14 +6,12 @@
 {%- liquid
   assign b = block.settings
 
-  # --- Título ---
   if b.title_source == 'custom' and b.title_custom != blank
     assign title_text = b.title_custom
   else
     assign title_text = product.title
   endif
 
-  # --- Fuentes ---
   case b.title_font
     when 'heading'
       assign title_font_family = 'var(--font-heading-family)'
@@ -40,12 +38,41 @@
 
   assign title_tag = b.title_tag | default: 'h1'
   assign subtitle_tag = b.subtitle_tag | default: 'p'
+
+  if b.layout_mobile == 'auto'
+    assign flex_mobile = '1 1 auto'
+  else
+    assign flex_mobile = '0 0 100%'
+  endif
+
+  if b.layout_desktop == 'auto'
+    assign flex_desktop = '1 1 auto'
+  else
+    assign flex_desktop = '0 0 100%'
+  endif
 -%}
 
 {%- style -%}
+  /* ---- Layout dentro del hero-header ---- */
+  @media screen and (max-width: 749px) {
+    .product__hero-header > .zzen-title-{{ block.id }} {
+      flex: {{ flex_mobile }};
+      order: {{ b.order_mobile | default: 2 }};
+    }
+  }
+
+  @media screen and (min-width: 750px) {
+    .product__hero-header > .zzen-title-{{ block.id }} {
+      flex: {{ flex_desktop }};
+      order: {{ b.order_desktop | default: 3 }};
+    }
+  }
+
+  /* ---- Estilos propios ---- */
   .zzen-title-{{ block.id }} {
     margin: 0 0 {{ b.margin_bottom_mobile }}px;
     text-align: {{ b.align_mobile }};
+    min-width: 0;
   }
 
   .zzen-title-{{ block.id }}__title {
@@ -71,6 +98,7 @@
     line-height: {{ b.subtitle_line_height }};
     letter-spacing: {{ b.subtitle_letter_spacing }}px;
     {% if b.subtitle_uppercase %}text-transform: uppercase;{% endif %}
+    {% if b.subtitle_nowrap_mobile %}white-space: nowrap;{% endif %}
   }
 
   {% if b.show_mobile == false %}
@@ -90,6 +118,7 @@
     .zzen-title-{{ block.id }}__subtitle {
       margin-top: {{ b.gap_desktop }}px;
       font-size: {{ b.subtitle_size_desktop }}px;
+      white-space: normal;
     }
   }
 {%- endstyle -%}
