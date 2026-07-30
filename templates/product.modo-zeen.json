@@ -137,7 +137,7 @@
             "subtitle_size_desktop": 22,
             "gap_desktop": 6,
             "align_desktop": "left",
-            "margin_bottom_desktop": 0,
+            "margin_bottom_desktop": 20,
             "title_size_mobile": 44,
             "subtitle_size_mobile": 16,
             "gap_mobile": 4,
