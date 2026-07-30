@@ -145,10 +145,10 @@
   {%- elsif b.icon_style != 'none' -%}
     <span class="zzen-bullets-{{ block.id }}__icon" aria-hidden="true">
       {%- case b.icon_style -%}
-        {%- when 'arrow_up_right' -%}
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ b.icon_stroke }}" xmlns="http://www.w3.org/2000/svg" focusable="false">
-            <path d="M6.5 17.5L17.5 6.5" stroke-linecap="round"/>
-            <path d="M8.8 6.5h8.7v8.7" stroke-linecap="round" stroke-linejoin="round"/>
+       {%- when 'arrow_up_right' -%}
+          <svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M1 13.7827L13.6938 1.08887" stroke="currentColor" stroke-width="{{ b.icon_stroke }}" stroke-linecap="round"/>
+            <path d="M13.7826 13.6051V1H1" stroke="currentColor" stroke-width="{{ b.icon_stroke }}" stroke-linecap="round"/>
           </svg>
         {%- when 'arrow_right' -%}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ b.icon_stroke }}" xmlns="http://www.w3.org/2000/svg" focusable="false">
