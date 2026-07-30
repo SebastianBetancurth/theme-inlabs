@@ -44,7 +44,7 @@
             "icon_color": "#111111",
             "border_width": 1,
             "border_radius": 30,
-            "use_theme_font": true,
+            "use_theme_font": false,
             "custom_font_stack": "'Helvetica Neue', Helvetica, Arial, sans-serif",
             "text_weight": "400",
             "letter_spacing": 0,
