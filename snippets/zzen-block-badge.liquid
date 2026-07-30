@@ -5,25 +5,47 @@
 
 {%- liquid
   assign b = block.settings
-  assign inline_class = ''
-  if b.mobile_layout == 'inline'
-    assign inline_class = ' zzen-badge--inline-mobile'
+
+  if b.layout_mobile == 'auto'
+    assign flex_mobile = '0 0 auto'
+  else
+    assign flex_mobile = '0 0 100%'
+  endif
+
+  if b.layout_desktop == 'auto'
+    assign flex_desktop = '0 0 auto'
+  else
+    assign flex_desktop = '0 0 100%'
   endif
 -%}
 
 {%- style -%}
+  /* ---- Layout dentro del hero-header ---- */
+  @media screen and (max-width: 749px) {
+    .product__hero-header > .zzen-badge-{{ block.id }} {
+      flex: {{ flex_mobile }};
+      order: {{ b.order_mobile | default: 3 }};
+      {% if b.push_right_mobile %}margin-left: auto;{% endif %}
+      align-self: {{ b.align_self_mobile | default: 'flex-start' }};
+      margin-top: {{ b.offset_top_mobile | default: -20 }}px;
+    }
+  }
+
+  @media screen and (min-width: 750px) {
+    .product__hero-header > .zzen-badge-{{ block.id }} {
+      flex: {{ flex_desktop }};
+      order: {{ b.order_desktop | default: 2 }};
+      {% if b.push_right_desktop %}margin-left: auto;{% endif %}
+      align-self: {{ b.align_self_desktop | default: 'auto' }};
+      margin-top: {{ b.offset_top_desktop | default: 0 }}px;
+    }
+  }
+
+  /* ---- Estilos propios ---- */
   .zzen-badge-{{ block.id }} {
     display: flex;
     justify-content: {{ b.align_mobile }};
-    margin: 0 0 {{ b.margin_bottom_mobile }}px;
-  }
-
-  {%- comment -%} Alineación vertical cuando comparte línea con el título en móvil {%- endcomment -%}
-  @media screen and (max-width: 749px) {
-    .zzen-badge-{{ block.id }}.zzen-badge--inline-mobile {
-      align-self: {{ b.align_self_mobile | default: 'flex-start' }};
-      margin-top: {{ b.offset_top_mobile | default: 0 }}px;
-    }
+    margin-bottom: {{ b.margin_bottom_mobile }}px;
   }
 
   .zzen-badge-{{ block.id }}__pill {
@@ -75,8 +97,6 @@
     .zzen-badge-{{ block.id }} {
       justify-content: {{ b.align_desktop }};
       margin-bottom: {{ b.margin_bottom_desktop }}px;
-      margin-top: 0;
-      align-self: auto;
       {% if b.show_mobile == false and b.show_desktop %}display: flex;{% endif %}
       {% if b.show_desktop == false %}display: none;{% endif %}
     }
@@ -122,7 +142,7 @@
   {%- endif -%}
 {%- endcapture -%}
 
-<div class="zzen-badge zzen-badge-{{ block.id }}{{ inline_class }}" {{ block.shopify_attributes }}>
+<div class="zzen-badge zzen-badge-{{ block.id }}" {{ block.shopify_attributes }}>
   {%- if b.link != blank -%}
     <a href="{{ b.link }}" class="zzen-badge-{{ block.id }}__pill">
       {{ badge_icon }}
