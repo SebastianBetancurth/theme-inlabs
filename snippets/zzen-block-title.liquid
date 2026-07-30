@@ -1,0 +1,109 @@
+{% comment %}
+  BLOQUE: zzen_title — título + subtítulo del producto
+  Parámetros: block, product, section
+{% endcomment %}
+
+{%- liquid
+  assign b = block.settings
+
+  # --- Título ---
+  if b.title_source == 'custom' and b.title_custom != blank
+    assign title_text = b.title_custom
+  else
+    assign title_text = product.title
+  endif
+
+  # --- Fuentes ---
+  case b.title_font
+    when 'heading'
+      assign title_font_family = 'var(--font-heading-family)'
+      assign title_font_style = 'var(--font-heading-style)'
+    when 'body'
+      assign title_font_family = 'var(--font-body-family)'
+      assign title_font_style = 'normal'
+    else
+      assign title_font_family = b.title_font_stack
+      assign title_font_style = 'normal'
+  endcase
+
+  case b.subtitle_font
+    when 'heading'
+      assign subtitle_font_family = 'var(--font-heading-family)'
+      assign subtitle_font_style = 'var(--font-heading-style)'
+    when 'body'
+      assign subtitle_font_family = 'var(--font-body-family)'
+      assign subtitle_font_style = 'normal'
+    else
+      assign subtitle_font_family = b.subtitle_font_stack
+      assign subtitle_font_style = 'normal'
+  endcase
+
+  assign title_tag = b.title_tag | default: 'h1'
+  assign subtitle_tag = b.subtitle_tag | default: 'p'
+-%}
+
+{%- style -%}
+  .zzen-title-{{ block.id }} {
+    margin: 0 0 {{ b.margin_bottom_mobile }}px;
+    text-align: {{ b.align_mobile }};
+  }
+
+  .zzen-title-{{ block.id }}__title {
+    margin: 0;
+    font-family: {{ title_font_family }};
+    font-style: {{ title_font_style }};
+    font-weight: {{ b.title_weight }};
+    color: {{ b.title_color }};
+    font-size: {{ b.title_size_mobile }}px;
+    line-height: {{ b.title_line_height }};
+    letter-spacing: {{ b.title_letter_spacing }}px;
+    {% if b.title_uppercase %}text-transform: uppercase;{% endif %}
+    word-break: break-word;
+  }
+
+  .zzen-title-{{ block.id }}__subtitle {
+    margin: {{ b.gap_mobile }}px 0 0;
+    font-family: {{ subtitle_font_family }};
+    font-style: {{ subtitle_font_style }};
+    font-weight: {{ b.subtitle_weight }};
+    color: {{ b.subtitle_color }};
+    font-size: {{ b.subtitle_size_mobile }}px;
+    line-height: {{ b.subtitle_line_height }};
+    letter-spacing: {{ b.subtitle_letter_spacing }}px;
+    {% if b.subtitle_uppercase %}text-transform: uppercase;{% endif %}
+  }
+
+  {% if b.show_mobile == false %}
+    .zzen-title-{{ block.id }} { display: none; }
+  {% endif %}
+
+  @media screen and (min-width: 750px) {
+    .zzen-title-{{ block.id }} {
+      margin-bottom: {{ b.margin_bottom_desktop }}px;
+      text-align: {{ b.align_desktop }};
+      {% if b.show_mobile == false and b.show_desktop %}display: block;{% endif %}
+      {% if b.show_desktop == false %}display: none;{% endif %}
+    }
+    .zzen-title-{{ block.id }}__title {
+      font-size: {{ b.title_size_desktop }}px;
+    }
+    .zzen-title-{{ block.id }}__subtitle {
+      margin-top: {{ b.gap_desktop }}px;
+      font-size: {{ b.subtitle_size_desktop }}px;
+    }
+  }
+{%- endstyle -%}
+
+<div class="zzen-title zzen-title-{{ block.id }}" {{ block.shopify_attributes }}>
+  {%- if b.link_to_product -%}
+    <{{ title_tag }} class="zzen-title-{{ block.id }}__title">
+      <a href="{{ product.url }}" style="color: inherit; text-decoration: none;">{{ title_text }}</a>
+    </{{ title_tag }}>
+  {%- else -%}
+    <{{ title_tag }} class="zzen-title-{{ block.id }}__title">{{ title_text }}</{{ title_tag }}>
+  {%- endif -%}
+
+  {%- if b.subtitle_text != blank -%}
+    <{{ subtitle_tag }} class="zzen-title-{{ block.id }}__subtitle">{{ b.subtitle_text }}</{{ subtitle_tag }}>
+  {%- endif -%}
+</div>
