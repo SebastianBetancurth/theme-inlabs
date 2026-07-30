@@ -1,0 +1,175 @@
+{% comment %}
+  BLOQUE: zzen_rating — estrellas + texto de valoración
+  Parámetros: block, product, section
+{% endcomment %}
+
+{%- liquid
+  assign b = block.settings
+  assign rating_num = b.rating_value | plus: 0.0
+  if rating_num > 5
+    assign rating_num = 5
+  endif
+  if rating_num < 0
+    assign rating_num = 0
+  endif
+  assign fill_pct = rating_num | divided_by: 5.0 | times: 100
+  assign star_count = b.star_count
+
+  if b.layout_mobile == 'auto'
+    assign flex_mobile = '0 0 auto'
+  else
+    assign flex_mobile = '0 0 100%'
+  endif
+
+  if b.layout_desktop == 'auto'
+    assign flex_desktop = '0 0 auto'
+  else
+    assign flex_desktop = '0 0 100%'
+  endif
+-%}
+
+{%- style -%}
+  /* ---- Layout dentro del hero-header (2 clases = gana al reset del contenedor) ---- */
+  @media screen and (max-width: 749px) {
+    .product__hero-header > .zzen-rating-{{ block.id }} {
+      flex: {{ flex_mobile }};
+      order: {{ b.order_mobile | default: 1 }};
+      {% if b.push_right_mobile %}margin-left: auto;{% endif %}
+    }
+  }
+
+  @media screen and (min-width: 750px) {
+    .product__hero-header > .zzen-rating-{{ block.id }} {
+      flex: {{ flex_desktop }};
+      order: {{ b.order_desktop | default: 1 }};
+      {% if b.push_right_desktop %}margin-left: auto;{% endif %}
+    }
+  }
+
+  /* ---- Estilos propios ---- */
+  .zzen-rating-{{ block.id }} {
+    display: flex;
+    align-items: center;
+    gap: {{ b.gap_stars_text }}px;
+    margin: 0 0 {{ b.margin_bottom_mobile }}px;
+    justify-content: {{ b.align_mobile }};
+    flex-wrap: wrap;
+  }
+
+  .zzen-rating-{{ block.id }}__link {
+    display: flex;
+    align-items: center;
+    gap: {{ b.gap_stars_text }}px;
+    text-decoration: none;
+    color: inherit;
+    flex-wrap: wrap;
+    justify-content: {{ b.align_mobile }};
+  }
+
+  .zzen-rating-{{ block.id }}__link:hover .zzen-rating-{{ block.id }}__text {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .zzen-rating-{{ block.id }}__stars {
+    position: relative;
+    display: inline-flex;
+    line-height: 0;
+    flex: 0 0 auto;
+  }
+
+  .zzen-rating-{{ block.id }}__layer {
+    display: inline-flex;
+    gap: {{ b.gap_stars }}px;
+    line-height: 0;
+  }
+
+  .zzen-rating-{{ block.id }}__layer svg {
+    width: {{ b.star_size_mobile }}px;
+    height: {{ b.star_size_mobile }}px;
+    display: block;
+    flex: 0 0 auto;
+  }
+
+  .zzen-rating-{{ block.id }}__layer--empty svg { fill: {{ b.star_color_empty }}; }
+  .zzen-rating-{{ block.id }}__layer--full svg { fill: {{ b.star_color }}; }
+
+  .zzen-rating-{{ block.id }}__layer--full {
+    position: absolute;
+    top: 0;
+    {% if b.align_mobile == 'flex-end' %}right: 0;{% else %}left: 0;{% endif %}
+    overflow: hidden;
+    white-space: nowrap;
+    width: {{ fill_pct }}%;
+  }
+
+  .zzen-rating-{{ block.id }}__text {
+    margin: 0;
+    font-family: {% if b.use_theme_font %}var(--font-body-family){% else %}{{ b.custom_font_stack }}{% endif %};
+    font-style: normal;
+    color: {{ b.text_color }};
+    font-size: {{ b.text_size_mobile }}px;
+    font-weight: {{ b.text_weight }};
+    letter-spacing: {{ b.letter_spacing }}px;
+    line-height: 1.3;
+  }
+
+  {% if b.show_mobile == false %}
+    .zzen-rating-{{ block.id }} { display: none; }
+  {% endif %}
+
+  @media screen and (min-width: 750px) {
+    .zzen-rating-{{ block.id }} {
+      justify-content: {{ b.align_desktop }};
+      margin-bottom: {{ b.margin_bottom_desktop }}px;
+      {% if b.show_mobile == false and b.show_desktop %}display: flex;{% endif %}
+      {% if b.show_desktop == false %}display: none;{% endif %}
+    }
+    .zzen-rating-{{ block.id }}__link {
+      justify-content: {{ b.align_desktop }};
+    }
+    .zzen-rating-{{ block.id }}__layer svg {
+      width: {{ b.star_size_desktop }}px;
+      height: {{ b.star_size_desktop }}px;
+    }
+    .zzen-rating-{{ block.id }}__layer--full {
+      {% if b.align_desktop == 'flex-end' %}right: 0; left: auto;{% else %}left: 0; right: auto;{% endif %}
+    }
+    .zzen-rating-{{ block.id }}__text {
+      font-size: {{ b.text_size_desktop }}px;
+    }
+  }
+{%- endstyle -%}
+
+{%- capture stars_markup -%}
+  <span class="zzen-rating-{{ block.id }}__stars" role="img" aria-label="{{ rating_num }} / 5">
+    <span class="zzen-rating-{{ block.id }}__layer zzen-rating-{{ block.id }}__layer--empty" aria-hidden="true">
+      {%- for i in (1..star_count) -%}
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" focusable="false"><path d="M12 1.6l3.09 6.7 7.31.86-5.35 5.06 1.4 7.18L12 17.9l-6.45 3.5 1.4-7.18L1.6 9.16l7.31-.86L12 1.6z"/></svg>
+      {%- endfor -%}
+    </span>
+    <span class="zzen-rating-{{ block.id }}__layer zzen-rating-{{ block.id }}__layer--full" aria-hidden="true">
+      {%- for i in (1..star_count) -%}
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" focusable="false"><path d="M12 1.6l3.09 6.7 7.31.86-5.35 5.06 1.4 7.18L12 17.9l-6.45 3.5 1.4-7.18L1.6 9.16l7.31-.86L12 1.6z"/></svg>
+      {%- endfor -%}
+    </span>
+  </span>
+{%- endcapture -%}
+
+{%- capture text_markup -%}
+  {%- if b.text != blank -%}
+    <span class="zzen-rating-{{ block.id }}__text">{{ b.text }}</span>
+  {%- endif -%}
+{%- endcapture -%}
+
+<div class="zzen-rating zzen-rating-{{ block.id }}" {{ block.shopify_attributes }}>
+  {%- if b.link != blank -%}
+    <a href="{{ b.link }}" class="zzen-rating-{{ block.id }}__link">
+      {{ stars_markup }}
+      {{ text_markup }}
+    </a>
+  {%- else -%}
+    {{ stars_markup }}
+    {{ text_markup }}
+  {%- endif -%}
+</div>
