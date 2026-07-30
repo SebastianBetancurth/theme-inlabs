@@ -145,6 +145,7 @@
 
   <script src="{{ 'product-info.js' | asset_url }}" defer="defer"></script>
   <script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'zzen-cta.js' | asset_url }}" defer="defer"></script>
   {%- if product.quantity_price_breaks_configured? -%}
     <script src="{{ 'show-more.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'price-per-item.js' | asset_url }}" defer="defer"></script>
@@ -2801,7 +2802,739 @@
           "label": "t:sections.main-product.blocks.popup.settings.page.label"
         }
       ]
+
+
     },
+
+    {
+  "type": "zzen_cta",
+  "name": "● Botón añadir al carrito",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Sustituye al bloque nativo «Botones de compra». Quita ese bloque de la sección para evitar formularios duplicados."
+    },
+    {
+      "type": "header",
+      "content": "Textos"
+    },
+    {
+      "type": "text",
+      "id": "label_text",
+      "label": "Etiqueta",
+      "default": "Añadir al carrito"
+    },
+    {
+      "type": "text",
+      "id": "label_soldout",
+      "label": "Etiqueta cuando está agotado",
+      "default": "Agotado"
+    },
+    {
+      "type": "text",
+      "id": "label_unavailable",
+      "label": "Etiqueta cuando no está disponible",
+      "default": "No disponible"
+    },
+    {
+      "type": "checkbox",
+      "id": "uppercase",
+      "label": "Etiqueta en mayúsculas",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Prefijo"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_prefix",
+      "label": "Mostrar prefijo antes de la etiqueta",
+      "default": true,
+      "info": "Se oculta automáticamente cuando el producto está agotado."
+    },
+    {
+      "type": "text",
+      "id": "prefix_char",
+      "label": "Carácter del prefijo",
+      "default": "+"
+    },
+    {
+      "type": "select",
+      "id": "prefix_weight",
+      "label": "Grosor del prefijo",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medio" },
+        { "value": "600", "label": "Semi-negrita" },
+        { "value": "700", "label": "Negrita" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "header",
+      "content": "Precio"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "Mostrar precio dentro del botón",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_compare_price",
+      "label": "Mostrar precio comparado tachado",
+      "default": true,
+      "info": "Solo aparece si la variante tiene precio de comparación mayor que el precio de venta."
+    },
+    {
+      "type": "range",
+      "id": "compare_thickness",
+      "label": "Grosor de la línea del tachado",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 1,
+      "info": "0 = grosor automático del navegador."
+    },
+    {
+      "type": "range",
+      "id": "compare_opacity",
+      "label": "Opacidad del precio comparado",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Icono"
+    },
+    {
+      "type": "select",
+      "id": "icon_style",
+      "label": "Icono integrado",
+      "options": [
+        { "value": "none", "label": "Sin icono" },
+        { "value": "cart", "label": "Carrito" },
+        { "value": "bag", "label": "Bolsa" },
+        { "value": "plus", "label": "Más +" },
+        { "value": "arrow_right", "label": "Flecha derecha" },
+        { "value": "lock", "label": "Candado" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_image",
+      "label": "Icono propio (SVG/PNG)",
+      "info": "Sustituye al icono integrado."
+    },
+    {
+      "type": "select",
+      "id": "icon_position",
+      "label": "Posición del icono",
+      "options": [
+        { "value": "before", "label": "Antes de la etiqueta" },
+        { "value": "after", "label": "Al final del botón" }
+      ],
+      "default": "before"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Color del icono",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_desktop",
+      "label": "Mostrar en escritorio",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_mobile",
+      "label": "Mostrar en móvil",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colores — estado normal"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Fondo",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Etiqueta",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "price_color",
+      "label": "Precio",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "compare_color",
+      "label": "Precio comparado",
+      "default": "#9A9A9A"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Borde",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Colores — hover"
+    },
+    {
+      "type": "color",
+      "id": "bg_color_hover",
+      "label": "Fondo",
+      "default": "#1F1F1F"
+    },
+    {
+      "type": "color",
+      "id": "text_color_hover",
+      "label": "Etiqueta",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "price_color_hover",
+      "label": "Precio",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "border_color_hover",
+      "label": "Borde",
+      "default": "#1F1F1F"
+    },
+    {
+      "type": "header",
+      "content": "Colores — agotado"
+    },
+    {
+      "type": "color",
+      "id": "bg_color_disabled",
+      "label": "Fondo",
+      "default": "#D9D9D9"
+    },
+    {
+      "type": "color",
+      "id": "text_color_disabled",
+      "label": "Etiqueta",
+      "default": "#6B6B6B"
+    },
+    {
+      "type": "color",
+      "id": "border_color_disabled",
+      "label": "Borde",
+      "default": "#D9D9D9"
+    },
+    {
+      "type": "header",
+      "content": "Forma"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "label": "Grosor del borde",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Redondeo",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Tipografía"
+    },
+    {
+      "type": "select",
+      "id": "font_family",
+      "label": "Fuente",
+      "options": [
+        { "value": "body", "label": "Fuente de texto del tema" },
+        { "value": "heading", "label": "Fuente de títulos del tema" },
+        { "value": "custom", "label": "Personalizada" }
+      ],
+      "default": "body"
+    },
+    {
+      "type": "text",
+      "id": "custom_font_stack",
+      "label": "Stack CSS personalizado",
+      "default": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+      "info": "Solo se aplica si eliges «Personalizada». Incluye fuentes de respaldo."
+    },
+    {
+      "type": "select",
+      "id": "label_weight",
+      "label": "Grosor de la etiqueta",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medio" },
+        { "value": "600", "label": "Semi-negrita" },
+        { "value": "700", "label": "Negrita" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "price_weight",
+      "label": "Grosor del precio",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medio" },
+        { "value": "600", "label": "Semi-negrita" },
+        { "value": "700", "label": "Negrita" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "compare_weight",
+      "label": "Grosor del precio comparado",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medio" },
+        { "value": "600", "label": "Semi-negrita" },
+        { "value": "700", "label": "Negrita" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "range",
+      "id": "letter_spacing",
+      "label": "Espaciado entre letras",
+      "min": -1,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Escritorio"
+    },
+    {
+      "type": "select",
+      "id": "width_desktop",
+      "label": "Ancho del botón",
+      "options": [
+        { "value": "full", "label": "Ancho completo" },
+        { "value": "auto", "label": "Ajustado al contenido" }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "range",
+      "id": "max_width_desktop",
+      "label": "Ancho máximo",
+      "min": 0,
+      "max": 900,
+      "step": 10,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = sin límite."
+    },
+    {
+      "type": "select",
+      "id": "align_desktop",
+      "label": "Alineación del botón",
+      "options": [
+        { "value": "flex-start", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "flex-end", "label": "Derecha" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "select",
+      "id": "content_align_desktop",
+      "label": "Alineación del contenido interno",
+      "options": [
+        { "value": "center", "label": "Centrado" },
+        { "value": "flex-start", "label": "Izquierda" },
+        { "value": "space-between", "label": "Separado a los extremos" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "height_desktop",
+      "label": "Altura mínima",
+      "min": 32,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_x_desktop",
+      "label": "Padding horizontal",
+      "min": 8,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_y_desktop",
+      "label": "Padding vertical",
+      "min": 4,
+      "max": 34,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "label_size_desktop",
+      "label": "Tamaño de la etiqueta",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "price_size_desktop",
+      "label": "Tamaño del precio",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "compare_size_desktop",
+      "label": "Tamaño del precio comparado",
+      "min": 8,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "icon_size_desktop",
+      "label": "Tamaño del icono",
+      "min": 8,
+      "max": 34,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "prefix_gap_desktop",
+      "label": "Separación prefijo ↔ etiqueta",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "gap_label_price_desktop",
+      "label": "Separación etiqueta ↔ precio",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "gap_prices_desktop",
+      "label": "Separación precio ↔ comparado",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "checkbox",
+      "id": "allow_wrap_desktop",
+      "label": "Permitir salto de línea dentro del botón",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "margin_top_desktop",
+      "label": "Espacio superior",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_desktop",
+      "label": "Espacio inferior",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Móvil"
+    },
+    {
+      "type": "select",
+      "id": "width_mobile",
+      "label": "Ancho del botón",
+      "options": [
+        { "value": "full", "label": "Ancho completo" },
+        { "value": "auto", "label": "Ajustado al contenido" }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "range",
+      "id": "max_width_mobile",
+      "label": "Ancho máximo",
+      "min": 0,
+      "max": 700,
+      "step": 10,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = sin límite."
+    },
+    {
+      "type": "select",
+      "id": "align_mobile",
+      "label": "Alineación del botón",
+      "options": [
+        { "value": "flex-start", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "flex-end", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "content_align_mobile",
+      "label": "Alineación del contenido interno",
+      "options": [
+        { "value": "center", "label": "Centrado" },
+        { "value": "flex-start", "label": "Izquierda" },
+        { "value": "space-between", "label": "Separado a los extremos" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "height_mobile",
+      "label": "Altura mínima",
+      "min": 32,
+      "max": 90,
+      "step": 1,
+      "unit": "px",
+      "default": 52
+    },
+    {
+      "type": "range",
+      "id": "padding_x_mobile",
+      "label": "Padding horizontal",
+      "min": 6,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_y_mobile",
+      "label": "Padding vertical",
+      "min": 4,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "label_size_mobile",
+      "label": "Tamaño de la etiqueta",
+      "min": 9,
+      "max": 26,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "price_size_mobile",
+      "label": "Tamaño del precio",
+      "min": 9,
+      "max": 26,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "compare_size_mobile",
+      "label": "Tamaño del precio comparado",
+      "min": 8,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "icon_size_mobile",
+      "label": "Tamaño del icono",
+      "min": 8,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "prefix_gap_mobile",
+      "label": "Separación prefijo ↔ etiqueta",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "gap_label_price_mobile",
+      "label": "Separación etiqueta ↔ precio",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 7
+    },
+    {
+      "type": "range",
+      "id": "gap_prices_mobile",
+      "label": "Separación precio ↔ comparado",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 6
+    },
+    {
+      "type": "checkbox",
+      "id": "allow_wrap_mobile",
+      "label": "Permitir salto de línea dentro del botón",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "margin_top_mobile",
+      "label": "Espacio superior",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_mobile",
+      "label": "Espacio inferior",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Extras"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dynamic_checkout",
+      "label": "Mostrar botones de pago rápido",
+      "default": false,
+      "info": "Apple Pay, Google Pay, Shop Pay. Aparecen debajo del botón principal."
+    },
+    {
+      "type": "range",
+      "id": "dynamic_gap_desktop",
+      "label": "Separación con pago rápido (escritorio)",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "dynamic_gap_mobile",
+      "label": "Separación con pago rápido (móvil)",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "spinner_size",
+      "label": "Tamaño del spinner de carga",
+      "min": 12,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    }
+  ]
+},
     {
       "type": "rating",
       "name": "t:sections.main-product.blocks.rating.name",
