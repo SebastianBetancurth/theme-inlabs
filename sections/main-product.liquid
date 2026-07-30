@@ -63,20 +63,22 @@
   }
 
 
-  /* ===== HERO HEADER (contenido arriba de la galería en móvil) ===== */
-  #MainProduct-{{ section.id }} .product__hero-header {
+ /* ===== HERO HEADER (contenido arriba de la galería en móvil) ===== */
+  .product__hero-header {
     width: 100%;
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: {{ section.settings.hero_gap_mobile | default: 20 }}px;
   }
 
-  /* Por defecto cada bloque ocupa su propia línea */
-  #MainProduct-{{ section.id }} .product__hero-header > * {
+  /* Reset: por defecto cada bloque ocupa su propia línea.
+     Cada bloque puede sobreescribirlo con su propio ancho/orden. */
+  .product__hero-header > * {
     flex: 0 0 100%;
     min-width: 0;
   }
+
 
   /* Móvil: la etiqueta marcada como "junto al bloque anterior"
      comparte línea y se pega a la derecha */
@@ -1117,7 +1119,61 @@
           "step": 1,
           "unit": "px",
           "default": 8
-        }
+        },
+        {
+          "type": "header",
+          "content": "Layout en el hero"
+        },
+        {
+          "type": "select",
+          "id": "layout_mobile",
+          "label": "Ancho en móvil",
+          "options": [
+            { "value": "full", "label": "Línea propia" },
+            { "value": "auto", "label": "Compartir línea" }
+          ],
+          "default": "full"
+        },
+        {
+          "type": "range",
+          "id": "order_mobile",
+          "label": "Orden en móvil",
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "default": 1
+        },
+        {
+          "type": "checkbox",
+          "id": "push_right_mobile",
+          "label": "Empujar a la derecha (móvil)",
+          "default": false
+        },
+        {
+          "type": "select",
+          "id": "layout_desktop",
+          "label": "Ancho en escritorio",
+          "options": [
+            { "value": "full", "label": "Línea propia" },
+            { "value": "auto", "label": "Compartir línea" }
+          ],
+          "default": "full"
+        },
+        {
+          "type": "range",
+          "id": "order_desktop",
+          "label": "Orden en escritorio",
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "default": 1
+        },
+        {
+          "type": "checkbox",
+          "id": "push_right_desktop",
+          "label": "Empujar a la derecha (escritorio)",
+          "default": false
+        },
       ]
     },
     {
@@ -1178,21 +1234,7 @@
           "unit": "px",
           "default": 7
         },
-        {
-          "type": "header",
-          "content": "Comportamiento en móvil"
-        },
-        {
-          "type": "select",
-          "id": "mobile_layout",
-          "label": "Colocación en móvil",
-          "options": [
-            { "value": "block", "label": "En su propia línea" },
-            { "value": "inline", "label": "Junto al bloque anterior (derecha)" }
-          ],
-          "default": "inline",
-          "info": "Para que salga a la derecha del título, coloca este bloque justo DEBAJO del bloque del título en la lista."
-        },
+ 
         {
           "type": "select",
           "id": "align_self_mobile",
@@ -1456,7 +1498,83 @@
           "step": 2,
           "unit": "px",
           "default": 10
-        }
+        },
+        {
+          "type": "header",
+          "content": "Layout en el hero"
+        },
+        {
+          "type": "select",
+          "id": "layout_mobile",
+          "label": "Ancho en móvil",
+          "options": [
+            { "value": "full", "label": "Línea propia" },
+            { "value": "auto", "label": "Compartir línea" }
+          ],
+          "default": "auto"
+        },
+        {
+          "type": "range",
+          "id": "order_mobile",
+          "label": "Orden en móvil",
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "default": 3
+        },
+        {
+          "type": "checkbox",
+          "id": "push_right_mobile",
+          "label": "Empujar a la derecha (móvil)",
+          "default": true
+        },
+        {
+          "type": "select",
+          "id": "layout_desktop",
+          "label": "Ancho en escritorio",
+          "options": [
+            { "value": "full", "label": "Línea propia" },
+            { "value": "auto", "label": "Compartir línea" }
+          ],
+          "default": "full"
+        },
+        {
+          "type": "range",
+          "id": "order_desktop",
+          "label": "Orden en escritorio",
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "default": 2
+        },
+        {
+          "type": "checkbox",
+          "id": "push_right_desktop",
+          "label": "Empujar a la derecha (escritorio)",
+          "default": false
+        },
+        {
+          "type": "select",
+          "id": "align_self_desktop",
+          "label": "Alineación vertical (escritorio)",
+          "options": [
+            { "value": "auto", "label": "Automática" },
+            { "value": "flex-start", "label": "Arriba" },
+            { "value": "center", "label": "Centro" },
+            { "value": "flex-end", "label": "Abajo" }
+          ],
+          "default": "auto"
+        },
+        {
+          "type": "range",
+          "id": "offset_top_desktop",
+          "label": "Ajuste vertical fino (escritorio)",
+          "min": -20,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "default": 0
+        },
       ]
     },
     {
@@ -1785,7 +1903,56 @@
           "step": 2,
           "unit": "px",
           "default": 14
-        }
+        },
+        {
+          "type": "checkbox",
+          "id": "subtitle_nowrap_mobile",
+          "label": "Subtítulo en una sola línea (móvil)",
+          "default": false,
+          "info": "Útil si al compartir línea con la etiqueta el subtítulo se parte en dos."
+        },
+        {
+          "type": "header",
+          "content": "Layout en el hero"
+        },
+        {
+          "type": "select",
+          "id": "layout_mobile",
+          "label": "Ancho en móvil",
+          "options": [
+            { "value": "full", "label": "Línea propia" },
+            { "value": "auto", "label": "Compartir línea" }
+          ],
+          "default": "auto"
+        },
+        {
+          "type": "range",
+          "id": "order_mobile",
+          "label": "Orden en móvil",
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "default": 2
+        },
+        {
+          "type": "select",
+          "id": "layout_desktop",
+          "label": "Ancho en escritorio",
+          "options": [
+            { "value": "full", "label": "Línea propia" },
+            { "value": "auto", "label": "Compartir línea" }
+          ],
+          "default": "full"
+        },
+        {
+          "type": "range",
+          "id": "order_desktop",
+          "label": "Orden en escritorio",
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "default": 3
+        },
       ]
     },
     {
