@@ -1,0 +1,177 @@
+{% comment %}
+  ============================================================
+  SECCIÓN: Banner de anuncio de producto (clon ZZEN)
+  Archivo: sections/product-announcement-bar.liquid
+  - Solo se puede añadir en templates de producto (enabled_on)
+  - Texto centrado, fondo verde claro, tipografía pequeña
+  - Configurable desde el editor: texto, colores, tamaño, link
+  ============================================================
+{% endcomment %}
+
+{%- style -%}
+  .product-announcement-{{ section.id }} {
+    background-color: {{ section.settings.bg_color }};
+    display: block;
+    width: 100%;
+  }
+
+  .product-announcement-{{ section.id }}__inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: {{ section.settings.padding_vertical }}px 1.5rem;
+    min-height: {{ section.settings.padding_vertical | times: 2 | plus: 18 }}px;
+  }
+
+  .product-announcement-{{ section.id }}__text {
+    margin: 0;
+    color: {{ section.settings.text_color }};
+    font-size: {{ section.settings.text_size }}px;
+    font-weight: {{ section.settings.text_weight }};
+    letter-spacing: 0.02em;
+    line-height: 1.4;
+  }
+
+  .product-announcement-{{ section.id }}__link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .product-announcement-{{ section.id }}__link:hover .product-announcement-{{ section.id }}__text {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .product-announcement-{{ section.id }}__text {
+      font-size: {{ section.settings.text_size_mobile }}px;
+    }
+    .product-announcement-{{ section.id }}__inner {
+      padding: {{ section.settings.padding_vertical_mobile }}px 1rem;
+    }
+  }
+{%- endstyle -%}
+
+<div class="product-announcement-{{ section.id }}" role="region" aria-label="{{ 'sections.announcements.announcement' | t | default: 'Anuncio' }}">
+  {%- if section.settings.link != blank -%}
+    <a href="{{ section.settings.link }}" class="product-announcement-{{ section.id }}__link">
+  {%- endif -%}
+
+  <div class="product-announcement-{{ section.id }}__inner">
+    <p class="product-announcement-{{ section.id }}__text">
+      {{ section.settings.text }}
+    </p>
+  </div>
+
+  {%- if section.settings.link != blank -%}
+    </a>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Banner producto",
+  "tag": "aside",
+  "class": "section-product-announcement",
+  "enabled_on": {
+    "templates": ["product"]
+  },
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "text",
+      "label": "Texto del banner",
+      "default": "Recomendamos tomarlo durante 3 meses para resultados óptimos"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Enlace (opcional)",
+      "info": "Si añades un enlace, todo el banner será clicable"
+    },
+    {
+      "type": "header",
+      "content": "Colores"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo",
+      "default": "#DFF2E4"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color del texto",
+      "default": "#111111"
+    },
+    {
+      "type": "header",
+      "content": "Tipografía"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Tamaño de texto (escritorio)",
+      "min": 10,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "text_size_mobile",
+      "label": "Tamaño de texto (móvil)",
+      "min": 9,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "select",
+      "id": "text_weight",
+      "label": "Grosor del texto",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medio" },
+        { "value": "600", "label": "Semi-negrita" },
+        { "value": "700", "label": "Negrita" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "header",
+      "content": "Espaciado"
+    },
+    {
+      "type": "range",
+      "id": "padding_vertical",
+      "label": "Padding vertical (escritorio)",
+      "min": 4,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "padding_vertical_mobile",
+      "label": "Padding vertical (móvil)",
+      "min": 4,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 7
+    }
+  ],
+  "presets": [
+    {
+      "name": "Banner producto"
+    }
+  ]
+}
+{% endschema %}
