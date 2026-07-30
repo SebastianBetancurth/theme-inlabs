@@ -25,19 +25,97 @@
     {{ 'component-volume-pricing.css' | asset_url | stylesheet_tag }}
   {%- endif -%}
 
-  {%- style -%}
+  {%- liquid
+  # Tipos de bloque personalizados que renderiza el snippet zzen-product-blocks
+  assign zzen_block_types = 'zzen_rating' | split: ','
+
+  # ¿Hay algún bloque marcado para subir arriba de la galería en móvil?
+  assign has_hoisted = false
+  for b in section.blocks
+    if b.settings.hoist_mobile
+      assign has_hoisted = true
+      break
+    endif
+  endfor
+
+  # Ancho de la columna de imagen en escritorio según media_size
+  case section.settings.media_size
+    when 'small'
+      assign media_col = '42%'
+    when 'medium'
+      assign media_col = '50%'
+    else
+      assign media_col = '58%'
+  endcase
+-%}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
     .section-{{ section.id }}-padding {
-      padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
-      padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  /* ===== HERO HEADER (contenido arriba de la galería en móvil) ===== */
+  #MainProduct-{{ section.id }} .product__hero-header {
+    width: 100%;
+    margin-bottom: {{ section.settings.hero_gap_mobile | default: 20 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    /* En escritorio pasamos a CSS Grid para colocar el hero header
+       en la columna derecha, encima del resto de la info.
+       Solo se activa si hay bloques hoisted -> cero impacto si no se usa. */
+    #MainProduct-{{ section.id }} .product--hero-split {
+      display: grid;
+      grid-template-columns: {{ media_col }} minmax(0, 1fr);
+      grid-template-rows: auto minmax(0, 1fr);
+      grid-template-areas:
+        'media hero'
+        'media info';
+      column-gap: var(--grid-desktop-horizontal-spacing, 4rem);
+      row-gap: 0;
+      margin-left: 0;
+      align-items: start;
     }
 
-    @media screen and (min-width: 750px) {
-      .section-{{ section.id }}-padding {
-        padding-top: {{ section.settings.padding_top }}px;
-        padding-bottom: {{ section.settings.padding_bottom }}px;
-      }
+    #MainProduct-{{ section.id }} .product--hero-split.product--right {
+      grid-template-columns: minmax(0, 1fr) {{ media_col }};
+      grid-template-areas:
+        'hero media'
+        'info media';
     }
-  {%- endstyle -%}
+
+    #MainProduct-{{ section.id }} .product--hero-split > .product__media-wrapper {
+      grid-area: media;
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      padding-left: 0;
+    }
+
+    #MainProduct-{{ section.id }} .product--hero-split > .product__hero-header {
+      grid-area: hero;
+      margin-bottom: {{ section.settings.hero_gap_desktop | default: 24 }}px;
+      padding-left: 0;
+    }
+
+    #MainProduct-{{ section.id }} .product--hero-split > .product__info-wrapper {
+      grid-area: info;
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      padding-left: 0;
+      align-self: stretch;
+    }
+  }
+{%- endstyle -%}
 
   <script src="{{ 'product-info.js' | asset_url }}" defer="defer"></script>
   <script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
@@ -75,7 +153,16 @@
   {% assign variant_images = product.images | where: 'attached_to_variant?', true | map: 'src' %}
   <product-component view-event-payload="{{ product | standard_event_data: 'view', context: 'page' | escape }}">
     <div class="page-width">
-      <div class="product product--{{ section.settings.media_size }} product--{{ section.settings.media_position }} product--{{ section.settings.gallery_layout }} product--mobile-{{ section.settings.mobile_thumbnails }} grid grid--1-col {% if product.media.size > 0 %}grid--2-col-tablet{% else %}product--no-media{% endif %}">
+     <div class="product product--{{ section.settings.media_size }} product--{{ section.settings.media_position }} product--{{ section.settings.gallery_layout }} product--mobile-{{ section.settings.mobile_thumbnails }} grid grid--1-col {% if product.media.size > 0 %}grid--2-col-tablet{% else %}product--no-media{% endif %}{% if has_hoisted %} product--hero-split{% endif %}">
+        {%- if has_hoisted -%}
+          <div class="product__hero-header">
+            {%- for block in section.blocks -%}
+              {%- if block.settings.hoist_mobile -%}
+                {% render 'zzen-product-blocks', block: block, product: product, section: section %}
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
         <div class="grid__item product__media-wrapper">
           {% render 'product-media-gallery', variant_images: variant_images %}
         </div>
@@ -86,7 +173,17 @@
           >
             {%- assign product_form_id = 'product-form-' | append: section.id -%}
 
-            {%- for block in section.blocks -%}
+           {%- for block in section.blocks -%}
+              {%- if zzen_block_types contains block.type -%}
+                {%- comment -%}
+                  Si el bloque está hoisted ya se renderizó arriba (hero-header).
+                  Si no, se renderiza aquí en su posición normal.
+                {%- endcomment -%}
+                {%- unless block.settings.hoist_mobile -%}
+                  {% render 'zzen-product-blocks', block: block, product: product, section: section %}
+                {%- endunless -%}
+                {%- continue -%}
+              {%- endif -%}
               {%- case block.type -%}
                 {%- when '@app' -%}
                   {% render block %}
@@ -761,6 +858,243 @@
   "blocks": [
     {
       "type": "@app"
+    },
+    {
+      "type": "zzen_rating",
+      "name": "★ Valoración estrellas",
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "hoist_mobile",
+          "label": "Mostrar arriba de la galería en móvil",
+          "default": true,
+          "info": "Sube este bloque por encima de las imágenes en móvil. En escritorio se coloca en la columna derecha, arriba."
+        },
+        {
+          "type": "header",
+          "content": "Contenido"
+        },
+        {
+          "type": "text",
+          "id": "rating_value",
+          "label": "Valoración (0 a 5)",
+          "default": "4.9",
+          "info": "Controla cuántas estrellas se rellenan. Acepta decimales: 4.9"
+        },
+        {
+          "type": "range",
+          "id": "star_count",
+          "label": "Número de estrellas",
+          "min": 3,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "inline_richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "4.9/5 de +100.000 clientes verificados"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Enlace (opcional)",
+          "info": "Para llevar a las reseñas usa: #judgeme_product_reviews"
+        },
+        {
+          "type": "header",
+          "content": "Visibilidad"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_desktop",
+          "label": "Mostrar en escritorio",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_mobile",
+          "label": "Mostrar en móvil",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "Colores"
+        },
+        {
+          "type": "color",
+          "id": "star_color",
+          "label": "Color estrellas (rellenas)",
+          "default": "#111111"
+        },
+        {
+          "type": "color",
+          "id": "star_color_empty",
+          "label": "Color estrellas (vacías)",
+          "default": "#D9D9D9"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Color del texto",
+          "default": "#111111"
+        },
+        {
+          "type": "header",
+          "content": "Tipografía"
+        },
+        {
+          "type": "checkbox",
+          "id": "use_theme_font",
+          "label": "Usar la fuente del tema",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "custom_font_stack",
+          "label": "Fuente personalizada (stack CSS)",
+          "default": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+          "info": "Solo se aplica si desactivas la opción de arriba. Incluye siempre fuentes de respaldo para que los acentos no se descoloquen."
+        },
+        {
+          "type": "select",
+          "id": "text_weight",
+          "label": "Grosor del texto",
+          "options": [
+            { "value": "300", "label": "Light" },
+            { "value": "400", "label": "Normal" },
+            { "value": "500", "label": "Medio" },
+            { "value": "600", "label": "Semi-negrita" },
+            { "value": "700", "label": "Negrita" }
+          ],
+          "default": "400"
+        },
+       {
+          "type": "range",
+          "id": "letter_spacing",
+          "label": "Espaciado entre letras",
+          "min": -1,
+          "max": 4,
+          "step": 0.1,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "header",
+          "content": "Escritorio"
+        },
+        {
+          "type": "range",
+          "id": "star_size_desktop",
+          "label": "Tamaño estrellas",
+          "min": 8,
+          "max": 32,
+          "step": 1,
+          "unit": "px",
+          "default": 14
+        },
+        {
+          "type": "range",
+          "id": "text_size_desktop",
+          "label": "Tamaño texto",
+          "min": 10,
+          "max": 28,
+          "step": 1,
+          "unit": "px",
+          "default": 15
+        },
+        {
+          "type": "select",
+          "id": "align_desktop",
+          "label": "Alineación",
+          "options": [
+            { "value": "flex-start", "label": "Izquierda" },
+            { "value": "center", "label": "Centro" },
+            { "value": "flex-end", "label": "Derecha" }
+          ],
+          "default": "flex-start"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom_desktop",
+          "label": "Espacio inferior",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "default": 10
+        },
+        {
+          "type": "header",
+          "content": "Móvil"
+        },
+        {
+          "type": "range",
+          "id": "star_size_mobile",
+          "label": "Tamaño estrellas",
+          "min": 8,
+          "max": 28,
+          "step": 1,
+          "unit": "px",
+          "default": 12
+        },
+        {
+          "type": "range",
+          "id": "text_size_mobile",
+          "label": "Tamaño texto",
+          "min": 9,
+          "max": 24,
+          "step": 1,
+          "unit": "px",
+          "default": 13
+        },
+        {
+          "type": "select",
+          "id": "align_mobile",
+          "label": "Alineación",
+          "options": [
+            { "value": "flex-start", "label": "Izquierda" },
+            { "value": "center", "label": "Centro" },
+            { "value": "flex-end", "label": "Derecha" }
+          ],
+          "default": "flex-start"
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom_mobile",
+          "label": "Espacio inferior",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "default": 8
+        },
+        {
+          "type": "header",
+          "content": "Espaciados internos"
+        },
+        {
+          "type": "range",
+          "id": "gap_stars",
+          "label": "Separación entre estrellas",
+          "min": 0,
+          "max": 8,
+          "step": 1,
+          "unit": "px",
+          "default": 1
+        },
+        {
+          "type": "range",
+          "id": "gap_stars_text",
+          "label": "Separación estrellas ↔ texto",
+          "min": 0,
+          "max": 24,
+          "step": 1,
+          "unit": "px",
+          "default": 8
+        }
+      ]
     },
     {
       "type": "text",
@@ -2152,6 +2486,30 @@
       "id": "enable_sticky_info",
       "default": true,
       "label": "t:sections.main-product.settings.enable_sticky_info.label"
+    },
+    {
+      "type": "header",
+      "content": "Hero header (bloques arriba de la galería)"
+    },
+    {
+      "type": "range",
+      "id": "hero_gap_desktop",
+      "label": "Espacio bajo el hero header (escritorio)",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "hero_gap_mobile",
+      "label": "Espacio bajo el hero header (móvil)",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 20
     },
     {
       "type": "color_scheme",
