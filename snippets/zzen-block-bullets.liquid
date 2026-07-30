@@ -1,0 +1,196 @@
+{% comment %}
+  BLOQUE: zzen_bullets — lista de beneficios con icono
+  Parámetros: block, product, section
+{% endcomment %}
+
+{%- liquid
+  assign b = block.settings
+
+  assign items = ''
+  assign items = items | append: b.text_1 | append: '~|~'
+  assign items = items | append: b.text_2 | append: '~|~'
+  assign items = items | append: b.text_3 | append: '~|~'
+  assign items = items | append: b.text_4 | append: '~|~'
+  assign items = items | append: b.text_5 | append: '~|~'
+  assign items = items | append: b.text_6
+  assign items_array = items | split: '~|~'
+
+  case b.text_font
+    when 'heading'
+      assign text_font_family = 'var(--font-heading-family)'
+      assign text_font_style = 'var(--font-heading-style)'
+    when 'body'
+      assign text_font_family = 'var(--font-body-family)'
+      assign text_font_style = 'normal'
+    else
+      assign text_font_family = b.text_font_stack
+      assign text_font_style = 'normal'
+  endcase
+
+  if b.layout_mobile == 'auto'
+    assign flex_mobile = '1 1 auto'
+  else
+    assign flex_mobile = '0 0 100%'
+  endif
+
+  if b.layout_desktop == 'auto'
+    assign flex_desktop = '1 1 auto'
+  else
+    assign flex_desktop = '0 0 100%'
+  endif
+-%}
+
+{%- style -%}
+  /* ---- Layout dentro del hero-header ---- */
+  @media screen and (max-width: 749px) {
+    .product__hero-header > .zzen-bullets-{{ block.id }} {
+      flex: {{ flex_mobile }};
+      order: {{ b.order_mobile | default: 4 }};
+    }
+  }
+
+  @media screen and (min-width: 750px) {
+    .product__hero-header > .zzen-bullets-{{ block.id }} {
+      flex: {{ flex_desktop }};
+      order: {{ b.order_desktop | default: 4 }};
+    }
+  }
+
+  /* ---- Estilos propios ---- */
+  .zzen-bullets-{{ block.id }} {
+    margin: 0 0 {{ b.margin_bottom_mobile }}px;
+    min-width: 0;
+  }
+
+  .zzen-bullets-{{ block.id }}__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat({{ b.columns_mobile }}, minmax(0, 1fr));
+    column-gap: {{ b.column_gap_mobile }}px;
+    row-gap: {{ b.row_gap_mobile }}px;
+  }
+
+  .zzen-bullets-{{ block.id }}__item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: {{ b.icon_gap }}px;
+    align-items: start;
+    margin: 0;
+    padding: 0;
+  }
+
+  .zzen-bullets-{{ block.id }}__icon {
+    display: block;
+    flex: 0 0 auto;
+    width: {{ b.icon_size_mobile }}px;
+    height: {{ b.icon_size_mobile }}px;
+    color: {{ b.icon_color }};
+    margin-top: {{ b.icon_offset_mobile }}px;
+  }
+
+  .zzen-bullets-{{ block.id }}__icon svg,
+  .zzen-bullets-{{ block.id }}__icon img {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .zzen-bullets-{{ block.id }}__icon img { object-fit: contain; }
+
+  .zzen-bullets-{{ block.id }}__text {
+    margin: 0;
+    font-family: {{ text_font_family }};
+    font-style: {{ text_font_style }};
+    font-weight: {{ b.text_weight }};
+    color: {{ b.text_color }};
+    font-size: {{ b.text_size_mobile }}px;
+    line-height: {{ b.text_line_height }};
+    letter-spacing: {{ b.text_letter_spacing }}px;
+    {% if b.text_uppercase %}text-transform: uppercase;{% endif %}
+  }
+
+  {% if b.show_mobile == false %}
+    .zzen-bullets-{{ block.id }} { display: none; }
+  {% endif %}
+
+  @media screen and (min-width: 750px) {
+    .zzen-bullets-{{ block.id }} {
+      margin-bottom: {{ b.margin_bottom_desktop }}px;
+      {% if b.show_mobile == false and b.show_desktop %}display: block;{% endif %}
+      {% if b.show_desktop == false %}display: none;{% endif %}
+    }
+    .zzen-bullets-{{ block.id }}__list {
+      grid-template-columns: repeat({{ b.columns_desktop }}, minmax(0, 1fr));
+      column-gap: {{ b.column_gap_desktop }}px;
+      row-gap: {{ b.row_gap_desktop }}px;
+    }
+    .zzen-bullets-{{ block.id }}__icon {
+      width: {{ b.icon_size_desktop }}px;
+      height: {{ b.icon_size_desktop }}px;
+      margin-top: {{ b.icon_offset_desktop }}px;
+    }
+    .zzen-bullets-{{ block.id }}__text {
+      font-size: {{ b.text_size_desktop }}px;
+    }
+  }
+{%- endstyle -%}
+
+{%- capture bullet_icon -%}
+  {%- if b.icon_image != blank -%}
+    <span class="zzen-bullets-{{ block.id }}__icon">
+      {{ b.icon_image | image_url: width: 80 | image_tag: loading: 'lazy', alt: '' }}
+    </span>
+  {%- elsif b.icon_style != 'none' -%}
+    <span class="zzen-bullets-{{ block.id }}__icon" aria-hidden="true">
+      {%- case b.icon_style -%}
+        {%- when 'arrow_up_right' -%}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ b.icon_stroke }}" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M6.5 17.5L17.5 6.5" stroke-linecap="round"/>
+            <path d="M8.8 6.5h8.7v8.7" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        {%- when 'arrow_right' -%}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ b.icon_stroke }}" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M4 12h15" stroke-linecap="round"/>
+            <path d="M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        {%- when 'check' -%}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ b.icon_stroke }}" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M4.5 12.5l5 5L19.5 7" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        {%- when 'check_circle' -%}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ b.icon_stroke }}" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <circle cx="12" cy="12" r="9.2"/>
+            <path d="M8 12.3l2.7 2.7L16 9.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        {%- when 'plus' -%}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ b.icon_stroke }}" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M12 5v14M5 12h14" stroke-linecap="round"/>
+          </svg>
+        {%- when 'star' -%}
+          <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M12 1.6l3.09 6.7 7.31.86-5.35 5.06 1.4 7.18L12 17.9l-6.45 3.5 1.4-7.18L1.6 9.16l7.31-.86L12 1.6z"/>
+          </svg>
+        {%- when 'dot' -%}
+          <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <circle cx="12" cy="12" r="5"/>
+          </svg>
+      {%- endcase -%}
+    </span>
+  {%- endif -%}
+{%- endcapture -%}
+
+<div class="zzen-bullets zzen-bullets-{{ block.id }}" {{ block.shopify_attributes }}>
+  <ul class="zzen-bullets-{{ block.id }}__list" role="list">
+    {%- for item in items_array -%}
+      {%- assign item_text = item | strip -%}
+      {%- if item_text != blank -%}
+        <li class="zzen-bullets-{{ block.id }}__item">
+          {{ bullet_icon }}
+          <span class="zzen-bullets-{{ block.id }}__text">{{ item_text }}</span>
+        </li>
+      {%- endif -%}
+    {%- endfor -%}
+  </ul>
+</div>
