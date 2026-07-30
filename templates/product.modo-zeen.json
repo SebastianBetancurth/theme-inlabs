@@ -27,6 +27,42 @@
     "main": {
       "type": "main-product",
       "blocks": {
+        "zzen_badge_kzmNtJ": {
+          "type": "zzen_badge",
+          "settings": {
+            "hoist_mobile": true,
+            "text": "Bestseller",
+            "link": "",
+            "icon_style": "check_circle",
+            "gap_icon_text": 7,
+            "mobile_layout": "inline",
+            "show_desktop": true,
+            "show_mobile": true,
+            "bg_color": "#ffffff",
+            "border_color": "#111111",
+            "text_color": "#111111",
+            "icon_color": "#111111",
+            "border_width": 1,
+            "border_radius": 30,
+            "use_theme_font": true,
+            "custom_font_stack": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+            "text_weight": "400",
+            "letter_spacing": 0,
+            "uppercase": false,
+            "text_size_desktop": 15,
+            "icon_size_desktop": 17,
+            "padding_x_desktop": 16,
+            "padding_y_desktop": 9,
+            "align_desktop": "flex-start",
+            "margin_bottom_desktop": 16,
+            "text_size_mobile": 12,
+            "icon_size_mobile": 13,
+            "padding_x_mobile": 11,
+            "padding_y_mobile": 6,
+            "align_mobile": "flex-start",
+            "margin_bottom_mobile": 10
+          }
+        },
         "zzen_rating_Wf3NeA": {
           "type": "zzen_rating",
           "settings": {
@@ -101,6 +137,7 @@
         }
       },
       "block_order": [
+        "zzen_badge_kzmNtJ",
         "zzen_rating_Wf3NeA",
         "vendor",
         "title",
