@@ -1,0 +1,457 @@
+{% comment %}
+  ============================================================
+  BLOQUE: zzen_cta — Botón "Añadir al carrito" con precio integrado
+  Parámetros: block, product, section
+  Requiere: assets/zzen-cta.js
+
+  NOTAS TÉCNICAS
+  --------------
+  1. Este bloque renderiza su propio <product-form>. NO uses a la vez el
+     bloque nativo "buy_buttons": duplicaría el id del formulario y el id
+     ProductSubmitButton-<section>, y product-info.js leería el equivocado.
+
+  2. El id del formulario es 'product-form-' + section.id, el mismo que
+     calcula main-product.liquid. Así el selector de cantidad
+     (input form="...") sigue apuntando a este formulario.
+
+  3. El id del botón es ProductSubmitButton-<section.id> porque
+     product-info.js lee ese id del HTML recién traído para decidir si
+     el botón queda deshabilitado.
+
+  4. Dawn sobrescribe el texto del primer <span> del botón en cada cambio
+     de variante (toggleSubmitButton). Por eso el contenido va marcado con
+     data-zzen-cta-content y zzen-cta.js lo restaura desde el HTML del
+     evento variantChange, que se publica justo después.
+  ============================================================
+{% endcomment %}
+
+{%- liquid
+  assign b = block.settings
+  assign variant = product.selected_or_first_available_variant
+  assign product_form_id = 'product-form-' | append: section.id
+  assign cta_id = 'ZzenCta-' | append: block.id
+
+  # ---- Estado del botón (misma lógica que buy-buttons.liquid) ----
+  assign check_against_inventory = true
+  if variant.inventory_management != 'shopify' or variant.inventory_policy == 'continue'
+    assign check_against_inventory = false
+  endif
+
+  assign quantity_rule_soldout = false
+  if variant.quantity_rule.min > variant.inventory_quantity and check_against_inventory
+    assign quantity_rule_soldout = true
+  endif
+
+  assign is_unavailable = false
+  assign is_soldout = false
+  if variant == null
+    assign is_unavailable = true
+  elsif variant.available == false or quantity_rule_soldout
+    assign is_soldout = true
+  endif
+
+  assign is_disabled = false
+  if is_unavailable or is_soldout
+    assign is_disabled = true
+  endif
+
+  # ---- Etiqueta según estado ----
+  if is_unavailable
+    assign cta_label = b.label_unavailable
+  elsif is_soldout
+    assign cta_label = b.label_soldout
+  else
+    assign cta_label = b.label_text
+  endif
+
+  # ---- Precios ----
+  assign show_prices = false
+  if b.show_price and variant != null and is_disabled == false
+    assign show_prices = true
+  endif
+
+  if settings.currency_code_enabled
+    assign money_price = variant.price | money_with_currency
+    assign money_compare = variant.compare_at_price | money_with_currency
+  else
+    assign money_price = variant.price | money
+    assign money_compare = variant.compare_at_price | money
+  endif
+
+  assign show_compare = false
+  if b.show_compare_price and variant.compare_at_price > variant.price
+    assign show_compare = true
+  endif
+
+  # ---- Fuente ----
+  case b.font_family
+    when 'heading'
+      assign font_stack = 'var(--font-heading-family)'
+    when 'custom'
+      assign font_stack = b.custom_font_stack
+    else
+      assign font_stack = 'var(--font-body-family)'
+  endcase
+
+  # ---- Ancho del botón ----
+  if b.width_mobile == 'auto'
+    assign btn_flex_mobile = '0 1 auto'
+  else
+    assign btn_flex_mobile = '1 1 100%'
+  endif
+
+  if b.width_desktop == 'auto'
+    assign btn_flex_desktop = '0 1 auto'
+  else
+    assign btn_flex_desktop = '1 1 100%'
+  endif
+-%}
+
+{%- style -%}
+  /* ===================== MÓVIL (base) ===================== */
+  .zzen-cta-{{ block.id }} {
+    display: flex;
+    justify-content: {{ b.align_mobile }};
+    margin-top: {{ b.margin_top_mobile }}px;
+    margin-bottom: {{ b.margin_bottom_mobile }}px;
+    {% if b.show_mobile == false %}display: none;{% endif %}
+  }
+
+  .zzen-cta-{{ block.id }} .zzen-cta__form {
+    flex: {{ btn_flex_mobile }};
+    min-width: 0;
+    {% if b.max_width_mobile > 0 %}max-width: {{ b.max_width_mobile }}px;{% endif %}
+  }
+
+  .zzen-cta-{{ block.id }} .zzen-cta__btn {
+    display: flex;
+    align-items: center;
+    justify-content: {{ b.content_align_mobile }};
+    gap: {{ b.gap_label_price_mobile }}px;
+    width: 100%;
+    min-height: {{ b.height_mobile }}px;
+    padding: {{ b.padding_y_mobile }}px {{ b.padding_x_mobile }}px;
+    box-sizing: border-box;
+    position: relative;
+    background-color: {{ b.bg_color }};
+    color: {{ b.text_color }};
+    border: {{ b.border_width }}px solid {{ b.border_color }};
+    border-radius: {{ b.border_radius }}px;
+    font-family: {{ font_stack }};
+    letter-spacing: {{ b.letter_spacing }}px;
+    line-height: 1.1;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: none;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .zzen-cta-{{ block.id }} .zzen-cta__content {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: {{ b.gap_label_price_mobile }}px;
+    flex-wrap: {% if b.allow_wrap_mobile %}wrap{% else %}nowrap{% endif %};
+    min-width: 0;
+  }
+
+  .zzen-cta-{{ block.id }} .zzen-cta__label {
+    font-size: {{ b.label_size_mobile }}px;
+    font-weight: {{ b.label_weight }};
+    {% if b.uppercase %}text-transform: uppercase;{% endif %}
+  }
+
+  {%- if b.show_prefix and b.prefix_char != blank -%}
+    .zzen-cta-{{ block.id }} .zzen-cta__label::before {
+      content: {{ b.prefix_char | json }};
+      margin-right: {{ b.prefix_gap_mobile }}px;
+      font-weight: {{ b.prefix_weight }};
+    }
+    /* Sin prefijo cuando está agotado o no disponible */
+    .zzen-cta-{{ block.id }} .zzen-cta__btn:disabled .zzen-cta__label::before {
+      content: none;
+      margin-right: 0;
+    }
+  {%- endif -%}
+
+  .zzen-cta-{{ block.id }} .zzen-cta__prices {
+    display: inline-flex;
+    align-items: baseline;
+    gap: {{ b.gap_prices_mobile }}px;
+    white-space: nowrap;
+  }
+
+  .zzen-cta-{{ block.id }} .zzen-cta__price {
+    font-size: {{ b.price_size_mobile }}px;
+    font-weight: {{ b.price_weight }};
+    color: {{ b.price_color }};
+  }
+
+  .zzen-cta-{{ block.id }} .zzen-cta__compare {
+    font-size: {{ b.compare_size_mobile }}px;
+    font-weight: {{ b.compare_weight }};
+    color: {{ b.compare_color }};
+    text-decoration: line-through;
+    {% if b.compare_thickness > 0 %}text-decoration-thickness: {{ b.compare_thickness }}px;{% endif %}
+    opacity: {{ b.compare_opacity | divided_by: 100.0 }};
+  }
+
+  /* ---- Icono ---- */
+  .zzen-cta-{{ block.id }} .zzen-cta__icon {
+    display: block;
+    flex: 0 0 auto;
+    width: {{ b.icon_size_mobile }}px;
+    height: {{ b.icon_size_mobile }}px;
+    color: {{ b.icon_color }};
+  }
+
+  .zzen-cta-{{ block.id }} .zzen-cta__icon svg,
+  .zzen-cta-{{ block.id }} .zzen-cta__icon img {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .zzen-cta-{{ block.id }} .zzen-cta__icon img { object-fit: contain; }
+
+  /* ---- Hover ---- */
+  @media (hover: hover) {
+    .zzen-cta-{{ block.id }} .zzen-cta__btn:not(:disabled):hover {
+      background-color: {{ b.bg_color_hover }};
+      color: {{ b.text_color_hover }};
+      border-color: {{ b.border_color_hover }};
+    }
+    .zzen-cta-{{ block.id }} .zzen-cta__btn:not(:disabled):hover .zzen-cta__price {
+      color: {{ b.price_color_hover }};
+    }
+  }
+
+  /* ---- Foco visible (accesibilidad) ---- */
+  .zzen-cta-{{ block.id }} .zzen-cta__btn:focus-visible {
+    outline: 2px solid {{ b.border_color_hover }};
+    outline-offset: 3px;
+  }
+
+  /* ---- Deshabilitado ---- */
+  .zzen-cta-{{ block.id }} .zzen-cta__btn:disabled {
+    background-color: {{ b.bg_color_disabled }};
+    color: {{ b.text_color_disabled }};
+    border-color: {{ b.border_color_disabled }};
+    cursor: not-allowed;
+  }
+
+  .zzen-cta-{{ block.id }} .zzen-cta__btn:disabled .zzen-cta__prices { display: none; }
+
+  /* ---- Estado cargando (product-form.js añade .loading) ---- */
+  .zzen-cta-{{ block.id }} .zzen-cta__btn.loading .zzen-cta__content,
+  .zzen-cta-{{ block.id }} .zzen-cta__btn.loading .zzen-cta__icon {
+    visibility: hidden;
+  }
+
+  .zzen-cta-{{ block.id }} .zzen-cta__btn .loading__spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .zzen-cta-{{ block.id }} .zzen-cta__btn .loading__spinner.hidden { display: none; }
+
+  .zzen-cta-{{ block.id }} .zzen-cta__btn .spinner {
+    width: {{ b.spinner_size }}px;
+    height: {{ b.spinner_size }}px;
+  }
+
+  .zzen-cta-{{ block.id }} .zzen-cta__btn .path { stroke: {{ b.text_color }}; }
+
+  /* ---- Mensaje de error del formulario ---- */
+  .zzen-cta-{{ block.id }} .product-form__error-message-wrapper {
+    margin-bottom: 1rem;
+  }
+
+  /* ---- Botones de pago dinámico ---- */
+  .zzen-cta-{{ block.id }} .shopify-payment-button {
+    margin-top: {{ b.dynamic_gap_mobile }}px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .zzen-cta-{{ block.id }} .zzen-cta__btn { transition: none; }
+  }
+
+  /* ===================== ESCRITORIO ===================== */
+  @media screen and (min-width: 750px) {
+    .zzen-cta-{{ block.id }} {
+      justify-content: {{ b.align_desktop }};
+      margin-top: {{ b.margin_top_desktop }}px;
+      margin-bottom: {{ b.margin_bottom_desktop }}px;
+      {% if b.show_mobile == false and b.show_desktop %}display: flex;{% endif %}
+      {% if b.show_desktop == false %}display: none;{% endif %}
+    }
+
+    .zzen-cta-{{ block.id }} .zzen-cta__form {
+      flex: {{ btn_flex_desktop }};
+      {% if b.max_width_desktop > 0 %}
+        max-width: {{ b.max_width_desktop }}px;
+      {% else %}
+        max-width: none;
+      {% endif %}
+    }
+
+    .zzen-cta-{{ block.id }} .zzen-cta__btn {
+      justify-content: {{ b.content_align_desktop }};
+      gap: {{ b.gap_label_price_desktop }}px;
+      min-height: {{ b.height_desktop }}px;
+      padding: {{ b.padding_y_desktop }}px {{ b.padding_x_desktop }}px;
+    }
+
+    .zzen-cta-{{ block.id }} .zzen-cta__content {
+      gap: {{ b.gap_label_price_desktop }}px;
+      flex-wrap: {% if b.allow_wrap_desktop %}wrap{% else %}nowrap{% endif %};
+    }
+
+    .zzen-cta-{{ block.id }} .zzen-cta__label { font-size: {{ b.label_size_desktop }}px; }
+    .zzen-cta-{{ block.id }} .zzen-cta__prices { gap: {{ b.gap_prices_desktop }}px; }
+    .zzen-cta-{{ block.id }} .zzen-cta__price { font-size: {{ b.price_size_desktop }}px; }
+    .zzen-cta-{{ block.id }} .zzen-cta__compare { font-size: {{ b.compare_size_desktop }}px; }
+
+    .zzen-cta-{{ block.id }} .zzen-cta__icon {
+      width: {{ b.icon_size_desktop }}px;
+      height: {{ b.icon_size_desktop }}px;
+    }
+
+    .zzen-cta-{{ block.id }} .shopify-payment-button {
+      margin-top: {{ b.dynamic_gap_desktop }}px;
+    }
+
+    {%- if b.show_prefix and b.prefix_char != blank -%}
+      .zzen-cta-{{ block.id }} .zzen-cta__label::before {
+        margin-right: {{ b.prefix_gap_desktop }}px;
+      }
+    {%- endif -%}
+  }
+{%- endstyle -%}
+
+{%- comment -%} ---------- Icono ---------- {%- endcomment -%}
+{%- capture cta_icon -%}
+  {%- if b.icon_image != blank -%}
+    <span class="zzen-cta__icon">
+      {{ b.icon_image | image_url: width: 80 | image_tag: loading: 'eager', alt: '' }}
+    </span>
+  {%- elsif b.icon_style != 'none' -%}
+    <span class="zzen-cta__icon" aria-hidden="true">
+      {%- if b.icon_style == 'cart' -%}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" xmlns="http://www.w3.org/2000/svg" focusable="false">
+          <path d="M2.5 3h2.2l2.4 11.2h10.6l2.3-8.2H6.1" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="9" cy="19" r="1.6"/>
+          <circle cx="17" cy="19" r="1.6"/>
+        </svg>
+      {%- elsif b.icon_style == 'bag' -%}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" xmlns="http://www.w3.org/2000/svg" focusable="false">
+          <path d="M4.5 7.5h15l-1.2 13H5.7L4.5 7.5z" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8.8 7.5V5.8a3.2 3.2 0 0 1 6.4 0v1.7" stroke-linecap="round"/>
+        </svg>
+      {%- elsif b.icon_style == 'plus' -%}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" xmlns="http://www.w3.org/2000/svg" focusable="false">
+          <path d="M12 5v14M5 12h14" stroke-linecap="round"/>
+        </svg>
+      {%- elsif b.icon_style == 'arrow_right' -%}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" xmlns="http://www.w3.org/2000/svg" focusable="false">
+          <path d="M4 12h15m0 0-5.5-5.5M19 12l-5.5 5.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      {%- elsif b.icon_style == 'lock' -%}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" xmlns="http://www.w3.org/2000/svg" focusable="false">
+          <rect x="4.8" y="10.5" width="14.4" height="9.5" rx="2"/>
+          <path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7" stroke-linecap="round"/>
+        </svg>
+      {%- endif -%}
+    </span>
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- comment -%} ---------- Contenido interno del botón ---------- {%- endcomment -%}
+{%- capture cta_content -%}
+  {%- if b.icon_position == 'before' -%}{{ cta_icon }}{%- endif -%}
+  <span class="zzen-cta__label">{{ cta_label }}</span>
+  {%- if show_prices -%}
+    <span class="zzen-cta__prices">
+      <span class="zzen-cta__price">{{ money_price }}</span>
+      {%- if show_compare -%}
+        <s class="zzen-cta__compare">{{ money_compare }}</s>
+      {%- endif -%}
+    </span>
+  {%- endif -%}
+  {%- if b.icon_position == 'after' -%}{{ cta_icon }}{%- endif -%}
+{%- endcapture -%}
+
+<zzen-cta
+  id="{{ cta_id }}"
+  class="zzen-cta zzen-cta-{{ block.id }}"
+  data-block-id="{{ block.id }}"
+  {{ block.shopify_attributes }}
+>
+  {%- if product != blank -%}
+    <product-form
+      class="zzen-cta__form product-form"
+      data-section-id="{{ section.id }}"
+      data-hide-errors="false"
+    >
+      <div class="product-form__error-message-wrapper" role="alert" hidden>
+        <span class="svg-wrapper">
+          {{- 'icon-error.svg' | inline_asset_content -}}
+        </span>
+        <span class="product-form__error-message"></span>
+      </div>
+
+      {%- form 'product',
+        product,
+        id: product_form_id,
+        class: 'form zzen-cta__form-el',
+        novalidate: 'novalidate',
+        data-type: 'add-to-cart-form'
+      -%}
+        <input
+          type="hidden"
+          name="id"
+          value="{{ variant.id }}"
+          class="product-variant-id"
+          {% if is_disabled %}disabled{% endif %}
+        >
+
+        <button
+          id="ProductSubmitButton-{{ section.id }}"
+          type="submit"
+          name="add"
+          class="zzen-cta__btn"
+          {% if is_disabled %}disabled{% endif %}
+        >
+          {%- comment -%}
+            data-zzen-cta-content marca el nodo que zzen-cta.js restaura
+            después de que Dawn lo sobrescriba con toggleSubmitButton().
+          {%- endcomment -%}
+          <span class="zzen-cta__content" data-zzen-cta-content>
+            {{ cta_content }}
+          </span>
+          {%- render 'loading-spinner' -%}
+        </button>
+
+        {%- if b.show_dynamic_checkout -%}
+          {{ form | payment_button }}
+        {%- endif -%}
+      {%- endform -%}
+    </product-form>
+  {%- else -%}
+    <div class="zzen-cta__form">
+      <button type="button" class="zzen-cta__btn" disabled>
+        <span class="zzen-cta__content" data-zzen-cta-content>
+          <span class="zzen-cta__label">{{ b.label_soldout }}</span>
+        </span>
+      </button>
+    </div>
+  {%- endif -%}
+</zzen-cta>
+
