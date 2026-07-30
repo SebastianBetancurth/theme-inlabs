@@ -1956,6 +1956,376 @@
       ]
     },
     {
+      "type": "zzen_bullets",
+      "name": "↗ Bullets beneficios",
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "hoist_mobile",
+          "label": "Mostrar arriba de la galería en móvil",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "Textos (deja vacío para ocultar)"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "text_1",
+          "label": "Bullet 1",
+          "default": "Activa tu mente, calma tu cuerpo y rinde mejor"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "text_2",
+          "label": "Bullet 2",
+          "default": "Desbloquea concentración y energía"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "text_3",
+          "label": "Bullet 3",
+          "default": "Gestiona el estrés y recupera el equilibrio"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "text_4",
+          "label": "Bullet 4",
+          "default": "Optimiza tu descanso y despierta al 100%"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "text_5",
+          "label": "Bullet 5"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "text_6",
+          "label": "Bullet 6"
+        },
+        {
+          "type": "header",
+          "content": "Icono"
+        },
+        {
+          "type": "select",
+          "id": "icon_style",
+          "label": "Icono",
+          "options": [
+            { "value": "arrow_up_right", "label": "Flecha diagonal ↗" },
+            { "value": "arrow_right", "label": "Flecha derecha →" },
+            { "value": "check", "label": "Check" },
+            { "value": "check_circle", "label": "Check en círculo" },
+            { "value": "plus", "label": "Más +" },
+            { "value": "star", "label": "Estrella" },
+            { "value": "dot", "label": "Punto" },
+            { "value": "none", "label": "Sin icono" }
+          ],
+          "default": "arrow_up_right"
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_image",
+          "label": "Icono propio (SVG/PNG)",
+          "info": "Sustituye al icono integrado."
+        },
+        {
+          "type": "color",
+          "id": "icon_color",
+          "label": "Color del icono",
+          "default": "#111111"
+        },
+        {
+          "type": "range",
+          "id": "icon_stroke",
+          "label": "Grosor del trazo",
+          "min": 1,
+          "max": 3,
+          "step": 0.1,
+          "default": 1.5
+        },
+        {
+          "type": "range",
+          "id": "icon_gap",
+          "label": "Separación icono ↔ texto",
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "px",
+          "default": 10
+        },
+        {
+          "type": "header",
+          "content": "Visibilidad"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_desktop",
+          "label": "Mostrar en escritorio",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_mobile",
+          "label": "Mostrar en móvil",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "Tipografía"
+        },
+        {
+          "type": "select",
+          "id": "text_font",
+          "label": "Fuente",
+          "options": [
+            { "value": "body", "label": "Fuente de texto del tema" },
+            { "value": "heading", "label": "Fuente de títulos del tema" },
+            { "value": "custom", "label": "Personalizada" }
+          ],
+          "default": "body"
+        },
+        {
+          "type": "text",
+          "id": "text_font_stack",
+          "label": "Stack CSS personalizado",
+          "default": "'Helvetica Neue', Helvetica, Arial, sans-serif"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Color del texto",
+          "default": "#222222"
+        },
+        {
+          "type": "select",
+          "id": "text_weight",
+          "label": "Grosor",
+          "options": [
+            { "value": "300", "label": "Light" },
+            { "value": "400", "label": "Normal" },
+            { "value": "500", "label": "Medio" },
+            { "value": "600", "label": "Semi-negrita" },
+            { "value": "700", "label": "Negrita" }
+          ],
+          "default": "400"
+        },
+        {
+          "type": "range",
+          "id": "text_line_height",
+          "label": "Altura de línea",
+          "min": 0.8,
+          "max": 2,
+          "step": 0.1,
+          "default": 1.5
+        },
+        {
+          "type": "range",
+          "id": "text_letter_spacing",
+          "label": "Espaciado entre letras",
+          "min": -2,
+          "max": 8,
+          "step": 0.1,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "checkbox",
+          "id": "text_uppercase",
+          "label": "Mayúsculas",
+          "default": false
+        },
+        {
+          "type": "header",
+          "content": "Escritorio"
+        },
+        {
+          "type": "range",
+          "id": "columns_desktop",
+          "label": "Columnas",
+          "min": 1,
+          "max": 3,
+          "step": 1,
+          "default": 2
+        },
+        {
+          "type": "range",
+          "id": "text_size_desktop",
+          "label": "Tamaño texto",
+          "min": 10,
+          "max": 32,
+          "step": 1,
+          "unit": "px",
+          "default": 16
+        },
+        {
+          "type": "range",
+          "id": "icon_size_desktop",
+          "label": "Tamaño icono",
+          "min": 8,
+          "max": 34,
+          "step": 1,
+          "unit": "px",
+          "default": 17
+        },
+        {
+          "type": "range",
+          "id": "icon_offset_desktop",
+          "label": "Ajuste vertical del icono",
+          "min": -10,
+          "max": 16,
+          "step": 1,
+          "unit": "px",
+          "default": 3
+        },
+        {
+          "type": "range",
+          "id": "row_gap_desktop",
+          "label": "Separación entre filas",
+          "min": 0,
+          "max": 50,
+          "step": 1,
+          "unit": "px",
+          "default": 16
+        },
+        {
+          "type": "range",
+          "id": "column_gap_desktop",
+          "label": "Separación entre columnas",
+          "min": 0,
+          "max": 70,
+          "step": 1,
+          "unit": "px",
+          "default": 24
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom_desktop",
+          "label": "Espacio inferior",
+          "min": 0,
+          "max": 80,
+          "step": 2,
+          "unit": "px",
+          "default": 24
+        },
+        {
+          "type": "header",
+          "content": "Móvil"
+        },
+       {
+          "type": "range",
+          "id": "columns_mobile",
+          "label": "Columnas",
+          "min": 1,
+          "max": 3,
+          "step": 1,
+          "default": 1
+        },
+        {
+          "type": "range",
+          "id": "text_size_mobile",
+          "label": "Tamaño texto",
+          "min": 9,
+          "max": 26,
+          "step": 1,
+          "unit": "px",
+          "default": 14
+        },
+        {
+          "type": "range",
+          "id": "icon_size_mobile",
+          "label": "Tamaño icono",
+          "min": 8,
+          "max": 28,
+          "step": 1,
+          "unit": "px",
+          "default": 15
+        },
+        {
+          "type": "range",
+          "id": "icon_offset_mobile",
+          "label": "Ajuste vertical del icono",
+          "min": -10,
+          "max": 16,
+          "step": 1,
+          "unit": "px",
+          "default": 2
+        },
+        {
+          "type": "range",
+          "id": "row_gap_mobile",
+          "label": "Separación entre filas",
+          "min": 0,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "default": 10
+        },
+        {
+          "type": "range",
+          "id": "column_gap_mobile",
+          "label": "Separación entre columnas",
+          "min": 0,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "default": 14
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom_mobile",
+          "label": "Espacio inferior",
+          "min": 0,
+          "max": 60,
+          "step": 2,
+          "unit": "px",
+          "default": 18
+        },
+        {
+          "type": "header",
+          "content": "Layout en el hero"
+        },
+        {
+          "type": "select",
+          "id": "layout_mobile",
+          "label": "Ancho en móvil",
+          "options": [
+            { "value": "full", "label": "Línea propia" },
+            { "value": "auto", "label": "Compartir línea" }
+          ],
+          "default": "full"
+        },
+        {
+          "type": "range",
+          "id": "order_mobile",
+          "label": "Orden en móvil",
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "default": 4
+        },
+        {
+          "type": "select",
+          "id": "layout_desktop",
+          "label": "Ancho en escritorio",
+          "options": [
+            { "value": "full", "label": "Línea propia" },
+            { "value": "auto", "label": "Compartir línea" }
+          ],
+          "default": "full"
+        },
+        {
+          "type": "range",
+          "id": "order_desktop",
+          "label": "Orden en escritorio",
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "default": 4
+        }
+      ]
+    },
+    {
       "type": "text",
       "name": "t:sections.main-product.blocks.text.name",
       "settings": [
