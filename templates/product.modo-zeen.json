@@ -65,6 +65,8 @@
             "icon_style": "check_circle",
             "gap_icon_text": 4,
             "mobile_layout": "inline",
+            "align_self_mobile": "flex-start",
+            "offset_top_mobile": 4,
             "show_desktop": true,
             "show_mobile": true,
             "bg_color": "#ffffff",
@@ -92,15 +94,9 @@
             "margin_bottom_mobile": 10
           }
         },
-        "vendor": {
-          "type": "text",
-          "settings": {
-            "text": "{{ product.vendor }}",
-            "text_style": "uppercase"
-          }
-        },
         "title": {
           "type": "title",
+          "disabled": true,
           "settings": {}
         },
         "price": {
@@ -139,7 +135,6 @@
       "block_order": [
         "zzen_rating_Wf3NeA",
         "zzen_badge_kzmNtJ",
-        "vendor",
         "title",
         "price",
         "variant_picker",
