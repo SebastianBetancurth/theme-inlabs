@@ -85,6 +85,10 @@
     "disclosures": {
       "type": "disclosures",
       "settings": {
+        "heading": "Divulgaciones",
+        "heading_size": "h2",
+        "open_by_default": false,
+        "color_scheme": "",
         "padding_top": 36,
         "padding_bottom": 0
       }
@@ -106,9 +110,25 @@
         "padding_top": 36,
         "padding_bottom": 28
       }
+    },
+    "product_announcement_bar_Nd8zcC": {
+      "type": "product-announcement-bar",
+      "name": "Banner producto",
+      "settings": {
+        "text": "Recomendamos tomarlo durante 3 meses para resultados óptimos",
+        "link": "",
+        "bg_color": "#DFF2E4",
+        "text_color": "#111111",
+        "text_size": 13,
+        "text_size_mobile": 12,
+        "text_weight": "400",
+        "padding_vertical": 8,
+        "padding_vertical_mobile": 7
+      }
     }
   },
   "order": [
+    "product_announcement_bar_Nd8zcC",
     "main",
     "disclosures",
     "related-products"
