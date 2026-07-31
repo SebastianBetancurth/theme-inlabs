@@ -52,17 +52,6 @@
     assign max_w = s.content_max_width | append: 'px'
   endif
 
-  if s.aspect_d == 'natural'
-    assign ar_d = 'auto'
-  else
-    assign ar_d = s.aspect_d
-  endif
-
-  if s.aspect_m == 'natural'
-    assign ar_m = 'auto'
-  else
-    assign ar_m = s.aspect_m
-  endif
 -%}
 
 {%- style -%}
@@ -92,7 +81,7 @@
     --cslx-gap: {{ s.gap_d }}px;
     --cslx-align: {{ s.vertical_align_d }};
     --cslx-media-w: {{ s.media_width_d }}%;
-    --cslx-ar: {{ ar_d }};
+    --cslx-focus: {{ s.image_focus }};
     --cslx-radius: {{ s.image_radius }}px;
     --cslx-dur: {{ s.fade_duration }}ms;
     --cslx-out: {{ s.fade_out_duration }}ms;
@@ -212,20 +201,36 @@
     min-width: 0;
   }
 
-  .cslx__img,
-  .cslx__placeholder {
-    display: block;
+  /* La proporción se aplica al MARCO (un div normal), no al <img>.
+     En un elemento reemplazado dentro de <picture> con atributos width/height,
+     la proporción natural del archivo puede ganar y la imagen sale alargada. */
+  .cslx__frame {
+    position: relative;
     width: 100%;
-    aspect-ratio: var(--cslx-ar);
-    object-fit: cover;
+    overflow: hidden;
     border-radius: var(--cslx-radius);
   }
 
+  .cslx__frame > picture {
+    display: block;
+  }
+
+  .cslx__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    object-position: var(--cslx-focus);
+  }
+
   .cslx__placeholder {
+    display: block;
     background: rgba(127, 127, 127, 0.1);
+    aspect-ratio: 1 / 1;
   }
 
   .cslx__placeholder svg {
+    display: block;
     width: 100%;
     height: 100%;
     opacity: 0.35;
@@ -473,6 +478,22 @@
     .cslx--nav-d-stepper .cslx__steps { display: grid; }
     .cslx--nav-d-dots .cslx__dots { display: flex; }
     .cslx--arrows-d .cslx__arrows { display: flex; }
+
+    {%- if s.aspect_d != 'natural' -%}
+      .cslx-{{ section.id }} .cslx__frame {
+        aspect-ratio: {{ s.aspect_d }};
+      }
+      .cslx-{{ section.id }} .cslx__frame > picture,
+      .cslx-{{ section.id }} .cslx__placeholder {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .cslx-{{ section.id }} .cslx__img {
+        height: 100%;
+      }
+    {%- endif -%}
   }
 
   /* ================= Móvil ================= */
@@ -484,7 +505,6 @@
       --cslx-pl: {{ s.padding_left_m }}px;
       --cslx-pr: {{ s.padding_right_m }}px;
       --cslx-gap: {{ s.gap_m }}px;
-      --cslx-ar: {{ ar_m }};
 
       --cslx-h-size: {{ s.heading_size_m }}px;
       --cslx-h-lh: {{ s.heading_line_height_m }};
@@ -523,6 +543,22 @@
     .cslx--nav-m-stepper .cslx__steps { display: grid; }
     .cslx--nav-m-dots .cslx__dots { display: flex; }
     .cslx--arrows-m .cslx__arrows { display: flex; }
+
+    {%- if s.aspect_m != 'natural' -%}
+      .cslx-{{ section.id }} .cslx__frame {
+        aspect-ratio: {{ s.aspect_m }};
+      }
+      .cslx-{{ section.id }} .cslx__frame > picture,
+      .cslx-{{ section.id }} .cslx__placeholder {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .cslx-{{ section.id }} .cslx__img {
+        height: 100%;
+      }
+    {%- endif -%}
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -566,6 +602,7 @@
         >
           <div class="cslx__slide-inner">
             <div class="cslx__media">
+              <div class="cslx__frame">
               {%- if img_d != blank -%}
                 <picture>
                   {%- if has_m -%}
@@ -603,6 +640,7 @@
               {%- else -%}
                 <div class="cslx__placeholder">{{ 'image' | placeholder_svg_tag }}</div>
               {%- endif -%}
+              </div>
             </div>
 
             <div class="cslx__content">
@@ -1120,6 +1158,20 @@
         { "value": "natural", "label": "Original" }
       ],
       "default": "1/1"
+    },
+    {
+      "type": "select",
+      "id": "image_focus",
+      "label": "Punto focal del recorte",
+      "info": "Qué parte de la foto se conserva al recortarla a la proporción elegida.",
+      "options": [
+        { "value": "center", "label": "Centro" },
+        { "value": "top", "label": "Arriba" },
+        { "value": "bottom", "label": "Abajo" },
+        { "value": "left", "label": "Izquierda" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
     },
     {
       "type": "range",
