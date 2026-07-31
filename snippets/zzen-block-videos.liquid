@@ -87,7 +87,20 @@
       assign snap_css = 'x mandatory'
   endcase
 
-  assign overlay_alpha = b.overlay_opacity | divided_by: 100.0
+  # times: 0.01 en lugar de divided_by: 100 — divided_by redondea a
+  # entero cuando el divisor se interpreta como entero, y 75/100 daría
+  # 0: overlay invisible. times con float nunca redondea.
+  assign overlay_alpha = b.overlay_opacity | times: 0.01
+
+  # La oscuridad va HORNEADA en el color, no en la propiedad opacity.
+  # Así la propiedad opacity queda libre para la animación y no puede
+  # quedarse pegada a 0 por una animación anterior.
+  assign overlay_rgba = b.overlay_color | color_modify: 'alpha', overlay_alpha
+  if overlay_rgba == blank
+    assign overlay_rgba = b.overlay_color
+  endif
+
+  assign hover_scale = b.card_hover_zoom | times: 0.01
 -%}
 
 {%- if playable > 0 -%}
@@ -165,7 +178,7 @@
 
     @media (hover: hover) {
       .zzen-vid-{{ block.id }}__card:hover img {
-        transform: scale({{ b.card_hover_zoom | divided_by: 100.0 }});
+        transform: scale({{ hover_scale }});
       }
     }
 
@@ -303,8 +316,7 @@
       position: fixed;
       inset: 0;
       z-index: 0;
-      background-color: {{ b.overlay_color }};
-      opacity: {{ overlay_alpha }};
+      background-color: {{ overlay_rgba }};
       cursor: pointer;
       {% if b.overlay_blur > 0 %}
         backdrop-filter: blur({{ b.overlay_blur }}px);
@@ -518,7 +530,6 @@
     data-autoplay="{{ b.autoplay }}"
     data-start-muted="{{ b.start_muted }}"
     data-loop="{{ b.loop }}"
-    data-overlay-opacity="{{ overlay_alpha }}"
     {{ block.shopify_attributes }}
   >
     {%- if b.heading != blank -%}
@@ -700,8 +711,6 @@
             this.autoplay = this.dataset.autoplay === 'true';
             this.startMuted = this.dataset.startMuted !== 'false';
             this.loop = this.dataset.loop === 'true';
-            this.overlayOpacity = parseFloat(this.dataset.overlayOpacity);
-            if (isNaN(this.overlayOpacity)) this.overlayOpacity = 0.75;
 
             this.wrap = this.querySelector('[data-wrap]');
             this.track = this.querySelector('[data-track]');
@@ -817,6 +826,13 @@
 
             this.soundBtn?.addEventListener('click', () => this.toggleSound());
 
+            // Única fuente de verdad para el icono: el estado real del
+            // vídeo. Da igual quién cambie el mute (nosotros, el
+            // fallback de autoplay o los controles nativos).
+            this.video?.addEventListener('volumechange', () => {
+              this.soundBtn?.classList.toggle('is-muted', this.video.muted);
+            });
+
             this.video?.addEventListener('ended', () => {
               if (!this.loop && this.index < this.slides.length - 1) {
                 this.goTo(this.index + 1);
@@ -889,8 +905,12 @@
             this.video.poster = slide.dataset.poster || '';
             this.video.loop = this.loop;
             this.video.muted = muted;
+
+            // Asignar src ya dispara la carga por sí solo. Llamar
+            // además a load() era redundante y provocaba que play()
+            // rechazara con AbortError, perdiendo el gesto del usuario
+            // que es justo lo que permite arrancar CON sonido.
             this.video.src = url;
-            this.video.load();
 
             this.soundBtn?.classList.toggle('is-muted', this.video.muted);
 
@@ -900,23 +920,38 @@
           tryPlay() {
             const video = this.video;
 
-            // play() justo después de load() puede rechazar con
-            // AbortError. Lo intentamos ya y lo reintentamos cuando el
-            // navegador avisa de que tiene datos suficientes.
+            // Intento con el estado de sonido pedido. Si el navegador
+            // lo rechaza teniendo audio, es la política de autoplay:
+            // repliegue a silenciado, que sí permiten siempre. Mejor
+            // sonando en silencio que un vídeo parado.
             const attempt = () => {
               const promise = video.play();
-              if (promise && promise.catch) promise.catch(() => {});
+              if (!promise || !promise.catch) return;
+
+              promise.catch(() => {
+                if (video.muted) return;
+                video.muted = true;
+                video.play().catch(() => {});
+              });
             };
 
             attempt();
-            video.addEventListener('canplay', attempt, { once: true });
 
-            // Red de seguridad: si el navegador bloquea el autoplay,
-            // sacamos los controles nativos en lugar de dejar un vídeo
-            // parado sin forma de arrancarlo.
+            // Reintento cuando el navegador ya tiene datos, por si el
+            // primero llegó demasiado pronto.
+            video.addEventListener(
+              'canplay',
+              () => {
+                if (video.paused) attempt();
+              },
+              { once: true }
+            );
+
+            // Red de seguridad: si sigue parado, sacamos los controles
+            // nativos en vez de dejar un vídeo muerto.
             this.playTimer = setTimeout(() => {
               if (video.paused) video.controls = true;
-            }, 1200);
+            }, 1500);
           }
 
           unload() {
@@ -933,7 +968,7 @@
             if (!this.video) return;
             this.video.muted = !this.video.muted;
             if (!this.video.muted && this.video.paused) this.video.play().catch(() => {});
-            this.soundBtn?.classList.toggle('is-muted', this.video.muted);
+            // El icono lo actualiza el listener de volumechange.
           }
 
           /* ---- Animación ---- */
@@ -947,8 +982,12 @@
             this.overlayAnim?.cancel();
             this.stageAnim?.cancel();
 
+            // La oscuridad vive en el color de fondo, así que aquí
+            // animamos de 0 a 1 sin depender de ningún valor calculado.
+            if (this.overlay) this.overlay.style.opacity = '';
+
             this.overlayAnim = this.overlay?.animate(
-              { opacity: [0, this.overlayOpacity] },
+              { opacity: [0, 1] },
               { duration, easing: this.easing }
             );
 
@@ -968,7 +1007,7 @@
             this.stageAnim?.cancel();
 
             this.overlayAnim = this.overlay?.animate(
-              { opacity: [this.overlayOpacity, 0] },
+              { opacity: [1, 0] },
               { duration, easing: this.easing, fill: 'forwards' }
             );
 
