@@ -322,7 +322,8 @@
           "type": "zzen_payments",
           "settings": {
             "source": "auto",
-            "append_extras": false,
+            "append_extras": true,
+            "icon_1": "shopify://shop_images/huffpost-logo-vector-11573934718i8xq2jrytm.png",
             "show_desktop": true,
             "show_mobile": true,
             "opacity": 100,
