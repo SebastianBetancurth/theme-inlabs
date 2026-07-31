@@ -1,0 +1,752 @@
+{% comment %}
+  ============================================================
+  BLOQUE: zzen_accordion — Desplegables (acordeón)
+  Parámetros: block, product, section
+  Requiere: assets/zzen-accordion.js
+
+  Un solo bloque contiene hasta 8 filas para que la tipografía y los
+  bordes se configuren una vez, no siete veces. Las filas sin título
+  se saltan, así que puedes dejar huecos vacíos sin que salgan líneas
+  fantasma.
+
+  Si necesitas más de 8 filas, añade un segundo bloque y desactiva en
+  él "Línea encima de la primera fila" para que la unión no doble el
+  grosor del borde.
+
+  Cada fila usa <details>/<summary> nativos: accesible por teclado,
+  anunciado correctamente por lectores de pantalla y localizable con
+  Ctrl+F en Chrome. La animación se sobrepone sin romper esa semántica.
+  ============================================================
+{% endcomment %}
+
+{%- liquid
+  assign b = block.settings
+
+  assign row_indexes = '1,2,3,4,5,6,7,8' | split: ','
+
+  # Contamos filas con título para saber cuál es la primera y la última
+  assign total_rows = 0
+  for i in row_indexes
+    assign title_key = 'row_' | append: i | append: '_title'
+    if b[title_key] != blank
+      assign total_rows = total_rows | plus: 1
+    endif
+  endfor
+
+  case b.title_font
+    when 'heading'
+      assign title_stack = 'var(--font-heading-family)'
+    when 'custom'
+      assign title_stack = b.title_font_stack
+    else
+      assign title_stack = 'var(--font-body-family)'
+  endcase
+
+  case b.content_font
+    when 'heading'
+      assign content_stack = 'var(--font-heading-family)'
+    when 'custom'
+      assign content_stack = b.content_font_stack
+    else
+      assign content_stack = 'var(--font-body-family)'
+  endcase
+
+  case b.easing
+    when 'linear'
+      assign easing_css = 'linear'
+    when 'ease_out'
+      assign easing_css = 'cubic-bezier(0.22, 1, 0.36, 1)'
+    when 'ease_in_out'
+      assign easing_css = 'cubic-bezier(0.65, 0, 0.35, 1)'
+    when 'spring'
+      assign easing_css = 'cubic-bezier(0.34, 1.4, 0.64, 1)'
+    else
+      assign easing_css = 'cubic-bezier(0.4, 0, 0.2, 1)'
+  endcase
+
+  assign has_left_icon = false
+  if b.left_icon_image != blank or b.left_icon_style != 'none'
+    assign has_left_icon = true
+  endif
+-%}
+
+{%- if total_rows > 0 -%}
+
+  {%- style -%}
+    /* ===================== MÓVIL (base) ===================== */
+    .zzen-acc-{{ block.id }} {
+      margin-top: {{ b.margin_top_mobile }}px;
+      margin-bottom: {{ b.margin_bottom_mobile }}px;
+      {% if b.show_mobile == false %}display: none;{% endif %}
+    }
+
+    .zzen-acc-{{ block.id }}__item {
+      border-bottom: {{ b.border_width }}px solid {{ b.border_color }};
+    }
+
+    .zzen-acc-{{ block.id }}__item:first-child {
+      {% if b.border_top_first %}
+        border-top: {{ b.border_width }}px solid {{ b.border_color }};
+      {% endif %}
+    }
+
+    {%- if b.border_bottom_last == false -%}
+      .zzen-acc-{{ block.id }}__item:last-child { border-bottom: 0; }
+    {%- endif -%}
+
+    /* ---- Cabecera clicable ---- */
+    .zzen-acc-{{ block.id }}__summary {
+      display: flex;
+      align-items: center;
+      gap: {{ b.left_icon_gap_mobile }}px;
+      padding: {{ b.row_padding_y_mobile }}px 0;
+      cursor: pointer;
+      list-style: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .zzen-acc-{{ block.id }}__summary::-webkit-details-marker { display: none; }
+    .zzen-acc-{{ block.id }}__summary::marker { content: ''; }
+
+    .zzen-acc-{{ block.id }}__summary:focus { outline: none; }
+    .zzen-acc-{{ block.id }}__summary:focus-visible {
+      outline: 2px solid {{ b.title_color }};
+      outline-offset: 2px;
+    }
+
+    /* ---- Título ---- */
+    .zzen-acc-{{ block.id }}__title {
+      flex: 1 1 auto;
+      min-width: 0;
+      margin: 0;
+      font-family: {{ title_stack }};
+      font-size: {{ b.title_size_mobile }}px;
+      font-weight: {{ b.title_weight }};
+      color: {{ b.title_color }};
+      line-height: {{ b.title_line_height }};
+      letter-spacing: {{ b.title_letter_spacing }}px;
+      text-align: left;
+      {% if b.title_uppercase %}text-transform: uppercase;{% endif %}
+      transition: color 0.2s ease;
+    }
+
+    .zzen-acc-{{ block.id }}__item[open] > .zzen-acc-{{ block.id }}__summary .zzen-acc-{{ block.id }}__title {
+      color: {{ b.title_color_open }};
+    }
+
+    @media (hover: hover) {
+      .zzen-acc-{{ block.id }}__summary:hover .zzen-acc-{{ block.id }}__title {
+        color: {{ b.title_color_hover }};
+      }
+    }
+
+    /* ---- Icono izquierdo ---- */
+    .zzen-acc-{{ block.id }}__lead {
+      display: block;
+      flex: 0 0 auto;
+      width: {{ b.left_icon_size_mobile }}px;
+      height: {{ b.left_icon_size_mobile }}px;
+      color: {{ b.left_icon_color }};
+      transform: translateY({{ b.left_icon_offset_mobile }}px);
+    }
+
+    .zzen-acc-{{ block.id }}__lead svg,
+    .zzen-acc-{{ block.id }}__lead img {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .zzen-acc-{{ block.id }}__lead img { object-fit: contain; }
+
+    /* ---- Icono derecho (indicador) ---- */
+    .zzen-acc-{{ block.id }}__caret {
+      display: block;
+      flex: 0 0 auto;
+      width: {{ b.caret_size_mobile }}px;
+      height: {{ b.caret_size_mobile }}px;
+      margin-left: {{ b.caret_gap_mobile }}px;
+      color: {{ b.caret_color }};
+      transition: transform {{ b.duration }}ms {{ easing_css }}, color 0.2s ease;
+      transform-origin: 50% 50%;
+    }
+
+    .zzen-acc-{{ block.id }}__caret svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: visible;
+    }
+
+    /* Abierto: gira. Cerrándose: vuelve ya, sin esperar a que
+       termine la animación de altura. */
+    .zzen-acc-{{ block.id }}__item[open] > .zzen-acc-{{ block.id }}__summary .zzen-acc-{{ block.id }}__caret {
+      transform: rotate({{ b.caret_rotation }}deg);
+      color: {{ b.caret_color_open }};
+    }
+
+    .zzen-acc-{{ block.id }}__item.is-closing > .zzen-acc-{{ block.id }}__summary .zzen-acc-{{ block.id }}__caret {
+      transform: rotate(0deg);
+      color: {{ b.caret_color }};
+    }
+
+    /* ---- Panel de contenido ---- */
+    .zzen-acc-{{ block.id }}__panel {
+      overflow: hidden;
+      will-change: height;
+    }
+
+    .zzen-acc-{{ block.id }}__inner {
+      font-family: {{ content_stack }};
+      font-size: {{ b.content_size_mobile }}px;
+      font-weight: {{ b.content_weight }};
+      color: {{ b.content_color }};
+      line-height: {{ b.content_line_height }};
+      letter-spacing: {{ b.content_letter_spacing }}px;
+      padding-bottom: {{ b.content_padding_bottom_mobile }}px;
+      padding-left: {{ b.content_indent_mobile }}px;
+      padding-right: {{ b.content_padding_right_mobile }}px;
+    }
+
+    .zzen-acc-{{ block.id }}__inner > * { margin-top: 0; }
+    .zzen-acc-{{ block.id }}__inner > *:last-child { margin-bottom: 0; }
+
+    .zzen-acc-{{ block.id }}__inner a {
+      color: inherit;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .zzen-acc-{{ block.id }}__inner img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .zzen-acc-{{ block.id }}__inner ul,
+    .zzen-acc-{{ block.id }}__inner ol {
+      padding-left: 1.2em;
+      margin-top: 0.5em;
+    }
+
+    .zzen-acc-{{ block.id }}__inner li + li { margin-top: 0.35em; }
+
+    /* Sin JS (o antes de que cargue) el acordeón sigue funcionando:
+       details nativo abre y cierra, solo sin animación. */
+    @media (prefers-reduced-motion: reduce) {
+      .zzen-acc-{{ block.id }}__caret { transition: none; }
+    }
+
+    /* ===================== ESCRITORIO ===================== */
+    @media screen and (min-width: 750px) {
+      .zzen-acc-{{ block.id }} {
+        margin-top: {{ b.margin_top_desktop }}px;
+        margin-bottom: {{ b.margin_bottom_desktop }}px;
+        {% if b.show_mobile == false and b.show_desktop %}display: block;{% endif %}
+        {% if b.show_desktop == false %}display: none;{% endif %}
+      }
+
+      .zzen-acc-{{ block.id }}__summary {
+        gap: {{ b.left_icon_gap_desktop }}px;
+        padding: {{ b.row_padding_y_desktop }}px 0;
+      }
+
+      .zzen-acc-{{ block.id }}__title { font-size: {{ b.title_size_desktop }}px; }
+
+      .zzen-acc-{{ block.id }}__lead {
+        width: {{ b.left_icon_size_desktop }}px;
+        height: {{ b.left_icon_size_desktop }}px;
+        transform: translateY({{ b.left_icon_offset_desktop }}px);
+      }
+
+      .zzen-acc-{{ block.id }}__caret {
+        width: {{ b.caret_size_desktop }}px;
+        height: {{ b.caret_size_desktop }}px;
+        margin-left: {{ b.caret_gap_desktop }}px;
+      }
+
+      .zzen-acc-{{ block.id }}__inner {
+        font-size: {{ b.content_size_desktop }}px;
+        padding-bottom: {{ b.content_padding_bottom_desktop }}px;
+        padding-left: {{ b.content_indent_desktop }}px;
+        padding-right: {{ b.content_padding_right_desktop }}px;
+      }
+    }
+  {%- endstyle -%}
+
+  {%- comment -%} ---------- Icono izquierdo ---------- {%- endcomment -%}
+  {%- capture lead_icon -%}
+    {%- if b.left_icon_image != blank -%}
+      <span class="zzen-acc-{{ block.id }}__lead">
+        {{ b.left_icon_image | image_url: width: 80 | image_tag: loading: 'lazy', alt: '' }}
+      </span>
+    {%- elsif b.left_icon_style != 'none' -%}
+      <span class="zzen-acc-{{ block.id }}__lead" aria-hidden="true">
+        {%- if b.left_icon_style == 'arrow_up_right' -%}
+          <svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M1 13.7827L13.6938 1.08887" stroke="currentColor" stroke-width="{{ b.left_icon_stroke }}" stroke-linecap="round"/>
+            <path d="M13.7826 13.6051V1H1" stroke="currentColor" stroke-width="{{ b.left_icon_stroke }}" stroke-linecap="round"/>
+          </svg>
+        {%- elsif b.left_icon_style == 'arrow_right' -%}
+          <svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M1 7.5h12.7" stroke="currentColor" stroke-width="{{ b.left_icon_stroke }}" stroke-linecap="round"/>
+            <path d="M9.2 3l4.5 4.5-4.5 4.5" stroke="currentColor" stroke-width="{{ b.left_icon_stroke }}" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        {%- elsif b.left_icon_style == 'plus' -%}
+          <svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M7.5 1.5v12M1.5 7.5h12" stroke="currentColor" stroke-width="{{ b.left_icon_stroke }}" stroke-linecap="round"/>
+          </svg>
+        {%- elsif b.left_icon_style == 'dot' -%}
+          <svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <circle cx="7.5" cy="7.5" r="3" fill="currentColor"/>
+          </svg>
+        {%- endif -%}
+      </span>
+    {%- endif -%}
+  {%- endcapture -%}
+
+  {%- comment -%} ---------- Icono indicador ---------- {%- endcomment -%}
+  {%- capture caret_icon -%}
+    {%- if b.caret_style != 'none' -%}
+      <span class="zzen-acc-{{ block.id }}__caret" aria-hidden="true">
+        {%- if b.caret_style == 'chevron_wide' -%}
+          <svg viewBox="0 0 22 12" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M1 1l10 10L21 1" stroke="currentColor" stroke-width="{{ b.caret_stroke }}" stroke-linecap="round"/>
+          </svg>
+        {%- elsif b.caret_style == 'chevron' -%}
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M3 5.5l5 5 5-5" stroke="currentColor" stroke-width="{{ b.caret_stroke }}" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        {%- elsif b.caret_style == 'plus' -%}
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="{{ b.caret_stroke }}" stroke-linecap="round"/>
+          </svg>
+        {%- elsif b.caret_style == 'arrow' -%}
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M8 2.5v11" stroke="currentColor" stroke-width="{{ b.caret_stroke }}" stroke-linecap="round"/>
+            <path d="M3.5 9l4.5 4.5L12.5 9" stroke="currentColor" stroke-width="{{ b.caret_stroke }}" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        {%- endif -%}
+      </span>
+    {%- endif -%}
+  {%- endcapture -%}
+
+  <zzen-accordion
+    class="zzen-acc zzen-acc-{{ block.id }}"
+    data-duration="{{ b.duration }}"
+    data-easing="{{ easing_css }}"
+    data-exclusive="{{ b.exclusive }}"
+    data-fade="{{ b.content_fade }}"
+    data-slide="{{ b.content_slide }}"
+    {{ block.shopify_attributes }}
+  >
+    {%- assign rendered = 0 -%}
+    {%- for i in row_indexes -%}
+      {%- liquid
+        assign title_key = 'row_' | append: i | append: '_title'
+        assign content_key = 'row_' | append: i | append: '_content'
+        assign page_key = 'row_' | append: i | append: '_page'
+        assign row_title = b[title_key]
+        assign row_content = b[content_key]
+        assign row_page = b[page_key]
+      -%}
+
+      {%- if row_title != blank -%}
+        {%- assign rendered = rendered | plus: 1 -%}
+        <details
+          id="ZzenAcc-{{ block.id }}-{{ i }}"
+          class="zzen-acc-{{ block.id }}__item"
+          {% if b.open_first and rendered == 1 %}open{% endif %}
+        >
+          <summary class="zzen-acc-{{ block.id }}__summary">
+            {%- if has_left_icon -%}{{ lead_icon }}{%- endif -%}
+            <span class="zzen-acc-{{ block.id }}__title">{{ row_title }}</span>
+            {{ caret_icon }}
+          </summary>
+
+          <div class="zzen-acc-{{ block.id }}__panel" data-zzen-acc-panel>
+            <div class="zzen-acc-{{ block.id }}__inner rte" data-zzen-acc-inner>
+              {{ row_content }}
+              {{ row_page.content }}
+            </div>
+          </div>
+        </details>
+      {%- endif -%}
+    {%- endfor -%}
+  </zzen-accordion>
+{%- endif -%}
+{% comment %}
+  ============================================================
+  BLOQUE: zzen_accordion — Desplegables (acordeón)
+  Parámetros: block, product, section
+  Requiere: assets/zzen-accordion.js
+
+  Un solo bloque contiene hasta 8 filas para que la tipografía y los
+  bordes se configuren una vez, no siete veces. Las filas sin título
+  se saltan, así que puedes dejar huecos vacíos sin que salgan líneas
+  fantasma.
+
+  Si necesitas más de 8 filas, añade un segundo bloque y desactiva en
+  él "Línea encima de la primera fila" para que la unión no doble el
+  grosor del borde.
+
+  Cada fila usa <details>/<summary> nativos: accesible por teclado,
+  anunciado correctamente por lectores de pantalla y localizable con
+  Ctrl+F en Chrome. La animación se sobrepone sin romper esa semántica.
+  ============================================================
+{% endcomment %}
+
+{%- liquid
+  assign b = block.settings
+
+  assign row_indexes = '1,2,3,4,5,6,7,8' | split: ','
+
+  # Contamos filas con título para saber cuál es la primera y la última
+  assign total_rows = 0
+  for i in row_indexes
+    assign title_key = 'row_' | append: i | append: '_title'
+    if b[title_key] != blank
+      assign total_rows = total_rows | plus: 1
+    endif
+  endfor
+
+  case b.title_font
+    when 'heading'
+      assign title_stack = 'var(--font-heading-family)'
+    when 'custom'
+      assign title_stack = b.title_font_stack
+    else
+      assign title_stack = 'var(--font-body-family)'
+  endcase
+
+  case b.content_font
+    when 'heading'
+      assign content_stack = 'var(--font-heading-family)'
+    when 'custom'
+      assign content_stack = b.content_font_stack
+    else
+      assign content_stack = 'var(--font-body-family)'
+  endcase
+
+  case b.easing
+    when 'linear'
+      assign easing_css = 'linear'
+    when 'ease_out'
+      assign easing_css = 'cubic-bezier(0.22, 1, 0.36, 1)'
+    when 'ease_in_out'
+      assign easing_css = 'cubic-bezier(0.65, 0, 0.35, 1)'
+    when 'spring'
+      assign easing_css = 'cubic-bezier(0.34, 1.4, 0.64, 1)'
+    else
+      assign easing_css = 'cubic-bezier(0.4, 0, 0.2, 1)'
+  endcase
+
+  assign has_left_icon = false
+  if b.left_icon_image != blank or b.left_icon_style != 'none'
+    assign has_left_icon = true
+  endif
+-%}
+
+{%- if total_rows > 0 -%}
+
+  {%- style -%}
+    /* ===================== MÓVIL (base) ===================== */
+    .zzen-acc-{{ block.id }} {
+      margin-top: {{ b.margin_top_mobile }}px;
+      margin-bottom: {{ b.margin_bottom_mobile }}px;
+      {% if b.show_mobile == false %}display: none;{% endif %}
+    }
+
+    .zzen-acc-{{ block.id }}__item {
+      border-bottom: {{ b.border_width }}px solid {{ b.border_color }};
+    }
+
+    .zzen-acc-{{ block.id }}__item:first-child {
+      {% if b.border_top_first %}
+        border-top: {{ b.border_width }}px solid {{ b.border_color }};
+      {% endif %}
+    }
+
+    {%- if b.border_bottom_last == false -%}
+      .zzen-acc-{{ block.id }}__item:last-child { border-bottom: 0; }
+    {%- endif -%}
+
+    /* ---- Cabecera clicable ---- */
+    .zzen-acc-{{ block.id }}__summary {
+      display: flex;
+      align-items: center;
+      gap: {{ b.left_icon_gap_mobile }}px;
+      padding: {{ b.row_padding_y_mobile }}px 0;
+      cursor: pointer;
+      list-style: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .zzen-acc-{{ block.id }}__summary::-webkit-details-marker { display: none; }
+    .zzen-acc-{{ block.id }}__summary::marker { content: ''; }
+
+    .zzen-acc-{{ block.id }}__summary:focus { outline: none; }
+    .zzen-acc-{{ block.id }}__summary:focus-visible {
+      outline: 2px solid {{ b.title_color }};
+      outline-offset: 2px;
+    }
+
+    /* ---- Título ---- */
+    .zzen-acc-{{ block.id }}__title {
+      flex: 1 1 auto;
+      min-width: 0;
+      margin: 0;
+      font-family: {{ title_stack }};
+      font-size: {{ b.title_size_mobile }}px;
+      font-weight: {{ b.title_weight }};
+      color: {{ b.title_color }};
+      line-height: {{ b.title_line_height }};
+      letter-spacing: {{ b.title_letter_spacing }}px;
+      text-align: left;
+      {% if b.title_uppercase %}text-transform: uppercase;{% endif %}
+      transition: color 0.2s ease;
+    }
+
+    .zzen-acc-{{ block.id }}__item[open] > .zzen-acc-{{ block.id }}__summary .zzen-acc-{{ block.id }}__title {
+      color: {{ b.title_color_open }};
+    }
+
+    @media (hover: hover) {
+      .zzen-acc-{{ block.id }}__summary:hover .zzen-acc-{{ block.id }}__title {
+        color: {{ b.title_color_hover }};
+      }
+    }
+
+    /* ---- Icono izquierdo ---- */
+    .zzen-acc-{{ block.id }}__lead {
+      display: block;
+      flex: 0 0 auto;
+      width: {{ b.left_icon_size_mobile }}px;
+      height: {{ b.left_icon_size_mobile }}px;
+      color: {{ b.left_icon_color }};
+      transform: translateY({{ b.left_icon_offset_mobile }}px);
+    }
+
+    .zzen-acc-{{ block.id }}__lead svg,
+    .zzen-acc-{{ block.id }}__lead img {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .zzen-acc-{{ block.id }}__lead img { object-fit: contain; }
+
+    /* ---- Icono derecho (indicador) ---- */
+    .zzen-acc-{{ block.id }}__caret {
+      display: block;
+      flex: 0 0 auto;
+      width: {{ b.caret_size_mobile }}px;
+      height: {{ b.caret_size_mobile }}px;
+      margin-left: {{ b.caret_gap_mobile }}px;
+      color: {{ b.caret_color }};
+      transition: transform {{ b.duration }}ms {{ easing_css }}, color 0.2s ease;
+      transform-origin: 50% 50%;
+    }
+
+    .zzen-acc-{{ block.id }}__caret svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: visible;
+    }
+
+    /* Abierto: gira. Cerrándose: vuelve ya, sin esperar a que
+       termine la animación de altura. */
+    .zzen-acc-{{ block.id }}__item[open] > .zzen-acc-{{ block.id }}__summary .zzen-acc-{{ block.id }}__caret {
+      transform: rotate({{ b.caret_rotation }}deg);
+      color: {{ b.caret_color_open }};
+    }
+
+    .zzen-acc-{{ block.id }}__item.is-closing > .zzen-acc-{{ block.id }}__summary .zzen-acc-{{ block.id }}__caret {
+      transform: rotate(0deg);
+      color: {{ b.caret_color }};
+    }
+
+    /* ---- Panel de contenido ---- */
+    .zzen-acc-{{ block.id }}__panel {
+      overflow: hidden;
+      will-change: height;
+    }
+
+    .zzen-acc-{{ block.id }}__inner {
+      font-family: {{ content_stack }};
+      font-size: {{ b.content_size_mobile }}px;
+      font-weight: {{ b.content_weight }};
+      color: {{ b.content_color }};
+      line-height: {{ b.content_line_height }};
+      letter-spacing: {{ b.content_letter_spacing }}px;
+      padding-bottom: {{ b.content_padding_bottom_mobile }}px;
+      padding-left: {{ b.content_indent_mobile }}px;
+      padding-right: {{ b.content_padding_right_mobile }}px;
+    }
+
+    .zzen-acc-{{ block.id }}__inner > * { margin-top: 0; }
+    .zzen-acc-{{ block.id }}__inner > *:last-child { margin-bottom: 0; }
+
+    .zzen-acc-{{ block.id }}__inner a {
+      color: inherit;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .zzen-acc-{{ block.id }}__inner img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .zzen-acc-{{ block.id }}__inner ul,
+    .zzen-acc-{{ block.id }}__inner ol {
+      padding-left: 1.2em;
+      margin-top: 0.5em;
+    }
+
+    .zzen-acc-{{ block.id }}__inner li + li { margin-top: 0.35em; }
+
+    /* Sin JS (o antes de que cargue) el acordeón sigue funcionando:
+       details nativo abre y cierra, solo sin animación. */
+    @media (prefers-reduced-motion: reduce) {
+      .zzen-acc-{{ block.id }}__caret { transition: none; }
+    }
+
+    /* ===================== ESCRITORIO ===================== */
+    @media screen and (min-width: 750px) {
+      .zzen-acc-{{ block.id }} {
+        margin-top: {{ b.margin_top_desktop }}px;
+        margin-bottom: {{ b.margin_bottom_desktop }}px;
+        {% if b.show_mobile == false and b.show_desktop %}display: block;{% endif %}
+        {% if b.show_desktop == false %}display: none;{% endif %}
+      }
+
+      .zzen-acc-{{ block.id }}__summary {
+        gap: {{ b.left_icon_gap_desktop }}px;
+        padding: {{ b.row_padding_y_desktop }}px 0;
+      }
+
+      .zzen-acc-{{ block.id }}__title { font-size: {{ b.title_size_desktop }}px; }
+
+      .zzen-acc-{{ block.id }}__lead {
+        width: {{ b.left_icon_size_desktop }}px;
+        height: {{ b.left_icon_size_desktop }}px;
+        transform: translateY({{ b.left_icon_offset_desktop }}px);
+      }
+
+      .zzen-acc-{{ block.id }}__caret {
+        width: {{ b.caret_size_desktop }}px;
+        height: {{ b.caret_size_desktop }}px;
+        margin-left: {{ b.caret_gap_desktop }}px;
+      }
+
+      .zzen-acc-{{ block.id }}__inner {
+        font-size: {{ b.content_size_desktop }}px;
+        padding-bottom: {{ b.content_padding_bottom_desktop }}px;
+        padding-left: {{ b.content_indent_desktop }}px;
+        padding-right: {{ b.content_padding_right_desktop }}px;
+      }
+    }
+  {%- endstyle -%}
+
+  {%- comment -%} ---------- Icono izquierdo ---------- {%- endcomment -%}
+  {%- capture lead_icon -%}
+    {%- if b.left_icon_image != blank -%}
+      <span class="zzen-acc-{{ block.id }}__lead">
+        {{ b.left_icon_image | image_url: width: 80 | image_tag: loading: 'lazy', alt: '' }}
+      </span>
+    {%- elsif b.left_icon_style != 'none' -%}
+      <span class="zzen-acc-{{ block.id }}__lead" aria-hidden="true">
+        {%- if b.left_icon_style == 'arrow_up_right' -%}
+          <svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M1 13.7827L13.6938 1.08887" stroke="currentColor" stroke-width="{{ b.left_icon_stroke }}" stroke-linecap="round"/>
+            <path d="M13.7826 13.6051V1H1" stroke="currentColor" stroke-width="{{ b.left_icon_stroke }}" stroke-linecap="round"/>
+          </svg>
+        {%- elsif b.left_icon_style == 'arrow_right' -%}
+          <svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M1 7.5h12.7" stroke="currentColor" stroke-width="{{ b.left_icon_stroke }}" stroke-linecap="round"/>
+            <path d="M9.2 3l4.5 4.5-4.5 4.5" stroke="currentColor" stroke-width="{{ b.left_icon_stroke }}" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        {%- elsif b.left_icon_style == 'plus' -%}
+          <svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M7.5 1.5v12M1.5 7.5h12" stroke="currentColor" stroke-width="{{ b.left_icon_stroke }}" stroke-linecap="round"/>
+          </svg>
+        {%- elsif b.left_icon_style == 'dot' -%}
+          <svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <circle cx="7.5" cy="7.5" r="3" fill="currentColor"/>
+          </svg>
+        {%- endif -%}
+      </span>
+    {%- endif -%}
+  {%- endcapture -%}
+
+  {%- comment -%} ---------- Icono indicador ---------- {%- endcomment -%}
+  {%- capture caret_icon -%}
+    {%- if b.caret_style != 'none' -%}
+      <span class="zzen-acc-{{ block.id }}__caret" aria-hidden="true">
+        {%- if b.caret_style == 'chevron_wide' -%}
+          <svg viewBox="0 0 22 12" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M1 1l10 10L21 1" stroke="currentColor" stroke-width="{{ b.caret_stroke }}" stroke-linecap="round"/>
+          </svg>
+        {%- elsif b.caret_style == 'chevron' -%}
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M3 5.5l5 5 5-5" stroke="currentColor" stroke-width="{{ b.caret_stroke }}" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        {%- elsif b.caret_style == 'plus' -%}
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="{{ b.caret_stroke }}" stroke-linecap="round"/>
+          </svg>
+        {%- elsif b.caret_style == 'arrow' -%}
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M8 2.5v11" stroke="currentColor" stroke-width="{{ b.caret_stroke }}" stroke-linecap="round"/>
+            <path d="M3.5 9l4.5 4.5L12.5 9" stroke="currentColor" stroke-width="{{ b.caret_stroke }}" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        {%- endif -%}
+      </span>
+    {%- endif -%}
+  {%- endcapture -%}
+
+  <zzen-accordion
+    class="zzen-acc zzen-acc-{{ block.id }}"
+    data-duration="{{ b.duration }}"
+    data-easing="{{ easing_css }}"
+    data-exclusive="{{ b.exclusive }}"
+    data-fade="{{ b.content_fade }}"
+    data-slide="{{ b.content_slide }}"
+    {{ block.shopify_attributes }}
+  >
+    {%- assign rendered = 0 -%}
+    {%- for i in row_indexes -%}
+      {%- liquid
+        assign title_key = 'row_' | append: i | append: '_title'
+        assign content_key = 'row_' | append: i | append: '_content'
+        assign page_key = 'row_' | append: i | append: '_page'
+        assign row_title = b[title_key]
+        assign row_content = b[content_key]
+        assign row_page = b[page_key]
+      -%}
+
+      {%- if row_title != blank -%}
+        {%- assign rendered = rendered | plus: 1 -%}
+        <details
+          id="ZzenAcc-{{ block.id }}-{{ i }}"
+          class="zzen-acc-{{ block.id }}__item"
+          {% if b.open_first and rendered == 1 %}open{% endif %}
+        >
+          <summary class="zzen-acc-{{ block.id }}__summary">
+            {%- if has_left_icon -%}{{ lead_icon }}{%- endif -%}
+            <span class="zzen-acc-{{ block.id }}__title">{{ row_title }}</span>
+            {{ caret_icon }}
+          </summary>
+
+          <div class="zzen-acc-{{ block.id }}__panel" data-zzen-acc-panel>
+            <div class="zzen-acc-{{ block.id }}__inner rte" data-zzen-acc-inner>
+              {{ row_content }}
+              {{ row_page.content }}
+            </div>
+          </div>
+        </details>
+      {%- endif -%}
+    {%- endfor -%}
+  </zzen-accordion>
+{%- endif -%}
