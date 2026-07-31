@@ -1,0 +1,198 @@
+{% comment %}
+  ============================================================
+  BLOQUE: zzen_note — Nota / texto auxiliar
+  Parámetros: block, product, section
+
+  Uso previsto: el texto pequeño gris bajo el botón de añadir al
+  carrito ("Recomendamos tomarlo mínimo 3 meses...") y cualquier
+  aviso corto similar. Sin límite de instancias.
+
+  Si activas "Mostrar arriba de la galería en móvil" el bloque pasa
+  al hero-header y respeta los ajustes de "Layout en el hero",
+  igual que zzen_badge y zzen_rating.
+  ============================================================
+{% endcomment %}
+
+{%- liquid
+  assign b = block.settings
+
+  if b.layout_mobile == 'auto'
+    assign flex_mobile = '0 0 auto'
+  else
+    assign flex_mobile = '0 0 100%'
+  endif
+
+  if b.layout_desktop == 'auto'
+    assign flex_desktop = '0 0 auto'
+  else
+    assign flex_desktop = '0 0 100%'
+  endif
+
+  case b.font_family
+    when 'heading'
+      assign font_stack = 'var(--font-heading-family)'
+    when 'custom'
+      assign font_stack = b.custom_font_stack
+    else
+      assign font_stack = 'var(--font-body-family)'
+  endcase
+-%}
+
+{%- style -%}
+  /* ---- Layout dentro del hero-header (solo si está hoisted) ---- */
+  @media screen and (max-width: 749px) {
+    .product__hero-header > .zzen-note-{{ block.id }} {
+      flex: {{ flex_mobile }};
+      order: {{ b.order_mobile }};
+      {% if b.push_right_mobile %}margin-left: auto;{% endif %}
+    }
+  }
+
+  @media screen and (min-width: 750px) {
+    .product__hero-header > .zzen-note-{{ block.id }} {
+      flex: {{ flex_desktop }};
+      order: {{ b.order_desktop }};
+      {% if b.push_right_desktop %}margin-left: auto;{% endif %}
+    }
+  }
+
+  /* ===================== MÓVIL (base) ===================== */
+  .zzen-note-{{ block.id }} {
+    display: flex;
+    justify-content: {{ b.align_mobile }};
+    margin-top: {{ b.margin_top_mobile }}px;
+    margin-bottom: {{ b.margin_bottom_mobile }}px;
+    {% if b.show_mobile == false %}display: none;{% endif %}
+  }
+
+  .zzen-note-{{ block.id }}__inner {
+    display: inline-flex;
+    align-items: center;
+    gap: {{ b.gap_icon_text_mobile }}px;
+    {% if b.max_width_mobile > 0 %}max-width: {{ b.max_width_mobile }}px;{% endif %}
+    min-width: 0;
+  }
+
+  .zzen-note-{{ block.id }}__text {
+    font-family: {{ font_stack }};
+    font-size: {{ b.text_size_mobile }}px;
+    font-weight: {{ b.text_weight }};
+    font-style: {% if b.italic %}italic{% else %}normal{% endif %};
+    color: {{ b.text_color }};
+    line-height: {{ b.line_height }};
+    letter-spacing: {{ b.letter_spacing }}px;
+    text-align: {{ b.text_align_mobile }};
+    {% if b.uppercase %}text-transform: uppercase;{% endif %}
+    {% if b.nowrap_mobile %}white-space: nowrap;{% endif %}
+  }
+
+  .zzen-note-{{ block.id }}__text a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* ---- Icono ---- */
+  .zzen-note-{{ block.id }}__icon {
+    display: block;
+    flex: 0 0 auto;
+    width: {{ b.icon_size_mobile }}px;
+    height: {{ b.icon_size_mobile }}px;
+    color: {{ b.icon_color }};
+    transform: translateY({{ b.icon_offset_mobile }}px);
+  }
+
+  .zzen-note-{{ block.id }}__icon svg,
+  .zzen-note-{{ block.id }}__icon img {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .zzen-note-{{ block.id }}__icon img { object-fit: contain; }
+
+  /* ===================== ESCRITORIO ===================== */
+  @media screen and (min-width: 750px) {
+    .zzen-note-{{ block.id }} {
+      justify-content: {{ b.align_desktop }};
+      margin-top: {{ b.margin_top_desktop }}px;
+      margin-bottom: {{ b.margin_bottom_desktop }}px;
+      {% if b.show_mobile == false and b.show_desktop %}display: flex;{% endif %}
+      {% if b.show_desktop == false %}display: none;{% endif %}
+    }
+
+    .zzen-note-{{ block.id }}__inner {
+      gap: {{ b.gap_icon_text_desktop }}px;
+      {% if b.max_width_desktop > 0 %}
+        max-width: {{ b.max_width_desktop }}px;
+      {% else %}
+        max-width: none;
+      {% endif %}
+    }
+
+    .zzen-note-{{ block.id }}__text {
+      font-size: {{ b.text_size_desktop }}px;
+      text-align: {{ b.text_align_desktop }};
+      {% if b.nowrap_desktop %}white-space: nowrap;{% else %}white-space: normal;{% endif %}
+    }
+
+    .zzen-note-{{ block.id }}__icon {
+      width: {{ b.icon_size_desktop }}px;
+      height: {{ b.icon_size_desktop }}px;
+      transform: translateY({{ b.icon_offset_desktop }}px);
+    }
+  }
+{%- endstyle -%}
+
+{%- capture note_icon -%}
+  {%- if b.icon_image != blank -%}
+    <span class="zzen-note-{{ block.id }}__icon">
+      {{ b.icon_image | image_url: width: 80 | image_tag: loading: 'lazy', alt: '' }}
+    </span>
+  {%- elsif b.icon_style != 'none' -%}
+    <span class="zzen-note-{{ block.id }}__icon" aria-hidden="true">
+      {%- if b.icon_style == 'info' -%}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg" focusable="false">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 11v5.5" stroke-linecap="round"/>
+          <circle cx="12" cy="7.8" r="0.9" fill="currentColor" stroke="none"/>
+        </svg>
+      {%- elsif b.icon_style == 'check' -%}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" xmlns="http://www.w3.org/2000/svg" focusable="false">
+          <path d="M4.5 12.5l5 5L19.5 7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      {%- elsif b.icon_style == 'clock' -%}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg" focusable="false">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 7v5.4l3.4 2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      {%- elsif b.icon_style == 'leaf' -%}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg" focusable="false">
+          <path d="M20 4c0 8.5-4.8 13-11.5 13H5.5C5.5 9.5 11 4 20 4z" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M4 20c1.5-4.5 4.5-8 9-10" stroke-linecap="round"/>
+        </svg>
+      {%- elsif b.icon_style == 'truck' -%}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg" focusable="false">
+          <path d="M2.5 6.5h10.5v9H2.5zM13 9.5h4l3 3v3h-7z" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="6.5" cy="17.5" r="1.6"/>
+          <circle cx="16.5" cy="17.5" r="1.6"/>
+        </svg>
+      {%- elsif b.icon_style == 'shield' -%}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg" focusable="false">
+          <path d="M12 3l7 2.8v5.4c0 4.4-2.9 7.7-7 9.8-4.1-2.1-7-5.4-7-9.8V5.8L12 3z" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8.8 12.2l2.2 2.2 4.2-4.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      {%- endif -%}
+    </span>
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- if b.text != blank -%}
+  <div class="zzen-note zzen-note-{{ block.id }}" {{ block.shopify_attributes }}>
+    <span class="zzen-note-{{ block.id }}__inner">
+      {%- if b.icon_position == 'before' -%}{{ note_icon }}{%- endif -%}
+      <span class="zzen-note-{{ block.id }}__text">{{ b.text }}</span>
+      {%- if b.icon_position == 'after' -%}{{ note_icon }}{%- endif -%}
+    </span>
+  </div>
+{%- endif -%}
