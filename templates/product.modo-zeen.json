@@ -1219,7 +1219,7 @@
             "label": "Claridad Mental",
             "val_1": "Sí",
             "val_2": "Sí",
-            "val_3": "",
+            "val_3": "Si",
             "val_4": "Sí",
             "val_5": ""
           }
@@ -1230,7 +1230,18 @@
             "label": "Claridad Mental",
             "val_1": "Sí",
             "val_2": "Sí",
-            "val_3": "",
+            "val_3": "Si",
+            "val_4": "Sí",
+            "val_5": ""
+          }
+        },
+        "row_7bEwjU": {
+          "type": "row",
+          "settings": {
+            "label": "Claridad Mental",
+            "val_1": "Sí",
+            "val_2": "Sí",
+            "val_3": "Si",
             "val_4": "Sí",
             "val_5": ""
           }
@@ -1261,6 +1272,7 @@
       "block_order": [
         "row_Dm7YEz",
         "row_HWiTnU",
+        "row_7bEwjU",
         "row_a4W3NL",
         "row_ym4Amx"
       ],
