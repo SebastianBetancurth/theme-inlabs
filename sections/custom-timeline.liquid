@@ -118,6 +118,8 @@
     --ctml-line: {{ s.line_color }};
     --ctml-line-w: {{ s.line_width }}px;
     --ctml-line-ext: {{ s.line_extend }}px;
+    --ctml-fade-top: {{ s.line_fade_top }}%;
+    --ctml-fade-bottom: {{ s.line_fade_bottom }}%;
     --ctml-pill-col: {{ s.pill_col_width_d }}px;
     --ctml-col-gap: {{ s.column_gap_d }}px;
     --ctml-content-pl: {{ s.content_padding_left_d }}px;
@@ -259,6 +261,8 @@
   }
 
   /* ================= Timeline ================= */
+  /* Gradiente en vez de color plano: la línea se desvanece a transparente
+     en los extremos. Con los desvanecidos a 0% queda una línea sólida. */
   .ctml__line {
     position: absolute;
     top: calc(var(--ctml-line-ext) * -1);
@@ -266,7 +270,13 @@
     left: calc(var(--ctml-pill-col) / 2);
     width: var(--ctml-line-w);
     transform: translateX(-50%);
-    background-color: var(--ctml-line);
+    background-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      var(--ctml-line) var(--ctml-fade-top),
+      var(--ctml-line) calc(100% - var(--ctml-fade-bottom)),
+      transparent 100%
+    );
     pointer-events: none;
   }
 
@@ -1194,6 +1204,27 @@
       "label": "Extensión de la línea",
       "info": "Cuánto sobresale por arriba y por abajo de la primera y última etapa.",
       "default": 0
+    },
+    {
+      "type": "range",
+      "id": "line_fade_top",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "%",
+      "label": "Desvanecido superior de la línea",
+      "info": "Porcentaje del alto de la línea en el que se difumina hasta desaparecer. 0 = línea sólida.",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "line_fade_bottom",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "%",
+      "label": "Desvanecido inferior de la línea",
+      "default": 14
     },
     {
       "type": "checkbox",
