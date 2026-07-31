@@ -129,12 +129,6 @@
   endfor
   assign m_tracks = m_track_str | split: ','
 
-  # Degradado del recuadro destacado: mismo color con dos opacidades.
-  assign a_top = s.highlight_opacity_top | divided_by: 100.0
-  assign a_bottom = s.highlight_opacity_bottom | divided_by: 100.0
-  assign hl_top = s.highlight_bg | color_modify: 'alpha', a_top
-  assign hl_bottom = s.highlight_bg | color_modify: 'alpha', a_bottom
-
   # En móvil hay menos columnas, así que el desplazamiento del recuadro se
   # recalcula sobre las visibles. Si la columna destacada no se muestra en
   # móvil, el recuadro se oculta: dibujarlo caería sobre otra columna.
@@ -221,14 +215,15 @@
     --ctbl-rline: {{ s.row_line_color }};
     --ctbl-rline-w: {{ s.row_line_width }}px;
 
-    --ctbl-hl-top-color: {{ hl_top }};
-    --ctbl-hl-bottom-color: {{ hl_bottom }};
+    --ctbl-hl-color: {{ s.highlight_bg }};
+    --ctbl-hl-opacity: {{ s.highlight_opacity }}%;
+    --ctbl-hl-fade-from: {{ s.highlight_fade_from }}%;
+    --ctbl-hl-fade-to: {{ s.highlight_fade_to }}%;
     --ctbl-hl-border: {{ s.highlight_border_color }};
     --ctbl-hl-border-w: {{ s.highlight_border_width }}px;
     --ctbl-hl-radius: {{ s.highlight_radius }}px;
     --ctbl-hl-ovf-top: {{ s.highlight_overhang_top_d }}px;
     --ctbl-hl-ovf-bottom: {{ s.highlight_overhang_bottom_d }}px;
-    --ctbl-hl-fade: {{ s.highlight_fade_start }}%;
   }
 
   /* ================= Estructura ================= */
@@ -379,20 +374,45 @@
     width: calc((100% - var(--ctbl-c1)) / var(--ctbl-n));
     right: calc((100% - var(--ctbl-c1)) / var(--ctbl-n) * var(--ctbl-k));
     z-index: 0;
-    background-image: linear-gradient(
-      to bottom,
-      var(--ctbl-hl-top-color) 0%,
-      var(--ctbl-hl-bottom-color) 100%
-    );
     border: var(--ctbl-hl-border-w) solid var(--ctbl-hl-border);
     border-radius: var(--ctbl-hl-radius);
+    overflow: hidden;
     pointer-events: none;
+  }
+
+  /* El relleno va en un ::before para poder difuminarlo con una máscara sin
+     tocar el borde. Color plano + opacity: no hace falta generar ningún
+     rgba() en Liquid, así que no hay filtros de color que puedan fallar. */
+  .ctbl__highlight::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: var(--ctbl-hl-color);
+    opacity: var(--ctbl-hl-opacity);
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      #000 var(--ctbl-hl-fade-from),
+      transparent var(--ctbl-hl-fade-to)
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      #000 var(--ctbl-hl-fade-from),
+      transparent var(--ctbl-hl-fade-to)
+    );
   }
 
   /* Difumina también el borde hacia abajo, no sólo el relleno. */
   .ctbl--fade-edges .ctbl__highlight {
-    -webkit-mask-image: linear-gradient(to bottom, #000 var(--ctbl-hl-fade), transparent 100%);
-    mask-image: linear-gradient(to bottom, #000 var(--ctbl-hl-fade), transparent 100%);
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      #000 var(--ctbl-hl-fade-from),
+      transparent var(--ctbl-hl-fade-to)
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      #000 var(--ctbl-hl-fade-from),
+      transparent var(--ctbl-hl-fade-to)
+    );
   }
 
   /* ================= Móvil ================= */
@@ -740,24 +760,35 @@
     },
     {
       "type": "range",
-      "id": "highlight_opacity_top",
+      "id": "highlight_opacity",
       "min": 0,
       "max": 100,
       "step": 1,
       "unit": "%",
-      "label": "Opacidad del relleno arriba",
-      "default": 11
+      "label": "Intensidad del relleno arriba",
+      "info": "Súbelo a 25% para verlo claramente y luego bájalo hasta el punto que te guste.",
+      "default": 14
     },
     {
       "type": "range",
-      "id": "highlight_opacity_bottom",
+      "id": "highlight_fade_from",
       "min": 0,
       "max": 100,
-      "step": 1,
+      "step": 5,
       "unit": "%",
-      "label": "Opacidad del relleno abajo",
-      "info": "Más baja que la de arriba = el recuadro se oscurece y se difumina hacia abajo.",
-      "default": 0
+      "label": "Hasta dónde se mantiene gris",
+      "info": "Desde esta altura del recuadro empieza a oscurecerse.",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "highlight_fade_to",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Dónde acaba de volverse negro",
+      "default": 100
     },
     {
       "type": "checkbox",
@@ -765,16 +796,6 @@
       "label": "Difuminar también el borde",
       "info": "El borde inferior se desvanece junto con el relleno.",
       "default": false
-    },
-    {
-      "type": "range",
-      "id": "highlight_fade_start",
-      "min": 0,
-      "max": 100,
-      "step": 5,
-      "unit": "%",
-      "label": "Desde dónde empieza a difuminarse el borde",
-      "default": 55
     },
     {
       "type": "color",
