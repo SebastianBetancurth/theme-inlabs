@@ -1592,6 +1592,308 @@
     }
     ]
   },
+
+  {
+  "type": "zzen_payments",
+  "name": "▤ Métodos de pago",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Origen de los iconos"
+    },
+    {
+      "type": "select",
+      "id": "source",
+      "label": "Modo",
+      "options": [
+        { "value": "auto", "label": "Automático (los activos en la tienda)" },
+        { "value": "manual", "label": "Manual (mis imágenes)" }
+      ],
+      "default": "auto",
+      "info": "Automático se mantiene solo pero no permite elegir el orden. Manual da control total y admite métodos que Shopify no incluye, como Bizum."
+    },
+    {
+      "type": "checkbox",
+      "id": "append_extras",
+      "label": "Añadir iconos propios al final",
+      "default": false,
+      "info": "Solo en modo automático: pone los nativos primero y tus imágenes después. Ideal para sumar Bizum a los de Shopify."
+    },
+    {
+      "type": "header",
+      "content": "Iconos propios",
+      "info": "Se usan en modo manual, o al final en modo automático si activas la opción de arriba. Sube SVG para máxima nitidez. Se muestran en este orden; los huecos vacíos se saltan."
+    },
+    { "type": "image_picker", "id": "icon_1", "label": "Icono 1" },
+    { "type": "image_picker", "id": "icon_2", "label": "Icono 2" },
+    { "type": "image_picker", "id": "icon_3", "label": "Icono 3" },
+    { "type": "image_picker", "id": "icon_4", "label": "Icono 4" },
+    { "type": "image_picker", "id": "icon_5", "label": "Icono 5" },
+    { "type": "image_picker", "id": "icon_6", "label": "Icono 6" },
+    { "type": "image_picker", "id": "icon_7", "label": "Icono 7" },
+    { "type": "image_picker", "id": "icon_8", "label": "Icono 8" },
+    { "type": "image_picker", "id": "icon_9", "label": "Icono 9" },
+    { "type": "image_picker", "id": "icon_10", "label": "Icono 10" },
+    {
+      "type": "header",
+      "content": "Visibilidad"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_desktop",
+      "label": "Mostrar en escritorio",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_mobile",
+      "label": "Mostrar en móvil",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Apariencia"
+    },
+    {
+      "type": "range",
+      "id": "opacity",
+      "label": "Opacidad",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "checkbox",
+      "id": "grayscale",
+      "label": "Escala de grises",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "color_on_hover",
+      "label": "Recuperar color al pasar el ratón",
+      "default": false,
+      "info": "Solo tiene efecto si la escala de grises está activada."
+    },
+    {
+      "type": "range",
+      "id": "icon_radius",
+      "label": "Redondeo de los iconos",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 0,
+      "info": "Los iconos nativos de Shopify ya traen su propio redondeo. Úsalo solo si tus imágenes lo necesitan."
+    },
+    {
+      "type": "checkbox",
+      "id": "icon_bg_enabled",
+      "label": "Poner fondo tras cada icono",
+      "default": false,
+      "info": "Útil si tienes iconos monocromos que no se ven sobre el fondo de la página."
+    },
+    {
+      "type": "color",
+      "id": "icon_bg",
+      "label": "Color del fondo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "icon_padding",
+      "label": "Padding del fondo",
+      "min": 0,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "icon_border_width",
+      "label": "Grosor del borde",
+      "min": 0,
+      "max": 3,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "color",
+      "id": "icon_border_color",
+      "label": "Color del borde",
+      "default": "#E5E5E5"
+    },
+    {
+      "type": "header",
+      "content": "Escritorio"
+    },
+    {
+      "type": "range",
+      "id": "height_desktop",
+      "label": "Altura de los iconos",
+      "min": 12,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 26
+    },
+    {
+      "type": "select",
+      "id": "align_desktop",
+      "label": "Alineación",
+      "options": [
+        { "value": "flex-start", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "flex-end", "label": "Derecha" },
+        { "value": "space-between", "label": "Repartidos a lo ancho" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "column_gap_desktop",
+      "label": "Separación horizontal",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "row_gap_desktop",
+      "label": "Separación entre filas",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "max_width_desktop",
+      "label": "Ancho máximo",
+      "min": 0,
+      "max": 800,
+      "step": 10,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = sin límite. Fuerza el punto donde salta de fila."
+    },
+    {
+      "type": "range",
+      "id": "margin_top_desktop",
+      "label": "Espacio superior",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_desktop",
+      "label": "Espacio inferior",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Móvil"
+    },
+    {
+      "type": "range",
+      "id": "height_mobile",
+      "label": "Altura de los iconos",
+      "min": 10,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 22
+    },
+    {
+      "type": "select",
+      "id": "align_mobile",
+      "label": "Alineación",
+      "options": [
+        { "value": "flex-start", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "flex-end", "label": "Derecha" },
+        { "value": "space-between", "label": "Repartidos a lo ancho" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "overflow_mobile",
+      "label": "Si no caben en una línea",
+      "options": [
+        { "value": "wrap", "label": "Salto de fila" },
+        { "value": "scroll", "label": "Scroll horizontal" }
+      ],
+      "default": "wrap",
+      "info": "Con scroll se mantienen todos en una sola fila deslizable y se oculta la barra."
+    },
+    {
+      "type": "range",
+      "id": "column_gap_mobile",
+      "label": "Separación horizontal",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "row_gap_mobile",
+      "label": "Separación entre filas",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "max_width_mobile",
+      "label": "Ancho máximo",
+      "min": 0,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = sin límite."
+    },
+    {
+      "type": "range",
+      "id": "margin_top_mobile",
+      "label": "Espacio superior",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_mobile",
+      "label": "Espacio inferior",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+      }
+    ]
+  },
     {
       "type": "zzen_badge",
       "name": "◇ Etiqueta / Badge",
