@@ -27,7 +27,7 @@
 
   {%- liquid
   # Tipos de bloque personalizados que renderiza el snippet zzen-product-blocks
-  assign zzen_block_types = 'zzen_rating,zzen_badge,zzen_title,zzen_bullets,zzen_cta' | split: ','
+  assign zzen_block_types = 'zzen_rating,zzen_badge,zzen_title,zzen_bullets,zzen_cta,zzen_note' | split: ','
 
   # ¿Hay algún bloque marcado para subir arriba de la galería en móvil?
   assign has_hoisted = false
@@ -1177,6 +1177,421 @@
         },
       ]
     },
+    {
+  "type": "zzen_note",
+  "name": "— Nota / texto auxiliar",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "hoist_mobile",
+      "label": "Mostrar arriba de la galería en móvil",
+      "default": false,
+      "info": "Actívalo para el aviso que va sobre las imágenes. Déjalo desactivado para el texto de debajo del botón."
+    },
+    {
+      "type": "header",
+      "content": "Contenido"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "text",
+      "label": "Texto",
+      "default": "Recomendamos tomarlo mínimo 3 meses para resultados óptimos",
+      "info": "Déjalo vacío para ocultar el bloque. Admite negrita, cursiva, enlaces y metacampos vía fuente dinámica."
+    },
+    {
+      "type": "header",
+      "content": "Icono"
+    },
+    {
+      "type": "select",
+      "id": "icon_style",
+      "label": "Icono integrado",
+      "options": [
+        { "value": "none", "label": "Sin icono" },
+        { "value": "info", "label": "Información" },
+        { "value": "check", "label": "Check" },
+        { "value": "clock", "label": "Reloj" },
+        { "value": "leaf", "label": "Hoja" },
+        { "value": "truck", "label": "Camión" },
+        { "value": "shield", "label": "Escudo" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon_image",
+      "label": "Icono propio (SVG/PNG)",
+      "info": "Sustituye al icono integrado."
+    },
+    {
+      "type": "select",
+      "id": "icon_position",
+      "label": "Posición del icono",
+      "options": [
+        { "value": "before", "label": "Antes del texto" },
+        { "value": "after", "label": "Después del texto" }
+      ],
+      "default": "before"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Color del icono",
+      "default": "#8A8A8A"
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_desktop",
+      "label": "Mostrar en escritorio",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_mobile",
+      "label": "Mostrar en móvil",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Tipografía"
+    },
+    {
+      "type": "select",
+      "id": "font_family",
+      "label": "Fuente",
+      "options": [
+        { "value": "body", "label": "Fuente de texto del tema" },
+        { "value": "heading", "label": "Fuente de títulos del tema" },
+        { "value": "custom", "label": "Personalizada" }
+      ],
+      "default": "body"
+    },
+    {
+      "type": "text",
+      "id": "custom_font_stack",
+      "label": "Stack CSS personalizado",
+      "default": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+      "info": "Solo se aplica si eliges «Personalizada». Incluye fuentes de respaldo."
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color del texto",
+      "default": "#8A8A8A"
+    },
+    {
+      "type": "select",
+      "id": "text_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medio" },
+        { "value": "600", "label": "Semi-negrita" },
+        { "value": "700", "label": "Negrita" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "range",
+      "id": "line_height",
+      "label": "Altura de línea",
+      "min": 0.9,
+      "max": 2.2,
+      "step": 0.1,
+      "default": 1.4
+    },
+    {
+      "type": "range",
+      "id": "letter_spacing",
+      "label": "Espaciado entre letras",
+      "min": -1,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "uppercase",
+      "label": "Mayúsculas",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "italic",
+      "label": "Cursiva",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Escritorio"
+    },
+    {
+      "type": "range",
+      "id": "text_size_desktop",
+      "label": "Tamaño del texto",
+      "min": 8,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "select",
+      "id": "align_desktop",
+      "label": "Posición del bloque",
+      "options": [
+        { "value": "flex-start", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "flex-end", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_align_desktop",
+      "label": "Alineación del texto",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "max_width_desktop",
+      "label": "Ancho máximo",
+      "min": 0,
+      "max": 700,
+      "step": 10,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = sin límite. Útil para forzar dónde parte la línea."
+    },
+    {
+      "type": "checkbox",
+      "id": "nowrap_desktop",
+      "label": "Forzar una sola línea",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "icon_size_desktop",
+      "label": "Tamaño del icono",
+      "min": 8,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "icon_offset_desktop",
+      "label": "Ajuste vertical del icono",
+      "min": -8,
+      "max": 8,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "gap_icon_text_desktop",
+      "label": "Separación icono ↔ texto",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 7
+    },
+    {
+      "type": "range",
+      "id": "margin_top_desktop",
+      "label": "Espacio superior",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_desktop",
+      "label": "Espacio inferior",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Móvil"
+    },
+    {
+      "type": "range",
+      "id": "text_size_mobile",
+      "label": "Tamaño del texto",
+      "min": 8,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "select",
+      "id": "align_mobile",
+      "label": "Posición del bloque",
+      "options": [
+        { "value": "flex-start", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "flex-end", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_align_mobile",
+      "label": "Alineación del texto",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "max_width_mobile",
+      "label": "Ancho máximo",
+      "min": 0,
+      "max": 500,
+      "step": 10,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = sin límite."
+    },
+    {
+      "type": "checkbox",
+      "id": "nowrap_mobile",
+      "label": "Forzar una sola línea",
+      "default": false,
+      "info": "Con cuidado: en pantallas estrechas puede desbordar."
+    },
+    {
+      "type": "range",
+      "id": "icon_size_mobile",
+      "label": "Tamaño del icono",
+      "min": 8,
+      "max": 26,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "icon_offset_mobile",
+      "label": "Ajuste vertical del icono",
+      "min": -8,
+      "max": 8,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "gap_icon_text_mobile",
+      "label": "Separación icono ↔ texto",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "margin_top_mobile",
+      "label": "Espacio superior",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_mobile",
+      "label": "Espacio inferior",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Layout en el hero",
+      "info": "Solo aplica si has activado «Mostrar arriba de la galería en móvil»."
+    },
+    {
+      "type": "select",
+      "id": "layout_mobile",
+      "label": "Ancho en móvil",
+      "options": [
+        { "value": "full", "label": "Línea propia" },
+        { "value": "auto", "label": "Compartir línea" }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "range",
+      "id": "order_mobile",
+      "label": "Orden en móvil",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "push_right_mobile",
+      "label": "Empujar a la derecha (móvil)",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "layout_desktop",
+      "label": "Ancho en escritorio",
+      "options": [
+        { "value": "full", "label": "Línea propia" },
+        { "value": "auto", "label": "Compartir línea" }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "range",
+      "id": "order_desktop",
+      "label": "Orden en escritorio",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "checkbox",
+      "id": "push_right_desktop",
+      "label": "Empujar a la derecha (escritorio)",
+      "default": false
+    }
+    ]
+  },
     {
       "type": "zzen_badge",
       "name": "◇ Etiqueta / Badge",
