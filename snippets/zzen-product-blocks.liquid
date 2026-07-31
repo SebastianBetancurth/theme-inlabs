@@ -32,6 +32,9 @@
     {% render 'zzen-block-cta', block: block, product: product, section: section %}
 
   {%- when 'zzen_note' -%}
-  {% render 'zzen-block-note', block: block, product: product, section: section %}
+   {% render 'zzen-block-note', block: block, product: product, section: section %}
+   
+  {%- when 'zzen_payments' -%}
+   {% render 'zzen-block-payments', block: block, product: product, section: section %}
 
 {%- endcase -%}
