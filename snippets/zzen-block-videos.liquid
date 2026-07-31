@@ -312,7 +312,24 @@
 
     /* CAPAS EXPLÍCITAS. Sin esto el stage, que va después en el DOM,
        pinta por encima de las flechas y en móvil no se pueden pulsar. */
-    .zzen-vid-{{ block.id }}__overlay {
+    /* OJO CON EL SELECTOR: lleva "div." a propósito.
+       Dawn trae esto en base.css:
+
+         a:empty, ul:empty, div:empty, section:empty, p:empty, ... {
+           display: none;
+         }
+
+       El overlay es un <div> sin contenido, así que encaja ahí. Y
+       div:empty tiene especificidad (0,1,1) — el tipo más la
+       pseudoclase — mientras que una sola clase es (0,1,0). Dawn gana
+       aunque nuestra regla vaya después: cuando la especificidad es
+       distinta, el orden en el documento no decide.
+
+       Con "div." subimos a (0,2,1) y ganamos por especificidad. El
+       !important es cinturón extra: cualquier app puede inyectar otra
+       regla de display y esto es demasiado crítico para arriesgarlo. */
+    div.zzen-vid-{{ block.id }}__overlay {
+      display: block !important;
       position: fixed;
       inset: 0;
       z-index: 0;
@@ -727,6 +744,12 @@
             this.ticking = false;
             this.playTimer = null;
 
+            // Intención de sonido del usuario, separada del estado real
+            // del vídeo. El vídeo SIEMPRE arranca silenciado (es lo
+            // único que ningún navegador bloquea) y si esta bandera está
+            // activa le quitamos el silencio en cuanto suena.
+            this.wantsSound = !this.startMuted;
+
             this.bindCarousel();
             this.bindModal();
 
@@ -847,10 +870,11 @@
             this.modal.showModal();
             document.documentElement.style.overflow = 'hidden';
 
-            // Al abrir siempre arrancamos con el estado de sonido
-            // configurado; al navegar se respeta lo que eligió el
-            // usuario (ver goTo).
-            this.load(index, this.startMuted);
+            // Cada apertura parte del ajuste del tema. Al navegar entre
+            // vídeos se conserva lo que haya elegido el usuario.
+            this.wantsSound = !this.startMuted;
+
+            this.load(index);
             this.animateIn();
           }
 
@@ -866,9 +890,8 @@
           goTo(index) {
             if (index < 0 || index > this.slides.length - 1) return;
 
-            const keepMuted = this.video ? this.video.muted : this.startMuted;
             this.index = index;
-            this.load(index, keepMuted);
+            this.load(index);
 
             this.slides[index]?.closest('li')?.scrollIntoView({
               behavior: this.reducedMotion ? 'auto' : 'smooth',
@@ -879,7 +902,7 @@
 
           /* ---- Carga del vídeo ---- */
 
-          load(index, muted) {
+          load(index) {
             const slide = this.slides[index];
             if (!slide || !this.video) return;
 
@@ -904,7 +927,14 @@
             // El poster evita el rectángulo negro mientras carga.
             this.video.poster = slide.dataset.poster || '';
             this.video.loop = this.loop;
-            this.video.muted = muted;
+
+            // Arrancar con audio es la petición más frágil que existe:
+            // los navegadores la rechazan salvo que haya gesto reciente
+            // del usuario, y basta un tick de retraso para perderlo.
+            // Arrancamos en silencio, que nunca falla, y desmuteamos en
+            // el evento "playing" (ver tryPlay). Desmutear algo que ya
+            // está sonando es mucho más fiable.
+            this.video.muted = true;
 
             // Asignar src ya dispara la carga por sí solo. Llamar
             // además a load() era redundante y provocaba que play()
@@ -920,19 +950,9 @@
           tryPlay() {
             const video = this.video;
 
-            // Intento con el estado de sonido pedido. Si el navegador
-            // lo rechaza teniendo audio, es la política de autoplay:
-            // repliegue a silenciado, que sí permiten siempre. Mejor
-            // sonando en silencio que un vídeo parado.
             const attempt = () => {
               const promise = video.play();
-              if (!promise || !promise.catch) return;
-
-              promise.catch(() => {
-                if (video.muted) return;
-                video.muted = true;
-                video.play().catch(() => {});
-              });
+              if (promise && promise.catch) promise.catch(() => {});
             };
 
             attempt();
@@ -943,6 +963,18 @@
               'canplay',
               () => {
                 if (video.paused) attempt();
+              },
+              { once: true }
+            );
+
+            // AQUÍ se activa el audio: ya está reproduciéndose, así que
+            // quitar el silencio es una operación que los navegadores
+            // aceptan sin pelear. Si aun así la rechazan, el vídeo sigue
+            // sonando en silencio y el botón de altavoz queda a un toque.
+            video.addEventListener(
+              'playing',
+              () => {
+                if (this.wantsSound) video.muted = false;
               },
               { once: true }
             );
@@ -967,6 +999,8 @@
           toggleSound() {
             if (!this.video) return;
             this.video.muted = !this.video.muted;
+            // Recordamos la decisión para los vídeos siguientes.
+            this.wantsSound = !this.video.muted;
             if (!this.video.muted && this.video.paused) this.video.play().catch(() => {});
             // El icono lo actualiza el listener de volumechange.
           }
