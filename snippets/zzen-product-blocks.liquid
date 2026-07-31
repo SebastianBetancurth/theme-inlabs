@@ -40,4 +40,7 @@
    {%- when 'zzen_guarantee' -%}
   {% render 'zzen-block-guarantee', block: block, product: product, section: section %}
 
+  {%- when 'zzen_accordion' -%}
+  {% render 'zzen-block-accordion', block: block, product: product, section: section %}
+
 {%- endcase -%}
