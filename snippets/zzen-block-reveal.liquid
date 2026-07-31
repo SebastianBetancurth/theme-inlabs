@@ -1,0 +1,520 @@
+{% comment %}
+  ============================================================
+  BLOQUE: zzen_reveal — Desplegable destacado (tarjeta)
+  Parámetros: block, product, section
+
+  Una sola fila dentro de una tarjeta con fondo propio. Pensado para
+  el "Con cada pedido regalamos el NUEVO ZZEN Challenge": título con
+  parte en negrita, y al abrir un subtítulo, un texto y una imagen.
+
+  El JS va incrustado al final de este mismo archivo. La definición
+  del custom element está protegida con customElements.get(), así que
+  aunque el snippet se renderice varias veces (varios bloques, o un
+  re-render de la sección al cambiar de variante) solo se registra una.
+
+  El indicador gira 90° por defecto, no 180°: un chevron hacia abajo
+  rotado en sentido horario queda apuntando a la izquierda, que es el
+  estado abierto de la maqueta.
+  ============================================================
+{% endcomment %}
+
+{%- liquid
+  assign b = block.settings
+
+  case b.title_font
+    when 'heading'
+      assign title_stack = 'var(--font-heading-family)'
+    when 'custom'
+      assign title_stack = b.title_font_stack
+    else
+      assign title_stack = 'var(--font-body-family)'
+  endcase
+
+  case b.body_font
+    when 'heading'
+      assign body_stack = 'var(--font-heading-family)'
+    when 'custom'
+      assign body_stack = b.body_font_stack
+    else
+      assign body_stack = 'var(--font-body-family)'
+  endcase
+
+  case b.easing
+    when 'linear'
+      assign easing_css = 'linear'
+    when 'ease_out'
+      assign easing_css = 'cubic-bezier(0.22, 1, 0.36, 1)'
+    when 'ease_in_out'
+      assign easing_css = 'cubic-bezier(0.65, 0, 0.35, 1)'
+    when 'spring'
+      assign easing_css = 'cubic-bezier(0.34, 1.4, 0.64, 1)'
+    else
+      assign easing_css = 'cubic-bezier(0.4, 0, 0.2, 1)'
+  endcase
+
+  case b.image_ratio
+    when 'square'
+      assign ratio_css = '1 / 1'
+    when 'portrait_45'
+      assign ratio_css = '4 / 5'
+    when 'portrait_34'
+      assign ratio_css = '3 / 4'
+    when 'landscape'
+      assign ratio_css = '16 / 9'
+    else
+      assign ratio_css = 'auto'
+  endcase
+
+  assign has_content = false
+  if b.subtitle != blank or b.text != blank or b.image != blank
+    assign has_content = true
+  endif
+-%}
+
+{%- if b.title != blank -%}
+
+  {%- style -%}
+    /* ===================== MÓVIL (base) ===================== */
+    .zzen-rev-{{ block.id }} {
+      display: block;
+      margin-top: {{ b.margin_top_mobile }}px;
+      margin-bottom: {{ b.margin_bottom_mobile }}px;
+      {% if b.max_width_mobile > 0 %}
+        max-width: {{ b.max_width_mobile }}px;
+        margin-left: auto;
+        margin-right: auto;
+      {% endif %}
+      {% if b.show_mobile == false %}display: none;{% endif %}
+    }
+
+    .zzen-rev-{{ block.id }}__card {
+      background-color: {{ b.bg_color }};
+      border: {{ b.border_width }}px solid {{ b.border_color }};
+      border-radius: {{ b.border_radius }}px;
+      overflow: hidden;
+      {% if b.shadow_enabled %}
+        box-shadow: 0 {{ b.shadow_y }}px {{ b.shadow_blur }}px {{ b.shadow_color }};
+      {% endif %}
+    }
+
+    /* ---- Cabecera clicable ---- */
+    .zzen-rev-{{ block.id }}__summary {
+      display: flex;
+      align-items: {{ b.caret_valign }};
+      gap: {{ b.caret_gap_mobile }}px;
+      padding: {{ b.padding_y_mobile }}px {{ b.padding_x_mobile }}px;
+      cursor: pointer;
+      list-style: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color 0.2s ease;
+    }
+
+    .zzen-rev-{{ block.id }}__summary::-webkit-details-marker { display: none; }
+    .zzen-rev-{{ block.id }}__summary::marker { content: ''; }
+
+    @media (hover: hover) {
+      .zzen-rev-{{ block.id }}__summary:hover { background-color: {{ b.bg_color_hover }}; }
+    }
+
+    .zzen-rev-{{ block.id }}__summary:focus { outline: none; }
+    .zzen-rev-{{ block.id }}__summary:focus-visible {
+      outline: 2px solid {{ b.caret_color }};
+      outline-offset: -4px;
+    }
+
+    /* ---- Título ---- */
+    .zzen-rev-{{ block.id }}__title {
+      flex: 1 1 auto;
+      min-width: 0;
+      margin: 0;
+      font-family: {{ title_stack }};
+      font-size: {{ b.title_size_mobile }}px;
+      font-weight: {{ b.title_weight }};
+      color: {{ b.title_color }};
+      line-height: {{ b.title_line_height }};
+      letter-spacing: {{ b.title_letter_spacing }}px;
+      text-align: left;
+      {% if b.title_uppercase %}text-transform: uppercase;{% endif %}
+      {% if b.title_max_width_mobile > 0 %}max-width: {{ b.title_max_width_mobile }}px;{% endif %}
+    }
+
+    /* La parte en negrita del título lleva su propio grosor */
+    .zzen-rev-{{ block.id }}__title strong,
+    .zzen-rev-{{ block.id }}__title b {
+      font-weight: {{ b.title_strong_weight }};
+    }
+
+    /* ---- Indicador ---- */
+    .zzen-rev-{{ block.id }}__caret {
+      display: block;
+      flex: 0 0 auto;
+      width: {{ b.caret_size_mobile }}px;
+      height: {{ b.caret_size_mobile }}px;
+      color: {{ b.caret_color }};
+      transform: rotate(0deg);
+      transform-origin: 50% 50%;
+      transition: transform {{ b.duration }}ms {{ easing_css }}, color 0.2s ease;
+    }
+
+    .zzen-rev-{{ block.id }}__caret svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: visible;
+    }
+
+    .zzen-rev-{{ block.id }}__card[open] > .zzen-rev-{{ block.id }}__summary .zzen-rev-{{ block.id }}__caret {
+      transform: rotate({{ b.caret_rotation }}deg);
+      color: {{ b.caret_color_open }};
+    }
+
+    /* Al cerrar vuelve ya, sin esperar a que acabe la altura */
+    .zzen-rev-{{ block.id }}__card.is-closing > .zzen-rev-{{ block.id }}__summary .zzen-rev-{{ block.id }}__caret {
+      transform: rotate(0deg);
+      color: {{ b.caret_color }};
+    }
+
+    /* ---- Panel ---- */
+    .zzen-rev-{{ block.id }}__panel {
+      overflow: hidden;
+      will-change: height;
+    }
+
+    .zzen-rev-{{ block.id }}__inner {
+      padding: 0 {{ b.padding_x_mobile }}px {{ b.padding_bottom_mobile }}px;
+    }
+
+    /* ---- Subtítulo ---- */
+    .zzen-rev-{{ block.id }}__subtitle {
+      font-family: {{ body_stack }};
+      font-size: {{ b.subtitle_size_mobile }}px;
+      font-weight: {{ b.subtitle_weight }};
+      color: {{ b.subtitle_color }};
+      line-height: {{ b.subtitle_line_height }};
+      letter-spacing: {{ b.subtitle_letter_spacing }}px;
+      margin: 0 0 {{ b.gap_subtitle_text_mobile }}px;
+      {% if b.subtitle_uppercase %}text-transform: uppercase;{% endif %}
+    }
+
+    /* ---- Texto ---- */
+    .zzen-rev-{{ block.id }}__text {
+      font-family: {{ body_stack }};
+      font-size: {{ b.text_size_mobile }}px;
+      font-weight: {{ b.text_weight }};
+      color: {{ b.text_color }};
+      line-height: {{ b.text_line_height }};
+      letter-spacing: {{ b.text_letter_spacing }}px;
+    }
+
+    .zzen-rev-{{ block.id }}__text > * { margin-top: 0; }
+    .zzen-rev-{{ block.id }}__text > *:last-child { margin-bottom: 0; }
+    .zzen-rev-{{ block.id }}__text > * + * { margin-top: 0.7em; }
+
+    .zzen-rev-{{ block.id }}__text a {
+      color: inherit;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .zzen-rev-{{ block.id }}__text strong,
+    .zzen-rev-{{ block.id }}__text b {
+      color: {{ b.subtitle_color }};
+    }
+
+    .zzen-rev-{{ block.id }}__text ul,
+    .zzen-rev-{{ block.id }}__text ol {
+      padding-left: 1.2em;
+      margin-top: 0.6em;
+    }
+
+    .zzen-rev-{{ block.id }}__text li + li { margin-top: 0.35em; }
+
+    /* ---- Imagen ---- */
+    .zzen-rev-{{ block.id }}__media {
+      display: block;
+      margin-top: {{ b.gap_media_mobile }}px;
+      border-radius: {{ b.image_radius }}px;
+      overflow: hidden;
+      line-height: 0;
+    }
+
+    .zzen-rev-{{ block.id }}__media img {
+      display: block;
+      width: 100%;
+      height: {% if ratio_css == 'auto' %}auto{% else %}100%{% endif %};
+      {% unless ratio_css == 'auto' %}
+        aspect-ratio: {{ ratio_css }};
+        object-fit: {{ b.image_fit }};
+        object-position: {{ b.image_position }};
+      {% endunless %}
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .zzen-rev-{{ block.id }}__caret,
+      .zzen-rev-{{ block.id }}__summary { transition: none; }
+    }
+
+    /* ===================== ESCRITORIO ===================== */
+    @media screen and (min-width: 750px) {
+      .zzen-rev-{{ block.id }} {
+        margin-top: {{ b.margin_top_desktop }}px;
+        margin-bottom: {{ b.margin_bottom_desktop }}px;
+        {% if b.max_width_desktop > 0 %}
+          max-width: {{ b.max_width_desktop }}px;
+        {% else %}
+          max-width: none;
+        {% endif %}
+        {% if b.show_mobile == false and b.show_desktop %}display: block;{% endif %}
+        {% if b.show_desktop == false %}display: none;{% endif %}
+      }
+
+      .zzen-rev-{{ block.id }}__summary {
+        gap: {{ b.caret_gap_desktop }}px;
+        padding: {{ b.padding_y_desktop }}px {{ b.padding_x_desktop }}px;
+      }
+
+      .zzen-rev-{{ block.id }}__title {
+        font-size: {{ b.title_size_desktop }}px;
+        {% if b.title_max_width_desktop > 0 %}max-width: {{ b.title_max_width_desktop }}px;{% endif %}
+      }
+
+      .zzen-rev-{{ block.id }}__caret {
+        width: {{ b.caret_size_desktop }}px;
+        height: {{ b.caret_size_desktop }}px;
+      }
+
+      .zzen-rev-{{ block.id }}__inner {
+        padding: 0 {{ b.padding_x_desktop }}px {{ b.padding_bottom_desktop }}px;
+      }
+
+      .zzen-rev-{{ block.id }}__subtitle {
+        font-size: {{ b.subtitle_size_desktop }}px;
+        margin-bottom: {{ b.gap_subtitle_text_desktop }}px;
+      }
+
+      .zzen-rev-{{ block.id }}__text { font-size: {{ b.text_size_desktop }}px; }
+
+      .zzen-rev-{{ block.id }}__media { margin-top: {{ b.gap_media_desktop }}px; }
+    }
+  {%- endstyle -%}
+
+  {%- capture rev_caret -%}
+    {%- if b.caret_style != 'none' -%}
+      <span class="zzen-rev-{{ block.id }}__caret" aria-hidden="true">
+        {%- if b.caret_style == 'chevron_wide' -%}
+          <svg viewBox="0 0 22 12" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M1 1l10 10L21 1" stroke="currentColor" stroke-width="{{ b.caret_stroke }}" stroke-linecap="round"/>
+          </svg>
+        {%- elsif b.caret_style == 'chevron' -%}
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M3 5.5l5 5 5-5" stroke="currentColor" stroke-width="{{ b.caret_stroke }}" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        {%- elsif b.caret_style == 'plus' -%}
+          <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="{{ b.caret_stroke }}" stroke-linecap="round"/>
+          </svg>
+        {%- elsif b.caret_style == 'arrow_up_right' -%}
+          <svg viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M1 13.7827L13.6938 1.08887" stroke="currentColor" stroke-width="{{ b.caret_stroke }}" stroke-linecap="round"/>
+            <path d="M13.7826 13.6051V1H1" stroke="currentColor" stroke-width="{{ b.caret_stroke }}" stroke-linecap="round"/>
+          </svg>
+        {%- endif -%}
+      </span>
+    {%- endif -%}
+  {%- endcapture -%}
+
+  <zzen-reveal
+    class="zzen-rev zzen-rev-{{ block.id }}"
+    data-duration="{{ b.duration }}"
+    data-easing="{{ easing_css }}"
+    data-fade="{{ b.content_fade }}"
+    data-slide="{{ b.content_slide }}"
+    {{ block.shopify_attributes }}
+  >
+    <details
+      class="zzen-rev-{{ block.id }}__card"
+      id="ZzenRev-{{ block.id }}"
+      {% if b.open_by_default %}open{% endif %}
+    >
+      <summary class="zzen-rev-{{ block.id }}__summary">
+        <span class="zzen-rev-{{ block.id }}__title">{{ b.title }}</span>
+        {{ rev_caret }}
+      </summary>
+
+      {%- if has_content -%}
+        <div class="zzen-rev-{{ block.id }}__panel" data-zzen-rev-panel>
+          <div class="zzen-rev-{{ block.id }}__inner" data-zzen-rev-inner>
+            {%- if b.subtitle != blank -%}
+              <p class="zzen-rev-{{ block.id }}__subtitle">{{ b.subtitle }}</p>
+            {%- endif -%}
+
+            {%- if b.text != blank -%}
+              <div class="zzen-rev-{{ block.id }}__text">{{ b.text }}</div>
+            {%- endif -%}
+
+            {%- if b.image != blank -%}
+              {%- capture rev_image -%}
+                {{
+                  b.image
+                  | image_url: width: 1400
+                  | image_tag:
+                    loading: 'lazy',
+                    sizes: '(min-width: 750px) 50vw, 100vw',
+                    widths: '350, 500, 700, 900, 1100, 1400',
+                    alt: b.image.alt
+                }}
+              {%- endcapture -%}
+
+              {%- if b.image_link != blank -%}
+                <a href="{{ b.image_link }}" class="zzen-rev-{{ block.id }}__media">{{ rev_image }}</a>
+              {%- else -%}
+                <div class="zzen-rev-{{ block.id }}__media">{{ rev_image }}</div>
+              {%- endif -%}
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+    </details>
+  </zzen-reveal>
+
+  <script>
+    /* ----------------------------------------------------------
+       zzen-reveal — animación de apertura y cierre
+
+       Va aquí en lugar de en assets/ a peticion expresa. La guarda
+       de customElements.get() evita registrar el elemento dos veces
+       si el snippet se renderiza más de una vez (varios bloques o
+       re-render de la sección al cambiar de variante).
+
+       height: auto no es animable y <details> oculta su contenido de
+       golpe al quitar open, así que interceptamos el click, medimos
+       la altura real y la animamos con la Web Animations API. Al
+       cerrar, open se mantiene hasta que la animación termina.
+
+       Sin JS el bloque sigue abriendo y cerrando: details nativo.
+       ---------------------------------------------------------- */
+    if (!customElements.get('zzen-reveal')) {
+      customElements.define(
+        'zzen-reveal',
+        class ZzenReveal extends HTMLElement {
+          connectedCallback() {
+            this.duration = parseInt(this.dataset.duration, 10) || 320;
+            this.easing = this.dataset.easing || 'cubic-bezier(0.22, 1, 0.36, 1)';
+            this.fade = this.dataset.fade === 'true';
+            this.slide = parseInt(this.dataset.slide, 10) || 0;
+
+            this.details = this.querySelector('details');
+            this.panel = this.querySelector('[data-zzen-rev-panel]');
+            this.inner = this.querySelector('[data-zzen-rev-inner]');
+
+            const summary = this.querySelector('summary');
+            if (!summary || !this.details) return;
+
+            summary.addEventListener('click', (event) => {
+              // Sin panel no hay nada que animar: dejamos el
+              // comportamiento nativo intacto.
+              if (!this.panel) return;
+              event.preventDefault();
+              this.details.open ? this.collapse() : this.expand();
+            });
+          }
+
+          get reducedMotion() {
+            return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          }
+
+          get visibleHeight() {
+            return this.panel.getBoundingClientRect().height;
+          }
+
+          expand() {
+            this.details.classList.remove('is-closing');
+
+            const from = this.anim ? this.visibleHeight : 0;
+            this.details.open = true;
+            const to = this.panel.scrollHeight;
+
+            this.run(from, to, () => {
+              this.panel.style.height = '';
+              this.panel.style.overflow = '';
+            });
+
+            this.runContent(1);
+          }
+
+          collapse() {
+            this.details.classList.add('is-closing');
+
+            const from = this.visibleHeight;
+
+            this.run(from, 0, () => {
+              this.details.open = false;
+              this.details.classList.remove('is-closing');
+              this.panel.style.height = '';
+              this.panel.style.overflow = '';
+            });
+
+            this.runContent(0);
+          }
+
+          run(from, to, onDone) {
+            this.anim?.cancel();
+
+            this.panel.style.overflow = 'hidden';
+            this.panel.style.height = from + 'px';
+
+            const animation = this.panel.animate(
+              { height: [from + 'px', to + 'px'] },
+              {
+                duration: this.reducedMotion ? 0 : this.duration,
+                easing: this.easing,
+                fill: 'forwards',
+              }
+            );
+
+            this.anim = animation;
+
+            animation.onfinish = () => {
+              this.anim = null;
+              animation.cancel();
+              onDone();
+            };
+
+            animation.oncancel = () => {
+              if (this.anim === animation) this.anim = null;
+            };
+          }
+
+          runContent(toOpacity) {
+            if (!this.inner) return;
+            if (!this.fade && this.slide === 0) return;
+
+            this.innerAnim?.cancel();
+
+            const keyframes = {};
+            if (this.fade) keyframes.opacity = toOpacity === 1 ? [0, 1] : [1, 0];
+            if (this.slide > 0) {
+              keyframes.transform =
+                toOpacity === 1
+                  ? ['translateY(-' + this.slide + 'px)', 'translateY(0)']
+                  : ['translateY(0)', 'translateY(-' + this.slide + 'px)'];
+            }
+
+            const animation = this.inner.animate(keyframes, {
+              duration: this.reducedMotion ? 0 : this.duration,
+              easing: this.easing,
+              fill: 'forwards',
+            });
+
+            this.innerAnim = animation;
+
+            animation.onfinish = () => {
+              this.innerAnim = null;
+              animation.cancel();
+            };
+          }
+        }
+      );
+    }
+  </script>
+{%- endif -%}
