@@ -95,6 +95,8 @@
     --cslx-ar: {{ ar_d }};
     --cslx-radius: {{ s.image_radius }}px;
     --cslx-dur: {{ s.fade_duration }}ms;
+    --cslx-out: {{ s.fade_out_duration }}ms;
+    --cslx-delay: {{ s.fade_out_duration }}ms;
     --cslx-ease: {{ s.fade_easing }};
     --cslx-shift: {{ s.fade_shift }}px;
 
@@ -164,30 +166,29 @@
 
   /* Todas las slides ocupan la misma celda: la altura es la de la más alta,
      así el bloque no salta al cambiar de producto. */
+
+  /* Estado inactivo. Es también el estado al que vuelve la slide que sale,
+     por eso lleva la duración de salida y NO lleva retardo. */
   .cslx__slide {
     grid-area: stack;
     opacity: 0;
     transform: translateY(var(--cslx-shift));
     pointer-events: none;
     z-index: 0;
-    transition: opacity var(--cslx-dur) var(--cslx-ease),
-      transform var(--cslx-dur) var(--cslx-ease);
+    transition: opacity var(--cslx-out) var(--cslx-ease),
+      transform var(--cslx-out) var(--cslx-ease);
   }
 
+  /* La slide que entra espera con un retardo igual a la duración de salida:
+     así la anterior ya se ha desvanecido por completo y los dos textos
+     nunca se ven superpuestos. */
   .cslx__slide.is-active {
     opacity: 1;
     transform: none;
     pointer-events: auto;
     z-index: 2;
-  }
-
-  /* La slide que sale se queda visible debajo mientras la nueva aparece
-     encima: así el fundido es cruzado y no hay un parpadeo del fondo. */
-  .cslx__slide.is-leaving {
-    opacity: 1;
-    transform: none;
-    z-index: 1;
-    transition: none;
+    transition: opacity var(--cslx-dur) var(--cslx-ease) var(--cslx-delay),
+      transform var(--cslx-dur) var(--cslx-ease) var(--cslx-delay);
   }
 
   .cslx__slide-inner {
@@ -537,7 +538,6 @@
 <cslx-slider
   class="cslx cslx-{{ section.id }} cslx--media-{{ s.image_position_d }} cslx--nav-d-{{ s.nav_style_d }} cslx--nav-m-{{ s.nav_style_m }}{% if s.show_arrows_d %} cslx--arrows-d{% endif %}{% if s.show_arrows_m %} cslx--arrows-m{% endif %}"
   {% if s.loop %}data-loop="true"{% endif %}
-  data-duration="{{ s.fade_duration }}"
   role="region"
   aria-roledescription="carrusel"
   aria-label="{{ s.aria_label | escape }}"
@@ -723,7 +723,6 @@
           this.prevBtn = this.querySelector('[data-prev]');
           this.nextBtn = this.querySelector('[data-next]');
           this.loop = this.dataset.loop === 'true';
-          this.duration = parseInt(this.dataset.duration, 10) || 500;
           this.index = 0;
           this.supportsInert = 'inert' in HTMLElement.prototype;
 
@@ -758,7 +757,6 @@
 
         disconnectedCallback() {
           document.removeEventListener('shopify:block:select', this.blockSelect);
-          clearTimeout(this._fade);
         }
 
         bindSwipe() {
@@ -798,20 +796,9 @@
           }
           if (i === this.index) return;
 
-          const outgoing = this.slides[this.index];
-          const incoming = this.slides[i];
-
-          outgoing.classList.remove('is-active');
-          outgoing.classList.add('is-leaving');
-          incoming.classList.add('is-active');
+          this.slides[this.index].classList.remove('is-active');
+          this.slides[i].classList.add('is-active');
           this.index = i;
-
-          clearTimeout(this._fade);
-          this._fade = setTimeout(() => {
-            this.slides.forEach((slide) => {
-              if (slide !== incoming) slide.classList.remove('is-leaving');
-            });
-          }, this.duration);
 
           this.update();
         }
@@ -917,13 +904,24 @@
     },
     {
       "type": "range",
+      "id": "fade_out_duration",
+      "min": 0,
+      "max": 1000,
+      "step": 50,
+      "unit": "ms",
+      "label": "Duración al desaparecer",
+      "info": "El contenido nuevo espera este tiempo antes de entrar, para que no se solapen.",
+      "default": 250
+    },
+    {
+      "type": "range",
       "id": "fade_duration",
       "min": 100,
       "max": 1500,
       "step": 50,
       "unit": "ms",
-      "label": "Duración del fundido",
-      "default": 500
+      "label": "Duración al aparecer",
+      "default": 400
     },
     {
       "type": "select",
