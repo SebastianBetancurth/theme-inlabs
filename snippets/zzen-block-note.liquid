@@ -60,7 +60,7 @@
   .zzen-note-{{ block.id }} {
     display: flex;
     justify-content: {{ b.align_mobile }};
-    margin-top: {{ b.margin_top_mobile }}px;
+    margin-top: -20px;;
     margin-bottom: {{ b.margin_bottom_mobile }}px;
     {% if b.show_mobile == false %}display: none;{% endif %}
   }
@@ -115,7 +115,8 @@
   @media screen and (min-width: 750px) {
     .zzen-note-{{ block.id }} {
       justify-content: {{ b.align_desktop }};
-      margin-top: {{ b.margin_top_desktop }}px;
+      margin-top: justify-content: center;
+      margin-top: -20px;;
       margin-bottom: {{ b.margin_bottom_desktop }}px;
       {% if b.show_mobile == false and b.show_desktop %}display: flex;{% endif %}
       {% if b.show_desktop == false %}display: none;{% endif %}
