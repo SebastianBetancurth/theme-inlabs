@@ -452,7 +452,7 @@
             "border_width": 1,
             "border_color": "#111111",
             "border_top_first": true,
-            "border_bottom_last": true,
+            "border_bottom_last": false,
             "left_icon_style": "arrow_up_right",
             "left_icon_color": "#111111",
             "left_icon_stroke": 1.5,
