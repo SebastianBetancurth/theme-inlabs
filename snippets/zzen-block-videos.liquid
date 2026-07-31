@@ -1,0 +1,982 @@
+{% comment %}
+  ============================================================
+  BLOQUE: zzen_videos — Carrusel de vídeos + lightbox
+  Parámetros: block, product, section
+
+  Los bloques de sección no admiten bloques hijos, así que los vídeos
+  van en 10 huecos numerados. Los huecos sin vídeo se saltan.
+
+  · Carrusel con scroll-snap nativo: dedo, trackpad, rueda y teclado
+    sin librerías. Las flechas solo empujan el scroll.
+  · Las flechas se ocultan solas en los extremos y ambas desaparecen
+    si los vídeos caben sin desbordar.
+  · El lightbox es un <dialog> con showModal(): vive en el top layer
+    del navegador, así que el overlay cubre TODA la web por encima de
+    cualquier z-index aunque el bloque esté anidado en la columna de
+    producto. Trae atrapado de foco, Esc y semántica de diálogo.
+  · Un solo <video> reutilizado: al navegar se cambian las fuentes.
+    Al cerrar se vacía para cortar la descarga.
+  · Autoplay silenciado (única forma que permiten los navegadores)
+    con botón para activar el sonido.
+
+  SOLO VÍDEO ALOJADO EN SHOPIFY: el control de sonido y el autoplay
+  necesitan un <video> real, que un iframe de YouTube no permite.
+
+  El JS va incrustado al final. La guarda de customElements.get()
+  evita registrarlo dos veces si hay varios bloques o si la sección
+  se re-renderiza al cambiar de variante.
+  ============================================================
+{% endcomment %}
+
+{%- liquid
+  assign b = block.settings
+  assign slot_indexes = '1,2,3,4,5,6,7,8,9,10' | split: ','
+
+  assign playable = 0
+  for i in slot_indexes
+    assign vkey = 'video_' | append: i
+    if b[vkey] != blank
+      assign playable = playable | plus: 1
+    endif
+  endfor
+
+  case b.heading_font
+    when 'heading'
+      assign heading_stack = 'var(--font-heading-family)'
+    when 'custom'
+      assign heading_stack = b.heading_font_stack
+    else
+      assign heading_stack = 'var(--font-body-family)'
+  endcase
+
+  case b.card_ratio
+    when 'portrait_45'
+      assign ratio_css = '4 / 5'
+    when 'portrait_34'
+      assign ratio_css = '3 / 4'
+    when 'square'
+      assign ratio_css = '1 / 1'
+    else
+      assign ratio_css = '9 / 16'
+  endcase
+
+  case b.easing
+    when 'linear'
+      assign easing_css = 'linear'
+    when 'ease_in_out'
+      assign easing_css = 'cubic-bezier(0.65, 0, 0.35, 1)'
+    when 'spring'
+      assign easing_css = 'cubic-bezier(0.34, 1.4, 0.64, 1)'
+    else
+      assign easing_css = 'cubic-bezier(0.22, 1, 0.36, 1)'
+  endcase
+
+  case b.snap
+    when 'proximity'
+      assign snap_css = 'x proximity'
+    when 'none'
+      assign snap_css = 'none'
+    else
+      assign snap_css = 'x mandatory'
+  endcase
+-%}
+
+{%- if playable > 0 -%}
+
+  {%- style -%}
+    /* ===================== MÓVIL (base) ===================== */
+    .zzen-vid-{{ block.id }} {
+      display: block;
+      margin-top: {{ b.margin_top_mobile }}px;
+      margin-bottom: {{ b.margin_bottom_mobile }}px;
+      {% if b.show_mobile == false %}display: none;{% endif %}
+    }
+
+    /* ---------- Encabezado ---------- */
+    .zzen-vid-{{ block.id }}__heading {
+      font-family: {{ heading_stack }};
+      font-size: {{ b.heading_size_mobile }}px;
+      font-weight: {{ b.heading_weight }};
+      color: {{ b.heading_color }};
+      line-height: {{ b.heading_line_height }};
+      letter-spacing: {{ b.heading_letter_spacing }}px;
+      text-align: {{ b.heading_align_mobile }};
+      margin: 0 0 {{ b.heading_gap_mobile }}px;
+      {% if b.heading_uppercase %}text-transform: uppercase;{% endif %}
+    }
+
+    /* ---------- Carrusel ---------- */
+    .zzen-vid-{{ block.id }}__wrap { position: relative; }
+
+    .zzen-vid-{{ block.id }}__track {
+      display: flex;
+      column-gap: {{ b.gap_mobile }}px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: {{ snap_css }};
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      -webkit-overflow-scrolling: touch;
+      padding: {{ b.track_padding }}px;
+      margin: -{{ b.track_padding }}px;
+      list-style: none;
+    }
+
+    .zzen-vid-{{ block.id }}__track::-webkit-scrollbar { display: none; }
+
+    .zzen-vid-{{ block.id }}__slide {
+      flex: 0 0 calc((100% - ({{ b.per_view_mobile }} - 1) * {{ b.gap_mobile }}px) / {{ b.per_view_mobile }});
+      scroll-snap-align: start;
+      min-width: 0;
+    }
+
+    /* ---------- Tarjeta ---------- */
+    .zzen-vid-{{ block.id }}__card {
+      position: relative;
+      display: block;
+      width: 100%;
+      aspect-ratio: {{ ratio_css }};
+      border-radius: {{ b.card_radius }}px;
+      overflow: hidden;
+      background-color: {{ b.card_bg }};
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .zzen-vid-{{ block.id }}__card img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: center;
+      transition: transform {{ b.duration }}ms {{ easing_css }};
+    }
+
+    @media (hover: hover) {
+      .zzen-vid-{{ block.id }}__card:hover img {
+        transform: scale({{ b.card_hover_zoom | divided_by: 100.0 }});
+      }
+    }
+
+    .zzen-vid-{{ block.id }}__card:focus { outline: none; }
+    .zzen-vid-{{ block.id }}__card:focus-visible {
+      outline: 3px solid {{ b.arrow_bg }};
+      outline-offset: 2px;
+    }
+
+    /* ---------- Botón de play ---------- */
+    .zzen-vid-{{ block.id }}__play {
+      position: absolute;
+      {% if b.play_position == 'center' %}
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      {% elsif b.play_position == 'bottom_center' %}
+        bottom: {{ b.play_offset_mobile }}px;
+        left: 50%;
+        transform: translateX(-50%);
+      {% elsif b.play_position == 'bottom_right' %}
+        bottom: {{ b.play_offset_mobile }}px;
+        right: {{ b.play_offset_mobile }}px;
+      {% else %}
+        bottom: {{ b.play_offset_mobile }}px;
+        left: {{ b.play_offset_mobile }}px;
+      {% endif %}
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: {{ b.play_size_mobile }}px;
+      height: {{ b.play_size_mobile }}px;
+      border-radius: 50%;
+      background-color: {{ b.play_bg }};
+      border: {{ b.play_border_width }}px solid {{ b.play_border_color }};
+      color: {{ b.play_color }};
+      box-sizing: border-box;
+      pointer-events: none;
+      transition: background-color 0.2s ease;
+    }
+
+    .zzen-vid-{{ block.id }}__play svg {
+      width: 38%;
+      height: 38%;
+      display: block;
+      margin-left: 6%;
+    }
+
+    @media (hover: hover) {
+      .zzen-vid-{{ block.id }}__card:hover .zzen-vid-{{ block.id }}__play {
+        background-color: {{ b.play_bg_hover }};
+      }
+    }
+
+    /* ---------- Flechas del carrusel ---------- */
+    .zzen-vid-{{ block.id }}__arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: {{ b.arrow_size_mobile }}px;
+      height: {{ b.arrow_size_mobile }}px;
+      border-radius: {% if b.arrow_shape == 'circle' %}50%{% else %}{{ b.arrow_radius }}px{% endif %};
+      background-color: {{ b.arrow_bg }};
+      border: {{ b.arrow_border_width }}px solid {{ b.arrow_border_color }};
+      color: {{ b.arrow_color }};
+      cursor: pointer;
+      padding: 0;
+      box-sizing: border-box;
+      opacity: 1;
+      transition: opacity {{ b.duration }}ms {{ easing_css }}, background-color 0.2s ease, visibility {{ b.duration }}ms;
+      {% if b.arrow_shadow %}box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);{% endif %}
+    }
+
+    .zzen-vid-{{ block.id }}__arrow svg { width: 42%; height: 42%; display: block; }
+
+    .zzen-vid-{{ block.id }}__arrow--prev { left: {{ b.arrow_inset_mobile }}px; }
+    .zzen-vid-{{ block.id }}__arrow--next { right: {{ b.arrow_inset_mobile }}px; }
+
+    @media (hover: hover) {
+      .zzen-vid-{{ block.id }}__arrow:hover {
+        background-color: {{ b.arrow_bg_hover }};
+        color: {{ b.arrow_color_hover }};
+      }
+    }
+
+    .zzen-vid-{{ block.id }}__arrow:focus-visible {
+      outline: 2px solid {{ b.arrow_color }};
+      outline-offset: 2px;
+    }
+
+    /* Ocultar en los extremos. is-at-start viene ya en el HTML, así
+       la flecha izquierda no parpadea antes de que arranque el JS. */
+    {%- if b.hide_arrows_at_edges -%}
+      .zzen-vid-{{ block.id }}__wrap.is-at-start .zzen-vid-{{ block.id }}__arrow--prev,
+      .zzen-vid-{{ block.id }}__wrap.is-at-end .zzen-vid-{{ block.id }}__arrow--next {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+    {%- endif -%}
+
+    /* Si todo cabe sin scroll, fuera las dos */
+    .zzen-vid-{{ block.id }}__wrap.is-static .zzen-vid-{{ block.id }}__arrow { display: none; }
+
+    {%- if b.show_arrows == false -%}
+      .zzen-vid-{{ block.id }}__arrow { display: none; }
+    {%- endif -%}
+
+    @media screen and (max-width: 749px) {
+      {%- if b.show_arrows_mobile == false -%}
+        .zzen-vid-{{ block.id }}__arrow { display: none; }
+      {%- endif -%}
+    }
+
+    /* ================= LIGHTBOX ================= */
+    .zzen-vid-{{ block.id }}__modal {
+      padding: 0;
+      border: 0;
+      margin: 0;
+      max-width: none;
+      max-height: none;
+      width: 100vw;
+      height: 100vh;
+      background: transparent;
+      overflow: hidden;
+    }
+
+    .zzen-vid-{{ block.id }}__modal::backdrop { background: transparent; }
+    .zzen-vid-{{ block.id }}__modal:not([open]) { display: none; }
+
+    .zzen-vid-{{ block.id }}__overlay {
+      position: fixed;
+      inset: 0;
+      background-color: {{ b.overlay_color }};
+      opacity: {{ b.overlay_opacity | divided_by: 100.0 }};
+      border: 0;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+      {% if b.overlay_blur > 0 %}
+        backdrop-filter: blur({{ b.overlay_blur }}px);
+        -webkit-backdrop-filter: blur({{ b.overlay_blur }}px);
+      {% endif %}
+    }
+
+    .zzen-vid-{{ block.id }}__stage {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      aspect-ratio: {{ ratio_css }};
+      height: {{ b.modal_height_mobile }}vh;
+      max-width: calc(100vw - {{ b.modal_inset_mobile | times: 2 }}px);
+      max-height: calc(100vh - {{ b.modal_inset_mobile | times: 2 }}px);
+      border-radius: {{ b.modal_radius }}px;
+      overflow: hidden;
+      background-color: #000;
+    }
+
+    .zzen-vid-{{ block.id }}__video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: {{ b.modal_fit }};
+      background-color: #000;
+    }
+
+    .zzen-vid-{{ block.id }}__ctrl {
+      position: fixed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      cursor: pointer;
+      padding: 0;
+      box-sizing: border-box;
+      background-color: {{ b.modal_btn_bg }};
+      border: {{ b.modal_btn_border_width }}px solid {{ b.modal_btn_border_color }};
+      color: {{ b.modal_btn_color }};
+      transition: background-color 0.2s ease, opacity {{ b.duration }}ms {{ easing_css }};
+    }
+
+    @media (hover: hover) {
+      .zzen-vid-{{ block.id }}__ctrl:hover { background-color: {{ b.modal_btn_bg_hover }}; }
+    }
+
+    .zzen-vid-{{ block.id }}__ctrl:focus-visible {
+      outline: 2px solid {{ b.modal_btn_color }};
+      outline-offset: 3px;
+    }
+
+    .zzen-vid-{{ block.id }}__ctrl svg { display: block; }
+
+    .zzen-vid-{{ block.id }}__close {
+      top: {{ b.modal_close_inset_mobile }}px;
+      right: {{ b.modal_close_inset_mobile }}px;
+      width: {{ b.modal_close_size_mobile }}px;
+      height: {{ b.modal_close_size_mobile }}px;
+    }
+
+    .zzen-vid-{{ block.id }}__close svg { width: 42%; height: 42%; }
+
+    .zzen-vid-{{ block.id }}__mnav {
+      top: 50%;
+      transform: translateY(-50%);
+      width: {{ b.modal_nav_size_mobile }}px;
+      height: {{ b.modal_nav_size_mobile }}px;
+    }
+
+    .zzen-vid-{{ block.id }}__mnav svg { width: 40%; height: 40%; }
+    .zzen-vid-{{ block.id }}__mnav--prev { left: {{ b.modal_nav_inset_mobile }}px; }
+    .zzen-vid-{{ block.id }}__mnav--next { right: {{ b.modal_nav_inset_mobile }}px; }
+
+    .zzen-vid-{{ block.id }}__modal.is-first .zzen-vid-{{ block.id }}__mnav--prev,
+    .zzen-vid-{{ block.id }}__modal.is-last .zzen-vid-{{ block.id }}__mnav--next {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* Botón de sonido: dentro del stage, arriba a la izquierda */
+    .zzen-vid-{{ block.id }}__sound {
+      position: absolute;
+      top: {{ b.modal_sound_inset_mobile }}px;
+      left: {{ b.modal_sound_inset_mobile }}px;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: {{ b.modal_sound_size_mobile }}px;
+      height: {{ b.modal_sound_size_mobile }}px;
+      border-radius: 50%;
+      background-color: {{ b.sound_bg }};
+      border: 0;
+      color: {{ b.sound_color }};
+      cursor: pointer;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background-color 0.2s ease;
+    }
+
+    .zzen-vid-{{ block.id }}__sound svg { width: 52%; height: 52%; display: block; }
+
+    @media (hover: hover) {
+      .zzen-vid-{{ block.id }}__sound:hover { background-color: {{ b.sound_bg_hover }}; }
+    }
+
+    .zzen-vid-{{ block.id }}__sound:focus-visible {
+      outline: 2px solid {{ b.sound_color }};
+      outline-offset: 2px;
+    }
+
+    {%- if b.show_sound_button == false -%}
+      .zzen-vid-{{ block.id }}__sound { display: none; }
+    {%- endif -%}
+
+    .zzen-vid-{{ block.id }}__sound .icon-off { display: none; }
+    .zzen-vid-{{ block.id }}__sound.is-muted .icon-on { display: none; }
+    .zzen-vid-{{ block.id }}__sound.is-muted .icon-off { display: block; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .zzen-vid-{{ block.id }}__track { scroll-behavior: auto; }
+      .zzen-vid-{{ block.id }}__card img,
+      .zzen-vid-{{ block.id }}__arrow,
+      .zzen-vid-{{ block.id }}__ctrl { transition: none; }
+    }
+
+    /* ===================== ESCRITORIO ===================== */
+    @media screen and (min-width: 750px) {
+      .zzen-vid-{{ block.id }} {
+        margin-top: {{ b.margin_top_desktop }}px;
+        margin-bottom: {{ b.margin_bottom_desktop }}px;
+        {% if b.show_mobile == false and b.show_desktop %}display: block;{% endif %}
+        {% if b.show_desktop == false %}display: none;{% endif %}
+      }
+
+      .zzen-vid-{{ block.id }}__heading {
+        font-size: {{ b.heading_size_desktop }}px;
+        text-align: {{ b.heading_align_desktop }};
+        margin-bottom: {{ b.heading_gap_desktop }}px;
+      }
+
+      .zzen-vid-{{ block.id }}__track { column-gap: {{ b.gap_desktop }}px; }
+
+      .zzen-vid-{{ block.id }}__slide {
+        flex: 0 0 calc((100% - ({{ b.per_view_desktop }} - 1) * {{ b.gap_desktop }}px) / {{ b.per_view_desktop }});
+      }
+
+      .zzen-vid-{{ block.id }}__play {
+        width: {{ b.play_size_desktop }}px;
+        height: {{ b.play_size_desktop }}px;
+        {% if b.play_position == 'center' %}
+        {% elsif b.play_position == 'bottom_center' %}
+          bottom: {{ b.play_offset_desktop }}px;
+        {% elsif b.play_position == 'bottom_right' %}
+          bottom: {{ b.play_offset_desktop }}px;
+          right: {{ b.play_offset_desktop }}px;
+        {% else %}
+          bottom: {{ b.play_offset_desktop }}px;
+          left: {{ b.play_offset_desktop }}px;
+        {% endif %}
+      }
+
+      .zzen-vid-{{ block.id }}__arrow {
+        width: {{ b.arrow_size_desktop }}px;
+        height: {{ b.arrow_size_desktop }}px;
+      }
+
+      .zzen-vid-{{ block.id }}__arrow--prev { left: {{ b.arrow_inset_desktop }}px; }
+      .zzen-vid-{{ block.id }}__arrow--next { right: {{ b.arrow_inset_desktop }}px; }
+
+      .zzen-vid-{{ block.id }}__stage {
+        height: {{ b.modal_height_desktop }}vh;
+        max-width: calc(100vw - {{ b.modal_inset_desktop | times: 2 }}px);
+        max-height: calc(100vh - {{ b.modal_inset_desktop | times: 2 }}px);
+      }
+
+      .zzen-vid-{{ block.id }}__close {
+        top: {{ b.modal_close_inset_desktop }}px;
+        right: {{ b.modal_close_inset_desktop }}px;
+        width: {{ b.modal_close_size_desktop }}px;
+        height: {{ b.modal_close_size_desktop }}px;
+      }
+
+      .zzen-vid-{{ block.id }}__mnav {
+        width: {{ b.modal_nav_size_desktop }}px;
+        height: {{ b.modal_nav_size_desktop }}px;
+      }
+
+      .zzen-vid-{{ block.id }}__mnav--prev { left: {{ b.modal_nav_inset_desktop }}px; }
+      .zzen-vid-{{ block.id }}__mnav--next { right: {{ b.modal_nav_inset_desktop }}px; }
+
+      .zzen-vid-{{ block.id }}__sound {
+        top: {{ b.modal_sound_inset_desktop }}px;
+        left: {{ b.modal_sound_inset_desktop }}px;
+        width: {{ b.modal_sound_size_desktop }}px;
+        height: {{ b.modal_sound_size_desktop }}px;
+      }
+    }
+  {%- endstyle -%}
+
+  <zzen-video-carousel
+    class="zzen-vid zzen-vid-{{ block.id }}"
+    data-block-id="{{ block.id }}"
+    data-duration="{{ b.duration }}"
+    data-easing="{{ easing_css }}"
+    data-per-scroll="{{ b.per_scroll }}"
+    data-autoplay="{{ b.autoplay }}"
+    data-start-muted="{{ b.start_muted }}"
+    data-loop="{{ b.loop }}"
+    {{ block.shopify_attributes }}
+  >
+    {%- if b.heading != blank -%}
+      <p class="zzen-vid-{{ block.id }}__heading">{{ b.heading }}</p>
+    {%- endif -%}
+
+    <div class="zzen-vid-{{ block.id }}__wrap is-at-start" data-wrap>
+      <button
+        type="button"
+        class="zzen-vid-{{ block.id }}__arrow zzen-vid-{{ block.id }}__arrow--prev"
+        data-scroll="-1"
+        aria-label="{{ 'general.slider.previous_slide' | t }}"
+      >
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+          <path d="M10.5 2L4.5 8l6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <ul class="zzen-vid-{{ block.id }}__track" data-track role="list">
+        {%- assign vindex = 0 -%}
+        {%- for i in slot_indexes -%}
+          {%- liquid
+            assign vkey = 'video_' | append: i
+            assign pkey = 'poster_' | append: i
+            assign lkey = 'label_' | append: i
+            assign v = b[vkey]
+          -%}
+          {%- if v == blank -%}{%- continue -%}{%- endif -%}
+          {%- liquid
+            if b[pkey] != blank
+              assign poster = b[pkey]
+            else
+              assign poster = v.preview_image
+            endif
+            assign v_label = b[lkey] | default: 'Vídeo'
+          -%}
+
+          <li class="zzen-vid-{{ block.id }}__slide">
+            <button
+              type="button"
+              class="zzen-vid-{{ block.id }}__card"
+              data-slide
+              data-index="{{ vindex }}"
+              aria-label="{{ v_label | escape }}"
+            >
+              {%- if poster != blank -%}
+                {{
+                  poster
+                  | image_url: width: 900
+                  | image_tag:
+                    loading: 'lazy',
+                    sizes: '(min-width: 750px) 20vw, 45vw',
+                    widths: '160, 240, 320, 480, 640, 900',
+                    alt: v_label
+                }}
+              {%- endif -%}
+
+              <span class="zzen-vid-{{ block.id }}__play" aria-hidden="true">
+                <svg viewBox="0 0 12 14" fill="currentColor" xmlns="http://www.w3.org/2000/svg" focusable="false">
+                  <path d="M1 1.2c0-.5.5-.8 1-.6l8.6 5.3c.4.3.4.9 0 1.2L2 12.4c-.5.3-1 0-1-.6V1.2z"/>
+                </svg>
+              </span>
+
+              <script type="application/json" data-sources>
+                {{ v.sources | json }}
+              </script>
+            </button>
+          </li>
+          {%- assign vindex = vindex | plus: 1 -%}
+        {%- endfor -%}
+      </ul>
+
+      <button
+        type="button"
+        class="zzen-vid-{{ block.id }}__arrow zzen-vid-{{ block.id }}__arrow--next"
+        data-scroll="1"
+        aria-label="{{ 'general.slider.next_slide' | t }}"
+      >
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+          <path d="M5.5 2l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+
+    {%- comment -%} ================= LIGHTBOX ================= {%- endcomment -%}
+    <dialog
+      class="zzen-vid-{{ block.id }}__modal"
+      data-modal
+      aria-label="{{ b.heading | default: 'Vídeos' | strip_html | escape }}"
+    >
+      <button
+        type="button"
+        class="zzen-vid-{{ block.id }}__overlay"
+        data-close
+        aria-label="{{ 'accessibility.close' | t }}"
+        tabindex="-1"
+      ></button>
+
+      <button
+        type="button"
+        class="zzen-vid-{{ block.id }}__ctrl zzen-vid-{{ block.id }}__close"
+        data-close
+        aria-label="{{ 'accessibility.close' | t }}"
+      >
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+          <path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <button
+        type="button"
+        class="zzen-vid-{{ block.id }}__ctrl zzen-vid-{{ block.id }}__mnav zzen-vid-{{ block.id }}__mnav--prev"
+        data-step="-1"
+        aria-label="{{ 'general.slider.previous_slide' | t }}"
+      >
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+          <path d="M10.5 2L4.5 8l6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <button
+        type="button"
+        class="zzen-vid-{{ block.id }}__ctrl zzen-vid-{{ block.id }}__mnav zzen-vid-{{ block.id }}__mnav--next"
+        data-step="1"
+        aria-label="{{ 'general.slider.next_slide' | t }}"
+      >
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+          <path d="M5.5 2l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <div class="zzen-vid-{{ block.id }}__stage" data-stage>
+        <button
+          type="button"
+          class="zzen-vid-{{ block.id }}__sound is-muted"
+          data-sound
+          aria-label="{{ b.label_sound | escape }}"
+        >
+          <svg class="icon-on" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M4 7.5h2.5L10 4.2v11.6L6.5 12.5H4v-5z" fill="currentColor"/>
+            <path d="M13 7c1 .9 1 4.1 0 5M15.2 5c1.9 1.7 1.9 7.3 0 9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+          <svg class="icon-off" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+            <path d="M4 7.5h2.5L10 4.2v11.6L6.5 12.5H4v-5z" fill="currentColor"/>
+            <path d="M13 7.5l4 5M17 7.5l-4 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <video
+          class="zzen-vid-{{ block.id }}__video"
+          data-video
+          playsinline
+          preload="none"
+          controlslist="nodownload"
+        ></video>
+      </div>
+    </dialog>
+  </zzen-video-carousel>
+
+  <script>
+    /* ----------------------------------------------------------
+       zzen-video-carousel — incrustado a petición expresa.
+       La guarda evita registrar el elemento dos veces si hay
+       varios bloques o si la sección se re-renderiza.
+       ---------------------------------------------------------- */
+    if (!customElements.get('zzen-video-carousel')) {
+      customElements.define(
+        'zzen-video-carousel',
+        class ZzenVideoCarousel extends HTMLElement {
+          connectedCallback() {
+            this.duration = parseInt(this.dataset.duration, 10) || 320;
+            this.easing = this.dataset.easing || 'cubic-bezier(0.22, 1, 0.36, 1)';
+            this.perScroll = parseFloat(this.dataset.perScroll) || 1;
+            this.autoplay = this.dataset.autoplay === 'true';
+            this.startMuted = this.dataset.startMuted !== 'false';
+            this.loop = this.dataset.loop === 'true';
+
+            this.wrap = this.querySelector('[data-wrap]');
+            this.track = this.querySelector('[data-track]');
+            this.modal = this.querySelector('[data-modal]');
+            this.stage = this.querySelector('[data-stage]');
+            this.video = this.querySelector('[data-video]');
+            this.soundBtn = this.querySelector('[data-sound]');
+            this.overlay = this.querySelector('[data-close]');
+            this.slides = Array.from(this.querySelectorAll('[data-slide]'));
+
+            if (!this.track || !this.slides.length) return;
+
+            this.index = 0;
+            this.ticking = false;
+
+            this.bindCarousel();
+            this.bindModal();
+
+            // Doble pasada: una ya y otra cuando el layout asiente,
+            // porque las miniaturas cargan en diferido.
+            this.updateEdges();
+            requestAnimationFrame(() => this.updateEdges());
+            window.addEventListener('load', () => this.updateEdges(), { once: true });
+          }
+
+          get reducedMotion() {
+            return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          }
+
+          /* ============ CARRUSEL ============ */
+
+          bindCarousel() {
+            this.querySelectorAll('[data-scroll]').forEach((btn) => {
+              btn.addEventListener('click', () => {
+                this.scrollByCards(parseInt(btn.dataset.scroll, 10));
+              });
+            });
+
+            // Passive + rAF: el listener nunca bloquea el scroll.
+            this.track.addEventListener(
+              'scroll',
+              () => {
+                if (this.ticking) return;
+                this.ticking = true;
+                requestAnimationFrame(() => {
+                  this.updateEdges();
+                  this.ticking = false;
+                });
+              },
+              { passive: true }
+            );
+
+            if ('ResizeObserver' in window) {
+              this.resizeObserver = new ResizeObserver(() => this.updateEdges());
+              this.resizeObserver.observe(this.track);
+            } else {
+              this.onResize = () => this.updateEdges();
+              window.addEventListener('resize', this.onResize);
+            }
+
+            this.slides.forEach((slide) => {
+              slide.addEventListener('click', () => {
+                this.open(parseInt(slide.dataset.index, 10));
+              });
+            });
+          }
+
+          scrollByCards(direction) {
+            const card = this.slides[0]?.closest('li');
+            if (!card) return;
+
+            const gap = parseFloat(getComputedStyle(this.track).columnGap) || 0;
+            const step = (card.offsetWidth + gap) * this.perScroll * direction;
+
+            this.track.scrollBy({
+              left: step,
+              behavior: this.reducedMotion ? 'auto' : 'smooth',
+            });
+          }
+
+          updateEdges() {
+            if (!this.wrap) return;
+
+            const { scrollLeft, scrollWidth, clientWidth } = this.track;
+
+            // Sin desbordamiento no hay nada que navegar.
+            this.wrap.classList.toggle('is-static', scrollWidth - clientWidth <= 2);
+
+            // Tolerancia de 2px: los navegadores redondean scrollLeft y
+            // sin margen la flecha del final no llegaría a ocultarse.
+            this.wrap.classList.toggle('is-at-start', scrollLeft <= 2);
+            this.wrap.classList.toggle('is-at-end', scrollLeft >= scrollWidth - clientWidth - 2);
+          }
+
+          /* ============ LIGHTBOX ============ */
+
+          bindModal() {
+            if (!this.modal) return;
+
+            this.querySelectorAll('[data-close]').forEach((btn) => {
+              btn.addEventListener('click', () => this.close());
+            });
+
+            this.querySelectorAll('[data-step]').forEach((btn) => {
+              btn.addEventListener('click', () => {
+                this.goTo(this.index + parseInt(btn.dataset.step, 10));
+              });
+            });
+
+            // Esc dispara "cancel": lo interceptamos para animar la
+            // salida en lugar de que el diálogo desaparezca de golpe.
+            this.modal.addEventListener('cancel', (event) => {
+              event.preventDefault();
+              this.close();
+            });
+
+            this.modal.addEventListener('keydown', (event) => {
+              if (event.key === 'ArrowRight') this.goTo(this.index + 1);
+              if (event.key === 'ArrowLeft') this.goTo(this.index - 1);
+            });
+
+            this.soundBtn?.addEventListener('click', () => this.toggleSound());
+
+            this.video?.addEventListener('ended', () => {
+              if (!this.loop && this.index < this.slides.length - 1) {
+                this.goTo(this.index + 1);
+              }
+            });
+          }
+
+          open(index) {
+            this.lastFocused = document.activeElement;
+            this.index = index;
+
+            this.modal.showModal();
+            document.documentElement.style.overflow = 'hidden';
+
+            this.load(index);
+            this.animateIn();
+          }
+
+          close() {
+            this.animateOut(() => {
+              this.modal.close();
+              document.documentElement.style.overflow = '';
+              this.unload();
+              this.lastFocused?.focus?.();
+            });
+          }
+
+          goTo(index) {
+            if (index < 0 || index > this.slides.length - 1) return;
+            this.index = index;
+            this.load(index);
+
+            // Arrastramos el carrusel de fondo para que al cerrar, el
+            // vídeo que estabas viendo quede a la vista.
+            this.slides[index]?.closest('li')?.scrollIntoView({
+              behavior: this.reducedMotion ? 'auto' : 'smooth',
+              block: 'nearest',
+              inline: 'nearest',
+            });
+          }
+
+          /* ---- Fuentes ---- */
+
+          pickSource(sources) {
+            const mp4 = sources.filter((src) => (src.format || '').toLowerCase() === 'mp4');
+            if (!mp4.length) return null;
+
+            mp4.sort((a, b) => (a.height || 0) - (b.height || 0));
+
+            // Solo la resolución que la pantalla puede aprovechar.
+            const target = window.innerWidth < 750 ? 720 : 1080;
+            return mp4.find((src) => (src.height || 0) >= target) || mp4[mp4.length - 1];
+          }
+
+          load(index) {
+            const slide = this.slides[index];
+            if (!slide || !this.video) return;
+
+            let sources = [];
+            try {
+              sources = JSON.parse(slide.querySelector('[data-sources]').textContent);
+            } catch (error) {
+              return;
+            }
+
+            const source = this.pickSource(sources);
+            if (!source) return;
+
+            this.video.pause();
+            this.video.removeAttribute('src');
+            this.video.innerHTML = '';
+
+            const el = document.createElement('source');
+            el.src = source.url;
+            el.type = source.mime_type || 'video/mp4';
+            this.video.appendChild(el);
+
+            this.video.loop = this.loop;
+            this.video.muted = this.startMuted;
+            this.video.controls = false;
+            this.soundBtn?.classList.toggle('is-muted', this.video.muted);
+
+            this.video.load();
+
+            if (this.autoplay) {
+              // Los navegadores solo permiten autoplay silenciado. Si
+              // aun así lo bloquean, sacamos los controles nativos para
+              // que se pueda dar play a mano en lugar de dejar un
+              // rectángulo negro parado.
+              const attempt = this.video.play();
+              if (attempt?.catch) {
+                attempt.catch(() => {
+                  this.video.controls = true;
+                });
+              }
+            }
+
+            this.modal.classList.toggle('is-first', index === 0);
+            this.modal.classList.toggle('is-last', index === this.slides.length - 1);
+          }
+
+          unload() {
+            if (!this.video) return;
+            this.video.pause();
+            this.video.removeAttribute('src');
+            this.video.innerHTML = '';
+            this.video.load();
+          }
+
+          toggleSound() {
+            if (!this.video) return;
+            this.video.muted = !this.video.muted;
+            if (!this.video.muted && this.video.paused) this.video.play().catch(() => {});
+            this.soundBtn?.classList.toggle('is-muted', this.video.muted);
+          }
+
+          /* ---- Animación ---- */
+
+          animateIn() {
+            const duration = this.reducedMotion ? 0 : this.duration;
+            const opacity = this.overlay ? getComputedStyle(this.overlay).opacity : 1;
+
+            this.overlay?.animate({ opacity: [0, opacity] }, { duration, easing: this.easing, fill: 'backwards' });
+
+            this.stage?.animate(
+              {
+                opacity: [0, 1],
+                transform: ['translate(-50%, -50%) scale(0.94)', 'translate(-50%, -50%) scale(1)'],
+              },
+              { duration, easing: this.easing }
+            );
+          }
+
+          animateOut(onDone) {
+            const duration = this.reducedMotion ? 0 : Math.round(this.duration * 0.8);
+            const opacity = this.overlay ? getComputedStyle(this.overlay).opacity : 1;
+
+            this.overlay?.animate({ opacity: [opacity, 0] }, { duration, easing: this.easing, fill: 'forwards' });
+
+            const anim = this.stage?.animate(
+              {
+                opacity: [1, 0],
+                transform: ['translate(-50%, -50%) scale(1)', 'translate(-50%, -50%) scale(0.96)'],
+              },
+              { duration, easing: this.easing, fill: 'forwards' }
+            );
+
+            if (anim) {
+              anim.onfinish = () => {
+                anim.cancel();
+                onDone();
+              };
+            } else {
+              onDone();
+            }
+          }
+
+          disconnectedCallback() {
+            this.resizeObserver?.disconnect();
+            if (this.onResize) window.removeEventListener('resize', this.onResize);
+            // Si la sección se re-renderiza con el modal abierto, no
+            // dejamos la página bloqueada sin scroll.
+            document.documentElement.style.overflow = '';
+          }
+        }
+      );
+    }
+  </script>
+{%- endif -%}
