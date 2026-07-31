@@ -917,6 +917,7 @@
         "padding_right_m": 14,
         "aspect_d": "1/1",
         "aspect_m": "1/1",
+        "image_focus": "center",
         "image_radius": 8,
         "heading_font": "thin2",
         "heading_font_custom": "'thin2', serif",
@@ -980,6 +981,145 @@
         "aria_prev": "Anterior",
         "aria_next": "Siguiente"
       }
+    },
+    "custom_timeline_4idfyt": {
+      "type": "custom-timeline",
+      "blocks": {
+        "stage_ndCkbX": {
+          "type": "stage",
+          "settings": {
+            "pill": "Semana 1",
+            "title": "Notas que algo empieza a cambiar",
+            "text": "<p>Empiezas los días con un poco más de energía. Te cuesta menos concentrarte y por la noche tu cuerpo se relaja antes. Tu cuerpo empieza a sentir un cambio.</p>"
+          }
+        },
+        "stage_XVaBi3": {
+          "type": "stage",
+          "settings": {
+            "pill": "Semana 1",
+            "title": "Notas que algo empieza a cambiar",
+            "text": "<p>Describe aquí qué nota la persona en esta etapa.</p>"
+          }
+        },
+        "stage_AEq6V9": {
+          "type": "stage",
+          "settings": {
+            "pill": "Semana 1",
+            "title": "Notas que algo empieza a cambiar",
+            "text": "<p>Describe aquí qué nota la persona en esta etapa.</p>"
+          }
+        },
+        "stage_Ac6EfW": {
+          "type": "stage",
+          "settings": {
+            "pill": "Semana 1",
+            "title": "Notas que algo empieza a cambiar",
+            "text": "<p>Describe aquí qué nota la persona en esta etapa.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "stage_ndCkbX",
+        "stage_XVaBi3",
+        "stage_AEq6V9",
+        "stage_Ac6EfW"
+      ],
+      "name": "Timeline en tarjeta",
+      "settings": {
+        "heading": "El poder de la constancia",
+        "heading_tag": "h2",
+        "intro": "<p>Gracias a su efecto acumulativo, los beneficios van incrementando con el <strong>consumo diario</strong> sostenido en el tiempo</p>",
+        "image": "shopify://shop_images/Modo_ZZEN.webp",
+        "show_placeholder": true,
+        "item_title_tag": "h3",
+        "bg_color": "#000000",
+        "card_bg": "#ffffff",
+        "mobile_breakpoint": 750,
+        "card_max_width": 1240,
+        "card_radius_d": 26,
+        "card_radius_m": 20,
+        "text_position_d": "left",
+        "text_width_d": 44,
+        "gap_d": 100,
+        "gap_m": 28,
+        "padding_top_d": 44,
+        "padding_bottom_d": 44,
+        "padding_left_d": 24,
+        "padding_right_d": 24,
+        "padding_top_m": 12,
+        "padding_bottom_m": 12,
+        "padding_left_m": 8,
+        "padding_right_m": 8,
+        "card_padding_top_d": 44,
+        "card_padding_bottom_d": 44,
+        "card_padding_left_d": 44,
+        "card_padding_right_d": 44,
+        "card_padding_top_m": 24,
+        "card_padding_bottom_m": 24,
+        "card_padding_left_m": 16,
+        "card_padding_right_m": 16,
+        "heading_font": "thin2",
+        "heading_font_custom": "'thin2', serif",
+        "heading_weight": "400",
+        "heading_color": "#101010",
+        "heading_size_d": 38,
+        "heading_line_height_d": 1.2,
+        "heading_letter_spacing_d": 0,
+        "heading_align_d": "left",
+        "heading_margin_bottom_d": 16,
+        "heading_size_m": 24,
+        "heading_line_height_m": 1.2,
+        "heading_align_m": "center",
+        "heading_margin_bottom_m": 12,
+        "body_font": "helvetica",
+        "body_font_custom": "'Helvetica neue', sans-serif",
+        "intro_color": "#1a1a1a",
+        "intro_size_d": 16,
+        "intro_line_height_d": 1.5,
+        "intro_align_d": "left",
+        "intro_margin_bottom_d": 0,
+        "intro_size_m": 13,
+        "intro_line_height_m": 1.5,
+        "intro_align_m": "center",
+        "intro_margin_bottom_m": 0,
+        "aspect_d": "4/3",
+        "aspect_m": "4/3",
+        "image_focus": "center",
+        "image_radius": 8,
+        "image_margin_top_d": 40,
+        "image_margin_top_m": 16,
+        "line_color": "#2b2b2b",
+        "line_width": 1,
+        "line_extend": 0,
+        "show_separators": true,
+        "separator_color": "#e5e5e5",
+        "pill_col_width_d": 78,
+        "pill_col_width_m": 62,
+        "column_gap_d": 14,
+        "column_gap_m": 14,
+        "content_padding_left_d": 18,
+        "content_padding_left_m": 16,
+        "item_padding_d": 18,
+        "item_padding_m": 14,
+        "pill_bg": "#2b2b2b",
+        "pill_text_color": "#ffffff",
+        "pill_size_d": 11,
+        "pill_size_m": 10,
+        "pill_weight": "500",
+        "pill_padding_y": 5,
+        "pill_radius": 11,
+        "item_title_color": "#101010",
+        "item_title_weight": "400",
+        "item_title_size_d": 20,
+        "item_title_size_m": 15,
+        "item_title_line_height": 1.3,
+        "item_title_margin_bottom_d": 12,
+        "item_title_margin_bottom_m": 8,
+        "item_text_color": "#5a5a5a",
+        "item_text_size_d": 14,
+        "item_text_size_m": 12,
+        "item_text_line_height": 1.5
+      }
     }
   },
   "order": [
@@ -988,6 +1128,7 @@
     "disclosures",
     "related-products",
     "custom_split_text_image_wfEQyg",
-    "custom_product_slider_GYz7zJ"
+    "custom_product_slider_GYz7zJ",
+    "custom_timeline_4idfyt"
   ]
 }
