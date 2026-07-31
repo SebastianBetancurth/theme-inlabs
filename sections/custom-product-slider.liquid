@@ -94,6 +94,9 @@
     --cslx-media-w: {{ s.media_width_d }}%;
     --cslx-ar: {{ ar_d }};
     --cslx-radius: {{ s.image_radius }}px;
+    --cslx-dur: {{ s.fade_duration }}ms;
+    --cslx-ease: {{ s.fade_easing }};
+    --cslx-shift: {{ s.fade_shift }}px;
 
     --cslx-h-font: {{ heading_stack }};
     --cslx-h-size: {{ s.heading_size_d }}px;
@@ -153,25 +156,38 @@
     box-sizing: border-box;
   }
 
-  .cslx__track {
-    display: flex;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    scroll-behavior: smooth;
+  .cslx__stack {
+    display: grid;
+    grid-template-areas: 'stack';
+    overflow: hidden;
   }
 
-  .cslx__track::-webkit-scrollbar {
-    display: none;
-  }
-
+  /* Todas las slides ocupan la misma celda: la altura es la de la más alta,
+     así el bloque no salta al cambiar de producto. */
   .cslx__slide {
-    flex: 0 0 100%;
-    min-width: 0;
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
+    grid-area: stack;
+    opacity: 0;
+    transform: translateY(var(--cslx-shift));
+    pointer-events: none;
+    z-index: 0;
+    transition: opacity var(--cslx-dur) var(--cslx-ease),
+      transform var(--cslx-dur) var(--cslx-ease);
+  }
+
+  .cslx__slide.is-active {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    z-index: 2;
+  }
+
+  /* La slide que sale se queda visible debajo mientras la nueva aparece
+     encima: así el fundido es cruzado y no hay un parpadeo del fondo. */
+  .cslx__slide.is-leaving {
+    opacity: 1;
+    transform: none;
+    z-index: 1;
+    transition: none;
   }
 
   .cslx__slide-inner {
@@ -509,8 +525,8 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .cslx__track {
-      scroll-behavior: auto;
+    .cslx__slide {
+      transition: none !important;
     }
     .cslx * {
       transition: none !important;
@@ -521,12 +537,13 @@
 <cslx-slider
   class="cslx cslx-{{ section.id }} cslx--media-{{ s.image_position_d }} cslx--nav-d-{{ s.nav_style_d }} cslx--nav-m-{{ s.nav_style_m }}{% if s.show_arrows_d %} cslx--arrows-d{% endif %}{% if s.show_arrows_m %} cslx--arrows-m{% endif %}"
   {% if s.loop %}data-loop="true"{% endif %}
+  data-duration="{{ s.fade_duration }}"
   role="region"
   aria-roledescription="carrusel"
   aria-label="{{ s.aria_label | escape }}"
 >
   <div class="cslx__wrap">
-    <div class="cslx__track" data-track tabindex="0" aria-live="polite">
+    <div class="cslx__stack" data-track>
       {%- for block in section.blocks -%}
         {%- liquid
           assign img_d = block.settings.image
@@ -540,7 +557,13 @@
             assign has_m = false
           endif
         -%}
-        <div class="cslx__slide" data-slide data-index="{{ forloop.index0 }}" {{ block.shopify_attributes }}>
+        <div
+          class="cslx__slide{% if forloop.first %} is-active{% endif %}"
+          data-slide
+          data-index="{{ forloop.index0 }}"
+          {% unless forloop.first %}aria-hidden="true"{% endunless %}
+          {{ block.shopify_attributes }}
+        >
           <div class="cslx__slide-inner">
             <div class="cslx__media">
               {%- if img_d != blank -%}
@@ -638,7 +661,7 @@
     </div>
 
     {%- if n > 1 -%}
-      <div class="cslx__nav">
+      <div class="cslx__nav" data-nav>
         <div class="cslx__steps" style="--cslx-n: {{ n }};">
           <span class="cslx__steps-line" aria-hidden="true"></span>
           {%- for block in section.blocks -%}
@@ -691,18 +714,18 @@
       'cslx-slider',
       class CslxSlider extends HTMLElement {
         connectedCallback() {
-          this.track = this.querySelector('[data-track]');
+          this.stack = this.querySelector('[data-track]');
           this.slides = Array.from(this.querySelectorAll('[data-slide]'));
-          if (!this.track || this.slides.length < 2) return;
+          if (!this.stack || this.slides.length < 2) return;
 
           this.steps = Array.from(this.querySelectorAll('[data-step]'));
+          this.nav = this.querySelector('[data-nav]');
           this.prevBtn = this.querySelector('[data-prev]');
           this.nextBtn = this.querySelector('[data-next]');
           this.loop = this.dataset.loop === 'true';
+          this.duration = parseInt(this.dataset.duration, 10) || 500;
           this.index = 0;
-
-          this.onScroll = this.onScroll.bind(this);
-          this.onResize = this.onResize.bind(this);
+          this.supportsInert = 'inert' in HTMLElement.prototype;
 
           this.steps.forEach((btn) =>
             btn.addEventListener('click', () => this.goTo(Number(btn.dataset.index)))
@@ -710,13 +733,19 @@
           if (this.prevBtn) this.prevBtn.addEventListener('click', () => this.goTo(this.index - 1));
           if (this.nextBtn) this.nextBtn.addEventListener('click', () => this.goTo(this.index + 1));
 
-          this.track.addEventListener('scroll', this.onScroll, { passive: true });
-          window.addEventListener('resize', this.onResize);
+          if (this.nav) {
+            this.nav.addEventListener('keydown', (e) => {
+              if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+              e.preventDefault();
+              this.goTo(this.index + (e.key === 'ArrowRight' ? 1 : -1));
+              const focusable = this.steps.filter(
+                (b) => Number(b.dataset.index) === this.index && b.offsetParent !== null
+              );
+              if (focusable.length) focusable[0].focus();
+            });
+          }
 
-          this.track.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight') { e.preventDefault(); this.goTo(this.index + 1); }
-            if (e.key === 'ArrowLeft') { e.preventDefault(); this.goTo(this.index - 1); }
-          });
+          this.bindSwipe();
 
           this.blockSelect = (e) => {
             const slide = e.target.closest('[data-slide]');
@@ -728,8 +757,36 @@
         }
 
         disconnectedCallback() {
-          window.removeEventListener('resize', this.onResize);
           document.removeEventListener('shopify:block:select', this.blockSelect);
+          clearTimeout(this._fade);
+        }
+
+        bindSwipe() {
+          let x0 = null;
+          let y0 = null;
+          this.stack.addEventListener(
+            'touchstart',
+            (e) => {
+              x0 = e.changedTouches[0].clientX;
+              y0 = e.changedTouches[0].clientY;
+            },
+            { passive: true }
+          );
+          this.stack.addEventListener(
+            'touchend',
+            (e) => {
+              if (x0 === null) return;
+              const dx = e.changedTouches[0].clientX - x0;
+              const dy = e.changedTouches[0].clientY - y0;
+              // Solo si el gesto es claramente horizontal, para no robar el scroll vertical.
+              if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+                this.goTo(this.index + (dx < 0 ? 1 : -1));
+              }
+              x0 = null;
+              y0 = null;
+            },
+            { passive: true }
+          );
         }
 
         goTo(i) {
@@ -739,35 +796,41 @@
           } else {
             i = Math.max(0, Math.min(total - 1, i));
           }
+          if (i === this.index) return;
+
+          const outgoing = this.slides[this.index];
+          const incoming = this.slides[i];
+
+          outgoing.classList.remove('is-active');
+          outgoing.classList.add('is-leaving');
+          incoming.classList.add('is-active');
           this.index = i;
-          this.track.scrollTo({ left: this.track.clientWidth * i });
+
+          clearTimeout(this._fade);
+          this._fade = setTimeout(() => {
+            this.slides.forEach((slide) => {
+              if (slide !== incoming) slide.classList.remove('is-leaving');
+            });
+          }, this.duration);
+
           this.update();
         }
 
-        onScroll() {
-          clearTimeout(this._t);
-          this._t = setTimeout(() => {
-            const w = this.track.clientWidth;
-            if (!w) return;
-            const i = Math.round(Math.abs(this.track.scrollLeft) / w);
-            if (i !== this.index && i >= 0 && i < this.slides.length) {
-              this.index = i;
-              this.update();
-            }
-          }, 60);
-        }
-
-        onResize() {
-          clearTimeout(this._r);
-          this._r = setTimeout(() => {
-            this.track.scrollTo({ left: this.track.clientWidth * this.index, behavior: 'auto' });
-          }, 120);
-        }
-
         update() {
+          this.slides.forEach((slide, i) => {
+            const active = i === this.index;
+            if (active) {
+              slide.removeAttribute('aria-hidden');
+            } else {
+              slide.setAttribute('aria-hidden', 'true');
+            }
+            if (this.supportsInert) slide.inert = !active;
+          });
+
           this.steps.forEach((btn) => {
             btn.setAttribute('aria-current', Number(btn.dataset.index) === this.index ? 'true' : 'false');
           });
+
           if (!this.loop) {
             if (this.prevBtn) this.prevBtn.disabled = this.index === 0;
             if (this.nextBtn) this.nextBtn.disabled = this.index === this.slides.length - 1;
@@ -846,6 +909,45 @@
       "id": "loop",
       "label": "Carrusel infinito",
       "default": true
+    },
+
+    {
+      "type": "header",
+      "content": "Transición"
+    },
+    {
+      "type": "range",
+      "id": "fade_duration",
+      "min": 100,
+      "max": 1500,
+      "step": 50,
+      "unit": "ms",
+      "label": "Duración del fundido",
+      "default": 500
+    },
+    {
+      "type": "select",
+      "id": "fade_easing",
+      "label": "Curva del fundido",
+      "options": [
+        { "value": "linear", "label": "Lineal" },
+        { "value": "ease", "label": "Ease" },
+        { "value": "ease-in-out", "label": "Ease in-out" },
+        { "value": "cubic-bezier(0.4, 0, 0.2, 1)", "label": "Suave" },
+        { "value": "cubic-bezier(0.16, 1, 0.3, 1)", "label": "Muy suave (salida larga)" }
+      ],
+      "default": "cubic-bezier(0.4, 0, 0.2, 1)"
+    },
+    {
+      "type": "range",
+      "id": "fade_shift",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Desplazamiento vertical al aparecer",
+      "info": "0 = fundido puro, sin movimiento.",
+      "default": 0
     },
 
     {
