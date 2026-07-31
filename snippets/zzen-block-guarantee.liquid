@@ -1,0 +1,283 @@
+{% comment %}
+  ============================================================
+  BLOQUE: zzen_guarantee — Caja de garantía / devolución
+  Parámetros: block, product, section
+
+  Título + texto dentro de una caja con borde. Pensado para el
+  "30 DÍAS DE GARANTÍA" bajo los métodos de pago, pero sirve para
+  cualquier aviso de confianza (envío gratis, laboratorio, etc.).
+  Sin límite de instancias.
+  ============================================================
+{% endcomment %}
+
+{%- liquid
+  assign b = block.settings
+
+  # Fuentes
+  case b.heading_font
+    when 'heading'
+      assign heading_stack = 'var(--font-heading-family)'
+    when 'custom'
+      assign heading_stack = b.heading_font_stack
+    else
+      assign heading_stack = 'var(--font-body-family)'
+  endcase
+
+  case b.text_font
+    when 'heading'
+      assign text_stack = 'var(--font-heading-family)'
+    when 'custom'
+      assign text_stack = b.text_font_stack
+    else
+      assign text_stack = 'var(--font-body-family)'
+  endcase
+
+  # De text-align a justify-content, para la fila del título con icono inline
+  case b.text_align_mobile
+    when 'left'
+      assign justify_mobile = 'flex-start'
+    when 'right'
+      assign justify_mobile = 'flex-end'
+    else
+      assign justify_mobile = 'center'
+  endcase
+
+  case b.text_align_desktop
+    when 'left'
+      assign justify_desktop = 'flex-start'
+    when 'right'
+      assign justify_desktop = 'flex-end'
+    else
+      assign justify_desktop = 'center'
+  endcase
+
+  assign has_icon = false
+  if b.icon_image != blank or b.icon_style != 'none'
+    assign has_icon = true
+  endif
+-%}
+
+{%- if b.heading != blank or b.text != blank -%}
+
+  {%- style -%}
+    /* ===================== MÓVIL (base) ===================== */
+    .zzen-guar-{{ block.id }} {
+      display: flex;
+      justify-content: {{ b.align_mobile }};
+      margin-top: {{ b.margin_top_mobile }}px;
+      margin-bottom: {{ b.margin_bottom_mobile }}px;
+      {% if b.show_mobile == false %}display: none;{% endif %}
+    }
+
+    .zzen-guar-{{ block.id }}__box {
+      display: block;
+      width: 100%;
+      {% if b.max_width_mobile > 0 %}max-width: {{ b.max_width_mobile }}px;{% endif %}
+      box-sizing: border-box;
+      padding: {{ b.padding_y_mobile }}px {{ b.padding_x_mobile }}px;
+      background-color: {{ b.bg_color }};
+      border: {{ b.border_width }}px solid {{ b.border_color }};
+      border-radius: {{ b.border_radius }}px;
+      text-align: {{ b.text_align_mobile }};
+      text-decoration: none;
+      {% if b.shadow_enabled %}
+        box-shadow: 0 {{ b.shadow_y }}px {{ b.shadow_blur }}px {{ b.shadow_color }};
+      {% endif %}
+    }
+
+    {%- if b.link != blank -%}
+      .zzen-guar-{{ block.id }}__box { transition: border-color 0.2s ease, background-color 0.2s ease; }
+      @media (hover: hover) {
+        .zzen-guar-{{ block.id }}__box:hover {
+          border-color: {{ b.border_color_hover }};
+          background-color: {{ b.bg_color_hover }};
+        }
+      }
+      .zzen-guar-{{ block.id }}__box:focus-visible {
+        outline: 2px solid {{ b.border_color_hover }};
+        outline-offset: 3px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .zzen-guar-{{ block.id }}__box { transition: none; }
+      }
+    {%- endif -%}
+
+    /* ---- Fila del título ---- */
+    .zzen-guar-{{ block.id }}__head {
+      display: flex;
+      align-items: center;
+      justify-content: {{ justify_mobile }};
+      gap: {{ b.icon_gap_mobile }}px;
+    }
+
+    .zzen-guar-{{ block.id }}__heading {
+      font-family: {{ heading_stack }};
+      font-size: {{ b.heading_size_mobile }}px;
+      font-weight: {{ b.heading_weight }};
+      color: {{ b.heading_color }};
+      line-height: {{ b.heading_line_height }};
+      letter-spacing: {{ b.heading_letter_spacing }}px;
+      margin: 0;
+      {% if b.heading_uppercase %}text-transform: uppercase;{% endif %}
+    }
+
+    /* ---- Texto ---- */
+    .zzen-guar-{{ block.id }}__text {
+      font-family: {{ text_stack }};
+      font-size: {{ b.text_size_mobile }}px;
+      font-weight: {{ b.text_weight }};
+      color: {{ b.text_color }};
+      line-height: {{ b.text_line_height }};
+      letter-spacing: {{ b.text_letter_spacing }}px;
+      margin-top: {{ b.gap_mobile }}px;
+      {% if b.text_uppercase %}text-transform: uppercase;{% endif %}
+    }
+
+    /* Reset de los <p> que mete el editor de texto enriquecido */
+    .zzen-guar-{{ block.id }}__text > * { margin: 0; }
+    .zzen-guar-{{ block.id }}__text > * + * { margin-top: 0.6em; }
+
+    .zzen-guar-{{ block.id }}__text a {
+      color: inherit;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    /* ---- Icono ---- */
+    .zzen-guar-{{ block.id }}__icon {
+      display: block;
+      flex: 0 0 auto;
+      width: {{ b.icon_size_mobile }}px;
+      height: {{ b.icon_size_mobile }}px;
+      color: {{ b.icon_color }};
+    }
+
+    .zzen-guar-{{ block.id }}__icon svg,
+    .zzen-guar-{{ block.id }}__icon img {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .zzen-guar-{{ block.id }}__icon img { object-fit: contain; }
+
+    /* Icono encima del título: centrado según la alineación del texto */
+    .zzen-guar-{{ block.id }}__icon--top {
+      margin-bottom: {{ b.icon_gap_mobile }}px;
+      {% if b.text_align_mobile == 'center' %}margin-left: auto; margin-right: auto;{% endif %}
+      {% if b.text_align_mobile == 'right' %}margin-left: auto;{% endif %}
+    }
+
+    /* ===================== ESCRITORIO ===================== */
+    @media screen and (min-width: 750px) {
+      .zzen-guar-{{ block.id }} {
+        justify-content: {{ b.align_desktop }};
+        margin-top: {{ b.margin_top_desktop }}px;
+        margin-bottom: {{ b.margin_bottom_desktop }}px;
+        {% if b.show_mobile == false and b.show_desktop %}display: flex;{% endif %}
+        {% if b.show_desktop == false %}display: none;{% endif %}
+      }
+
+      .zzen-guar-{{ block.id }}__box {
+        {% if b.max_width_desktop > 0 %}
+          max-width: {{ b.max_width_desktop }}px;
+        {% else %}
+          max-width: none;
+        {% endif %}
+        padding: {{ b.padding_y_desktop }}px {{ b.padding_x_desktop }}px;
+        text-align: {{ b.text_align_desktop }};
+      }
+
+      .zzen-guar-{{ block.id }}__head {
+        justify-content: {{ justify_desktop }};
+        gap: {{ b.icon_gap_desktop }}px;
+      }
+
+      .zzen-guar-{{ block.id }}__heading { font-size: {{ b.heading_size_desktop }}px; }
+
+      .zzen-guar-{{ block.id }}__text {
+        font-size: {{ b.text_size_desktop }}px;
+        margin-top: {{ b.gap_desktop }}px;
+      }
+
+      .zzen-guar-{{ block.id }}__icon {
+        width: {{ b.icon_size_desktop }}px;
+        height: {{ b.icon_size_desktop }}px;
+      }
+
+      .zzen-guar-{{ block.id }}__icon--top {
+        margin-bottom: {{ b.icon_gap_desktop }}px;
+        {% if b.text_align_desktop == 'center' %}margin-left: auto; margin-right: auto;{% else %}margin-left: 0;{% endif %}
+        {% if b.text_align_desktop == 'right' %}margin-left: auto; margin-right: 0;{% endif %}
+      }
+    }
+  {%- endstyle -%}
+
+  {%- capture guar_icon -%}
+    {%- if b.icon_image != blank -%}
+      {{ b.icon_image | image_url: width: 120 | image_tag: loading: 'lazy', alt: '' }}
+    {%- elsif b.icon_style == 'shield' -%}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg" focusable="false">
+        <path d="M12 3l7 2.8v5.4c0 4.4-2.9 7.7-7 9.8-4.1-2.1-7-5.4-7-9.8V5.8L12 3z" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    {%- elsif b.icon_style == 'shield_check' -%}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg" focusable="false">
+        <path d="M12 3l7 2.8v5.4c0 4.4-2.9 7.7-7 9.8-4.1-2.1-7-5.4-7-9.8V5.8L12 3z" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M8.8 12.2l2.2 2.2 4.2-4.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    {%- elsif b.icon_style == 'return' -%}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg" focusable="false">
+        <path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1" stroke-linecap="round"/>
+        <path d="M3.2 4.2v4.4h4.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    {%- elsif b.icon_style == 'lock' -%}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg" focusable="false">
+        <rect x="4.8" y="10.5" width="14.4" height="9.5" rx="2"/>
+        <path d="M8.5 10.5V7.8a3.5 3.5 0 0 1 7 0v2.7" stroke-linecap="round"/>
+      </svg>
+    {%- elsif b.icon_style == 'medal' -%}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg" focusable="false">
+        <circle cx="12" cy="14.5" r="5.5"/>
+        <path d="M8.5 9.6L6 2.8h12l-2.5 6.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    {%- elsif b.icon_style == 'check_circle' -%}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg" focusable="false">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M8.2 12.3l2.5 2.5 5.1-5.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    {%- endif -%}
+  {%- endcapture -%}
+
+  {%- capture guar_body -%}
+    {%- if has_icon and b.icon_position == 'top' -%}
+      <span class="zzen-guar-{{ block.id }}__icon zzen-guar-{{ block.id }}__icon--top" aria-hidden="true">
+        {{- guar_icon -}}
+      </span>
+    {%- endif -%}
+
+    {%- if b.heading != blank -%}
+      <div class="zzen-guar-{{ block.id }}__head">
+        {%- if has_icon and b.icon_position == 'inline' -%}
+          <span class="zzen-guar-{{ block.id }}__icon" aria-hidden="true">{{- guar_icon -}}</span>
+        {%- endif -%}
+        <{{ b.heading_tag }} class="zzen-guar-{{ block.id }}__heading">{{ b.heading }}</{{ b.heading_tag }}>
+      </div>
+    {%- endif -%}
+
+    {%- if b.text != blank -%}
+      <div class="zzen-guar-{{ block.id }}__text">{{ b.text }}</div>
+    {%- endif -%}
+  {%- endcapture -%}
+
+  <div class="zzen-guar zzen-guar-{{ block.id }}" {{ block.shopify_attributes }}>
+    {%- if b.link != blank -%}
+      <a href="{{ b.link }}" class="zzen-guar-{{ block.id }}__box">
+        {{ guar_body }}
+      </a>
+    {%- else -%}
+      <div class="zzen-guar-{{ block.id }}__box">
+        {{ guar_body }}
+      </div>
+    {%- endif -%}
+  </div>
+{%- endif -%}
