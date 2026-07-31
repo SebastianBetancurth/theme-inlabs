@@ -1,0 +1,1703 @@
+{%- comment -%}
+  ============================================================================
+  SECCIÓN: Carrusel de producto (imagen + texto)
+  Tema: Dawn / Online Store 2.0
+  Ruta: sections/custom-product-slider.liquid
+
+  PC     -> imagen + título grande + párrafos. Navegación: stepper con línea,
+            puntos, etiquetas y flechas circulares.
+  Móvil  -> imagen arriba, título y lista de beneficios con flecha ↗.
+            Navegación: bullets centrados.
+
+  Cada slide tiene contenido independiente para PC y para móvil.
+  Todo configurable por separado en ambos breakpoints.
+  ============================================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign bp = s.mobile_breakpoint
+  assign bp_max = bp | minus: 1
+  assign n = section.blocks.size
+
+  case s.heading_font
+    when 'thin2'
+      assign heading_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign heading_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign heading_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign heading_stack = 'var(--font-body-family)'
+    else
+      assign heading_stack = s.heading_font_custom
+  endcase
+
+  case s.body_font
+    when 'thin2'
+      assign body_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign body_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign body_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign body_stack = 'var(--font-body-family)'
+    else
+      assign body_stack = s.body_font_custom
+  endcase
+
+  if s.content_max_width == 0
+    assign max_w = 'none'
+  else
+    assign max_w = s.content_max_width | append: 'px'
+  endif
+
+  if s.aspect_d == 'natural'
+    assign ar_d = 'auto'
+  else
+    assign ar_d = s.aspect_d
+  endif
+
+  if s.aspect_m == 'natural'
+    assign ar_m = 'auto'
+  else
+    assign ar_m = s.aspect_m
+  endif
+-%}
+
+{%- style -%}
+  @font-face {
+    font-family: 'Helvetica neue';
+    src: url('{{ 'HelveticaNeueCyr-Light.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'thin2';
+    src: url('{{ 'lawrence-regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ================= Variables: PC ================= */
+  .cslx-{{ section.id }} {
+    --cslx-bg: {{ s.bg_color }};
+    --cslx-max-w: {{ max_w }};
+    --cslx-pt: {{ s.padding_top_d }}px;
+    --cslx-pb: {{ s.padding_bottom_d }}px;
+    --cslx-pl: {{ s.padding_left_d }}px;
+    --cslx-pr: {{ s.padding_right_d }}px;
+    --cslx-gap: {{ s.gap_d }}px;
+    --cslx-align: {{ s.vertical_align_d }};
+    --cslx-media-w: {{ s.media_width_d }}%;
+    --cslx-ar: {{ ar_d }};
+    --cslx-radius: {{ s.image_radius }}px;
+
+    --cslx-h-font: {{ heading_stack }};
+    --cslx-h-size: {{ s.heading_size_d }}px;
+    --cslx-h-lh: {{ s.heading_line_height_d }};
+    --cslx-h-ls: {{ s.heading_letter_spacing_d }}px;
+    --cslx-h-weight: {{ s.heading_weight }};
+    --cslx-h-color: {{ s.heading_color }};
+    --cslx-h-align: {{ s.heading_align_d }};
+    --cslx-h-mb: {{ s.heading_margin_bottom_d }}px;
+
+    --cslx-b-font: {{ body_stack }};
+    --cslx-b-size: {{ s.body_size_d }}px;
+    --cslx-b-lh: {{ s.body_line_height_d }};
+    --cslx-b-ls: {{ s.body_letter_spacing_d }}px;
+    --cslx-b-weight: {{ s.body_weight }};
+    --cslx-b-color: {{ s.body_color }};
+    --cslx-b-align: {{ s.body_align_d }};
+    --cslx-p-gap: {{ s.paragraph_gap_d }}px;
+
+    --cslx-li-size: {{ s.bullet_size_m }}px;
+    --cslx-li-lh: {{ s.bullet_line_height_m }};
+    --cslx-li-color: {{ s.bullet_color }};
+    --cslx-li-gap: {{ s.bullet_gap_m }}px;
+    --cslx-li-icon: {{ s.bullet_icon_size }}px;
+    --cslx-li-icon-color: {{ s.bullet_icon_color }};
+    --cslx-li-icon-gap: {{ s.bullet_icon_gap }}px;
+
+    --cslx-nav-mt: {{ s.nav_margin_top_d }}px;
+    --cslx-nav-gap: {{ s.nav_gap }}px;
+    --cslx-line: {{ s.line_color }};
+    --cslx-dot: {{ s.dot_size_d }}px;
+    --cslx-dot-border: {{ s.dot_border_color }};
+    --cslx-dot-active: {{ s.dot_active_color }};
+    --cslx-label-size: {{ s.label_size_d }}px;
+    --cslx-label-color: {{ s.label_color }};
+    --cslx-label-active: {{ s.label_active_color }};
+    --cslx-label-gap: {{ s.label_gap }}px;
+    --cslx-arrow-size: {{ s.arrow_size }}px;
+    --cslx-arrow-border: {{ s.arrow_border_color }};
+    --cslx-arrow-icon: {{ s.arrow_icon_color }};
+    --cslx-arrow-gap: {{ s.arrow_gap }}px;
+    --cslx-pag: {{ s.pagdot_size }}px;
+    --cslx-pag-gap: {{ s.pagdot_gap }}px;
+    --cslx-pag-active: {{ s.pagdot_active_color }};
+    --cslx-pag-inactive: {{ s.pagdot_inactive_color }};
+  }
+
+  /* ================= Estructura ================= */
+  .cslx {
+    background-color: var(--cslx-bg);
+  }
+
+  .cslx__wrap {
+    max-width: var(--cslx-max-w);
+    margin-inline: auto;
+    padding: var(--cslx-pt) var(--cslx-pr) var(--cslx-pb) var(--cslx-pl);
+    box-sizing: border-box;
+  }
+
+  .cslx__track {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: smooth;
+  }
+
+  .cslx__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cslx__slide {
+    flex: 0 0 100%;
+    min-width: 0;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  .cslx__slide-inner {
+    display: flex;
+    flex-direction: row;
+    align-items: var(--cslx-align);
+    gap: var(--cslx-gap);
+  }
+
+  .cslx--media-right .cslx__slide-inner {
+    flex-direction: row-reverse;
+  }
+
+  .cslx__media {
+    flex: 0 0 var(--cslx-media-w);
+    min-width: 0;
+  }
+
+  .cslx__content {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .cslx__img,
+  .cslx__placeholder {
+    display: block;
+    width: 100%;
+    aspect-ratio: var(--cslx-ar);
+    object-fit: cover;
+    border-radius: var(--cslx-radius);
+  }
+
+  .cslx__placeholder {
+    background: rgba(127, 127, 127, 0.1);
+  }
+
+  .cslx__placeholder svg {
+    width: 100%;
+    height: 100%;
+    opacity: 0.35;
+  }
+
+  /* ================= Título y texto ================= */
+  .cslx__heading {
+    margin: 0 0 var(--cslx-h-mb);
+    font-family: var(--cslx-h-font);
+    font-size: var(--cslx-h-size);
+    font-weight: var(--cslx-h-weight);
+    line-height: var(--cslx-h-lh);
+    letter-spacing: var(--cslx-h-ls);
+    text-align: var(--cslx-h-align);
+    color: var(--cslx-h-color);
+  }
+
+  .cslx__heading em,
+  .cslx__heading i {
+    font-style: italic;
+  }
+
+  .cslx__body {
+    font-family: var(--cslx-b-font);
+    font-size: var(--cslx-b-size);
+    font-weight: var(--cslx-b-weight);
+    line-height: var(--cslx-b-lh);
+    letter-spacing: var(--cslx-b-ls);
+    text-align: var(--cslx-b-align);
+    color: var(--cslx-b-color);
+  }
+
+  .cslx__body > * {
+    margin: 0;
+  }
+
+  .cslx__body > * + * {
+    margin-top: var(--cslx-p-gap);
+  }
+
+  .cslx__body p:empty {
+    display: none;
+  }
+
+  .cslx__body a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .cslx__body strong {
+    font-weight: 600;
+  }
+
+  /* ================= Lista de beneficios (móvil) ================= */
+  .cslx__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: var(--cslx-b-font);
+    font-size: var(--cslx-li-size);
+    line-height: var(--cslx-li-lh);
+    color: var(--cslx-li-color);
+  }
+
+  .cslx__list li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--cslx-li-icon-gap);
+  }
+
+  .cslx__list li + li {
+    margin-top: var(--cslx-li-gap);
+  }
+
+  .cslx__list-icon {
+    flex: 0 0 auto;
+    width: var(--cslx-li-icon);
+    height: var(--cslx-li-icon);
+    margin-top: calc((var(--cslx-li-size) * var(--cslx-li-lh) - var(--cslx-li-icon)) / 2);
+    color: var(--cslx-li-icon-color);
+  }
+
+  .cslx__list-icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .cslx__list strong {
+    font-weight: 600;
+  }
+
+  /* ================= Navegación ================= */
+  .cslx__nav {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--cslx-nav-gap);
+    margin-top: var(--cslx-nav-mt);
+  }
+
+  .cslx__steps,
+  .cslx__dots,
+  .cslx__arrows {
+    display: none;
+  }
+
+  .cslx__steps {
+    position: relative;
+    flex: 1 1 auto;
+    grid-template-columns: repeat(var(--cslx-n), minmax(0, 1fr));
+  }
+
+  .cslx__steps-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(var(--cslx-dot) / 2);
+    height: 1px;
+    background: var(--cslx-line);
+  }
+
+  .cslx__step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--cslx-label-gap);
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
+  }
+
+  .cslx__step-dot {
+    width: var(--cslx-dot);
+    height: var(--cslx-dot);
+    border-radius: 50%;
+    border: 1.5px solid var(--cslx-dot-border);
+    background: var(--cslx-bg);
+    box-sizing: border-box;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+  }
+
+  .cslx__step[aria-current='true'] .cslx__step-dot {
+    background: var(--cslx-dot-active);
+    border-color: var(--cslx-dot-active);
+  }
+
+  .cslx__step-label {
+    font-family: var(--cslx-b-font);
+    font-size: var(--cslx-label-size);
+    line-height: 1.2;
+    color: var(--cslx-label-color);
+    white-space: nowrap;
+    transition: color 0.25s ease;
+  }
+
+  .cslx__step[aria-current='true'] .cslx__step-label {
+    color: var(--cslx-label-active);
+    font-weight: 500;
+  }
+
+  .cslx__step:focus-visible {
+    outline: 2px solid var(--cslx-dot-active);
+    outline-offset: 4px;
+    border-radius: 2px;
+  }
+
+  .cslx__arrows {
+    flex: 0 0 auto;
+    gap: var(--cslx-arrow-gap);
+  }
+
+  .cslx__arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--cslx-arrow-size);
+    height: var(--cslx-arrow-size);
+    padding: 0;
+    border: 1px solid var(--cslx-arrow-border);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--cslx-arrow-icon);
+    cursor: pointer;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+  }
+
+  .cslx__arrow:hover {
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  .cslx__arrow[disabled] {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  .cslx__arrow:focus-visible {
+    outline: 2px solid var(--cslx-dot-active);
+    outline-offset: 2px;
+  }
+
+  .cslx__arrow svg {
+    display: block;
+    width: 40%;
+    height: 40%;
+  }
+
+  .cslx__dots {
+    flex: 1 1 auto;
+    justify-content: center;
+    align-items: center;
+    gap: var(--cslx-pag-gap);
+  }
+
+  .cslx__pag {
+    width: var(--cslx-pag);
+    height: var(--cslx-pag);
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--cslx-pag-inactive);
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+  }
+
+  .cslx__pag[aria-current='true'] {
+    background: var(--cslx-pag-active);
+  }
+
+  .cslx__pag:focus-visible {
+    outline: 2px solid var(--cslx-pag-active);
+    outline-offset: 3px;
+  }
+
+  /* ================= Visibilidad por breakpoint ================= */
+  .cslx__only-mobile {
+    display: none;
+  }
+
+  @media screen and (min-width: {{ bp }}px) {
+    .cslx--nav-d-stepper .cslx__steps { display: grid; }
+    .cslx--nav-d-dots .cslx__dots { display: flex; }
+    .cslx--arrows-d .cslx__arrows { display: flex; }
+  }
+
+  /* ================= Móvil ================= */
+  @media screen and (max-width: {{ bp_max }}px) {
+    .cslx-{{ section.id }} {
+      --cslx-max-w: none;
+      --cslx-pt: {{ s.padding_top_m }}px;
+      --cslx-pb: {{ s.padding_bottom_m }}px;
+      --cslx-pl: {{ s.padding_left_m }}px;
+      --cslx-pr: {{ s.padding_right_m }}px;
+      --cslx-gap: {{ s.gap_m }}px;
+      --cslx-ar: {{ ar_m }};
+
+      --cslx-h-size: {{ s.heading_size_m }}px;
+      --cslx-h-lh: {{ s.heading_line_height_m }};
+      --cslx-h-ls: {{ s.heading_letter_spacing_m }}px;
+      --cslx-h-align: {{ s.heading_align_m }};
+      --cslx-h-mb: {{ s.heading_margin_bottom_m }}px;
+
+      --cslx-b-size: {{ s.body_size_m }}px;
+      --cslx-b-lh: {{ s.body_line_height_m }};
+      --cslx-b-ls: {{ s.body_letter_spacing_m }}px;
+      --cslx-b-align: {{ s.body_align_m }};
+      --cslx-p-gap: {{ s.paragraph_gap_m }}px;
+
+      --cslx-nav-mt: {{ s.nav_margin_top_m }}px;
+    }
+
+    .cslx__slide-inner,
+    .cslx--media-right .cslx__slide-inner {
+      flex-direction: column;
+    }
+
+    .cslx__media,
+    .cslx__content {
+      flex: 0 0 auto;
+      width: 100%;
+    }
+
+    .cslx__only-desktop {
+      display: none;
+    }
+
+    .cslx__only-mobile {
+      display: block;
+    }
+
+    .cslx--nav-m-stepper .cslx__steps { display: grid; }
+    .cslx--nav-m-dots .cslx__dots { display: flex; }
+    .cslx--arrows-m .cslx__arrows { display: flex; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cslx__track {
+      scroll-behavior: auto;
+    }
+    .cslx * {
+      transition: none !important;
+    }
+  }
+{%- endstyle -%}
+
+<cslx-slider
+  class="cslx cslx-{{ section.id }} cslx--media-{{ s.image_position_d }} cslx--nav-d-{{ s.nav_style_d }} cslx--nav-m-{{ s.nav_style_m }}{% if s.show_arrows_d %} cslx--arrows-d{% endif %}{% if s.show_arrows_m %} cslx--arrows-m{% endif %}"
+  {% if s.loop %}data-loop="true"{% endif %}
+  role="region"
+  aria-roledescription="carrusel"
+  aria-label="{{ s.aria_label | escape }}"
+>
+  <div class="cslx__wrap">
+    <div class="cslx__track" data-track tabindex="0" aria-live="polite">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign img_d = block.settings.image
+          assign img_m = block.settings.image_mobile
+          assign has_m = false
+          if img_m != blank
+            assign has_m = true
+          endif
+          if img_d == blank and has_m
+            assign img_d = img_m
+            assign has_m = false
+          endif
+        -%}
+        <div class="cslx__slide" data-slide data-index="{{ forloop.index0 }}" {{ block.shopify_attributes }}>
+          <div class="cslx__slide-inner">
+            <div class="cslx__media">
+              {%- if img_d != blank -%}
+                <picture>
+                  {%- if has_m -%}
+                    <source
+                      media="(max-width: {{ bp_max }}px)"
+                      srcset="
+                        {{ img_m | image_url: width: 400 }} 400w,
+                        {{ img_m | image_url: width: 600 }} 600w,
+                        {{ img_m | image_url: width: 900 }} 900w,
+                        {{ img_m | image_url: width: 1200 }} 1200w
+                      "
+                      sizes="100vw"
+                      width="{{ img_m.width }}"
+                      height="{{ img_m.height }}"
+                    >
+                  {%- endif -%}
+                  <img
+                    class="cslx__img"
+                    src="{{ img_d | image_url: width: 1200 }}"
+                    srcset="
+                      {{ img_d | image_url: width: 400 }} 400w,
+                      {{ img_d | image_url: width: 600 }} 600w,
+                      {{ img_d | image_url: width: 800 }} 800w,
+                      {{ img_d | image_url: width: 1200 }} 1200w,
+                      {{ img_d | image_url: width: 1600 }} 1600w
+                    "
+                    sizes="(min-width: {{ bp }}px) {{ s.media_width_d }}vw, 100vw"
+                    width="{{ img_d.width }}"
+                    height="{{ img_d.height }}"
+                    alt="{{ img_d.alt | escape }}"
+                    loading="lazy"
+                    decoding="async"
+                  >
+                </picture>
+              {%- else -%}
+                <div class="cslx__placeholder">{{ 'image' | placeholder_svg_tag }}</div>
+              {%- endif -%}
+            </div>
+
+            <div class="cslx__content">
+              {%- comment -%} ---------- Contenido PC ---------- {%- endcomment -%}
+              <div class="cslx__only-desktop">
+                {%- if block.settings.heading != blank -%}
+                  <{{ s.heading_tag }} class="cslx__heading">{{ block.settings.heading }}</{{ s.heading_tag }}>
+                {%- endif -%}
+                {%- if block.settings.text != blank -%}
+                  <div class="cslx__body">{{ block.settings.text }}</div>
+                {%- endif -%}
+              </div>
+
+              {%- comment -%} ---------- Contenido móvil ---------- {%- endcomment -%}
+              <div class="cslx__only-mobile">
+                {%- if s.mobile_content == 'same' -%}
+                  {%- if block.settings.heading != blank -%}
+                    <{{ s.heading_tag }} class="cslx__heading">{{ block.settings.heading }}</{{ s.heading_tag }}>
+                  {%- endif -%}
+                  {%- if block.settings.text != blank -%}
+                    <div class="cslx__body">{{ block.settings.text }}</div>
+                  {%- endif -%}
+                {%- else -%}
+                  {%- assign m_heading = block.settings.heading_mobile | default: block.settings.heading -%}
+                  {%- if m_heading != blank -%}
+                    <{{ s.heading_tag }} class="cslx__heading">{{ m_heading }}</{{ s.heading_tag }}>
+                  {%- endif -%}
+                  {%- assign bullets = block.settings.bullet_1 | append: block.settings.bullet_2 | append: block.settings.bullet_3 | append: block.settings.bullet_4 | append: block.settings.bullet_5 -%}
+                  {%- if bullets != blank -%}
+                    <ul class="cslx__list">
+                      {%- for i in (1..5) -%}
+                        {%- liquid
+                          assign key = 'bullet_' | append: i
+                          assign item = block.settings[key]
+                        -%}
+                        {%- if item != blank -%}
+                          <li>
+                            <span class="cslx__list-icon" aria-hidden="true">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14" fill="none">
+                                <path d="M1 12.8213L12.2786 1.54272" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                <path d="M12.3575 12.6636V1.46387H1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                              </svg>
+                            </span>
+                            <span>{{ item }}</span>
+                          </li>
+                        {%- endif -%}
+                      {%- endfor -%}
+                    </ul>
+                  {%- endif -%}
+                {%- endif -%}
+              </div>
+            </div>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+
+    {%- if n > 1 -%}
+      <div class="cslx__nav">
+        <div class="cslx__steps" style="--cslx-n: {{ n }};">
+          <span class="cslx__steps-line" aria-hidden="true"></span>
+          {%- for block in section.blocks -%}
+            <button
+              type="button"
+              class="cslx__step"
+              data-step
+              data-index="{{ forloop.index0 }}"
+              aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+            >
+              <span class="cslx__step-dot" aria-hidden="true"></span>
+              <span class="cslx__step-label">{{ block.settings.nav_label | default: forloop.index }}</span>
+            </button>
+          {%- endfor -%}
+        </div>
+
+        <div class="cslx__dots">
+          {%- for block in section.blocks -%}
+            <button
+              type="button"
+              class="cslx__pag"
+              data-step
+              data-index="{{ forloop.index0 }}"
+              aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+              aria-label="{{ block.settings.nav_label | default: forloop.index }}"
+            ></button>
+          {%- endfor -%}
+        </div>
+
+        <div class="cslx__arrows">
+          <button type="button" class="cslx__arrow" data-prev aria-label="{{ s.aria_prev | escape }}">
+            <svg viewBox="0 0 9 16" fill="none" aria-hidden="true">
+              <path d="M8 1L1.5 8L8 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button type="button" class="cslx__arrow" data-next aria-label="{{ s.aria_next | escape }}">
+            <svg viewBox="0 0 9 16" fill="none" aria-hidden="true">
+              <path d="M1 1L7.5 8L1 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+</cslx-slider>
+
+<script>
+  if (!customElements.get('cslx-slider')) {
+    customElements.define(
+      'cslx-slider',
+      class CslxSlider extends HTMLElement {
+        connectedCallback() {
+          this.track = this.querySelector('[data-track]');
+          this.slides = Array.from(this.querySelectorAll('[data-slide]'));
+          if (!this.track || this.slides.length < 2) return;
+
+          this.steps = Array.from(this.querySelectorAll('[data-step]'));
+          this.prevBtn = this.querySelector('[data-prev]');
+          this.nextBtn = this.querySelector('[data-next]');
+          this.loop = this.dataset.loop === 'true';
+          this.index = 0;
+
+          this.onScroll = this.onScroll.bind(this);
+          this.onResize = this.onResize.bind(this);
+
+          this.steps.forEach((btn) =>
+            btn.addEventListener('click', () => this.goTo(Number(btn.dataset.index)))
+          );
+          if (this.prevBtn) this.prevBtn.addEventListener('click', () => this.goTo(this.index - 1));
+          if (this.nextBtn) this.nextBtn.addEventListener('click', () => this.goTo(this.index + 1));
+
+          this.track.addEventListener('scroll', this.onScroll, { passive: true });
+          window.addEventListener('resize', this.onResize);
+
+          this.track.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') { e.preventDefault(); this.goTo(this.index + 1); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); this.goTo(this.index - 1); }
+          });
+
+          this.blockSelect = (e) => {
+            const slide = e.target.closest('[data-slide]');
+            if (slide && this.contains(slide)) this.goTo(Number(slide.dataset.index));
+          };
+          document.addEventListener('shopify:block:select', this.blockSelect);
+
+          this.update();
+        }
+
+        disconnectedCallback() {
+          window.removeEventListener('resize', this.onResize);
+          document.removeEventListener('shopify:block:select', this.blockSelect);
+        }
+
+        goTo(i) {
+          const total = this.slides.length;
+          if (this.loop) {
+            i = ((i % total) + total) % total;
+          } else {
+            i = Math.max(0, Math.min(total - 1, i));
+          }
+          this.index = i;
+          this.track.scrollTo({ left: this.track.clientWidth * i });
+          this.update();
+        }
+
+        onScroll() {
+          clearTimeout(this._t);
+          this._t = setTimeout(() => {
+            const w = this.track.clientWidth;
+            if (!w) return;
+            const i = Math.round(Math.abs(this.track.scrollLeft) / w);
+            if (i !== this.index && i >= 0 && i < this.slides.length) {
+              this.index = i;
+              this.update();
+            }
+          }, 60);
+        }
+
+        onResize() {
+          clearTimeout(this._r);
+          this._r = setTimeout(() => {
+            this.track.scrollTo({ left: this.track.clientWidth * this.index, behavior: 'auto' });
+          }, 120);
+        }
+
+        update() {
+          this.steps.forEach((btn) => {
+            btn.setAttribute('aria-current', Number(btn.dataset.index) === this.index ? 'true' : 'false');
+          });
+          if (!this.loop) {
+            if (this.prevBtn) this.prevBtn.disabled = this.index === 0;
+            if (this.nextBtn) this.nextBtn.disabled = this.index === this.slides.length - 1;
+          }
+        }
+      }
+    );
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Carrusel producto",
+  "tag": "section",
+  "class": "section-cslx",
+  "max_blocks": 12,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Diseño general"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "mobile_breakpoint",
+      "min": 480,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "label": "Punto de cambio a móvil",
+      "default": 750
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 0,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "label": "Ancho máximo del contenido",
+      "info": "0 = ancho completo.",
+      "default": 1400
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Etiqueta HTML de los títulos (SEO)",
+      "options": [
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "div", "label": "div (sin peso SEO)" }
+      ],
+      "default": "h3"
+    },
+    {
+      "type": "select",
+      "id": "mobile_content",
+      "label": "Contenido en móvil",
+      "options": [
+        { "value": "list", "label": "Título móvil + lista de beneficios" },
+        { "value": "same", "label": "El mismo texto que en PC" }
+      ],
+      "default": "list"
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "Carrusel infinito",
+      "default": true
+    },
+
+    {
+      "type": "header",
+      "content": "Layout — PC"
+    },
+    {
+      "type": "select",
+      "id": "image_position_d",
+      "label": "Posición de la imagen",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "vertical_align_d",
+      "label": "Alineación vertical",
+      "options": [
+        { "value": "flex-start", "label": "Arriba" },
+        { "value": "center", "label": "Centrado" },
+        { "value": "flex-end", "label": "Abajo" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "range",
+      "id": "media_width_d",
+      "min": 20,
+      "max": 70,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho de la imagen",
+      "default": 43
+    },
+    {
+      "type": "range",
+      "id": "gap_d",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Separación imagen / texto",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_top_d",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding superior",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_d",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding inferior",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_left_d",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding izquierdo",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right_d",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding derecho",
+      "default": 20
+    },
+
+    {
+      "type": "header",
+      "content": "Layout — Móvil"
+    },
+    {
+      "type": "range",
+      "id": "gap_m",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación imagen / texto",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "padding_top_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding superior",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding inferior",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_left_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding izquierdo",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "padding_right_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding derecho",
+      "default": 14
+    },
+
+    {
+      "type": "header",
+      "content": "Imagen"
+    },
+    {
+      "type": "select",
+      "id": "aspect_d",
+      "label": "Proporción en PC",
+      "options": [
+        { "value": "1/1", "label": "Cuadrada 1:1" },
+        { "value": "4/3", "label": "4:3" },
+        { "value": "3/2", "label": "3:2" },
+        { "value": "16/9", "label": "16:9" },
+        { "value": "3/4", "label": "3:4 vertical" },
+        { "value": "natural", "label": "Original" }
+      ],
+      "default": "1/1"
+    },
+    {
+      "type": "select",
+      "id": "aspect_m",
+      "label": "Proporción en móvil",
+      "options": [
+        { "value": "1/1", "label": "Cuadrada 1:1" },
+        { "value": "4/3", "label": "4:3" },
+        { "value": "3/2", "label": "3:2" },
+        { "value": "16/9", "label": "16:9" },
+        { "value": "3/4", "label": "3:4 vertical" },
+        { "value": "natural", "label": "Original" }
+      ],
+      "default": "1/1"
+    },
+    {
+      "type": "range",
+      "id": "image_radius",
+      "min": 0,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo de esquinas",
+      "default": 8
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía del título"
+    },
+    {
+      "type": "select",
+      "id": "heading_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "thin2"
+    },
+    {
+      "type": "text",
+      "id": "heading_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'thin2', serif"
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color",
+      "default": "#080808"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_d",
+      "min": 24,
+      "max": 124,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_d",
+      "min": 0.8,
+      "max": 2,
+      "step": 0.1,
+      "label": "Interlineado — PC",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing_d",
+      "min": -5,
+      "max": 10,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Espaciado entre letras — PC",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_d",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — PC",
+      "default": 22
+    },
+    {
+      "type": "select",
+      "id": "heading_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_m",
+      "min": 14,
+      "max": 64,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_m",
+      "min": 0.8,
+      "max": 2,
+      "step": 0.1,
+      "label": "Interlineado — Móvil",
+      "default": 1.2
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing_m",
+      "min": -5,
+      "max": 10,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Espaciado entre letras — Móvil",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — Móvil",
+      "default": 18
+    },
+    {
+      "type": "select",
+      "id": "heading_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía del texto"
+    },
+    {
+      "type": "select",
+      "id": "body_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "body_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "select",
+      "id": "body_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Color",
+      "default": "#080808"
+    },
+    {
+      "type": "range",
+      "id": "body_size_d",
+      "min": 10,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "body_line_height_d",
+      "min": 1,
+      "max": 2.4,
+      "step": 0.1,
+      "label": "Interlineado — PC",
+      "default": 1.5
+    },
+    {
+      "type": "range",
+      "id": "body_letter_spacing_d",
+      "min": -2,
+      "max": 6,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras — PC",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "paragraph_gap_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre párrafos — PC",
+      "default": 26
+    },
+    {
+      "type": "select",
+      "id": "body_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" },
+        { "value": "justify", "label": "Justificado" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "body_size_m",
+      "min": 10,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "body_line_height_m",
+      "min": 1,
+      "max": 2.4,
+      "step": 0.1,
+      "label": "Interlineado — Móvil",
+      "default": 1.5
+    },
+    {
+      "type": "range",
+      "id": "body_letter_spacing_m",
+      "min": -2,
+      "max": 6,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras — Móvil",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "paragraph_gap_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre párrafos — Móvil",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "body_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+
+    {
+      "type": "header",
+      "content": "Lista de beneficios (móvil)"
+    },
+    {
+      "type": "range",
+      "id": "bullet_size_m",
+      "min": 10,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de texto",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "bullet_line_height_m",
+      "min": 1,
+      "max": 2.4,
+      "step": 0.1,
+      "label": "Interlineado",
+      "default": 1.4
+    },
+    {
+      "type": "color",
+      "id": "bullet_color",
+      "label": "Color del texto",
+      "default": "#080808"
+    },
+    {
+      "type": "range",
+      "id": "bullet_gap_m",
+      "min": 0,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre ítems",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "bullet_icon_size",
+      "min": 8,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de la flecha",
+      "default": 13
+    },
+    {
+      "type": "color",
+      "id": "bullet_icon_color",
+      "label": "Color de la flecha",
+      "default": "#080808"
+    },
+    {
+      "type": "range",
+      "id": "bullet_icon_gap",
+      "min": 0,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación flecha / texto",
+      "default": 9
+    },
+
+    {
+      "type": "header",
+      "content": "Navegación — tipo"
+    },
+    {
+      "type": "select",
+      "id": "nav_style_d",
+      "label": "Estilo en PC",
+      "options": [
+        { "value": "stepper", "label": "Línea con puntos y etiquetas" },
+        { "value": "dots", "label": "Bullets" },
+        { "value": "none", "label": "Ninguno" }
+      ],
+      "default": "stepper"
+    },
+    {
+      "type": "select",
+      "id": "nav_style_m",
+      "label": "Estilo en móvil",
+      "options": [
+        { "value": "dots", "label": "Bullets" },
+        { "value": "stepper", "label": "Línea con puntos y etiquetas" },
+        { "value": "none", "label": "Ninguno" }
+      ],
+      "default": "dots"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows_d",
+      "label": "Mostrar flechas en PC",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows_m",
+      "label": "Mostrar flechas en móvil",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "nav_margin_top_d",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación con el contenido — PC",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "nav_margin_top_m",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación con el contenido — Móvil",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "nav_gap",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación línea / flechas",
+      "default": 36
+    },
+
+    {
+      "type": "header",
+      "content": "Navegación — línea, puntos y etiquetas"
+    },
+    {
+      "type": "color",
+      "id": "line_color",
+      "label": "Color de la línea",
+      "default": "#d9d9d9"
+    },
+    {
+      "type": "range",
+      "id": "dot_size_d",
+      "min": 6,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del punto",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "dot_border_color",
+      "label": "Borde del punto inactivo",
+      "default": "#080808"
+    },
+    {
+      "type": "color",
+      "id": "dot_active_color",
+      "label": "Punto activo",
+      "default": "#080808"
+    },
+    {
+      "type": "range",
+      "id": "label_size_d",
+      "min": 9,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de la etiqueta",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "label_gap",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación punto / etiqueta",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Etiqueta inactiva",
+      "default": "#8a8a8a"
+    },
+    {
+      "type": "color",
+      "id": "label_active_color",
+      "label": "Etiqueta activa",
+      "default": "#080808"
+    },
+
+    {
+      "type": "header",
+      "content": "Navegación — flechas y bullets"
+    },
+    {
+      "type": "range",
+      "id": "arrow_size",
+      "min": 24,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de las flechas",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "arrow_gap",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre flechas",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "arrow_border_color",
+      "label": "Borde de las flechas",
+      "default": "#d9d9d9"
+    },
+    {
+      "type": "color",
+      "id": "arrow_icon_color",
+      "label": "Icono de las flechas",
+      "default": "#080808"
+    },
+    {
+      "type": "range",
+      "id": "pagdot_size",
+      "min": 4,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de los bullets",
+      "default": 7
+    },
+    {
+      "type": "range",
+      "id": "pagdot_gap",
+      "min": 2,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre bullets",
+      "default": 8
+    },
+    {
+      "type": "color",
+      "id": "pagdot_active_color",
+      "label": "Bullet activo",
+      "default": "#5c5c5c"
+    },
+    {
+      "type": "color",
+      "id": "pagdot_inactive_color",
+      "label": "Bullet inactivo",
+      "default": "#d0d0d0"
+    },
+
+    {
+      "type": "header",
+      "content": "Accesibilidad"
+    },
+    {
+      "type": "text",
+      "id": "aria_label",
+      "label": "Nombre del carrusel",
+      "default": "Nuestras fórmulas"
+    },
+    {
+      "type": "text",
+      "id": "aria_prev",
+      "label": "Texto del botón anterior",
+      "default": "Anterior"
+    },
+    {
+      "type": "text",
+      "id": "aria_next",
+      "label": "Texto del botón siguiente",
+      "default": "Siguiente"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "text",
+          "id": "nav_label",
+          "label": "Etiqueta en la navegación",
+          "default": "Focus"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen — PC"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Imagen — Móvil",
+          "info": "Si la dejas vacía se usa la de PC."
+        },
+        {
+          "type": "header",
+          "content": "Contenido PC"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "label": "Título",
+          "default": "Focus"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "<p>Describe aquí la fórmula: para qué sirve, a quién va dirigida y qué la hace distinta.</p>"
+        },
+        {
+          "type": "header",
+          "content": "Contenido móvil"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "heading_mobile",
+          "label": "Título en móvil",
+          "info": "Si lo dejas vacío se usa el título de PC.",
+          "default": "ZZEN Focus"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "bullet_1",
+          "label": "Beneficio 1",
+          "default": "Productividad y motivación"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "bullet_2",
+          "label": "Beneficio 2",
+          "default": "Energía <strong>sostenida</strong>"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "bullet_3",
+          "label": "Beneficio 3",
+          "default": "Refuerza la <strong>memoria</strong>"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "bullet_4",
+          "label": "Beneficio 4"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "bullet_5",
+          "label": "Beneficio 5"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Carrusel producto",
+      "blocks": [
+        { "type": "slide" },
+        { "type": "slide" },
+        { "type": "slide" }
+      ]
+    }
+  ]
+}
+{% endschema %}
