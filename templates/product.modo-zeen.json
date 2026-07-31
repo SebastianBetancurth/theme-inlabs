@@ -872,9 +872,10 @@
         "slide_3JJppK": {
           "type": "slide",
           "settings": {
-            "nav_label": "Focus",
-            "heading": "Focus",
-            "text": "<p>Describe aquí la fórmula: para qué sirve, a quién va dirigida y qué la hace distinta.</p>",
+            "nav_label": "Sleep",
+            "image": "shopify://shop_images/ZZEN_Mode_Photos.webp",
+            "heading": "Sleep",
+            "text": "<p>ZZEN Sleep es el suplemento natural de ZZEN diseñado para ayudarte a dormir mejor, desconectar del día y recuperar tu energía física y mental. Su fórmula combina ingredientes naturales que promueven la relajación, facilitan el sueño y ayudan a mejorar la calidad del descanso.<br/><br/>No se trata solo de dormir más, sino de dormir mejor. ZZEN Sleep favorece un sueño reparador, apoya el estado de ánimo y la claridad mental al despertar, y te ayuda a establecer una rutina nocturna que funciona</p><p>Diseñado para tomarse a diario, como parte de tu ritual de desconexión antes de dormir.</p>",
             "heading_mobile": "ZZEN Focus",
             "bullet_1": "Productividad y motivación",
             "bullet_2": "Energía <strong>sostenida</strong>",
