@@ -179,7 +179,7 @@
             "icon_offset_desktop": 8,
             "row_gap_desktop": 16,
             "column_gap_desktop": 24,
-            "margin_bottom_desktop": 24,
+            "margin_bottom_desktop": 0,
             "columns_mobile": 1,
             "text_size_mobile": 15,
             "icon_size_mobile": 11,
