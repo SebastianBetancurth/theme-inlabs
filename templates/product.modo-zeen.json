@@ -317,6 +317,39 @@
             "order_desktop": 5,
             "push_right_desktop": false
           }
+        },
+        "zzen_payments_LtY4rp": {
+          "type": "zzen_payments",
+          "settings": {
+            "source": "auto",
+            "append_extras": false,
+            "show_desktop": true,
+            "show_mobile": true,
+            "opacity": 100,
+            "grayscale": false,
+            "color_on_hover": false,
+            "icon_radius": 0,
+            "icon_bg_enabled": false,
+            "icon_bg": "#ffffff",
+            "icon_padding": 4,
+            "icon_border_width": 1,
+            "icon_border_color": "#e5e5e5",
+            "height_desktop": 26,
+            "align_desktop": "center",
+            "column_gap_desktop": 8,
+            "row_gap_desktop": 8,
+            "max_width_desktop": 0,
+            "margin_top_desktop": 12,
+            "margin_bottom_desktop": 16,
+            "height_mobile": 22,
+            "align_mobile": "center",
+            "overflow_mobile": "wrap",
+            "column_gap_mobile": 6,
+            "row_gap_mobile": 6,
+            "max_width_mobile": 0,
+            "margin_top_mobile": 10,
+            "margin_bottom_mobile": 14
+          }
         }
       },
       "block_order": [
@@ -325,7 +358,8 @@
         "zzen_title_pbYVnE",
         "zzen_bullets_kmDViX",
         "zzen_cta_CLBKVN",
-        "zzen_note_XN6QY7"
+        "zzen_note_XN6QY7",
+        "zzen_payments_LtY4rp"
       ],
       "settings": {
         "enable_sticky_info": true,
