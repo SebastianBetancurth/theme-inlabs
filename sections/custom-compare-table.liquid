@@ -1,0 +1,1389 @@
+{%- comment -%}
+  ============================================================================
+  SECCIÓN: Texto + Tabla comparativa (La sinergia de las fórmulas)
+  Tema: Dawn / Online Store 2.0
+  Ruta: sections/custom-compare-table.liquid
+
+  PC     -> texto a un lado, tabla al otro. Una columna puede llevar un
+            recuadro redondeado que la destaca de las demás.
+  Móvil  -> todo apilado y la tabla se reduce a las columnas que marques
+            como visibles en móvil (en el original: sólo la primera y la
+            destacada), sin recuadro y con la línea del encabezado más gruesa.
+
+  La tabla es un CSS grid: las filas se alinean solas aunque una etiqueta
+  ocupe dos líneas, y ocultar una columna en móvil recoloca el resto sin
+  tener que duplicar el marcado.
+  ============================================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign bp = s.mobile_breakpoint
+  assign bp_max = bp | minus: 1
+
+  case s.heading_font
+    when 'thin2'
+      assign heading_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign heading_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign heading_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign heading_stack = 'var(--font-body-family)'
+    else
+      assign heading_stack = s.heading_font_custom
+  endcase
+
+  case s.body_font
+    when 'thin2'
+      assign body_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign body_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign body_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign body_stack = 'var(--font-body-family)'
+    else
+      assign body_stack = s.body_font_custom
+  endcase
+
+  if s.content_max_width == 0
+    assign max_w = 'none'
+  else
+    assign max_w = s.content_max_width | append: 'px'
+  endif
+
+  if s.em_italic
+    assign em_style = 'italic'
+  else
+    assign em_style = 'normal'
+  endif
+
+  # ------------------------------------------------------------------
+  # Columnas activas. Una columna existe si tiene título.
+  # cols_all    -> índices visibles en PC
+  # cols_mobile -> índices visibles en móvil
+  # ------------------------------------------------------------------
+  assign cols_all = ''
+  assign cols_mobile = ''
+  assign cols_hidden_m = ''
+
+  for i in (1..5)
+    assign key = 'col_' | append: i
+    assign key_m = 'col_' | append: i | append: '_mobile'
+    if s[key] != blank
+      assign cols_all = cols_all | append: i | append: ','
+      if s[key_m]
+        assign cols_mobile = cols_mobile | append: i | append: ','
+      else
+        assign cols_hidden_m = cols_hidden_m | append: i | append: ','
+      endif
+    endif
+  endfor
+
+  assign col_list = cols_all | split: ','
+  assign col_list_m = cols_mobile | split: ','
+  assign hidden_list_m = cols_hidden_m | split: ','
+  assign n_cols = col_list.size
+  assign n_cols_m = col_list_m.size
+
+  # repeat(0, ...) es CSS invalido y dividir por 0 en calc() tambien:
+  # se fuerza un minimo de 1 pista.
+  assign n_css = n_cols
+  if n_css < 1
+    assign n_css = 1
+  endif
+  assign n_css_m = n_cols_m
+  if n_css_m < 1
+    assign n_css_m = 1
+  endif
+
+  # ------------------------------------------------------------------
+  # Columna destacada: cuántas columnas visibles quedan a su derecha.
+  # Con eso el recuadro se coloca sin necesidad de conocer píxeles.
+  # ------------------------------------------------------------------
+  assign highlight_k = 0
+  assign highlight_on = false
+  if s.highlight_col != 'none'
+    for c in col_list
+      if c == s.highlight_col
+        assign highlight_on = true
+        assign highlight_k = n_cols | minus: forloop.index
+      endif
+    endfor
+  endif
+
+  # En móvil hay menos columnas, así que el desplazamiento del recuadro se
+  # recalcula sobre las visibles. Si la columna destacada no se muestra en
+  # móvil, el recuadro se oculta: dibujarlo caería sobre otra columna.
+  assign highlight_k_m = 0
+  assign highlight_on_m = false
+  if highlight_on
+    for c in col_list_m
+      if c == s.highlight_col
+        assign highlight_on_m = true
+        assign highlight_k_m = n_cols_m | minus: forloop.index
+      endif
+    endfor
+  endif
+  unless s.show_highlight_m
+    assign highlight_on_m = false
+  endunless
+-%}
+
+{%- style -%}
+  @font-face {
+    font-family: 'Helvetica neue';
+    src: url('{{ 'HelveticaNeueCyr-Light.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'thin2';
+    src: url('{{ 'lawrence-regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ================= Variables: PC ================= */
+  .ctbl-{{ section.id }} {
+    --ctbl-bg: {{ s.bg_color }};
+    --ctbl-max-w: {{ max_w }};
+    --ctbl-pt: {{ s.padding_top_d }}px;
+    --ctbl-pb: {{ s.padding_bottom_d }}px;
+    --ctbl-pl: {{ s.padding_left_d }}px;
+    --ctbl-pr: {{ s.padding_right_d }}px;
+    --ctbl-gap: {{ s.gap_d }}px;
+    --ctbl-align: {{ s.vertical_align_d }};
+    --ctbl-text-w: {{ s.text_width_d }}%;
+
+    --ctbl-h-font: {{ heading_stack }};
+    --ctbl-h-size: {{ s.heading_size_d }}px;
+    --ctbl-h-lh: {{ s.heading_line_height_d }};
+    --ctbl-h-ls: {{ s.heading_letter_spacing_d }}px;
+    --ctbl-h-weight: {{ s.heading_weight }};
+    --ctbl-h-color: {{ s.heading_color }};
+    --ctbl-h-align: {{ s.heading_align_d }};
+    --ctbl-h-mb: {{ s.heading_margin_bottom_d }}px;
+    --ctbl-em-color: {{ s.em_color }};
+    --ctbl-em-style: {{ em_style }};
+
+    --ctbl-b-font: {{ body_stack }};
+    --ctbl-lead-size: {{ s.lead_size_d }}px;
+    --ctbl-lead-lh: {{ s.lead_line_height_d }};
+    --ctbl-lead-color: {{ s.lead_color }};
+    --ctbl-lead-align: {{ s.lead_align_d }};
+    --ctbl-lead-gap: {{ s.lead_paragraph_gap_d }}px;
+
+    --ctbl-c1: {{ s.first_col_width_d }}%;
+    --ctbl-n: {{ n_css }};
+    --ctbl-k: {{ highlight_k }};
+
+    --ctbl-th-size: {{ s.th_size_d }}px;
+    --ctbl-th-color: {{ s.th_color }};
+    --ctbl-th-weight: {{ s.th_weight }};
+    --ctbl-th-ls: {{ s.th_letter_spacing }}px;
+    --ctbl-th-transform: {% if s.th_uppercase %}uppercase{% else %}none{% endif %};
+    --ctbl-th-pb: {{ s.th_padding_bottom_d }}px;
+    --ctbl-hline: {{ s.header_line_color }};
+    --ctbl-hline-w: {{ s.header_line_width_d }}px;
+
+    --ctbl-cell-size: {{ s.cell_size_d }}px;
+    --ctbl-cell-color: {{ s.cell_color }};
+    --ctbl-label-color: {{ s.label_color }};
+    --ctbl-cell-weight: {{ s.cell_weight }};
+    --ctbl-row-py: {{ s.row_padding_d }}px;
+    --ctbl-cell-px: {{ s.cell_padding_x_d }}px;
+    --ctbl-rline: {{ s.row_line_color }};
+    --ctbl-rline-w: {{ s.row_line_width }}px;
+
+    --ctbl-hl-bg: {{ s.highlight_bg }};
+    --ctbl-hl-border: {{ s.highlight_border_color }};
+    --ctbl-hl-border-w: {{ s.highlight_border_width }}px;
+    --ctbl-hl-radius: {{ s.highlight_radius }}px;
+    --ctbl-hl-ovf: {{ s.highlight_overhang_d }}px;
+  }
+
+  /* ================= Estructura ================= */
+  .ctbl {
+    background-color: var(--ctbl-bg);
+  }
+
+  .ctbl__inner {
+    display: flex;
+    flex-direction: row;
+    align-items: var(--ctbl-align);
+    gap: var(--ctbl-gap);
+    max-width: var(--ctbl-max-w);
+    margin-inline: auto;
+    padding: var(--ctbl-pt) var(--ctbl-pr) var(--ctbl-pb) var(--ctbl-pl);
+    box-sizing: border-box;
+  }
+
+  .ctbl--text-right .ctbl__inner {
+    flex-direction: row-reverse;
+  }
+
+  .ctbl__text {
+    flex: 0 1 var(--ctbl-text-w);
+    min-width: 0;
+  }
+
+  .ctbl__table-col {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  /* ================= Título y texto ================= */
+  .ctbl__heading {
+    margin: 0 0 var(--ctbl-h-mb);
+    font-family: var(--ctbl-h-font);
+    font-size: var(--ctbl-h-size);
+    font-weight: var(--ctbl-h-weight);
+    line-height: var(--ctbl-h-lh);
+    letter-spacing: var(--ctbl-h-ls);
+    text-align: var(--ctbl-h-align);
+    color: var(--ctbl-h-color);
+  }
+
+  .ctbl__heading em,
+  .ctbl__heading i {
+    font-style: var(--ctbl-em-style);
+    color: var(--ctbl-em-color);
+  }
+
+  .ctbl__lead {
+    font-family: var(--ctbl-b-font);
+    font-size: var(--ctbl-lead-size);
+    line-height: var(--ctbl-lead-lh);
+    text-align: var(--ctbl-lead-align);
+    color: var(--ctbl-lead-color);
+  }
+
+  .ctbl__lead > * {
+    margin: 0;
+  }
+
+  .ctbl__lead > * + * {
+    margin-top: var(--ctbl-lead-gap);
+  }
+
+  .ctbl__lead p:empty {
+    display: none;
+  }
+
+  .ctbl__lead strong {
+    font-weight: 600;
+  }
+
+  .ctbl__lead a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  /* ================= Tabla ================= */
+  /* Las filas existen para la accesibilidad pero no maquetan: con
+     display:contents sus celdas siguen siendo items directos del grid. */
+  .ctbl__row {
+    display: contents;
+  }
+
+  .ctbl__table {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--ctbl-c1) repeat({{ n_css }}, minmax(0, 1fr));
+    font-family: var(--ctbl-b-font);
+  }
+
+  .ctbl__cell {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    padding: var(--ctbl-row-py) var(--ctbl-cell-px);
+    font-size: var(--ctbl-cell-size);
+    font-weight: var(--ctbl-cell-weight);
+    line-height: 1.35;
+    color: var(--ctbl-cell-color);
+    box-sizing: border-box;
+  }
+
+  /* Primera columna: las etiquetas de cada fila */
+  .ctbl__cell--label {
+    color: var(--ctbl-label-color);
+    padding-left: 0;
+  }
+
+  /* Encabezado */
+  .ctbl__cell--head {
+    padding-top: 0;
+    padding-bottom: var(--ctbl-th-pb);
+    font-size: var(--ctbl-th-size);
+    font-weight: var(--ctbl-th-weight);
+    letter-spacing: var(--ctbl-th-ls);
+    text-transform: var(--ctbl-th-transform);
+    color: var(--ctbl-th-color);
+    border-bottom: var(--ctbl-hline-w) solid var(--ctbl-hline);
+  }
+
+  /* Separadores entre filas: el borde de cada celda se une con el de su
+     vecina y forma una línea continua a lo ancho de la tabla. */
+  .ctbl__cell--row:not(.ctbl__cell--rowfirst) {
+    border-top: var(--ctbl-rline-w) solid var(--ctbl-rline);
+  }
+
+  .ctbl--lastline .ctbl__cell--rowlast {
+    border-bottom: var(--ctbl-rline-w) solid var(--ctbl-rline);
+  }
+
+  /* ================= Columna destacada =================
+     Va en posición absoluta, así que no ocupa celda del grid. Su ancho es
+     el de una columna de valores y se desplaza a la derecha tantas columnas
+     como haya después de ella. No hace falta saber ningún píxel. */
+  .ctbl__highlight {
+    position: absolute;
+    top: calc(var(--ctbl-hl-ovf) * -1);
+    bottom: calc(var(--ctbl-hl-ovf) * -1);
+    width: calc((100% - var(--ctbl-c1)) / var(--ctbl-n));
+    right: calc((100% - var(--ctbl-c1)) / var(--ctbl-n) * var(--ctbl-k));
+    z-index: 0;
+    background-color: var(--ctbl-hl-bg);
+    border: var(--ctbl-hl-border-w) solid var(--ctbl-hl-border);
+    border-radius: var(--ctbl-hl-radius);
+    pointer-events: none;
+  }
+
+  /* ================= Móvil ================= */
+  @media screen and (max-width: {{ bp_max }}px) {
+    .ctbl-{{ section.id }} {
+      --ctbl-max-w: none;
+      --ctbl-pt: {{ s.padding_top_m }}px;
+      --ctbl-pb: {{ s.padding_bottom_m }}px;
+      --ctbl-pl: {{ s.padding_left_m }}px;
+      --ctbl-pr: {{ s.padding_right_m }}px;
+      --ctbl-gap: {{ s.gap_m }}px;
+
+      --ctbl-h-size: {{ s.heading_size_m }}px;
+      --ctbl-h-lh: {{ s.heading_line_height_m }};
+      --ctbl-h-align: {{ s.heading_align_m }};
+      --ctbl-h-mb: {{ s.heading_margin_bottom_m }}px;
+
+      --ctbl-lead-size: {{ s.lead_size_m }}px;
+      --ctbl-lead-lh: {{ s.lead_line_height_m }};
+      --ctbl-lead-align: {{ s.lead_align_m }};
+      --ctbl-lead-gap: {{ s.lead_paragraph_gap_m }}px;
+
+      --ctbl-c1: {{ s.first_col_width_m }}%;
+      --ctbl-n: {{ n_css_m }};
+
+      --ctbl-th-size: {{ s.th_size_m }}px;
+      --ctbl-th-pb: {{ s.th_padding_bottom_m }}px;
+      --ctbl-hline-w: {{ s.header_line_width_m }}px;
+
+      --ctbl-cell-size: {{ s.cell_size_m }}px;
+      --ctbl-row-py: {{ s.row_padding_m }}px;
+      --ctbl-cell-px: {{ s.cell_padding_x_m }}px;
+    }
+
+    .ctbl__inner,
+    .ctbl--text-right .ctbl__inner {
+      flex-direction: column;
+    }
+
+    .ctbl__text,
+    .ctbl__table-col {
+      flex: 0 0 auto;
+      width: 100%;
+    }
+
+    /* Menos columnas: se redefine la retícula y las celdas que quedan
+       se recolocan solas. */
+    .ctbl-{{ section.id }} .ctbl__table {
+      grid-template-columns: var(--ctbl-c1) repeat({{ n_css_m }}, minmax(0, 1fr));
+    }
+
+    {%- for c in hidden_list_m -%}
+      .ctbl-{{ section.id }} .ctbl__cell--c{{ c }} {
+        display: none;
+      }
+    {%- endfor -%}
+
+    {%- if highlight_on_m -%}
+      .ctbl-{{ section.id }} .ctbl__highlight {
+        --ctbl-k: {{ highlight_k_m }};
+      }
+    {%- else -%}
+      .ctbl-{{ section.id }} .ctbl__highlight {
+        display: none;
+      }
+    {%- endif -%}
+
+    {%- unless s.show_last_line_m -%}
+      .ctbl-{{ section.id }}.ctbl--lastline .ctbl__cell--rowlast {
+        border-bottom: 0;
+      }
+    {%- endunless -%}
+  }
+
+  @media screen and (min-width: {{ bp }}px) {
+    {%- unless s.show_last_line_d -%}
+      .ctbl-{{ section.id }}.ctbl--lastline .ctbl__cell--rowlast {
+        border-bottom: 0;
+      }
+    {%- endunless -%}
+  }
+{%- endstyle -%}
+
+<div class="ctbl ctbl-{{ section.id }} ctbl--text-{{ s.text_position_d }} ctbl--lastline">
+  <div class="ctbl__inner">
+    <div class="ctbl__text">
+      {%- if s.heading != blank -%}
+        <{{ s.heading_tag }} class="ctbl__heading">{{ s.heading | newline_to_br }}</{{ s.heading_tag }}>
+      {%- endif -%}
+      {%- if s.lead != blank -%}
+        <div class="ctbl__lead">{{ s.lead }}</div>
+      {%- endif -%}
+    </div>
+
+    <div class="ctbl__table-col">
+      <div class="ctbl__table" role="table">
+        {%- if highlight_on -%}
+          <span class="ctbl__highlight" aria-hidden="true"></span>
+        {%- endif -%}
+
+        {%- comment -%} ---------- Encabezado ---------- {%- endcomment -%}
+        <div class="ctbl__row" role="row">
+          <div class="ctbl__cell ctbl__cell--head ctbl__cell--label" role="columnheader">
+            {{- s.first_col_label -}}
+          </div>
+          {%- for c in col_list -%}
+            {%- assign key = 'col_' | append: c -%}
+            <div class="ctbl__cell ctbl__cell--head ctbl__cell--c{{ c }}" role="columnheader">
+              {{- s[key] -}}
+            </div>
+          {%- endfor -%}
+        </div>
+
+        {%- comment -%} ---------- Filas ---------- {%- endcomment -%}
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign row_class = 'ctbl__cell--row'
+            if forloop.first
+              assign row_class = row_class | append: ' ctbl__cell--rowfirst'
+            endif
+            if forloop.last
+              assign row_class = row_class | append: ' ctbl__cell--rowlast'
+            endif
+          -%}
+          <div class="ctbl__row" role="row" {{ block.shopify_attributes }}>
+            <div class="ctbl__cell ctbl__cell--label {{ row_class }}" role="rowheader">
+              {{- block.settings.label -}}
+            </div>
+            {%- for c in col_list -%}
+              {%- assign vkey = 'val_' | append: c -%}
+              <div class="ctbl__cell {{ row_class }} ctbl__cell--c{{ c }}" role="cell">
+                {{- block.settings[vkey] -}}
+              </div>
+            {%- endfor -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Tabla comparativa",
+  "tag": "section",
+  "class": "section-ctbl",
+  "max_blocks": 14,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Texto"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Título",
+      "info": "Enter para salto de línea. Envuelve una palabra en <em>así</em> para el acento en cursiva.",
+      "default": "La <em>sinergia</em> de\nlas fórmulas"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Etiqueta HTML del título (SEO)",
+      "options": [
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "div", "label": "div (sin peso SEO)" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "richtext",
+      "id": "lead",
+      "label": "Texto",
+      "default": "<p>El estrés afecta al sueño. La falta de sueño afecta a la atención. Y sin claridad mental, cualquier esfuerzo cuesta el doble.</p><p>Por eso diseñamos este sistema: para trabajar las tres piezas al mismo tiempo.</p><p>En esta tabla puedes ver cómo se refuerzan <strong>entre sí:</strong></p>"
+    },
+
+    {
+      "type": "header",
+      "content": "Columnas de la tabla"
+    },
+    {
+      "type": "text",
+      "id": "first_col_label",
+      "label": "Título de la primera columna",
+      "default": "BENEFICIOS"
+    },
+    {
+      "type": "text",
+      "id": "col_1",
+      "label": "Columna 1",
+      "info": "Deja el título vacío para no usar la columna.",
+      "default": "FOCUS"
+    },
+    {
+      "type": "checkbox",
+      "id": "col_1_mobile",
+      "label": "Mostrar columna 1 en móvil",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "col_2",
+      "label": "Columna 2",
+      "default": "CALM"
+    },
+    {
+      "type": "checkbox",
+      "id": "col_2_mobile",
+      "label": "Mostrar columna 2 en móvil",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "col_3",
+      "label": "Columna 3",
+      "default": "SLEEP"
+    },
+    {
+      "type": "checkbox",
+      "id": "col_3_mobile",
+      "label": "Mostrar columna 3 en móvil",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "col_4",
+      "label": "Columna 4",
+      "default": "MODO ZZEN"
+    },
+    {
+      "type": "checkbox",
+      "id": "col_4_mobile",
+      "label": "Mostrar columna 4 en móvil",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "col_5",
+      "label": "Columna 5"
+    },
+    {
+      "type": "checkbox",
+      "id": "col_5_mobile",
+      "label": "Mostrar columna 5 en móvil",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "first_col_width_d",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho de la primera columna — PC",
+      "default": 25
+    },
+    {
+      "type": "range",
+      "id": "first_col_width_m",
+      "min": 20,
+      "max": 75,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho de la primera columna — Móvil",
+      "default": 52
+    },
+
+    {
+      "type": "header",
+      "content": "Columna destacada"
+    },
+    {
+      "type": "select",
+      "id": "highlight_col",
+      "label": "Columna con recuadro",
+      "options": [
+        { "value": "none", "label": "Ninguna" },
+        { "value": "1", "label": "Columna 1" },
+        { "value": "2", "label": "Columna 2" },
+        { "value": "3", "label": "Columna 3" },
+        { "value": "4", "label": "Columna 4" },
+        { "value": "5", "label": "Columna 5" }
+      ],
+      "default": "4"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_highlight_m",
+      "label": "Mostrar el recuadro en móvil",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "highlight_bg",
+      "label": "Fondo del recuadro",
+      "default": "#161616"
+    },
+    {
+      "type": "color",
+      "id": "highlight_border_color",
+      "label": "Borde del recuadro",
+      "default": "#3d3d3d"
+    },
+    {
+      "type": "range",
+      "id": "highlight_border_width",
+      "min": 0,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor del borde",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "highlight_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo del recuadro",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "highlight_overhang_d",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Cuánto sobresale arriba y abajo",
+      "default": 16
+    },
+
+    {
+      "type": "header",
+      "content": "Diseño general"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "mobile_breakpoint",
+      "min": 480,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "label": "Punto de cambio a móvil",
+      "default": 750
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 0,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "label": "Ancho máximo del contenido",
+      "info": "0 = ancho completo.",
+      "default": 1500
+    },
+    {
+      "type": "select",
+      "id": "text_position_d",
+      "label": "Columna de texto en PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "vertical_align_d",
+      "label": "Alineación vertical en PC",
+      "options": [
+        { "value": "center", "label": "Centrado" },
+        { "value": "flex-start", "label": "Arriba" },
+        { "value": "flex-end", "label": "Abajo" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "text_width_d",
+      "min": 25,
+      "max": 65,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho de la columna de texto — PC",
+      "default": 42
+    },
+    {
+      "type": "range",
+      "id": "gap_d",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Separación texto / tabla — PC",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "gap_m",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación texto / tabla — Móvil",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "padding_top_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding superior — PC",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding inferior — PC",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "padding_left_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding izquierdo — PC",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_right_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding derecho — PC",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_top_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding superior — Móvil",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding inferior — Móvil",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_left_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding izquierdo — Móvil",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_right_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding derecho — Móvil",
+      "default": 16
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía del título"
+    },
+    {
+      "type": "select",
+      "id": "heading_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "thin2"
+    },
+    {
+      "type": "text",
+      "id": "heading_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'thin2', serif"
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "em_color",
+      "label": "Color del acento <em>",
+      "default": "#ffffff"
+    },
+    {
+      "type": "checkbox",
+      "id": "em_italic",
+      "label": "Acento <em> en cursiva",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "heading_size_d",
+      "min": 20,
+      "max": 110,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_d",
+      "min": 0.8,
+      "max": 2,
+      "step": 0.1,
+      "label": "Interlineado — PC",
+      "default": 1.1
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing_d",
+      "min": -3,
+      "max": 6,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "heading_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_d",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — PC",
+      "default": 34
+    },
+    {
+      "type": "range",
+      "id": "heading_size_m",
+      "min": 14,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_m",
+      "min": 0.8,
+      "max": 2,
+      "step": 0.1,
+      "label": "Interlineado — Móvil",
+      "default": 1.2
+    },
+    {
+      "type": "select",
+      "id": "heading_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — Móvil",
+      "default": 18
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía del texto"
+    },
+    {
+      "type": "select",
+      "id": "body_font",
+      "label": "Fuente (texto y tabla)",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "body_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "color",
+      "id": "lead_color",
+      "label": "Color",
+      "default": "#f0f0f0"
+    },
+    {
+      "type": "range",
+      "id": "lead_size_d",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "lead_line_height_d",
+      "min": 1,
+      "max": 2.4,
+      "step": 0.1,
+      "label": "Interlineado — PC",
+      "default": 1.5
+    },
+    {
+      "type": "select",
+      "id": "lead_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "lead_paragraph_gap_d",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre párrafos — PC",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "lead_size_m",
+      "min": 9,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "lead_line_height_m",
+      "min": 1,
+      "max": 2.4,
+      "step": 0.1,
+      "label": "Interlineado — Móvil",
+      "default": 1.5
+    },
+    {
+      "type": "select",
+      "id": "lead_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "lead_paragraph_gap_m",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre párrafos — Móvil",
+      "default": 14
+    },
+
+    {
+      "type": "header",
+      "content": "Tabla — encabezado"
+    },
+    {
+      "type": "color",
+      "id": "th_color",
+      "label": "Color del texto",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "th_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "checkbox",
+      "id": "th_uppercase",
+      "label": "En mayúsculas",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "th_letter_spacing",
+      "min": -1,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0.5
+    },
+    {
+      "type": "range",
+      "id": "th_size_d",
+      "min": 9,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "th_size_m",
+      "min": 8,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "th_padding_bottom_d",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Espacio bajo el encabezado — PC",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "th_padding_bottom_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Espacio bajo el encabezado — Móvil",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "header_line_color",
+      "label": "Color de la línea del encabezado",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "header_line_width_d",
+      "min": 0,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor de la línea — PC",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "header_line_width_m",
+      "min": 0,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor de la línea — Móvil",
+      "default": 2
+    },
+
+    {
+      "type": "header",
+      "content": "Tabla — celdas y filas"
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Color de la primera columna",
+      "default": "#d4d4d4"
+    },
+    {
+      "type": "color",
+      "id": "cell_color",
+      "label": "Color de los valores",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "cell_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "range",
+      "id": "cell_size_d",
+      "min": 9,
+      "max": 26,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "cell_size_m",
+      "min": 8,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "row_padding_d",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Alto interior de fila — PC",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "row_padding_m",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Alto interior de fila — Móvil",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "cell_padding_x_d",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Sangría lateral de celda — PC",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "cell_padding_x_m",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Sangría lateral de celda — Móvil",
+      "default": 4
+    },
+    {
+      "type": "color",
+      "id": "row_line_color",
+      "label": "Color del separador de filas",
+      "default": "#2e2e2e"
+    },
+    {
+      "type": "range",
+      "id": "row_line_width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor del separador",
+      "default": 1
+    },
+    {
+      "type": "checkbox",
+      "id": "show_last_line_d",
+      "label": "Línea al final de la tabla — PC",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_last_line_m",
+      "label": "Línea al final de la tabla — Móvil",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "row",
+      "name": "Fila",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Beneficio",
+          "default": "Claridad Mental"
+        },
+        {
+          "type": "text",
+          "id": "val_1",
+          "label": "Valor columna 1",
+          "info": "Déjalo vacío para una celda en blanco.",
+          "default": "Sí"
+        },
+        {
+          "type": "text",
+          "id": "val_2",
+          "label": "Valor columna 2",
+          "default": "Sí"
+        },
+        {
+          "type": "text",
+          "id": "val_3",
+          "label": "Valor columna 3"
+        },
+        {
+          "type": "text",
+          "id": "val_4",
+          "label": "Valor columna 4",
+          "default": "Sí"
+        },
+        {
+          "type": "text",
+          "id": "val_5",
+          "label": "Valor columna 5"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Tabla comparativa",
+      "blocks": [
+        { "type": "row" },
+        { "type": "row" },
+        { "type": "row" },
+        { "type": "row" }
+      ]
+    }
+  ]
+}
+{% endschema %}
