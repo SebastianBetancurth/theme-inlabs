@@ -3,28 +3,35 @@
   BLOQUE: zzen_videos — Carrusel de vídeos + lightbox
   Parámetros: block, product, section
 
-  Los bloques de sección no admiten bloques hijos, así que los vídeos
-  van en 10 huecos numerados. Los huecos sin vídeo se saltan.
+  VERSIÓN 2 — correcciones respecto a la anterior
+  -----------------------------------------------
+  1. Las URLs de vídeo se calculan en Liquid y viajan en atributos
+     data-src / data-src-sm. Antes iban en JSON incrustado y se
+     parseaban en JS: si el parseo o el filtrado por formato
+     fallaba, load() abandonaba en silencio y el vídeo salía negro.
+     Ahora son visibles en DevTools y no hay nada que parsear.
 
-  · Carrusel con scroll-snap nativo: dedo, trackpad, rueda y teclado
-    sin librerías. Las flechas solo empujan el scroll.
-  · Las flechas se ocultan solas en los extremos y ambas desaparecen
-    si los vídeos caben sin desbordar.
-  · El lightbox es un <dialog> con showModal(): vive en el top layer
-    del navegador, así que el overlay cubre TODA la web por encima de
-    cualquier z-index aunque el bloque esté anidado en la columna de
-    producto. Trae atrapado de foco, Esc y semántica de diálogo.
-  · Un solo <video> reutilizado: al navegar se cambian las fuentes.
-    Al cerrar se vacía para cortar la descarga.
-  · Autoplay silenciado (única forma que permiten los navegadores)
-    con botón para activar el sonido.
+  2. load() ya no puede abandonar antes de actualizar is-first /
+     is-last, así que las flechas del lightbox nunca se quedan en un
+     estado incorrecto.
 
-  SOLO VÍDEO ALOJADO EN SHOPIFY: el control de sonido y el autoplay
-  necesitan un <video> real, que un iframe de YouTube no permite.
+  3. play() ya no compite con load(). Se intenta al momento y se
+     reintenta en el evento canplay. Si a los 1,2 s sigue en pausa,
+     salen los controles nativos como red de seguridad.
 
-  El JS va incrustado al final. La guarda de customElements.get()
-  evita registrarlo dos veces si hay varios bloques o si la sección
-  se re-renderiza al cambiar de variante.
+  4. Las animaciones de entrada y salida se cancelan siempre. Antes
+     la de salida usaba fill: forwards y no se cancelaba, así que al
+     reabrir el overlay se quedaba en opacidad 0 para siempre.
+
+  5. Capas explícitas con z-index: overlay 0, vídeo 1, botones 3. Sin
+     esto el stage pintaba por encima de las flechas laterales y en
+     móvil no se podían pulsar.
+
+  6. El vídeo del lightbox lleva poster: mientras carga se ve la
+     miniatura en lugar de un rectángulo negro.
+
+  El schema no cambia: mismos ids de settings, no hay que volver a
+  configurar nada. Solo reemplaza este archivo.
   ============================================================
 {% endcomment %}
 
@@ -79,6 +86,8 @@
     else
       assign snap_css = 'x mandatory'
   endcase
+
+  assign overlay_alpha = b.overlay_opacity | divided_by: 100.0
 -%}
 
 {%- if playable > 0 -%}
@@ -92,7 +101,6 @@
       {% if b.show_mobile == false %}display: none;{% endif %}
     }
 
-    /* ---------- Encabezado ---------- */
     .zzen-vid-{{ block.id }}__heading {
       font-family: {{ heading_stack }};
       font-size: {{ b.heading_size_mobile }}px;
@@ -252,8 +260,6 @@
       outline-offset: 2px;
     }
 
-    /* Ocultar en los extremos. is-at-start viene ya en el HTML, así
-       la flecha izquierda no parpadea antes de que arranque el JS. */
     {%- if b.hide_arrows_at_edges -%}
       .zzen-vid-{{ block.id }}__wrap.is-at-start .zzen-vid-{{ block.id }}__arrow--prev,
       .zzen-vid-{{ block.id }}__wrap.is-at-end .zzen-vid-{{ block.id }}__arrow--next {
@@ -263,7 +269,6 @@
       }
     {%- endif -%}
 
-    /* Si todo cabe sin scroll, fuera las dos */
     .zzen-vid-{{ block.id }}__wrap.is-static .zzen-vid-{{ block.id }}__arrow { display: none; }
 
     {%- if b.show_arrows == false -%}
@@ -292,14 +297,14 @@
     .zzen-vid-{{ block.id }}__modal::backdrop { background: transparent; }
     .zzen-vid-{{ block.id }}__modal:not([open]) { display: none; }
 
+    /* CAPAS EXPLÍCITAS. Sin esto el stage, que va después en el DOM,
+       pinta por encima de las flechas y en móvil no se pueden pulsar. */
     .zzen-vid-{{ block.id }}__overlay {
       position: fixed;
       inset: 0;
+      z-index: 0;
       background-color: {{ b.overlay_color }};
-      opacity: {{ b.overlay_opacity | divided_by: 100.0 }};
-      border: 0;
-      padding: 0;
-      margin: 0;
+      opacity: {{ overlay_alpha }};
       cursor: pointer;
       {% if b.overlay_blur > 0 %}
         backdrop-filter: blur({{ b.overlay_blur }}px);
@@ -309,6 +314,7 @@
 
     .zzen-vid-{{ block.id }}__stage {
       position: fixed;
+      z-index: 1;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -331,6 +337,7 @@
 
     .zzen-vid-{{ block.id }}__ctrl {
       position: fixed;
+      z-index: 3;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -382,7 +389,6 @@
       pointer-events: none;
     }
 
-    /* Botón de sonido: dentro del stage, arriba a la izquierda */
     .zzen-vid-{{ block.id }}__sound {
       position: absolute;
       top: {{ b.modal_sound_inset_mobile }}px;
@@ -512,6 +518,7 @@
     data-autoplay="{{ b.autoplay }}"
     data-start-muted="{{ b.start_muted }}"
     data-loop="{{ b.loop }}"
+    data-overlay-opacity="{{ overlay_alpha }}"
     {{ block.shopify_attributes }}
   >
     {%- if b.heading != blank -%}
@@ -535,18 +542,32 @@
         {%- for i in slot_indexes -%}
           {%- liquid
             assign vkey = 'video_' | append: i
-            assign pkey = 'poster_' | append: i
-            assign lkey = 'label_' | append: i
             assign v = b[vkey]
           -%}
           {%- if v == blank -%}{%- continue -%}{%- endif -%}
           {%- liquid
+            assign pkey = 'poster_' | append: i
+            assign lkey = 'label_' | append: i
+
             if b[pkey] != blank
               assign poster = b[pkey]
             else
               assign poster = v.preview_image
             endif
+
             assign v_label = b[lkey] | default: 'Vídeo'
+
+            # Preferimos mp4: es el único formato que reproducen todos
+            # los navegadores sin librerías. Si por lo que sea no hay
+            # ninguno, usamos todas las fuentes tal cual en lugar de
+            # quedarnos sin nada.
+            assign mp4s = v.sources | where: 'format', 'mp4' | sort: 'height'
+            if mp4s.size == 0
+              assign mp4s = v.sources
+            endif
+
+            assign src_lo = mp4s | first
+            assign src_hi = mp4s | last
           -%}
 
           <li class="zzen-vid-{{ block.id }}__slide">
@@ -555,6 +576,12 @@
               class="zzen-vid-{{ block.id }}__card"
               data-slide
               data-index="{{ vindex }}"
+              data-src="{{ src_hi.url }}"
+              data-src-sm="{{ src_lo.url }}"
+              data-type="{{ src_hi.mime_type | default: 'video/mp4' }}"
+              {% if poster != blank %}
+                data-poster="{{ poster | image_url: width: 900 }}"
+              {% endif %}
               aria-label="{{ v_label | escape }}"
             >
               {%- if poster != blank -%}
@@ -574,10 +601,6 @@
                   <path d="M1 1.2c0-.5.5-.8 1-.6l8.6 5.3c.4.3.4.9 0 1.2L2 12.4c-.5.3-1 0-1-.6V1.2z"/>
                 </svg>
               </span>
-
-              <script type="application/json" data-sources>
-                {{ v.sources | json }}
-              </script>
             </button>
           </li>
           {%- assign vindex = vindex | plus: 1 -%}
@@ -602,13 +625,7 @@
       data-modal
       aria-label="{{ b.heading | default: 'Vídeos' | strip_html | escape }}"
     >
-      <button
-        type="button"
-        class="zzen-vid-{{ block.id }}__overlay"
-        data-close
-        aria-label="{{ 'accessibility.close' | t }}"
-        tabindex="-1"
-      ></button>
+      <div class="zzen-vid-{{ block.id }}__overlay" data-overlay data-close></div>
 
       <button
         type="button"
@@ -664,7 +681,7 @@
           class="zzen-vid-{{ block.id }}__video"
           data-video
           playsinline
-          preload="none"
+          preload="metadata"
           controlslist="nodownload"
         ></video>
       </div>
@@ -672,11 +689,6 @@
   </zzen-video-carousel>
 
   <script>
-    /* ----------------------------------------------------------
-       zzen-video-carousel — incrustado a petición expresa.
-       La guarda evita registrar el elemento dos veces si hay
-       varios bloques o si la sección se re-renderiza.
-       ---------------------------------------------------------- */
     if (!customElements.get('zzen-video-carousel')) {
       customElements.define(
         'zzen-video-carousel',
@@ -688,6 +700,8 @@
             this.autoplay = this.dataset.autoplay === 'true';
             this.startMuted = this.dataset.startMuted !== 'false';
             this.loop = this.dataset.loop === 'true';
+            this.overlayOpacity = parseFloat(this.dataset.overlayOpacity);
+            if (isNaN(this.overlayOpacity)) this.overlayOpacity = 0.75;
 
             this.wrap = this.querySelector('[data-wrap]');
             this.track = this.querySelector('[data-track]');
@@ -695,19 +709,18 @@
             this.stage = this.querySelector('[data-stage]');
             this.video = this.querySelector('[data-video]');
             this.soundBtn = this.querySelector('[data-sound]');
-            this.overlay = this.querySelector('[data-close]');
+            this.overlay = this.querySelector('[data-overlay]');
             this.slides = Array.from(this.querySelectorAll('[data-slide]'));
 
             if (!this.track || !this.slides.length) return;
 
             this.index = 0;
             this.ticking = false;
+            this.playTimer = null;
 
             this.bindCarousel();
             this.bindModal();
 
-            // Doble pasada: una ya y otra cuando el layout asiente,
-            // porque las miniaturas cargan en diferido.
             this.updateEdges();
             requestAnimationFrame(() => this.updateEdges());
             window.addEventListener('load', () => this.updateEdges(), { once: true });
@@ -726,7 +739,6 @@
               });
             });
 
-            // Passive + rAF: el listener nunca bloquea el scroll.
             this.track.addEventListener(
               'scroll',
               () => {
@@ -773,11 +785,7 @@
 
             const { scrollLeft, scrollWidth, clientWidth } = this.track;
 
-            // Sin desbordamiento no hay nada que navegar.
             this.wrap.classList.toggle('is-static', scrollWidth - clientWidth <= 2);
-
-            // Tolerancia de 2px: los navegadores redondean scrollLeft y
-            // sin margen la flecha del final no llegaría a ocultarse.
             this.wrap.classList.toggle('is-at-start', scrollLeft <= 2);
             this.wrap.classList.toggle('is-at-end', scrollLeft >= scrollWidth - clientWidth - 2);
           }
@@ -787,8 +795,8 @@
           bindModal() {
             if (!this.modal) return;
 
-            this.querySelectorAll('[data-close]').forEach((btn) => {
-              btn.addEventListener('click', () => this.close());
+            this.querySelectorAll('[data-close]').forEach((el) => {
+              el.addEventListener('click', () => this.close());
             });
 
             this.querySelectorAll('[data-step]').forEach((btn) => {
@@ -797,8 +805,6 @@
               });
             });
 
-            // Esc dispara "cancel": lo interceptamos para animar la
-            // salida en lugar de que el diálogo desaparezca de golpe.
             this.modal.addEventListener('cancel', (event) => {
               event.preventDefault();
               this.close();
@@ -825,7 +831,10 @@
             this.modal.showModal();
             document.documentElement.style.overflow = 'hidden';
 
-            this.load(index);
+            // Al abrir siempre arrancamos con el estado de sonido
+            // configurado; al navegar se respeta lo que eligió el
+            // usuario (ver goTo).
+            this.load(index, this.startMuted);
             this.animateIn();
           }
 
@@ -840,11 +849,11 @@
 
           goTo(index) {
             if (index < 0 || index > this.slides.length - 1) return;
-            this.index = index;
-            this.load(index);
 
-            // Arrastramos el carrusel de fondo para que al cerrar, el
-            // vídeo que estabas viendo quede a la vista.
+            const keepMuted = this.video ? this.video.muted : this.startMuted;
+            this.index = index;
+            this.load(index, keepMuted);
+
             this.slides[index]?.closest('li')?.scrollIntoView({
               behavior: this.reducedMotion ? 'auto' : 'smooth',
               block: 'nearest',
@@ -852,71 +861,71 @@
             });
           }
 
-          /* ---- Fuentes ---- */
+          /* ---- Carga del vídeo ---- */
 
-          pickSource(sources) {
-            const mp4 = sources.filter((src) => (src.format || '').toLowerCase() === 'mp4');
-            if (!mp4.length) return null;
-
-            mp4.sort((a, b) => (a.height || 0) - (b.height || 0));
-
-            // Solo la resolución que la pantalla puede aprovechar.
-            const target = window.innerWidth < 750 ? 720 : 1080;
-            return mp4.find((src) => (src.height || 0) >= target) || mp4[mp4.length - 1];
-          }
-
-          load(index) {
+          load(index, muted) {
             const slide = this.slides[index];
             if (!slide || !this.video) return;
 
-            let sources = [];
-            try {
-              sources = JSON.parse(slide.querySelector('[data-sources]').textContent);
-            } catch (error) {
+            // Estado de las flechas PRIMERO: pase lo que pase con el
+            // vídeo, la navegación queda coherente.
+            this.modal.classList.toggle('is-first', index === 0);
+            this.modal.classList.toggle('is-last', index === this.slides.length - 1);
+
+            // En pantallas estrechas pedimos la versión ligera.
+            const wide = window.innerWidth >= 750;
+            const url = (wide ? slide.dataset.src : slide.dataset.srcSm) || slide.dataset.src;
+
+            if (!url) {
+              console.warn('[zzen-videos] El vídeo ' + (index + 1) + ' no tiene URL reproducible. Revisa que el archivo se haya terminado de procesar en Contenido › Archivos.');
               return;
             }
 
-            const source = this.pickSource(sources);
-            if (!source) return;
+            clearTimeout(this.playTimer);
 
             this.video.pause();
-            this.video.removeAttribute('src');
-            this.video.innerHTML = '';
-
-            const el = document.createElement('source');
-            el.src = source.url;
-            el.type = source.mime_type || 'video/mp4';
-            this.video.appendChild(el);
-
-            this.video.loop = this.loop;
-            this.video.muted = this.startMuted;
             this.video.controls = false;
-            this.soundBtn?.classList.toggle('is-muted', this.video.muted);
-
+            // El poster evita el rectángulo negro mientras carga.
+            this.video.poster = slide.dataset.poster || '';
+            this.video.loop = this.loop;
+            this.video.muted = muted;
+            this.video.src = url;
             this.video.load();
 
-            if (this.autoplay) {
-              // Los navegadores solo permiten autoplay silenciado. Si
-              // aun así lo bloquean, sacamos los controles nativos para
-              // que se pueda dar play a mano en lugar de dejar un
-              // rectángulo negro parado.
-              const attempt = this.video.play();
-              if (attempt?.catch) {
-                attempt.catch(() => {
-                  this.video.controls = true;
-                });
-              }
-            }
+            this.soundBtn?.classList.toggle('is-muted', this.video.muted);
 
-            this.modal.classList.toggle('is-first', index === 0);
-            this.modal.classList.toggle('is-last', index === this.slides.length - 1);
+            if (this.autoplay) this.tryPlay();
+          }
+
+          tryPlay() {
+            const video = this.video;
+
+            // play() justo después de load() puede rechazar con
+            // AbortError. Lo intentamos ya y lo reintentamos cuando el
+            // navegador avisa de que tiene datos suficientes.
+            const attempt = () => {
+              const promise = video.play();
+              if (promise && promise.catch) promise.catch(() => {});
+            };
+
+            attempt();
+            video.addEventListener('canplay', attempt, { once: true });
+
+            // Red de seguridad: si el navegador bloquea el autoplay,
+            // sacamos los controles nativos en lugar de dejar un vídeo
+            // parado sin forma de arrancarlo.
+            this.playTimer = setTimeout(() => {
+              if (video.paused) video.controls = true;
+            }, 1200);
           }
 
           unload() {
             if (!this.video) return;
+            clearTimeout(this.playTimer);
             this.video.pause();
             this.video.removeAttribute('src');
-            this.video.innerHTML = '';
+            this.video.removeAttribute('poster');
+            this.video.controls = false;
             this.video.load();
           }
 
@@ -931,11 +940,19 @@
 
           animateIn() {
             const duration = this.reducedMotion ? 0 : this.duration;
-            const opacity = this.overlay ? getComputedStyle(this.overlay).opacity : 1;
 
-            this.overlay?.animate({ opacity: [0, opacity] }, { duration, easing: this.easing, fill: 'backwards' });
+            // Cancelar SIEMPRE lo anterior. La animación de salida usa
+            // fill: forwards y si no se cancela deja el overlay en
+            // opacidad 0 para todas las aperturas siguientes.
+            this.overlayAnim?.cancel();
+            this.stageAnim?.cancel();
 
-            this.stage?.animate(
+            this.overlayAnim = this.overlay?.animate(
+              { opacity: [0, this.overlayOpacity] },
+              { duration, easing: this.easing }
+            );
+
+            this.stageAnim = this.stage?.animate(
               {
                 opacity: [0, 1],
                 transform: ['translate(-50%, -50%) scale(0.94)', 'translate(-50%, -50%) scale(1)'],
@@ -946,11 +963,16 @@
 
           animateOut(onDone) {
             const duration = this.reducedMotion ? 0 : Math.round(this.duration * 0.8);
-            const opacity = this.overlay ? getComputedStyle(this.overlay).opacity : 1;
 
-            this.overlay?.animate({ opacity: [opacity, 0] }, { duration, easing: this.easing, fill: 'forwards' });
+            this.overlayAnim?.cancel();
+            this.stageAnim?.cancel();
 
-            const anim = this.stage?.animate(
+            this.overlayAnim = this.overlay?.animate(
+              { opacity: [this.overlayOpacity, 0] },
+              { duration, easing: this.easing, fill: 'forwards' }
+            );
+
+            this.stageAnim = this.stage?.animate(
               {
                 opacity: [1, 0],
                 transform: ['translate(-50%, -50%) scale(1)', 'translate(-50%, -50%) scale(0.96)'],
@@ -958,21 +980,27 @@
               { duration, easing: this.easing, fill: 'forwards' }
             );
 
-            if (anim) {
-              anim.onfinish = () => {
-                anim.cancel();
-                onDone();
-              };
-            } else {
+            const finish = () => {
               onDone();
+              // Cerramos primero y cancelamos después: al revés se
+              // vería un destello del overlay volviendo a su opacidad.
+              this.overlayAnim?.cancel();
+              this.stageAnim?.cancel();
+              this.overlayAnim = null;
+              this.stageAnim = null;
+            };
+
+            if (this.stageAnim) {
+              this.stageAnim.onfinish = finish;
+            } else {
+              finish();
             }
           }
 
           disconnectedCallback() {
             this.resizeObserver?.disconnect();
             if (this.onResize) window.removeEventListener('resize', this.onResize);
-            // Si la sección se re-renderiza con el modal abierto, no
-            // dejamos la página bloqueada sin scroll.
+            clearTimeout(this.playTimer);
             document.documentElement.style.overflow = '';
           }
         }
