@@ -153,7 +153,7 @@
         "zzen_bullets_kmDViX": {
           "type": "zzen_bullets",
           "settings": {
-            "hoist_mobile": false,
+            "hoist_mobile": true,
             "text_1": "Activa tu mente, calma tu cuerpo y rinde mejor",
             "text_2": "Desbloquea concentración y energía",
             "text_3": "Gestiona el estrés y recupera el equilibrio",
