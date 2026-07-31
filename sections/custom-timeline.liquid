@@ -1,0 +1,1507 @@
+{%- comment -%}
+  ============================================================================
+  SECCIÓN: Timeline en tarjeta (El poder de la constancia)
+  Tema: Dawn / Online Store 2.0
+  Ruta: sections/custom-timeline.liquid
+
+  PC     -> tarjeta blanca sobre fondo oscuro. Izquierda: título, texto e
+            imagen. Derecha: timeline con línea vertical, pills y etapas.
+  Móvil  -> todo apilado: título y texto centrados, imagen, y debajo el
+            timeline con la misma estructura a menor escala.
+
+  Cada etapa es un bloque. Todo configurable por separado en PC y móvil.
+  ============================================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign bp = s.mobile_breakpoint
+  assign bp_max = bp | minus: 1
+
+  case s.heading_font
+    when 'thin2'
+      assign heading_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign heading_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign heading_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign heading_stack = 'var(--font-body-family)'
+    else
+      assign heading_stack = s.heading_font_custom
+  endcase
+
+  case s.body_font
+    when 'thin2'
+      assign body_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign body_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign body_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign body_stack = 'var(--font-body-family)'
+    else
+      assign body_stack = s.body_font_custom
+  endcase
+
+  if s.card_max_width == 0
+    assign card_max = 'none'
+  else
+    assign card_max = s.card_max_width | append: 'px'
+  endif
+
+  assign img_d = s.image
+  assign img_m = s.image_mobile
+  assign has_m = false
+  if img_m != blank
+    assign has_m = true
+  endif
+  if img_d == blank and has_m
+    assign img_d = img_m
+    assign has_m = false
+  endif
+-%}
+
+{%- style -%}
+  @font-face {
+    font-family: 'Helvetica neue';
+    src: url('{{ 'HelveticaNeueCyr-Light.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'thin2';
+    src: url('{{ 'lawrence-regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ================= Variables: PC ================= */
+  .ctml-{{ section.id }} {
+    --ctml-bg: {{ s.bg_color }};
+    --ctml-card-bg: {{ s.card_bg }};
+    --ctml-card-max: {{ card_max }};
+    --ctml-card-r: {{ s.card_radius_d }}px;
+    --ctml-pt: {{ s.padding_top_d }}px;
+    --ctml-pb: {{ s.padding_bottom_d }}px;
+    --ctml-pl: {{ s.padding_left_d }}px;
+    --ctml-pr: {{ s.padding_right_d }}px;
+    --ctml-card-pt: {{ s.card_padding_top_d }}px;
+    --ctml-card-pb: {{ s.card_padding_bottom_d }}px;
+    --ctml-card-pl: {{ s.card_padding_left_d }}px;
+    --ctml-card-pr: {{ s.card_padding_right_d }}px;
+    --ctml-gap: {{ s.gap_d }}px;
+    --ctml-text-w: {{ s.text_width_d }}%;
+
+    --ctml-h-font: {{ heading_stack }};
+    --ctml-h-size: {{ s.heading_size_d }}px;
+    --ctml-h-lh: {{ s.heading_line_height_d }};
+    --ctml-h-ls: {{ s.heading_letter_spacing_d }}px;
+    --ctml-h-weight: {{ s.heading_weight }};
+    --ctml-h-color: {{ s.heading_color }};
+    --ctml-h-align: {{ s.heading_align_d }};
+    --ctml-h-mb: {{ s.heading_margin_bottom_d }}px;
+
+    --ctml-b-font: {{ body_stack }};
+    --ctml-lead-size: {{ s.intro_size_d }}px;
+    --ctml-lead-lh: {{ s.intro_line_height_d }};
+    --ctml-lead-color: {{ s.intro_color }};
+    --ctml-lead-align: {{ s.intro_align_d }};
+    --ctml-lead-mb: {{ s.intro_margin_bottom_d }}px;
+
+    --ctml-img-r: {{ s.image_radius }}px;
+    --ctml-img-focus: {{ s.image_focus }};
+    --ctml-img-mt: {{ s.image_margin_top_d }}px;
+
+    --ctml-line: {{ s.line_color }};
+    --ctml-line-w: {{ s.line_width }}px;
+    --ctml-line-ext: {{ s.line_extend }}px;
+    --ctml-pill-col: {{ s.pill_col_width_d }}px;
+    --ctml-col-gap: {{ s.column_gap_d }}px;
+    --ctml-content-pl: {{ s.content_padding_left_d }}px;
+    --ctml-item-py: {{ s.item_padding_d }}px;
+
+    --ctml-pill-bg: {{ s.pill_bg }};
+    --ctml-pill-color: {{ s.pill_text_color }};
+    --ctml-pill-size: {{ s.pill_size_d }}px;
+    --ctml-pill-py: {{ s.pill_padding_y }}px;
+    --ctml-pill-r: {{ s.pill_radius }}px;
+    --ctml-pill-weight: {{ s.pill_weight }};
+
+    --ctml-it-size: {{ s.item_title_size_d }}px;
+    --ctml-it-lh: {{ s.item_title_line_height }};
+    --ctml-it-color: {{ s.item_title_color }};
+    --ctml-it-weight: {{ s.item_title_weight }};
+    --ctml-it-mb: {{ s.item_title_margin_bottom_d }}px;
+
+    --ctml-ix-size: {{ s.item_text_size_d }}px;
+    --ctml-ix-lh: {{ s.item_text_line_height }};
+    --ctml-ix-color: {{ s.item_text_color }};
+
+    --ctml-sep: {{ s.separator_color }};
+  }
+
+  /* ================= Estructura ================= */
+  .ctml {
+    background-color: var(--ctml-bg);
+    padding: var(--ctml-pt) var(--ctml-pr) var(--ctml-pb) var(--ctml-pl);
+  }
+
+  .ctml__card {
+    max-width: var(--ctml-card-max);
+    margin-inline: auto;
+    background-color: var(--ctml-card-bg);
+    border-radius: var(--ctml-card-r);
+    padding: var(--ctml-card-pt) var(--ctml-card-pr) var(--ctml-card-pb) var(--ctml-card-pl);
+    box-sizing: border-box;
+  }
+
+  .ctml__inner {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: var(--ctml-gap);
+  }
+
+  .ctml--text-right .ctml__inner {
+    flex-direction: row-reverse;
+  }
+
+  .ctml__intro {
+    flex: 0 1 var(--ctml-text-w);
+    min-width: 0;
+  }
+
+  .ctml__timeline {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  /* ================= Título y texto ================= */
+  .ctml__heading {
+    margin: 0 0 var(--ctml-h-mb);
+    font-family: var(--ctml-h-font);
+    font-size: var(--ctml-h-size);
+    font-weight: var(--ctml-h-weight);
+    line-height: var(--ctml-h-lh);
+    letter-spacing: var(--ctml-h-ls);
+    text-align: var(--ctml-h-align);
+    color: var(--ctml-h-color);
+  }
+
+  .ctml__heading em,
+  .ctml__heading i {
+    font-style: italic;
+  }
+
+  .ctml__lead {
+    margin-bottom: var(--ctml-lead-mb);
+    font-family: var(--ctml-b-font);
+    font-size: var(--ctml-lead-size);
+    line-height: var(--ctml-lead-lh);
+    text-align: var(--ctml-lead-align);
+    color: var(--ctml-lead-color);
+  }
+
+  .ctml__lead > * {
+    margin: 0;
+  }
+
+  .ctml__lead > * + * {
+    margin-top: 0.6em;
+  }
+
+  .ctml__lead strong {
+    font-weight: 600;
+  }
+
+  .ctml__lead a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  /* ================= Imagen ================= */
+  .ctml__frame {
+    position: relative;
+    width: 100%;
+    margin-top: var(--ctml-img-mt);
+    overflow: hidden;
+    border-radius: var(--ctml-img-r);
+  }
+
+  .ctml__frame > picture {
+    display: block;
+  }
+
+  .ctml__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    object-position: var(--ctml-img-focus);
+  }
+
+  .ctml__placeholder {
+    display: block;
+    background: rgba(127, 127, 127, 0.1);
+    aspect-ratio: 4 / 3;
+  }
+
+  .ctml__placeholder svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 0.35;
+  }
+
+  /* ================= Timeline ================= */
+  .ctml__line {
+    position: absolute;
+    top: calc(var(--ctml-line-ext) * -1);
+    bottom: calc(var(--ctml-line-ext) * -1);
+    left: calc(var(--ctml-pill-col) / 2);
+    width: var(--ctml-line-w);
+    transform: translateX(-50%);
+    background-color: var(--ctml-line);
+    pointer-events: none;
+  }
+
+  .ctml__item {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--ctml-pill-col) minmax(0, 1fr);
+    column-gap: var(--ctml-col-gap);
+    align-items: center;
+  }
+
+  .ctml__pill-col {
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Ancho fijo para que todas las pills midan igual aunque el texto
+     sea más largo ("Semana 1" vs "Mes 1"). */
+  .ctml__pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding-block: var(--ctml-pill-py);
+    border-radius: var(--ctml-pill-r);
+    background-color: var(--ctml-pill-bg);
+    color: var(--ctml-pill-color);
+    font-family: var(--ctml-b-font);
+    font-size: var(--ctml-pill-size);
+    font-weight: var(--ctml-pill-weight);
+    line-height: 1.2;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  /* El padding vertical va en el contenido, no en el item: así el separador
+     cae justo en el límite entre etapas y solo cruza la columna de texto. */
+  .ctml__body {
+    padding: var(--ctml-item-py) 0 var(--ctml-item-py) var(--ctml-content-pl);
+  }
+
+  .ctml--separators .ctml__item + .ctml__item .ctml__body {
+    border-top: 1px solid var(--ctml-sep);
+  }
+
+  .ctml__item-title {
+    margin: 0 0 var(--ctml-it-mb);
+    font-family: var(--ctml-b-font);
+    font-size: var(--ctml-it-size);
+    font-weight: var(--ctml-it-weight);
+    line-height: var(--ctml-it-lh);
+    color: var(--ctml-it-color);
+  }
+
+  .ctml__item-text {
+    font-family: var(--ctml-b-font);
+    font-size: var(--ctml-ix-size);
+    line-height: var(--ctml-ix-lh);
+    color: var(--ctml-ix-color);
+  }
+
+  .ctml__item-text > * {
+    margin: 0;
+  }
+
+  .ctml__item-text > * + * {
+    margin-top: 0.7em;
+  }
+
+  .ctml__item-text strong {
+    font-weight: 600;
+  }
+
+  .ctml__item-text a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  /* ================= Proporción de imagen: PC ================= */
+  @media screen and (min-width: {{ bp }}px) {
+    {%- if s.aspect_d != 'natural' -%}
+      .ctml-{{ section.id }} .ctml__frame {
+        aspect-ratio: {{ s.aspect_d }};
+      }
+      .ctml-{{ section.id }} .ctml__frame > picture,
+      .ctml-{{ section.id }} .ctml__placeholder {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .ctml-{{ section.id }} .ctml__img {
+        height: 100%;
+      }
+    {%- endif -%}
+  }
+
+  /* ================= Móvil ================= */
+  @media screen and (max-width: {{ bp_max }}px) {
+    .ctml-{{ section.id }} {
+      --ctml-card-r: {{ s.card_radius_m }}px;
+      --ctml-pt: {{ s.padding_top_m }}px;
+      --ctml-pb: {{ s.padding_bottom_m }}px;
+      --ctml-pl: {{ s.padding_left_m }}px;
+      --ctml-pr: {{ s.padding_right_m }}px;
+      --ctml-card-pt: {{ s.card_padding_top_m }}px;
+      --ctml-card-pb: {{ s.card_padding_bottom_m }}px;
+      --ctml-card-pl: {{ s.card_padding_left_m }}px;
+      --ctml-card-pr: {{ s.card_padding_right_m }}px;
+      --ctml-gap: {{ s.gap_m }}px;
+
+      --ctml-h-size: {{ s.heading_size_m }}px;
+      --ctml-h-lh: {{ s.heading_line_height_m }};
+      --ctml-h-align: {{ s.heading_align_m }};
+      --ctml-h-mb: {{ s.heading_margin_bottom_m }}px;
+
+      --ctml-lead-size: {{ s.intro_size_m }}px;
+      --ctml-lead-lh: {{ s.intro_line_height_m }};
+      --ctml-lead-align: {{ s.intro_align_m }};
+      --ctml-lead-mb: {{ s.intro_margin_bottom_m }}px;
+
+      --ctml-img-mt: {{ s.image_margin_top_m }}px;
+
+      --ctml-pill-col: {{ s.pill_col_width_m }}px;
+      --ctml-col-gap: {{ s.column_gap_m }}px;
+      --ctml-content-pl: {{ s.content_padding_left_m }}px;
+      --ctml-item-py: {{ s.item_padding_m }}px;
+      --ctml-pill-size: {{ s.pill_size_m }}px;
+
+      --ctml-it-size: {{ s.item_title_size_m }}px;
+      --ctml-it-mb: {{ s.item_title_margin_bottom_m }}px;
+      --ctml-ix-size: {{ s.item_text_size_m }}px;
+    }
+
+    .ctml__inner,
+    .ctml--text-right .ctml__inner {
+      flex-direction: column;
+    }
+
+    .ctml__intro,
+    .ctml__timeline {
+      flex: 0 0 auto;
+      width: 100%;
+    }
+
+    {%- if s.aspect_m != 'natural' -%}
+      .ctml-{{ section.id }} .ctml__frame {
+        aspect-ratio: {{ s.aspect_m }};
+      }
+      .ctml-{{ section.id }} .ctml__frame > picture,
+      .ctml-{{ section.id }} .ctml__placeholder {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .ctml-{{ section.id }} .ctml__img {
+        height: 100%;
+      }
+    {%- endif -%}
+  }
+{%- endstyle -%}
+
+<div class="ctml ctml-{{ section.id }} ctml--text-{{ s.text_position_d }}{% if s.show_separators %} ctml--separators{% endif %}">
+  <div class="ctml__card">
+    <div class="ctml__inner">
+      <div class="ctml__intro">
+        {%- if s.heading != blank -%}
+          <{{ s.heading_tag }} class="ctml__heading">{{ s.heading | newline_to_br }}</{{ s.heading_tag }}>
+        {%- endif -%}
+
+        {%- if s.intro != blank -%}
+          <div class="ctml__lead">{{ s.intro }}</div>
+        {%- endif -%}
+
+        {%- if img_d != blank or s.show_placeholder -%}
+          <div class="ctml__frame">
+            {%- if img_d != blank -%}
+              <picture>
+                {%- if has_m -%}
+                  <source
+                    media="(max-width: {{ bp_max }}px)"
+                    srcset="
+                      {{ img_m | image_url: width: 400 }} 400w,
+                      {{ img_m | image_url: width: 600 }} 600w,
+                      {{ img_m | image_url: width: 900 }} 900w,
+                      {{ img_m | image_url: width: 1200 }} 1200w
+                    "
+                    sizes="100vw"
+                    width="{{ img_m.width }}"
+                    height="{{ img_m.height }}"
+                  >
+                {%- endif -%}
+                <img
+                  class="ctml__img"
+                  src="{{ img_d | image_url: width: 1200 }}"
+                  srcset="
+                    {{ img_d | image_url: width: 400 }} 400w,
+                    {{ img_d | image_url: width: 600 }} 600w,
+                    {{ img_d | image_url: width: 900 }} 900w,
+                    {{ img_d | image_url: width: 1200 }} 1200w,
+                    {{ img_d | image_url: width: 1600 }} 1600w
+                  "
+                  sizes="(min-width: {{ bp }}px) {{ s.text_width_d }}vw, 100vw"
+                  width="{{ img_d.width }}"
+                  height="{{ img_d.height }}"
+                  alt="{{ img_d.alt | escape }}"
+                  loading="lazy"
+                  decoding="async"
+                >
+              </picture>
+            {%- else -%}
+              <div class="ctml__placeholder">{{ 'image' | placeholder_svg_tag }}</div>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      <div class="ctml__timeline">
+        <span class="ctml__line" aria-hidden="true"></span>
+        {%- for block in section.blocks -%}
+          <div class="ctml__item" {{ block.shopify_attributes }}>
+            <div class="ctml__pill-col">
+              {%- if block.settings.pill != blank -%}
+                <span class="ctml__pill">{{ block.settings.pill }}</span>
+              {%- endif -%}
+            </div>
+            <div class="ctml__body">
+              {%- if block.settings.title != blank -%}
+                <{{ s.item_title_tag }} class="ctml__item-title">{{ block.settings.title }}</{{ s.item_title_tag }}>
+              {%- endif -%}
+              {%- if block.settings.text != blank -%}
+                <div class="ctml__item-text">{{ block.settings.text }}</div>
+              {%- endif -%}
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Timeline en tarjeta",
+  "tag": "section",
+  "class": "section-ctml",
+  "max_blocks": 12,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Contenido"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Título",
+      "info": "Pulsa Enter para forzar un salto de línea. Acepta <em>cursiva</em>.",
+      "default": "El poder de la constancia"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Etiqueta HTML del título (SEO)",
+      "options": [
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "div", "label": "div (sin peso SEO)" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "richtext",
+      "id": "intro",
+      "label": "Texto de entrada",
+      "default": "<p>Gracias a su efecto acumulativo, los beneficios van incrementando con el <strong>consumo diario</strong> sostenido en el tiempo</p>"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Imagen — PC"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_mobile",
+      "label": "Imagen — Móvil",
+      "info": "Si la dejas vacía se usa la de PC."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_placeholder",
+      "label": "Reservar el hueco de la imagen si no hay ninguna",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "item_title_tag",
+      "label": "Etiqueta HTML de los títulos de etapa",
+      "options": [
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "div", "label": "div (sin peso SEO)" }
+      ],
+      "default": "h3"
+    },
+
+    {
+      "type": "header",
+      "content": "Tarjeta y fondo"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Fondo de la sección",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Fondo de la tarjeta",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "mobile_breakpoint",
+      "min": 480,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "label": "Punto de cambio a móvil",
+      "default": 750
+    },
+    {
+      "type": "range",
+      "id": "card_max_width",
+      "min": 0,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "label": "Ancho máximo de la tarjeta",
+      "info": "0 = ancho completo.",
+      "default": 1240
+    },
+    {
+      "type": "range",
+      "id": "card_radius_d",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo de la tarjeta — PC",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "card_radius_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo de la tarjeta — Móvil",
+      "default": 20
+    },
+    {
+      "type": "select",
+      "id": "text_position_d",
+      "label": "Columna de texto en PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "text_width_d",
+      "min": 25,
+      "max": 65,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho de la columna de texto — PC",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "gap_d",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Separación entre columnas — PC",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "gap_m",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación imagen / timeline — Móvil",
+      "default": 28
+    },
+
+    {
+      "type": "header",
+      "content": "Márgenes exteriores (alrededor de la tarjeta)"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_d",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Superior — PC",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_d",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Inferior — PC",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "padding_left_d",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Izquierdo — PC",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_right_d",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Derecho — PC",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_top_m",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Superior — Móvil",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_m",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Inferior — Móvil",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding_left_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Izquierdo — Móvil",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "padding_right_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Derecho — Móvil",
+      "default": 8
+    },
+
+    {
+      "type": "header",
+      "content": "Padding interior de la tarjeta"
+    },
+    {
+      "type": "range",
+      "id": "card_padding_top_d",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Superior — PC",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "card_padding_bottom_d",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Inferior — PC",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "card_padding_left_d",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Izquierdo — PC",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "card_padding_right_d",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Derecho — PC",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "card_padding_top_m",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Superior — Móvil",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "card_padding_bottom_m",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Inferior — Móvil",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "card_padding_left_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Izquierdo — Móvil",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "card_padding_right_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Derecho — Móvil",
+      "default": 16
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía del título"
+    },
+    {
+      "type": "select",
+      "id": "heading_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "thin2"
+    },
+    {
+      "type": "text",
+      "id": "heading_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'thin2', serif"
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color",
+      "default": "#101010"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_d",
+      "min": 18,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 38
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_d",
+      "min": 0.8,
+      "max": 2,
+      "step": 0.1,
+      "label": "Interlineado — PC",
+      "default": 1.2
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing_d",
+      "min": -3,
+      "max": 6,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "heading_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — PC",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "heading_size_m",
+      "min": 14,
+      "max": 56,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_m",
+      "min": 0.8,
+      "max": 2,
+      "step": 0.1,
+      "label": "Interlineado — Móvil",
+      "default": 1.2
+    },
+    {
+      "type": "select",
+      "id": "heading_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "center", "label": "Centro" },
+        { "value": "left", "label": "Izquierda" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — Móvil",
+      "default": 12
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía del texto de entrada"
+    },
+    {
+      "type": "select",
+      "id": "body_font",
+      "label": "Fuente (texto, pills y etapas)",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "body_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "color",
+      "id": "intro_color",
+      "label": "Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "range",
+      "id": "intro_size_d",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "intro_line_height_d",
+      "min": 1,
+      "max": 2.4,
+      "step": 0.1,
+      "label": "Interlineado — PC",
+      "default": 1.5
+    },
+    {
+      "type": "select",
+      "id": "intro_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "intro_margin_bottom_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — PC",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "intro_size_m",
+      "min": 9,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "intro_line_height_m",
+      "min": 1,
+      "max": 2.4,
+      "step": 0.1,
+      "label": "Interlineado — Móvil",
+      "default": 1.5
+    },
+    {
+      "type": "select",
+      "id": "intro_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "center", "label": "Centro" },
+        { "value": "left", "label": "Izquierda" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "intro_margin_bottom_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — Móvil",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "Imagen"
+    },
+    {
+      "type": "select",
+      "id": "aspect_d",
+      "label": "Proporción — PC",
+      "options": [
+        { "value": "1/1", "label": "Cuadrada 1:1" },
+        { "value": "4/3", "label": "4:3" },
+        { "value": "3/2", "label": "3:2" },
+        { "value": "16/9", "label": "16:9" },
+        { "value": "3/4", "label": "3:4 vertical" },
+        { "value": "natural", "label": "Original" }
+      ],
+      "default": "4/3"
+    },
+    {
+      "type": "select",
+      "id": "aspect_m",
+      "label": "Proporción — Móvil",
+      "options": [
+        { "value": "1/1", "label": "Cuadrada 1:1" },
+        { "value": "4/3", "label": "4:3" },
+        { "value": "3/2", "label": "3:2" },
+        { "value": "16/9", "label": "16:9" },
+        { "value": "3/4", "label": "3:4 vertical" },
+        { "value": "natural", "label": "Original" }
+      ],
+      "default": "4/3"
+    },
+    {
+      "type": "select",
+      "id": "image_focus",
+      "label": "Punto focal del recorte",
+      "options": [
+        { "value": "center", "label": "Centro" },
+        { "value": "top", "label": "Arriba" },
+        { "value": "bottom", "label": "Abajo" },
+        { "value": "left", "label": "Izquierda" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "image_radius",
+      "min": 0,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo de esquinas",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "image_margin_top_d",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación con el texto — PC",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "image_margin_top_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación con el texto — Móvil",
+      "default": 16
+    },
+
+    {
+      "type": "header",
+      "content": "Timeline — línea y estructura"
+    },
+    {
+      "type": "color",
+      "id": "line_color",
+      "label": "Color de la línea",
+      "default": "#2b2b2b"
+    },
+    {
+      "type": "range",
+      "id": "line_width",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor de la línea",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "line_extend",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Extensión de la línea",
+      "info": "Cuánto sobresale por arriba y por abajo de la primera y última etapa.",
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "show_separators",
+      "label": "Mostrar separadores entre etapas",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "separator_color",
+      "label": "Color del separador",
+      "default": "#e5e5e5"
+    },
+    {
+      "type": "range",
+      "id": "pill_col_width_d",
+      "min": 40,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Ancho de la columna de pills — PC",
+      "info": "También define dónde cae la línea vertical: pasa por su centro.",
+      "default": 78
+    },
+    {
+      "type": "range",
+      "id": "pill_col_width_m",
+      "min": 30,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Ancho de la columna de pills — Móvil",
+      "default": 62
+    },
+    {
+      "type": "range",
+      "id": "column_gap_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación pill / texto — PC",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "column_gap_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación pill / texto — Móvil",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "content_padding_left_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Sangría del texto — PC",
+      "info": "El separador arranca antes del texto por esta cantidad.",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "content_padding_left_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Sangría del texto — Móvil",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "item_padding_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Espaciado vertical por etapa — PC",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "item_padding_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Espaciado vertical por etapa — Móvil",
+      "default": 14
+    },
+
+    {
+      "type": "header",
+      "content": "Timeline — pills"
+    },
+    {
+      "type": "color",
+      "id": "pill_bg",
+      "label": "Fondo",
+      "default": "#2b2b2b"
+    },
+    {
+      "type": "color",
+      "id": "pill_text_color",
+      "label": "Color del texto",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "pill_size_d",
+      "min": 8,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de texto — PC",
+      "default": 11
+    },
+    {
+      "type": "range",
+      "id": "pill_size_m",
+      "min": 7,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de texto — Móvil",
+      "default": 10
+    },
+    {
+      "type": "select",
+      "id": "pill_weight",
+      "label": "Grosor del texto",
+      "options": [
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "500"
+    },
+    {
+      "type": "range",
+      "id": "pill_padding_y",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Alto interior",
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "pill_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo",
+      "default": 11
+    },
+
+    {
+      "type": "header",
+      "content": "Timeline — textos de etapa"
+    },
+    {
+      "type": "color",
+      "id": "item_title_color",
+      "label": "Color del título",
+      "default": "#101010"
+    },
+    {
+      "type": "select",
+      "id": "item_title_weight",
+      "label": "Grosor del título",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "range",
+      "id": "item_title_size_d",
+      "min": 12,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del título — PC",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "item_title_size_m",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del título — Móvil",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "item_title_line_height",
+      "min": 1,
+      "max": 2,
+      "step": 0.1,
+      "label": "Interlineado del título",
+      "default": 1.3
+    },
+    {
+      "type": "range",
+      "id": "item_title_margin_bottom_d",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación título / texto — PC",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "item_title_margin_bottom_m",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación título / texto — Móvil",
+      "default": 8
+    },
+    {
+      "type": "color",
+      "id": "item_text_color",
+      "label": "Color del texto",
+      "default": "#5a5a5a"
+    },
+    {
+      "type": "range",
+      "id": "item_text_size_d",
+      "min": 9,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del texto — PC",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "item_text_size_m",
+      "min": 8,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del texto — Móvil",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "item_text_line_height",
+      "min": 1,
+      "max": 2.4,
+      "step": 0.1,
+      "label": "Interlineado del texto",
+      "default": 1.5
+    }
+  ],
+  "blocks": [
+    {
+      "type": "stage",
+      "name": "Etapa",
+      "settings": [
+        {
+          "type": "text",
+          "id": "pill",
+          "label": "Etiqueta (pill)",
+          "default": "Semana 1"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "title",
+          "label": "Título",
+          "default": "Notas que algo empieza a cambiar"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "<p>Describe aquí qué nota la persona en esta etapa.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Timeline en tarjeta",
+      "blocks": [
+        { "type": "stage" },
+        { "type": "stage" },
+        { "type": "stage" },
+        { "type": "stage" }
+      ]
+    }
+  ]
+}
+{% endschema %}
