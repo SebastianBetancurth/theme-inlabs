@@ -565,7 +565,7 @@
             "padding_y_desktop": 22,
             "padding_bottom_desktop": 24,
             "caret_size_desktop": 20,
-            "caret_gap_desktop": 20,
+            "caret_gap_desktop": 50,
             "gap_subtitle_text_desktop": 12,
             "gap_media_desktop": 20,
             "max_width_desktop": 0,
