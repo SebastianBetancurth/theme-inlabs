@@ -248,7 +248,7 @@
             "gap_prices_desktop": 8,
             "allow_wrap_desktop": false,
             "margin_top_desktop": 0,
-            "margin_bottom_desktop": 16,
+            "margin_bottom_desktop": 0,
             "width_mobile": "full",
             "max_width_mobile": 0,
             "align_mobile": "center",
@@ -265,17 +265,58 @@
             "gap_prices_mobile": 6,
             "allow_wrap_mobile": false,
             "margin_top_mobile": 0,
-            "margin_bottom_mobile": 12,
+            "margin_bottom_mobile": 0,
             "show_dynamic_checkout": false,
             "dynamic_gap_desktop": 10,
             "dynamic_gap_mobile": 8,
             "spinner_size": 20
           }
         },
-        "title": {
-          "type": "title",
-          "disabled": true,
-          "settings": {}
+        "zzen_note_XN6QY7": {
+          "type": "zzen_note",
+          "settings": {
+            "hoist_mobile": false,
+            "text": "Recomendamos tomarlo mínimo 3 meses para resultados óptimos",
+            "icon_style": "none",
+            "icon_position": "before",
+            "icon_color": "#8a8a8a",
+            "show_desktop": true,
+            "show_mobile": true,
+            "font_family": "body",
+            "custom_font_stack": "'Helvetica Neue', Helvetica, Arial, sans-serif",
+            "text_color": "#8a8a8a",
+            "text_weight": "400",
+            "line_height": 1.4,
+            "letter_spacing": 0,
+            "uppercase": false,
+            "italic": false,
+            "text_size_desktop": 13,
+            "align_desktop": "center",
+            "text_align_desktop": "center",
+            "max_width_desktop": 0,
+            "nowrap_desktop": false,
+            "icon_size_desktop": 15,
+            "icon_offset_desktop": 0,
+            "gap_icon_text_desktop": 7,
+            "margin_top_desktop": 0,
+            "margin_bottom_desktop": 16,
+            "text_size_mobile": 12,
+            "align_mobile": "center",
+            "text_align_mobile": "center",
+            "max_width_mobile": 0,
+            "nowrap_mobile": false,
+            "icon_size_mobile": 14,
+            "icon_offset_mobile": 0,
+            "gap_icon_text_mobile": 6,
+            "margin_top_mobile": 2,
+            "margin_bottom_mobile": 14,
+            "layout_mobile": "full",
+            "order_mobile": 5,
+            "push_right_mobile": false,
+            "layout_desktop": "full",
+            "order_desktop": 5,
+            "push_right_desktop": false
+          }
         }
       },
       "block_order": [
@@ -284,7 +325,7 @@
         "zzen_title_pbYVnE",
         "zzen_bullets_kmDViX",
         "zzen_cta_CLBKVN",
-        "title"
+        "zzen_note_XN6QY7"
       ],
       "settings": {
         "enable_sticky_info": true,
