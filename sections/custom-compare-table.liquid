@@ -113,6 +113,28 @@
     endfor
   endif
 
+  # Pista (columna del grid) que ocupa cada una de las 5 posibles columnas
+  # en móvil. 0 = oculta. La posición 1 del grid es siempre la de etiquetas.
+  assign m_track_str = ''
+  assign m_counter = 1
+  for i in (1..5)
+    assign key = 'col_' | append: i
+    assign key_m = 'col_' | append: i | append: '_mobile'
+    if s[key] != blank and s[key_m]
+      assign m_counter = m_counter | plus: 1
+      assign m_track_str = m_track_str | append: m_counter | append: ','
+    else
+      assign m_track_str = m_track_str | append: '0,'
+    endif
+  endfor
+  assign m_tracks = m_track_str | split: ','
+
+  # Degradado del recuadro destacado: mismo color con dos opacidades.
+  assign a_top = s.highlight_opacity_top | divided_by: 100.0
+  assign a_bottom = s.highlight_opacity_bottom | divided_by: 100.0
+  assign hl_top = s.highlight_bg | color_modify: 'alpha', a_top
+  assign hl_bottom = s.highlight_bg | color_modify: 'alpha', a_bottom
+
   # En móvil hay menos columnas, así que el desplazamiento del recuadro se
   # recalcula sobre las visibles. Si la columna destacada no se muestra en
   # móvil, el recuadro se oculta: dibujarlo caería sobre otra columna.
@@ -199,11 +221,14 @@
     --ctbl-rline: {{ s.row_line_color }};
     --ctbl-rline-w: {{ s.row_line_width }}px;
 
-    --ctbl-hl-bg: {{ s.highlight_bg }};
+    --ctbl-hl-top-color: {{ hl_top }};
+    --ctbl-hl-bottom-color: {{ hl_bottom }};
     --ctbl-hl-border: {{ s.highlight_border_color }};
     --ctbl-hl-border-w: {{ s.highlight_border_width }}px;
     --ctbl-hl-radius: {{ s.highlight_radius }}px;
-    --ctbl-hl-ovf: {{ s.highlight_overhang_d }}px;
+    --ctbl-hl-ovf-top: {{ s.highlight_overhang_top_d }}px;
+    --ctbl-hl-ovf-bottom: {{ s.highlight_overhang_bottom_d }}px;
+    --ctbl-hl-fade: {{ s.highlight_fade_start }}%;
   }
 
   /* ================= Estructura ================= */
@@ -298,7 +323,11 @@
     font-family: var(--ctbl-b-font);
   }
 
+  /* Posición declarada, no automática: si una celda falta o se oculta deja
+     un hueco en su sitio en vez de empujar a todas las siguientes. */
   .ctbl__cell {
+    grid-column: var(--ctbl-cd);
+    grid-row: var(--ctbl-r);
     position: relative;
     z-index: 1;
     display: flex;
@@ -345,15 +374,25 @@
      como haya después de ella. No hace falta saber ningún píxel. */
   .ctbl__highlight {
     position: absolute;
-    top: calc(var(--ctbl-hl-ovf) * -1);
-    bottom: calc(var(--ctbl-hl-ovf) * -1);
+    top: calc(var(--ctbl-hl-ovf-top) * -1);
+    bottom: calc(var(--ctbl-hl-ovf-bottom) * -1);
     width: calc((100% - var(--ctbl-c1)) / var(--ctbl-n));
     right: calc((100% - var(--ctbl-c1)) / var(--ctbl-n) * var(--ctbl-k));
     z-index: 0;
-    background-color: var(--ctbl-hl-bg);
+    background-image: linear-gradient(
+      to bottom,
+      var(--ctbl-hl-top-color) 0%,
+      var(--ctbl-hl-bottom-color) 100%
+    );
     border: var(--ctbl-hl-border-w) solid var(--ctbl-hl-border);
     border-radius: var(--ctbl-hl-radius);
     pointer-events: none;
+  }
+
+  /* Difumina también el borde hacia abajo, no sólo el relleno. */
+  .ctbl--fade-edges .ctbl__highlight {
+    -webkit-mask-image: linear-gradient(to bottom, #000 var(--ctbl-hl-fade), transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 var(--ctbl-hl-fade), transparent 100%);
   }
 
   /* ================= Móvil ================= */
@@ -405,6 +444,10 @@
       grid-template-columns: var(--ctbl-c1) repeat({{ n_css_m }}, minmax(0, 1fr));
     }
 
+    .ctbl-{{ section.id }} .ctbl__cell {
+      grid-column: var(--ctbl-cm);
+    }
+
     {%- for c in hidden_list_m -%}
       .ctbl-{{ section.id }} .ctbl__cell--c{{ c }} {
         display: none;
@@ -437,7 +480,7 @@
   }
 {%- endstyle -%}
 
-<div class="ctbl ctbl-{{ section.id }} ctbl--text-{{ s.text_position_d }} ctbl--lastline">
+<div class="ctbl ctbl-{{ section.id }} ctbl--text-{{ s.text_position_d }} ctbl--lastline{% if s.highlight_fade_edges %} ctbl--fade-edges{% endif %}">
   <div class="ctbl__inner">
     <div class="ctbl__text">
       {%- if s.heading != blank -%}
@@ -454,14 +497,36 @@
           <span class="ctbl__highlight" aria-hidden="true"></span>
         {%- endif -%}
 
+        {%- comment -%}
+          Cada celda declara su columna en PC (--ctbl-cd), su columna en móvil
+          (--ctbl-cm) y su fila (--ctbl-r). La cabecera es la fila 1 y el
+          bloque N la fila N+1.
+        {%- endcomment -%}
+
         {%- comment -%} ---------- Encabezado ---------- {%- endcomment -%}
         <div class="ctbl__row" role="row">
-          <div class="ctbl__cell ctbl__cell--head ctbl__cell--label" role="columnheader">
+          <div
+            class="ctbl__cell ctbl__cell--head ctbl__cell--label"
+            role="columnheader"
+            style="--ctbl-cd: 1; --ctbl-cm: 1; --ctbl-r: 1;"
+          >
             {{- s.first_col_label -}}
           </div>
           {%- for c in col_list -%}
-            {%- assign key = 'col_' | append: c -%}
-            <div class="ctbl__cell ctbl__cell--head ctbl__cell--c{{ c }}" role="columnheader">
+            {%- liquid
+              assign key = 'col_' | append: c
+              assign track_d = forloop.index | plus: 1
+              assign ci = c | minus: 1
+              assign track_m = m_tracks[ci]
+              if track_m == '0'
+                assign track_m = 1
+              endif
+            -%}
+            <div
+              class="ctbl__cell ctbl__cell--head ctbl__cell--c{{ c }}"
+              role="columnheader"
+              style="--ctbl-cd: {{ track_d }}; --ctbl-cm: {{ track_m }}; --ctbl-r: 1;"
+            >
               {{- s[key] -}}
             </div>
           {%- endfor -%}
@@ -470,6 +535,7 @@
         {%- comment -%} ---------- Filas ---------- {%- endcomment -%}
         {%- for block in section.blocks -%}
           {%- liquid
+            assign r = forloop.index | plus: 1
             assign row_class = 'ctbl__cell--row'
             if forloop.first
               assign row_class = row_class | append: ' ctbl__cell--rowfirst'
@@ -479,12 +545,28 @@
             endif
           -%}
           <div class="ctbl__row" role="row" {{ block.shopify_attributes }}>
-            <div class="ctbl__cell ctbl__cell--label {{ row_class }}" role="rowheader">
+            <div
+              class="ctbl__cell ctbl__cell--label {{ row_class }}"
+              role="rowheader"
+              style="--ctbl-cd: 1; --ctbl-cm: 1; --ctbl-r: {{ r }};"
+            >
               {{- block.settings.label -}}
             </div>
             {%- for c in col_list -%}
-              {%- assign vkey = 'val_' | append: c -%}
-              <div class="ctbl__cell {{ row_class }} ctbl__cell--c{{ c }}" role="cell">
+              {%- liquid
+                assign vkey = 'val_' | append: c
+                assign track_d = forloop.index | plus: 1
+                assign ci = c | minus: 1
+                assign track_m = m_tracks[ci]
+                if track_m == '0'
+                  assign track_m = 1
+                endif
+              -%}
+              <div
+                class="ctbl__cell {{ row_class }} ctbl__cell--c{{ c }}"
+                role="cell"
+                style="--ctbl-cd: {{ track_d }}; --ctbl-cm: {{ track_m }}; --ctbl-r: {{ r }};"
+              >
                 {{- block.settings[vkey] -}}
               </div>
             {%- endfor -%}
@@ -652,8 +734,47 @@
     {
       "type": "color",
       "id": "highlight_bg",
-      "label": "Fondo del recuadro",
-      "default": "#161616"
+      "label": "Color del relleno",
+      "info": "Sobre un fondo oscuro, blanco con poca opacidad da el gris del original.",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "highlight_opacity_top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Opacidad del relleno arriba",
+      "default": 11
+    },
+    {
+      "type": "range",
+      "id": "highlight_opacity_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Opacidad del relleno abajo",
+      "info": "Más baja que la de arriba = el recuadro se oscurece y se difumina hacia abajo.",
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "highlight_fade_edges",
+      "label": "Difuminar también el borde",
+      "info": "El borde inferior se desvanece junto con el relleno.",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "highlight_fade_start",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Desde dónde empieza a difuminarse el borde",
+      "default": 55
     },
     {
       "type": "color",
@@ -679,17 +800,27 @@
       "step": 1,
       "unit": "px",
       "label": "Redondeo del recuadro",
-      "default": 10
+      "default": 12
     },
     {
       "type": "range",
-      "id": "highlight_overhang_d",
+      "id": "highlight_overhang_top_d",
       "min": 0,
-      "max": 60,
+      "max": 80,
       "step": 1,
       "unit": "px",
-      "label": "Cuánto sobresale arriba y abajo",
-      "default": 16
+      "label": "Cuánto sobresale por arriba",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "highlight_overhang_bottom_d",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Cuánto sobresale por abajo",
+      "default": 14
     },
 
     {
@@ -1156,7 +1287,7 @@
       "step": 1,
       "unit": "px",
       "label": "Tamaño — PC",
-      "default": 13
+      "default": 14
     },
     {
       "type": "range",
@@ -1250,7 +1381,7 @@
       "step": 1,
       "unit": "px",
       "label": "Tamaño — PC",
-      "default": 14
+      "default": 15
     },
     {
       "type": "range",
@@ -1270,7 +1401,7 @@
       "step": 1,
       "unit": "px",
       "label": "Alto interior de fila — PC",
-      "default": 20
+      "default": 22
     },
     {
       "type": "range",
@@ -1306,7 +1437,7 @@
       "type": "color",
       "id": "row_line_color",
       "label": "Color del separador de filas",
-      "default": "#2e2e2e"
+      "default": "#3d3d3d"
     },
     {
       "type": "range",
