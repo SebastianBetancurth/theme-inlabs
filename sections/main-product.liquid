@@ -4137,6 +4137,768 @@
         }
       ]
     },
+{
+  "type": "zzen_reveal",
+  "name": "◆ Desplegable destacado",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Contenido"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "title",
+      "label": "Título",
+      "default": "Con cada pedido <strong>regalamos el NUEVO ZZEN Challenge</strong>",
+      "info": "Pon en negrita la parte que quieras destacar. Si lo dejas vacío el bloque no se renderiza."
+    },
+    {
+      "type": "inline_richtext",
+      "id": "subtitle",
+      "label": "Subtítulo",
+      "default": "Un método para acompañarte y ayudarte a mantener el compromiso"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Texto",
+      "default": "<p>El ZZEN Challenge es un tracker mensual de 30 días en el que puedes registrar tus progresos y avances en tus hábitos, propósitos y objetivos.</p>"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Imagen"
+    },
+    {
+      "type": "url",
+      "id": "image_link",
+      "label": "Enlace de la imagen (opcional)"
+    },
+    {
+      "type": "header",
+      "content": "Comportamiento"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_by_default",
+      "label": "Abierto al cargar la página",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "duration",
+      "label": "Duración de la animación",
+      "min": 100,
+      "max": 800,
+      "step": 20,
+      "unit": "ms",
+      "default": 380
+    },
+    {
+      "type": "select",
+      "id": "easing",
+      "label": "Curva de la animación",
+      "options": [
+        { "value": "standard", "label": "Estándar (equilibrada)" },
+        { "value": "ease_out", "label": "Suave al final (recomendada)" },
+        { "value": "ease_in_out", "label": "Suave en ambos extremos" },
+        { "value": "spring", "label": "Con rebote" },
+        { "value": "linear", "label": "Lineal" }
+      ],
+      "default": "ease_out"
+    },
+    {
+      "type": "checkbox",
+      "id": "content_fade",
+      "label": "Fundido del contenido",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "content_slide",
+      "label": "Desplazamiento del contenido",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 8,
+      "info": "El contenido entra deslizándose desde arriba. 0 lo desactiva."
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_desktop",
+      "label": "Mostrar en escritorio",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_mobile",
+      "label": "Mostrar en móvil",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Tarjeta"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Fondo",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "color",
+      "id": "bg_color_hover",
+      "label": "Fondo de la cabecera al pasar el ratón",
+      "default": "#242424"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Borde",
+      "default": "#1A1A1A"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "label": "Grosor del borde",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Redondeo",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "checkbox",
+      "id": "shadow_enabled",
+      "label": "Activar sombra",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "shadow_color",
+      "label": "Color de la sombra",
+      "default": "#00000026"
+    },
+    {
+      "type": "range",
+      "id": "shadow_blur",
+      "label": "Difuminado",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "shadow_y",
+      "label": "Desplazamiento vertical",
+      "min": -10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "Indicador"
+    },
+    {
+      "type": "select",
+      "id": "caret_style",
+      "label": "Icono",
+      "options": [
+        { "value": "chevron_wide", "label": "Chevron ancho" },
+        { "value": "chevron", "label": "Chevron compacto" },
+        { "value": "plus", "label": "Más +" },
+        { "value": "arrow_up_right", "label": "Flecha diagonal ↗" },
+        { "value": "none", "label": "Sin icono" }
+      ],
+      "default": "chevron_wide"
+    },
+    {
+      "type": "range",
+      "id": "caret_rotation",
+      "label": "Rotación al abrir",
+      "min": -180,
+      "max": 180,
+      "step": 15,
+      "unit": "°",
+      "default": 90,
+      "info": "90° convierte el chevron hacia abajo en uno hacia la izquierda, como en la maqueta. 180° lo pone hacia arriba."
+    },
+    {
+      "type": "color",
+      "id": "caret_color",
+      "label": "Color cerrado",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "caret_color_open",
+      "label": "Color abierto",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "caret_stroke",
+      "label": "Grosor del trazo",
+      "min": 0.5,
+      "max": 3,
+      "step": 0.1,
+      "default": 1.5
+    },
+    {
+      "type": "select",
+      "id": "caret_valign",
+      "label": "Alineación vertical del indicador",
+      "options": [
+        { "value": "center", "label": "Centrado con el título" },
+        { "value": "flex-start", "label": "Arriba" },
+        { "value": "flex-end", "label": "Abajo" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Tipografía del título"
+    },
+    {
+      "type": "select",
+      "id": "title_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "body", "label": "Fuente de texto del tema" },
+        { "value": "heading", "label": "Fuente de títulos del tema" },
+        { "value": "custom", "label": "Personalizada" }
+      ],
+      "default": "body"
+    },
+    {
+      "type": "text",
+      "id": "title_font_stack",
+      "label": "Stack CSS personalizado",
+      "default": "'Helvetica Neue', Helvetica, Arial, sans-serif"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "select",
+      "id": "title_weight",
+      "label": "Grosor del texto normal",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medio" },
+        { "value": "600", "label": "Semi-negrita" },
+        { "value": "700", "label": "Negrita" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "title_strong_weight",
+      "label": "Grosor de la parte en negrita",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medio" },
+        { "value": "600", "label": "Semi-negrita" },
+        { "value": "700", "label": "Negrita" },
+        { "value": "800", "label": "Extra negrita" }
+      ],
+      "default": "700"
+    },
+    {
+      "type": "range",
+      "id": "title_line_height",
+      "label": "Altura de línea",
+      "min": 0.9,
+      "max": 2,
+      "step": 0.1,
+      "default": 1.4
+    },
+    {
+      "type": "range",
+      "id": "title_letter_spacing",
+      "label": "Espaciado entre letras",
+      "min": -1,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "title_uppercase",
+      "label": "Mayúsculas",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Tipografía del contenido"
+    },
+    {
+      "type": "select",
+      "id": "body_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "body", "label": "Fuente de texto del tema" },
+        { "value": "heading", "label": "Fuente de títulos del tema" },
+        { "value": "custom", "label": "Personalizada" }
+      ],
+      "default": "body"
+    },
+    {
+      "type": "text",
+      "id": "body_font_stack",
+      "label": "Stack CSS personalizado",
+      "default": "'Helvetica Neue', Helvetica, Arial, sans-serif"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Color del subtítulo",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "select",
+      "id": "subtitle_weight",
+      "label": "Grosor del subtítulo",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medio" },
+        { "value": "600", "label": "Semi-negrita" },
+        { "value": "700", "label": "Negrita" }
+      ],
+      "default": "700"
+    },
+    {
+      "type": "range",
+      "id": "subtitle_line_height",
+      "label": "Altura de línea del subtítulo",
+      "min": 0.9,
+      "max": 2,
+      "step": 0.1,
+      "default": 1.4
+    },
+    {
+      "type": "range",
+      "id": "subtitle_letter_spacing",
+      "label": "Espaciado del subtítulo",
+      "min": -1,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "subtitle_uppercase",
+      "label": "Subtítulo en mayúsculas",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color del texto",
+      "default": "#CFCFCF"
+    },
+    {
+      "type": "select",
+      "id": "text_weight",
+      "label": "Grosor del texto",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medio" },
+        { "value": "600", "label": "Semi-negrita" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "range",
+      "id": "text_line_height",
+      "label": "Altura de línea del texto",
+      "min": 1,
+      "max": 2.4,
+      "step": 0.1,
+      "default": 1.6
+    },
+    {
+      "type": "range",
+      "id": "text_letter_spacing",
+      "label": "Espaciado del texto",
+      "min": -1,
+      "max": 3,
+      "step": 0.1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Imagen"
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "Proporción",
+      "options": [
+        { "value": "natural", "label": "Original de la imagen" },
+        { "value": "square", "label": "Cuadrada 1:1" },
+        { "value": "portrait_45", "label": "Vertical 4:5" },
+        { "value": "portrait_34", "label": "Vertical 3:4" },
+        { "value": "landscape", "label": "Horizontal 16:9" }
+      ],
+      "default": "natural"
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "Ajuste dentro del marco",
+      "options": [
+        { "value": "cover", "label": "Rellenar (recorta)" },
+        { "value": "contain", "label": "Contener (sin recortar)" }
+      ],
+      "default": "cover",
+      "info": "Solo se aplica si has elegido una proporción distinta de la original."
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Punto focal",
+      "options": [
+        { "value": "center", "label": "Centro" },
+        { "value": "top", "label": "Arriba" },
+        { "value": "bottom", "label": "Abajo" },
+        { "value": "left", "label": "Izquierda" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "image_radius",
+      "label": "Redondeo",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "Escritorio"
+    },
+    {
+      "type": "range",
+      "id": "title_size_desktop",
+      "label": "Tamaño del título",
+      "min": 11,
+      "max": 34,
+      "step": 1,
+      "unit": "px",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "title_max_width_desktop",
+      "label": "Ancho máximo del título",
+      "min": 0,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "default": 320,
+      "info": "Fuerza dónde parte el título en dos líneas. 0 = sin límite."
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size_desktop",
+      "label": "Tamaño del subtítulo",
+      "min": 10,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "text_size_desktop",
+      "label": "Tamaño del texto",
+      "min": 10,
+      "max": 26,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "padding_x_desktop",
+      "label": "Padding horizontal de la tarjeta",
+      "min": 4,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_y_desktop",
+      "label": "Padding vertical de la cabecera",
+      "min": 4,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "label": "Padding inferior del contenido",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "caret_size_desktop",
+      "label": "Tamaño del indicador",
+      "min": 8,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "caret_gap_desktop",
+      "label": "Separación título ↔ indicador",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "gap_subtitle_text_desktop",
+      "label": "Separación subtítulo ↔ texto",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "gap_media_desktop",
+      "label": "Separación texto ↔ imagen",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "max_width_desktop",
+      "label": "Ancho máximo del bloque",
+      "min": 0,
+      "max": 900,
+      "step": 10,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = todo el ancho disponible."
+    },
+    {
+      "type": "range",
+      "id": "margin_top_desktop",
+      "label": "Espacio superior",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_desktop",
+      "label": "Espacio inferior",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Móvil"
+    },
+    {
+      "type": "range",
+      "id": "title_size_mobile",
+      "label": "Tamaño del título",
+      "min": 10,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "title_max_width_mobile",
+      "label": "Ancho máximo del título",
+      "min": 0,
+      "max": 500,
+      "step": 10,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = sin límite."
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size_mobile",
+      "label": "Tamaño del subtítulo",
+      "min": 9,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "text_size_mobile",
+      "label": "Tamaño del texto",
+      "min": 9,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "padding_x_mobile",
+      "label": "Padding horizontal de la tarjeta",
+      "min": 4,
+      "max": 44,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "padding_y_mobile",
+      "label": "Padding vertical de la cabecera",
+      "min": 4,
+      "max": 44,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding inferior del contenido",
+      "min": 0,
+      "max": 44,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "caret_size_mobile",
+      "label": "Tamaño del indicador",
+      "min": 8,
+      "max": 34,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "caret_gap_mobile",
+      "label": "Separación título ↔ indicador",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "gap_subtitle_text_mobile",
+      "label": "Separación subtítulo ↔ texto",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "gap_media_mobile",
+      "label": "Separación texto ↔ imagen",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "max_width_mobile",
+      "label": "Ancho máximo del bloque",
+      "min": 0,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "default": 0,
+      "info": "0 = todo el ancho disponible."
+    },
+    {
+      "type": "range",
+      "id": "margin_top_mobile",
+      "label": "Espacio superior",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "margin_bottom_mobile",
+      "label": "Espacio inferior",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+        }
+      ]
+    },
+
     {
       "type": "popup",
       "name": "t:sections.main-product.blocks.popup.name",
