@@ -355,7 +355,7 @@
         "zzen_guarantee_b3imdX": {
           "type": "zzen_guarantee",
           "settings": {
-            "heading": "30 días de garantía",
+            "heading": "<strong>30 días de garantía</strong>",
             "heading_tag": "p",
             "text": "<p>Pruébalo con total tranquilidad y si no te convence te devolvemos el 100% de tu dinero</p>",
             "link": "",
