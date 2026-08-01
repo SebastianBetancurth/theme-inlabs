@@ -438,6 +438,12 @@
   min-width: 0;
 }
 
+/* Grid en lugar de flex a propósito. Con flex, `flex: 1 1 auto` calcula la
+   base a partir del contenido y, combinado con nowrap en el título, el
+   navegador colapsa la caja de nombres a su ancho mínimo: el título se queda
+   en «MO…» y la papelera se pega al texto. minmax(0, 1fr) reserva todo el
+   hueco sobrante para los nombres pase lo que pase, y deja la papelera
+   clavada en el borde derecho. */
 .zsd .zsd-line__top {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -448,6 +454,9 @@
 .zsd .zsd-line__names {
   min-width: 0;
 }
+
+/* min-width:0 arriba + overflow hidden aquí: sin las dos, el ellipsis no
+   recorta y el título desborda la columna. */
 .zsd-line__title {
   display: block;
   font-size: var(--zsd-line-title-size);
@@ -465,6 +474,7 @@
   text-underline-offset: 0.15em;
 }
 
+/* La variante sí puede partir: es secundaria y suele ser más larga. */
 .zsd-line__meta {
   margin: 2px 0 0;
   font-size: 13px;
@@ -504,9 +514,11 @@
   stroke-linejoin: round;
 }
 
+/* align-items:center alinea el selector con el bloque de precios, como en la
+   referencia: la cantidad queda a la altura del importe, no pegada arriba. */
 .zsd-line__bottom {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 10px;
   margin-top: 9px;
@@ -529,6 +541,7 @@
   align-items: baseline;
   justify-content: flex-end;
   gap: 7px;
+  white-space: nowrap;
 }
 
 .zsd-line__compare {
@@ -543,6 +556,9 @@
   white-space: nowrap;
 }
 
+/* nowrap para que «(Ahorro 20,80 €)» no parta en dos líneas como en la
+   captura. Si el panel es muy estrecho preferimos que se salga un pelo del
+   ancho del bloque antes que romper la frase. */
 .zsd-line__saving {
   margin: 3px 0 0;
   font-size: 13px;
@@ -573,21 +589,34 @@
 
 /* ==========================================================================
    7. Selector de cantidad
+
+   Aquí se pelea contra base.css, no contra component-cart-drawer.css.
+   Dawn declara sobre .quantity un ancho fijo de 14rem, un min-height de
+   4.5rem, flex-grow en el input y un borde dibujado con ::before/::after.
+   Como <quantity-input> tiene que conservar las clases `quantity` y
+   `cart-quantity` para que cart.js lo reconozca, esas reglas vienen de serie.
+
+   Se anulan con `quantity-input.zsd-qty` (elemento + clase, más específico que
+   `.quantity` a secas) en vez de con !important, para que mañana se puedan
+   seguir sobrescribiendo puntualmente sin una guerra de importancias.
    ========================================================================== */
 
-.zsd-line__qty-wrap {
-  display: flex;
-}
-
+/* Los tres envoltorios que Dawn interpone entre la fila y el selector. Sin
+   esto siguen estirándose y da igual lo estrecho que sea el selector. */
+.zsd quantity-popover,
+.zsd .zsd-line__qty-wrap,
 .zsd .quantity-popover-container {
+  display: flex;
+  flex: 0 0 auto;
+  width: auto;
   padding: 0;
 }
 
-css
-.zsd-qty {
+.zsd quantity-input.zsd-qty {
   display: inline-flex;
   align-items: stretch;
-  width: auto; /* anula el ancho fijo de 14rem que .quantity trae de base.css */
+  flex: 0 0 auto;
+  width: auto;
   min-width: 0;
   height: var(--zsd-qty-h);
   min-height: 0;
@@ -597,18 +626,21 @@ css
   overflow: hidden;
 }
 
-/* base.css dibuja un borde y un fondo extra sobre .quantity con
-   pseudoelementos; sin esto el selector sale con doble marco. */
-.zsd-qty::before,
-.zsd-qty::after {
+/* El marco fantasma de base.css. Sin esto se ve un doble borde descuadrado. */
+.zsd quantity-input.zsd-qty::before,
+.zsd quantity-input.zsd-qty::after {
   content: none;
 }
 
-
-.zsd-qty__btn {
+/* flex:0 0 26px, no width. En un contenedor flex el width es solo la base:
+   el flex-grow que Dawn pone sobre .quantity__button lo ignoraría y el botón
+   seguiría creciendo. */
+.zsd quantity-input.zsd-qty .zsd-qty__btn {
   display: grid;
   place-items: center;
+  flex: 0 0 26px;
   width: 26px;
+  min-width: 0;
   padding: 0;
   border: 0;
   background: none;
@@ -616,24 +648,31 @@ css
   cursor: pointer;
 }
 
-.zsd-qty__btn:disabled {
+.zsd quantity-input.zsd-qty .zsd-qty__btn:disabled {
   opacity: 0.35;
   cursor: default;
 }
 
-.zsd-qty__btn svg {
+/* pointer-events:none es obligatorio, no cosmético. quantity-input.js lee
+   event.target.name para saber si sumas o restas; si el clic cae en el <svg>,
+   que no tiene name, el botón deja de responder. */
+.zsd quantity-input.zsd-qty .zsd-qty__btn svg {
   width: 11px;
   height: 11px;
+  pointer-events: none;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.7;
   stroke-linecap: round;
 }
 
-.zsd-qty__input {
-  width: 26px;
+.zsd quantity-input.zsd-qty .zsd-qty__input {
+  flex: 0 0 30px;
+  width: 30px;
+  min-width: 0;
+  height: 100%;
   padding: 0;
-  border: 0; /* sin separadores internos, como la referencia */
+  border: 0;
   border-radius: 0;
   background: none;
   font-size: 13px;
@@ -644,16 +683,25 @@ css
   appearance: textfield;
 }
 
-.zsd-qty__input::-webkit-outer-spin-button,
-.zsd-qty__input::-webkit-inner-spin-button {
+.zsd quantity-input.zsd-qty .zsd-qty__input::-webkit-outer-spin-button,
+.zsd quantity-input.zsd-qty .zsd-qty__input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-.zsd-qty__input:focus-visible {
+.zsd quantity-input.zsd-qty .zsd-qty__input:focus-visible {
   outline: 2px solid var(--zsd-qty-color);
   outline-offset: -2px;
 }
+
+/* Total: 26 + 30 + 26 = 82px fijos.
+   Si prefieres los separadores verticales entre botones y número, descomenta:
+
+   .zsd quantity-input.zsd-qty .zsd-qty__input {
+     border-left: 1px solid var(--zsd-qty-border);
+     border-right: 1px solid var(--zsd-qty-border);
+   }
+*/
 
 /* ==========================================================================
    8. Etiqueta de descuento
