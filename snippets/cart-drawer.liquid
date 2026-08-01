@@ -586,23 +586,15 @@
                                     {% # theme-check-enable %}
                                     aria-label="{{ 'products.product.quantity.input_label' | t: product: item.product.title | escape }}"
                                   >
-                                  <button class="zsd-qty__btn quantity__button" name="plus" type="button">
-                                    <span class="visually-hidden">
-                                      {{- 'products.product.quantity.increase' | t: product: item.product.title | escape -}}
-                                    </span>
-                                    <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-                                      <path d="M10 4.5v11M4.5 10h11" />
-                                    </svg>
-                                    <button class="zsd-qty__btn zsd-qty__btn--plus quantity__button" name="plus" type="button">
-                                        <span class="visually-hidden">
-                                          {{- 'products.product.quantity.increase' | t: product: item.product.title | escape -}}
-                                        </span>
-                                        <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-                                          <path d="M10 4.5v11M4.5 10h11" />
-                                        </svg>
-                                        {%- render 'loading-spinner' -%}
-                                      </button>
-                                  </button>
+                                  <button class="zsd-qty__btn zsd-qty__btn--plus quantity__button" name="plus" type="button">
+                                  <span class="visually-hidden">
+                                    {{- 'products.product.quantity.increase' | t: product: item.product.title | escape -}}
+                                  </span>
+                                  <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                                    <path d="M10 4.5v11M4.5 10h11" />
+                                  </svg>
+                                  {%- render 'loading-spinner' -%}
+                                </button>
                                 </quantity-input>
                               </div>
                             </div>
