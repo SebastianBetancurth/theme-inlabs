@@ -138,6 +138,151 @@
         "settings": {
           "color_scheme": "scheme-1"
         }
+      },
+      "cart-drawer": {
+        "type": "cart-drawer",
+        "blocks": {
+          "cart-drawer-0": {
+            "type": "milestone",
+            "settings": {
+              "threshold": 50,
+              "label": "Envío Gratis",
+              "reward": "Envío Gratis",
+              "icon": "truck",
+              "icon_svg": "",
+              "gift_product": "",
+              "gift_auto_remove": true
+            }
+          },
+          "cart-drawer-1": {
+            "type": "milestone",
+            "settings": {
+              "threshold": 100,
+              "label": "15% de Descuento",
+              "reward": "15% de Descuento",
+              "icon": "discount",
+              "icon_svg": "",
+              "gift_product": "",
+              "gift_auto_remove": true
+            }
+          },
+          "cart-drawer-2": {
+            "type": "milestone",
+            "settings": {
+              "threshold": 150,
+              "label": "Tote Bag de regalo",
+              "reward": "Tote Bag de regalo",
+              "icon": "gift",
+              "icon_svg": "",
+              "gift_product": "",
+              "gift_auto_remove": true
+            }
+          },
+          "cart-drawer-3": {
+            "type": "reco",
+            "settings": {
+              "product": "zzen-focus"
+            }
+          },
+          "cart-drawer-4": {
+            "type": "reco",
+            "settings": {
+              "product": "zzen-calm"
+            }
+          },
+          "cart-drawer-5": {
+            "type": "reco",
+            "settings": {
+              "product": "modo-zzen-copy"
+            }
+          }
+        },
+        "block_order": [
+          "cart-drawer-0",
+          "cart-drawer-1",
+          "cart-drawer-2",
+          "cart-drawer-3",
+          "cart-drawer-4",
+          "cart-drawer-5"
+        ],
+        "settings": {
+          "panel_width": 420,
+          "panel_radius": 0,
+          "panel_full_mobile": true,
+          "panel_bg": "#ffffff",
+          "overlay_color": "#000000",
+          "overlay_opacity": 45,
+          "divider_color": "#eaeaea",
+          "pad_x": 18,
+          "title": "Cesta",
+          "title_size": 24,
+          "title_color": "#111111",
+          "close_bg": "#f1f1f1",
+          "close_color": "#7a7a7a",
+          "close_size": 34,
+          "progress_enabled": true,
+          "progress_basis": "subtotal",
+          "progress_spacing": "even",
+          "progress_text": "Añade {amount} más para desbloquear tu {reward}",
+          "progress_done_text": "¡Has desbloqueado todas las recompensas!",
+          "progress_text_color": "#6b6b6b",
+          "progress_text_size": 14,
+          "track_color": "#ececec",
+          "fill_color": "#111111",
+          "track_height": 7,
+          "milestone_size": 42,
+          "milestone_bg": "#ffffff",
+          "milestone_border": "#111111",
+          "milestone_icon": "#111111",
+          "milestone_bg_on": "#111111",
+          "milestone_icon_on": "#ffffff",
+          "milestone_label_color": "#6b6b6b",
+          "milestone_label_size": 11,
+          "line_img_size": 68,
+          "line_img_radius": 6,
+          "line_img_bg": "#f6f6f6",
+          "line_title_color": "#111111",
+          "line_title_size": 15,
+          "line_meta_color": "#9a9a9a",
+          "line_price_color": "#111111",
+          "line_compare_color": "#9a9a9a",
+          "line_show_saving": true,
+          "line_saving_text": "(Ahorro {amount})",
+          "line_saving_color": "#e02b2b",
+          "line_show_discount_chip": true,
+          "qty_border": "#dcdcdc",
+          "qty_color": "#111111",
+          "qty_height": 32,
+          "qty_radius": 20,
+          "gift_lock_qty": true,
+          "gift_hide_remove": true,
+          "reco_enabled": true,
+          "reco_title": "Nuestra recomendación",
+          "reco_max": 3,
+          "reco_exclude_in_cart": true,
+          "reco_button": "Añadir",
+          "reco_multi_variant": "link",
+          "reco_card_bg": "#f4f4f4",
+          "reco_card_radius": 8,
+          "reco_img_size": 62,
+          "reco_btn_bg": "#111111",
+          "reco_btn_color": "#ffffff",
+          "footer_bg": "#f4f4f4",
+          "checkout_label": "Pago Seguro - {total}",
+          "checkout_lock_icon": true,
+          "checkout_bg": "#111111",
+          "checkout_color": "#ffffff",
+          "checkout_height": 52,
+          "checkout_radius": 40,
+          "show_discounts_row": true,
+          "discounts_label": "Descuentos",
+          "show_payment_icons": true,
+          "show_note": false,
+          "show_tax_note": false,
+          "empty_text": "Tu carrito está vacío",
+          "empty_size": 21,
+          "empty_color": "#111111"
+        }
       }
     },
     "content_for_index": [],
