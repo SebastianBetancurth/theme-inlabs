@@ -90,6 +90,30 @@
   padding-top: 0;
 }
 
+/* --------------------------------------------------------------------------
+   cart.js añade is-empty a <cart-drawer> al vaciar el carrito:
+
+     if (cartDrawerWrapper) cartDrawerWrapper.classList.toggle('is-empty', ...)
+
+   No basta con quitar la clase del Liquid, porque vuelve en tiempo de
+   ejecución. Y con ella entran dos reglas de Dawn que convierten la columna
+   flex del panel en un grid centrado y esconden la cabecera, así que al borrar
+   la última línea el drawer se descuadraba entero y perdía el título y la X.
+   Aquí se devuelven ambas a su sitio: el estado vacío de esta versión mantiene
+   la misma estructura que el lleno, solo cambia el contenido del centro.
+   -------------------------------------------------------------------------- */
+.zsd.is-empty .drawer__inner {
+  display: flex;
+  flex-direction: column;
+  grid-template-rows: none;
+  align-items: stretch;
+  padding: 0;
+}
+
+.zsd.is-empty .drawer__header {
+  display: flex;
+}
+
 .zsd .drawer__header {
   position: relative;
   padding: 16px var(--zsd-pad-x) 12px;
@@ -183,7 +207,7 @@
 }
 
 .zsd-prog {
-  padding: 4px var(--zsd-pad-x) 0;
+  padding: 4px calc(var(--zsd-pad-x) + var(--zsd-prog-pad)) 0;
 }
 
 .zsd-prog__text {
@@ -224,14 +248,16 @@
   transition: width 0.55s cubic-bezier(0.33, 1, 0.68, 1);
 }
 
-/* Los círculos se colocan dentro de una banda metida media anchura de círculo
-   por cada lado. Sin ese retranqueo, el hito del 100% asomaría medio fuera del
-   panel y el del 0% quedaría cortado por la izquierda. La barra usa la misma
-   fórmula para que el relleno muera justo en el centro del círculo. */
+/* El hito se ancla en su porcentaje de la barra, y --zsd-mark-shift decide qué
+   parte del círculo cae sobre ese punto: el centro, el borde derecho o el
+   izquierdo. Con el borde derecho (por defecto) el último círculo queda
+   completo dentro de la barra en lugar de asomar medio fuera, que es lo que
+   hace la referencia. Para meter todo el conjunto más adentro del panel está
+   «Margen lateral de la barra», que empuja también las etiquetas. */
 .zsd-prog__mark {
   position: absolute;
   top: 0;
-  transform: translateX(-50%);
+  transform: translateX(var(--zsd-mark-shift));
 }
 
 .zsd-prog__dot {
@@ -273,7 +299,7 @@
   position: absolute;
   top: calc(var(--zsd-dot) + 6px);
   left: 50%;
-  width: 82px;
+  width: var(--zsd-dot-label-w);
   transform: translateX(-50%);
   font-size: var(--zsd-dot-label-size);
   line-height: 1.25;
@@ -348,12 +374,16 @@
    5. Estado vacío
    ========================================================================== */
 
-.zsd__empty {
+/* min-height explícito y no solo flex:1. Si el mensaje dependiera de que toda
+   la cadena flex se estire, cualquier regla de Dawn o de una app que toque
+   .drawer__contents o .cart-drawer__form lo dejaría con cero alto y el
+   mensaje desaparecería sin dejar rastro en el DOM. */
+.zsd .zsd__empty {
   flex: 1 1 auto;
   display: grid;
   place-items: center;
-  min-height: 180px;
-  padding: 48px var(--zsd-pad-x);
+  min-height: var(--zsd-empty-h);
+  padding: 32px var(--zsd-pad-x);
 }
 
 .zsd__empty-text {
@@ -891,10 +921,6 @@
 @media screen and (max-width: 749px) {
   .zsd .drawer__inner {
     border-radius: 0;
-  }
-
-  .zsd-prog__label {
-    width: 74px;
   }
 
   .zsd-reco__name {
