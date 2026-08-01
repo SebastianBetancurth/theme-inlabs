@@ -280,16 +280,28 @@
     --zsd-co-color: {{ s.checkout_color }};
     --zsd-co-h: {{ s.checkout_height }}px;
     --zsd-co-r: {{ s.checkout_radius }}px;
+    --zsd-panel-rm: {{ s.panel_radius_mobile | default: 16 }}px;
+    --zsd-pay-h: {{ s.pay_icon_size | default: 26 }}px;
 
     --zsd-empty-size: {{ s.empty_size }}px;
     --zsd-empty-color: {{ s.empty_color }};
     --zsd-empty-h: {{ s.empty_min_height }}px;
   }
-  {%- if s.panel_full_mobile -%}
-    @media screen and (max-width: 749px) {
-      .zsd .drawer__inner { width: 100vw; max-width: 100vw; }
+ {%- if s.panel_full_mobile -%}
+  @media screen and (max-width: 749px) {
+    .zsd .drawer__inner {
+      width: 100vw;
+      max-width: 100vw;
+      border-radius: var(--zsd-panel-rm) var(--zsd-panel-rm) 0 0;
     }
-  {%- endif -%}
+  }
+{%- else -%}
+  @media screen and (max-width: 749px) {
+    .zsd .drawer__inner {
+      border-radius: var(--zsd-panel-rm) 0 0 var(--zsd-panel-rm);
+    }
+  }
+{%- endif -%}
 {%- endstyle -%}
 
 <cart-drawer class="drawer zsd">
