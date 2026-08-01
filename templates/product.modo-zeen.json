@@ -1380,9 +1380,9 @@
         "moment_aQCVhT": {
           "type": "moment",
           "settings": {
-            "icon": "shopify://shop_images/iconos_boton_Mesa_de_trabajo_1_f9439db7-7700-4e41-8f39-bb0ef27d8086.svg",
+            "icon": "shopify://shop_images/download.svg",
             "icon_svg": "",
-            "image": "shopify://shop_images/Frame_1738_77063a22-6ff5-4372-b03a-3360d2e599b9.webp",
+            "image": "shopify://shop_images/download_5e8c0c29-37fe-4a12-88a7-5d3ab060b945.webp",
             "caption": "SLEEP 10:00 P.M.",
             "copy": "<p>Describe aquí este momento del día: cuándo tomarlo, con qué acompañarlo y qué aporta a la rutina.</p>",
             "tab_label": ""
