@@ -2173,24 +2173,6 @@
     },
     "custom_reviews_aKyaMC": {
       "type": "custom-reviews",
-      "blocks": {
-        "review_fqqPpT": {
-          "type": "review",
-          "settings": {
-            "author": "",
-            "place": "",
-            "flag": "",
-            "rating": 5,
-            "title": "",
-            "body": "",
-            "date": "",
-            "verified": false
-          }
-        }
-      },
-      "block_order": [
-        "review_fqqPpT"
-      ],
       "name": "Reseñas",
       "settings": {
         "metafield_namespace": "custom",

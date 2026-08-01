@@ -67,73 +67,189 @@
   endif
 
   # ------------------------------------------------------------------
-  # Origen de los datos. Primero el metafield de producto; si está vacío,
-  # los bloques.
+  # Origen de los datos.
+  # Se elige una única fuente por orden: demostración, metaobjects, bloques.
   # ------------------------------------------------------------------
   assign mf_ns = s.metafield_namespace | default: 'custom'
   assign mf_key = s.metafield_key | default: 'resenas'
   assign reviews = product.metafields[mf_ns][mf_key].value
-  assign use_meta = false
-  if reviews != blank and reviews.size > 0
-    assign use_meta = true
+
+  assign source = 'blocks'
+  if s.demo_mode
+    assign source = 'demo'
+  elsif reviews != blank and reviews.size > 0
+    assign source = 'meta'
   endif
+-%}
+
+{%- comment -%}
+  ============================================================================
+  Las tres fuentes se normalizan a una sola cadena antes de pintar nada.
+  Cada reseña es una fila separada por §§ y sus campos por ¦, en este orden:
+
+      autor ¦ pais ¦ bandera ¦ puntuacion ¦ titulo ¦ texto ¦ fecha ¦ verificada
+
+  Así el marcado de la ficha se escribe UNA vez en lugar de una por fuente.
+  Antes había un bucle para metaobjects y otro para bloques, ya duplicados;
+  con una tercera fuente el mismo cambio habría que hacerlo tres veces y
+  tarde o temprano una se queda atrás.
+
+  Los campos vacíos van como espacio, nunca vacíos del todo: dos separadores
+  seguidos descolocarían el resto de los campos de esa fila. Y el texto se
+  escapa aquí, de modo que una reseña no puede colar etiquetas en la página.
+  ============================================================================
+{%- endcomment -%}
+
+{%- capture rows -%}
+  {%- case source -%}
+
+    {%- when 'demo' -%}
+Ana G.¦España¦🇪🇸¦5¦Muy contenta¦Pedí el pack y llegó en dos días. La rutina es fácil de seguir y no se me olvida.¦ ¦1§§
+Marc S.¦España¦🇪🇸¦5¦Repetiré¦Segundo mes ya. Me gusta que las cápsulas sean pequeñas y fáciles de tragar.¦ ¦1§§
+Lucía R.M.¦España¦🇪🇸¦4¦Buen producto, envío mejorable¦El producto muy bien presentado.
+El envío tardó un día más de lo previsto, pero atención al cliente respondió enseguida.¦ ¦1§§
+Javier P.¦España¦🇪🇸¦5¦Cumple¦Justo lo que buscaba para ordenar mi rutina de la mañana.¦ ¦1§§
+Elena¦ ¦ ¦5¦Me encanta el formato¦El bote es cómodo y cabe en el bolso. La etiqueta se lee bien, que parece una tontería y no lo es.¦ ¦0§§
+Carlos E.C.A.¦España¦🇪🇸¦5¦Genial¦Llevo unas semanas y de momento muy satisfecho con la compra.¦ ¦1§§
+Marta L.¦España¦🇪🇸¦4¦Bien¦Buena relación calidad precio comparado con lo que había probado antes.¦ ¦1§§
+Diego F.¦Francia¦🇫🇷¦5¦Envío rápido a Francia¦Llegó antes de lo que decía la web. Todo perfectamente embalado, sin nada roto.¦ ¦1§§
+Sara N.¦España¦🇪🇸¦5¦Muy buena atención¦Tuve una duda con la suscripción y me la resolvieron por WhatsApp en diez minutos.¦ ¦1§§
+Pablo M.J.¦España¦🇪🇸¦3¦Correcto¦Está bien pero esperaba notar algo más en el primer mes. Le doy otra oportunidad.¦ ¦1§§
+Nuria¦España¦🇪🇸¦5¦Rutina sencilla¦Lo mejor es no tener que acordarse de cinco botes distintos. Uno por momento del día y listo.¦ ¦1§§
+Alberto R.¦España¦🇪🇸¦5¦Todo correcto¦Pedido, envío y producto. Nada que objetar.¦ ¦1§§
+Cristina V.B.¦España¦🇪🇸¦4¦Buena compra¦Me gustó el detalle del welcome pack. La agenda la estoy usando de verdad, no se ha quedado en un cajón.¦ ¦1§§
+Iván¦Italia¦🇮🇹¦5¦Perfetto¦Llegó a Italia sin problemas de aduana. Repetiré pedido.¦ ¦1§§
+Laura S.¦España¦🇪🇸¦5¦Muy recomendable¦Lo compré por recomendación de una amiga y no me arrepiento.¦ ¦1§§
+Miguel Ángel T.¦España¦🇪🇸¦5¦Buen packaging¦Se nota que han cuidado la presentación. Da gusto abrir la caja.¦ ¦1§§
+Patricia¦España¦🇪🇸¦4¦Contenta¦Buen producto. Le quito una estrella porque el precio se me hace algo alto sin suscripción.¦ ¦1§§
+Rubén O.¦España¦🇪🇸¦5¦Cómodo¦La suscripción mensual me quita el problema de quedarme sin a mitad de mes.¦ ¦1§§
+Andrea C.¦España¦🇪🇸¦5¦Sin pegas¦Tercer pedido. Siempre igual de bien.¦ ¦1§§
+Fernando E.¦España¦🇪🇸¦5¦Muy satisfecho¦Buena experiencia de principio a fin.
+La web es clara, el pedido llegó cuando dijeron y el producto es tal como se describe.
+Volveré a pedir.¦ ¦1§§
+Beatriz¦ ¦ ¦4¦Bien pero¦El producto bien. Echo de menos poder elegir día de entrega.¦ ¦0§§
+Gonzalo A.¦España¦🇪🇸¦5¦Recomendado¦Me lo recomendó mi entrenador y estoy muy contento con la compra.¦ ¦1§§
+Silvia M.¦España¦🇪🇸¦5¦Fácil de seguir¦Lo mejor es que la rutina es simple. Mañana, tarde y noche, sin complicarse.¦ ¦1§§
+Héctor¦Alemania¦🇩🇪¦5¦Llegó perfecto a Alemania¦Envío internacional sin problemas y el seguimiento funcionaba bien.¦ ¦1§§
+Rocío D.P.¦España¦🇪🇸¦5¦Muy bien¦Todo correcto, atención impecable.¦ ¦1§§
+Sergio L.¦España¦🇪🇸¦2¦No era para mí¦El producto está bien presentado pero a mí no me ha terminado de encajar. La devolución fue rápida, eso sí.¦ ¦1§§
+Teresa¦España¦🇪🇸¦5¦Encantada¦Ya voy por el tercer mes y sigo igual de contenta que el primer día.¦ ¦1§§
+Adrián B.¦España¦🇪🇸¦5¦Buen servicio¦Pedido un viernes, en casa el lunes. Sin quejas.¦ ¦1§§
+Marina J.¦España¦🇪🇸¦4¦Buena calidad¦Se nota la calidad de los ingredientes en la ficha. Me gusta que esté todo detallado.¦ ¦1§§
+Óscar¦España¦🇪🇸¦5¦Lo que buscaba¦Buscaba algo así desde hace tiempo. Contento con la compra.¦ ¦1§§
+Alicia R.¦España¦🇪🇸¦5¦Genial la agenda¦El extra del primer pedido es un detallazo. La estoy usando a diario.¦ ¦1§§
+Daniel M.C.¦España¦🇪🇸¦5¦Sin problemas¦Todo bien, repetiré.¦ ¦1§§
+Verónica¦Irlanda¦🇮🇪¦4¦Bien¦Tardó un poco más al ser envío internacional pero llegó en perfecto estado.¦ ¦1§§
+Jorge S.¦España¦🇪🇸¦5¦Muy buen producto¦La presentación y la calidad están a la altura del precio.¦ ¦1§§
+Isabel¦España¦🇪🇸¦5¦Recomiendo¦Compré por probar y me he quedado. Ya tengo la suscripción activa.¦ ¦1§§
+Raúl P.¦España¦🇪🇸¦5¦Todo perfecto¦Nada que añadir, todo como esperaba.¦ ¦1§§
+Carmen L.¦España¦🇪🇸¦3¦Está bien¦Producto correcto. Esperaba un envase un poco más grande por el precio.¦ ¦1§§
+Alejandro¦España¦🇪🇸¦5¦Muy cómodo¦No tener que pensar en pedirlo cada mes es lo que más valoro.¦ ¦1§§
+Natalia G.¦España¦🇪🇸¦5¦Buena experiencia¦Desde la compra hasta la entrega, todo muy fluido.¦ ¦1§§
+Guillermo¦España¦🇪🇸¦5¦Bien¦Cumple con lo que promete la ficha.¦ ¦0§§
+Paula M.¦España¦🇪🇸¦5¦Encantada con el trato¦Me equivoqué con la dirección y me lo solucionaron sin problema. Diez.¦ ¦1§§
+Tomás R.¦España¦🇪🇸¦4¦Buen producto¦Bien en general. Mejoraría la caja de cartón, llegó un poco abollada.¦ ¦1§§
+Irene¦España¦🇪🇸¦5¦Muy contenta¦Segundo pedido y todo igual de bien que el primero.¦ ¦1§§
+Manuel A.¦España¦🇪🇸¦5¦Perfecto¦Rápido, bien embalado y el producto tal cual.¦ ¦1§§
+Claudia S.¦España¦🇪🇸¦5¦Me gusta la rutina¦Lo he integrado con el desayuno y ya es automático.¦ ¦1§§
+Víctor¦Francia¦🇫🇷¦5¦Muy bien¦Envío correcto y producto tal como se describe en la web.¦ ¦1§§
+Lorena F.¦España¦🇪🇸¦5¦Genial¦Buen producto y mejor atención al cliente.¦ ¦1§§
+Ángel M.¦España¦🇪🇸¦4¦Contento¦Bien, aunque me gustaría que hubiera formato de prueba más pequeño.¦ ¦1§§
+Sonia¦España¦🇪🇸¦5¦Repito¦Tercer mes de suscripción. Sin intención de cancelar.¦ ¦1§§
+Ismael T.¦España¦🇪🇸¦5¦Buen envío¦Llegó en 24 horas, mejor de lo esperado.¦ ¦1§§
+Eva R.M.¦España¦🇪🇸¦5¦Muy recomendable¦Lo compré para probar y he acabado suscribiéndome.¦ ¦1§§
+Roberto¦España¦🇪🇸¦5¦Correcto¦Todo bien, sin incidencias.¦ ¦0§§
+Mónica P.¦España¦🇪🇸¦5¦Buena compra¦Contenta con la calidad y con el precio de la suscripción.¦ ¦1§§
+Álvaro G.¦España¦🇪🇸¦1¦Problema con el pedido¦Mi pedido llegó incompleto. Lo resolvieron y me mandaron lo que faltaba, pero la primera experiencia no fue buena.¦ ¦1§§
+Cristina M.¦España¦🇪🇸¦5¦Sin pegas¦Perfecto todo.¦ ¦1§§
+Fran¦España¦🇪🇸¦5¦Muy bien¦La web explica muy bien cómo tomarlo, eso ayuda mucho.¦ ¦0§§
+Ana Belén S.¦España¦🇪🇸¦5¦Encantada¦Es el tipo de producto que acabas incorporando sin darte cuenta.¦ ¦1§§
+Luis M.R.¦España¦🇪🇸¦4¦Bien¦Buen producto. El envío podría ser algo más rápido.¦ ¦1§§
+Sandra¦España¦🇪🇸¦5¦Muy satisfecha¦Atención al cliente de diez, resolvieron mi duda al momento.¦ ¦1§§
+Emilio C.¦España¦🇪🇸¦5¦Genial¦Repetiré sin duda.¦ ¦1§§
+Julia N.¦España¦🇪🇸¦5¦Buenísimo¦Lo mejor: la sencillez. No hay que hacer malabares con horarios raros.¦ ¦1§§
+Rafa¦España¦🇪🇸¦5¦Todo bien¦Sin ninguna queja.¦ ¦0§§
+Marisa T.¦España¦🇪🇸¦4¦Bien¦Producto correcto y buena presentación.¦ ¦1§§
+David L.¦España¦🇪🇸¦5¦Recomendable¦Buena calidad y buen servicio.¦ ¦1§§
+Celia¦Italia¦🇮🇹¦5¦Llegó bien a Italia¦Envío internacional sin sorpresas ni gastos extra.¦ ¦1§§
+Nacho P.¦España¦🇪🇸¦5¦Muy bien¦Segundo pedido, todo perfecto otra vez.¦ ¦1§§
+Amparo R.¦España¦🇪🇸¦5¦Contenta¦Buen producto y buen trato.¦ ¦1§§
+Borja¦España¦🇪🇸¦5¦Perfecto¦Rápido y bien.¦ ¦0§§
+Inés M.C.¦España¦🇪🇸¦5¦Muy buena experiencia¦Desde que hice el pedido hasta que llegó, todo muy claro y bien comunicado.
+Me avisaron por email en cada paso.¦ ¦1§§
+Santiago¦España¦🇪🇸¦4¦Bien¦Cumple. Le falta poder pausar la suscripción desde la app más fácil.¦ ¦1§§
+Rosa L.¦España¦🇪🇸¦5¦Genial¦Encantada, ya lo he recomendado a dos personas.¦ ¦1§§
+Jaime O.¦España¦🇪🇸¦5¦Buen producto¦Lo que esperaba y algo más por el detalle del regalo.¦ ¦1§§
+Lidia¦España¦🇪🇸¦5¦Muy bien¦Todo correcto, envío rápido.¦ ¦0§§
+Ricardo M.¦España¦🇪🇸¦5¦Sin problemas¦Cuarto pedido ya. Siempre bien.¦ ¦1§§
+Noelia F.¦España¦🇪🇸¦5¦Recomiendo¦Buena calidad y la suscripción sale muy a cuenta.¦ ¦1§§
+Enrique¦España¦🇪🇸¦3¦Aceptable¦Está bien pero no me ha sorprendido. Correcto sin más.¦ ¦1§§
+Marta C.G.¦España¦🇪🇸¦5¦Encantada¦El packaging es precioso y el producto está a la altura.¦ ¦1§§
+Xavi¦España¦🇪🇸¦5¦Muy bien¦Fácil de pedir y llegó enseguida.¦ ¦1§§
+Susana P.¦España¦🇪🇸¦5¦Buen servicio¦Cambié la dirección después de pedir y no hubo ningún problema.¦ ¦1§§
+Antonio R.¦España¦🇪🇸¦5¦Perfecto¦Todo bien, repetiré.¦ ¦1§§
+Gemma¦España¦🇪🇸¦4¦Bien¦Buen producto, buen precio con la suscripción.¦ ¦0§§
+Pedro M.¦España¦🇪🇸¦5¦Muy contento¦La rutina es fácil y no se hace pesada.¦ ¦1§§
+Aitor L.¦España¦🇪🇸¦5¦Genial¦Segundo mes y sigo igual de contento.¦ ¦1§§
+Blanca S.¦España¦🇪🇸¦5¦Recomendable¦Buena atención y buen producto.¦ ¦1§§
+Joan¦España¦🇪🇸¦5¦Tot correcte¦Envío rápido y producto bien embalado.¦ ¦1§§
+Raquel D.¦España¦🇪🇸¦2¦No me convenció¦El servicio bien pero el producto no era para mí. La devolución fue sencilla al menos.¦ ¦1§§
+Óliver M.¦España¦🇪🇸¦5¦Muy bien¦Sin nada que reprochar.¦ ¦0§§
+Julia R.¦España¦🇪🇸¦5¦Contenta¦Buena compra, repetiré.¦ ¦1§§
+Nicolás A.¦España¦🇪🇸¦5¦Perfecto¦Todo llegó bien y en plazo.¦ ¦1§§
+    {%- when 'meta' -%}
+      {%- for r in reviews -%}
+        {{- r.autor.value | default: ' ' | escape | replace: '¦', '/' -}}¦
+        {{- r.pais.value | default: ' ' | escape | replace: '¦', '/' -}}¦
+        {{- r.bandera.value | default: ' ' | escape -}}¦
+        {{- r.puntuacion.value | default: 5 -}}¦
+        {{- r.titulo.value | default: ' ' | escape | replace: '¦', '/' -}}¦
+        {{- r.texto.value | default: ' ' | escape | replace: '¦', '/' -}}¦
+        {{- r.fecha.value | default: ' ' -}}¦
+        {%- if r.verificada.value -%}1{%- else -%}0{%- endif -%}§§
+      {%- endfor -%}
+
+    {%- else -%}
+      {%- for block in section.blocks -%}
+        {{- block.settings.author | default: ' ' | escape | replace: '¦', '/' -}}¦
+        {{- block.settings.place | default: ' ' | escape | replace: '¦', '/' -}}¦
+        {{- block.settings.flag | default: ' ' | escape -}}¦
+        {{- block.settings.rating | default: 5 -}}¦
+        {{- block.settings.title | default: ' ' | escape | replace: '¦', '/' -}}¦
+        {{- block.settings.body | default: ' ' | escape | replace: '¦', '/' -}}¦
+        {{- block.settings.date | default: ' ' -}}¦
+        {%- if block.settings.verified -%}1{%- else -%}0{%- endif -%}§§
+      {%- endfor -%}
+
+  {%- endcase -%}
+{%- endcapture -%}
+
+{%- liquid
+  assign row_list = rows | strip | split: '§§'
 
   # ------------------------------------------------------------------
-  # Nota media y total, calculados sobre las reseñas reales.
-  # Escribir estos números a mano y que no cuadren con lo que se ve es lo
-  # que hace que Google retire las estrellas de los resultados.
+  # Nota media y total, calculados siempre sobre lo que se va a pintar.
+  # No hay ningún campo para escribirlos a mano: así no pueden descuadrar
+  # con lo que ve el visitante ni con los datos estructurados.
   # ------------------------------------------------------------------
   assign sum_r = 0
   assign n_r = 0
-  assign c5 = 0
-  assign c4 = 0
-  assign c3 = 0
-  assign c2 = 0
-  assign c1 = 0
 
-  if use_meta
-    for r in reviews
-      assign rv = r.puntuacion.value | default: 5 | round
-      if rv < 1
-        assign rv = 1
-      endif
-      if rv > 5
-        assign rv = 5
-      endif
-      assign sum_r = sum_r | plus: rv
-      assign n_r = n_r | plus: 1
-      case rv
-        when 5
-          assign c5 = c5 | plus: 1
-        when 4
-          assign c4 = c4 | plus: 1
-        when 3
-          assign c3 = c3 | plus: 1
-        when 2
-          assign c2 = c2 | plus: 1
-        else
-          assign c1 = c1 | plus: 1
-      endcase
-    endfor
-  else
-    for block in section.blocks
-      assign rv = block.settings.rating | plus: 0
-      assign sum_r = sum_r | plus: rv
-      assign n_r = n_r | plus: 1
-      case rv
-        when 5
-          assign c5 = c5 | plus: 1
-        when 4
-          assign c4 = c4 | plus: 1
-        when 3
-          assign c3 = c3 | plus: 1
-        when 2
-          assign c2 = c2 | plus: 1
-        else
-          assign c1 = c1 | plus: 1
-      endcase
-    endfor
-  endif
+  for row in row_list
+    if row == blank
+      continue
+    endif
+    assign f = row | split: '¦'
+    assign rv = f[3] | plus: 0
+    if rv < 1
+      assign rv = 1
+    endif
+    if rv > 5
+      assign rv = 5
+    endif
+    assign sum_r = sum_r | plus: rv
+    assign n_r = n_r | plus: 1
+  endfor
 
   assign avg_raw = 0
   if n_r > 0
@@ -254,6 +370,17 @@
     box-sizing: border-box;
     font-family: var(--zr-b-font);
     color: var(--zr-text);
+  }
+
+  .zrev__demo-note {
+    margin: 0 0 20px;
+    padding: 10px 14px;
+    border: 1px dashed #b58900;
+    border-radius: 6px;
+    background-color: #fff8e1;
+    color: #7a5c00;
+    font-size: 13px;
+    text-align: center;
   }
 
   .zrev__heading {
@@ -812,6 +939,17 @@
     data-error-rating="{{ s.error_rating | escape }}"
     data-dialog-id="zrev-sent-{{ section.id }}"
   >
+    {%- comment -%}
+      Recordatorio de que están puestas las reseñas de ejemplo. request.design_mode
+      solo es cierto dentro del editor de temas, así que esto lo ves tú mientras
+      maquetas y no lo ve nadie más.
+    {%- endcomment -%}
+    {%- if s.demo_mode and request.design_mode -%}
+      <div class="zrev__demo-note">
+        Reseñas de ejemplo activadas. Desmarca «Usar reseñas de ejemplo» antes de publicar.
+      </div>
+    {%- endif -%}
+
     {%- if s.heading != blank -%}
       <h2 class="zrev__heading">{{ s.heading }}</h2>
     {%- endif -%}
@@ -1003,140 +1141,81 @@
 
     {%- comment -%} ---------- Lista ---------- {%- endcomment -%}
     <div class="zrev__list" data-zr-list>
-      {%- if use_meta -%}
-        {%- for r in reviews -%}
-          {%- liquid
-            assign rv = r.puntuacion.value | default: 5 | round
-            if rv < 1
-              assign rv = 1
-            endif
-            if rv > 5
-              assign rv = 5
-            endif
-            assign r_author = r.autor.value | default: s.anonymous_label
-            assign r_place = r.pais.value
-            assign r_flag = r.bandera.value
-            assign r_title = r.titulo.value
-            assign r_body = r.texto.value
-            assign r_ver = r.verificada.value
-            assign r_date = r.fecha.value
-            assign r_stamp = 0
-            if r_date != blank
-              assign r_stamp = r_date | date: '%s'
-            endif
-          -%}
-          <article
-            class="zrev__item"
-            data-zr-item
-            data-rating="{{ rv }}"
-            data-date="{{ r_stamp }}"
-          >
-            <div class="zrev__author">
-              {%- if s.show_avatar -%}
-                <span class="zrev__avatar" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="8" r="3.4"></circle>
-                    <path d="M4.8 20c.7-3.6 3.6-5.6 7.2-5.6 1.5 0 2.8.3 3.9.9"></path>
-                    <path d="M17 18.4l1.4 1.4 2.8-2.8"></path>
-                  </svg>
-                </span>
-              {%- endif -%}
-              <div>
-                <div class="zrev__name-row">
-                  <span class="zrev__name">{{ r_author }}</span>
-                  {%- if r_ver -%}
-                    <span class="zrev__badge">{{ s.verified_label }}</span>
-                  {%- endif -%}
-                </div>
-                {%- if r_place != blank -%}
-                  <div class="zrev__place">{{ r_place }}{% if r_flag != blank %} {{ r_flag }}{% endif %}</div>
+      {%- for row in row_list -%}
+        {%- if row == blank -%}
+          {%- continue -%}
+        {%- endif -%}
+        {%- liquid
+          assign f = row | split: '¦'
+          assign r_author = f[0] | strip
+          assign r_place = f[1] | strip
+          assign r_flag = f[2] | strip
+          assign rv = f[3] | plus: 0
+          assign r_title = f[4] | strip
+          assign r_body = f[5]
+          assign r_date = f[6] | strip
+          assign r_ver = false
+          if f[7] == '1'
+            assign r_ver = true
+          endif
+          if r_author == blank
+            assign r_author = s.anonymous_label
+          endif
+          assign r_stamp = 0
+          if r_date != blank
+            assign r_stamp = r_date | date: '%s'
+          endif
+        -%}
+        <article
+          class="zrev__item"
+          data-zr-item
+          data-rating="{{ rv }}"
+          data-date="{{ r_stamp }}"
+          {%- if source == 'blocks' %} {{ section.blocks[forloop.index0].shopify_attributes }}{% endif -%}
+        >
+          <div class="zrev__author">
+            {%- if s.show_avatar -%}
+              <span class="zrev__avatar" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="8" r="3.4"></circle>
+                  <path d="M4.8 20c.7-3.6 3.6-5.6 7.2-5.6 1.5 0 2.8.3 3.9.9"></path>
+                  <path d="M17 18.4l1.4 1.4 2.8-2.8"></path>
+                </svg>
+              </span>
+            {%- endif -%}
+            <div>
+              <div class="zrev__name-row">
+                <span class="zrev__name">{{ r_author }}</span>
+                {%- if r_ver -%}
+                  <span class="zrev__badge">{{ s.verified_label }}</span>
                 {%- endif -%}
               </div>
+              {%- if r_place != blank -%}
+                <div class="zrev__place">{{ r_place }}{% if r_flag != blank %} {{ r_flag }}{% endif %}</div>
+              {%- endif -%}
             </div>
+          </div>
 
-            <div class="zrev__content">
-              <span class="zrev__stars zrev__item-stars" role="img" aria-label="{{ rv }} {{ s.out_of_label }}">
-                {%- for i in (1..5) -%}
-                  <svg class="zrev__star{% if i <= rv %} is-on{% endif %}" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="{{ star_path }}"></path>
-                  </svg>
-                {%- endfor -%}
-              </span>
-              {%- if r_title != blank -%}
-                <h3 class="zrev__item-title">{{ r_title }}</h3>
-              {%- endif -%}
-              {%- if r_body != blank -%}
-                <div class="zrev__item-body">{{ r_body }}</div>
-              {%- endif -%}
-              {%- if s.show_date and r_date != blank -%}
-                <div class="zrev__date">{{ r_date | date: s.date_format }}</div>
-              {%- endif -%}
-            </div>
-          </article>
-        {%- endfor -%}
-
-      {%- else -%}
-        {%- for block in section.blocks -%}
-          {%- liquid
-            assign rv = block.settings.rating | plus: 0
-            assign r_stamp = 0
-            if block.settings.date != blank
-              assign r_stamp = block.settings.date | date: '%s'
-            endif
-          -%}
-          <article
-            class="zrev__item"
-            data-zr-item
-            data-rating="{{ rv }}"
-            data-date="{{ r_stamp }}"
-            {{ block.shopify_attributes }}
-          >
-            <div class="zrev__author">
-              {%- if s.show_avatar -%}
-                <span class="zrev__avatar" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="8" r="3.4"></circle>
-                    <path d="M4.8 20c.7-3.6 3.6-5.6 7.2-5.6 1.5 0 2.8.3 3.9.9"></path>
-                    <path d="M17 18.4l1.4 1.4 2.8-2.8"></path>
-                  </svg>
-                </span>
-              {%- endif -%}
-              <div>
-                <div class="zrev__name-row">
-                  <span class="zrev__name">{{ block.settings.author | default: s.anonymous_label }}</span>
-                  {%- if block.settings.verified -%}
-                    <span class="zrev__badge">{{ s.verified_label }}</span>
-                  {%- endif -%}
-                </div>
-                {%- if block.settings.place != blank -%}
-                  <div class="zrev__place">
-                    {{ block.settings.place }}{% if block.settings.flag != blank %} {{ block.settings.flag }}{% endif %}
-                  </div>
-                {%- endif -%}
-              </div>
-            </div>
-
-            <div class="zrev__content">
-              <span class="zrev__stars zrev__item-stars" role="img" aria-label="{{ rv }} {{ s.out_of_label }}">
-                {%- for i in (1..5) -%}
-                  <svg class="zrev__star{% if i <= rv %} is-on{% endif %}" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="{{ star_path }}"></path>
-                  </svg>
-                {%- endfor -%}
-              </span>
-              {%- if block.settings.title != blank -%}
-                <h3 class="zrev__item-title">{{ block.settings.title }}</h3>
-              {%- endif -%}
-              {%- if block.settings.body != blank -%}
-                <div class="zrev__item-body">{{ block.settings.body }}</div>
-              {%- endif -%}
-              {%- if s.show_date and block.settings.date != blank -%}
-                <div class="zrev__date">{{ block.settings.date | date: s.date_format }}</div>
-              {%- endif -%}
-            </div>
-          </article>
-        {%- endfor -%}
-      {%- endif -%}
+          <div class="zrev__content">
+            <span class="zrev__stars zrev__item-stars" role="img" aria-label="{{ rv }} {{ s.out_of_label }}">
+              {%- for i in (1..5) -%}
+                <svg class="zrev__star{% if i <= rv %} is-on{% endif %}" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="{{ star_path }}"></path>
+                </svg>
+              {%- endfor -%}
+            </span>
+            {%- if r_title != blank -%}
+              <h3 class="zrev__item-title">{{ r_title }}</h3>
+            {%- endif -%}
+            {%- if r_body != blank -%}
+              <div class="zrev__item-body">{{ r_body }}</div>
+            {%- endif -%}
+            {%- if s.show_date and r_date != blank -%}
+              <div class="zrev__date">{{ r_date | date: s.date_format }}</div>
+            {%- endif -%}
+          </div>
+        </article>
+      {%- endfor -%}
 
       {%- if n_r == 0 -%}
         <p class="zrev__empty">{{ s.empty_label }}</p>
@@ -1418,6 +1497,13 @@
     {
       "type": "paragraph",
       "content": "Las reseñas se leen de un metafield de producto de tipo lista de metaobjects. Si está vacío, se usan los bloques de abajo (máximo 50, límite de Shopify)."
+    },
+    {
+      "type": "checkbox",
+      "id": "demo_mode",
+      "label": "Usar reseñas de ejemplo",
+      "info": "89 reseñas ficticias incluidas en el código, para maquetar sin tener que importar nada. Tienen prioridad sobre cualquier otra fuente. Desmárcalo antes de publicar la web: mostrar reseñas inventadas a clientes reales es infracción de consumo.",
+      "default": false
     },
     {
       "type": "text",
