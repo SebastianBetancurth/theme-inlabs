@@ -1,0 +1,2635 @@
+{%- comment -%}
+  ============================================================================
+  SECCIÓN: Reseñas verificadas
+  Tema: Dawn / Online Store 2.0
+  Ruta: sections/custom-reviews.liquid
+
+  PC     -> cabecera con la nota media a la izquierda, una línea vertical y el
+            botón de escribir reseña a la derecha. Debajo, el desplegable de
+            orden y la lista: datos de la persona a la izquierda, estrellas,
+            título y texto a la derecha. Al final, la paginación.
+  Móvil  -> todo apilado.
+
+  DE DÓNDE SALEN LAS RESEÑAS
+  De metaobjects, no de bloques. Una sección de Shopify admite 50 bloques como
+  máximo, así que con 89 reseñas los bloques no son una opción. Los bloques se
+  quedan como respaldo por si quieres montar tres o cuatro a mano.
+
+  PAGINACIÓN
+  Todas las reseñas se imprimen en el HTML y el JavaScript solo enseña las de
+  la página actual. Así Google las lee todas y el orden y el cambio de página
+  son instantáneos, sin recargar. Sin JavaScript se ven todas seguidas y la
+  paginación desaparece.
+
+  EL FORMULARIO ENVÍA DE VERDAD
+  Usa {% raw %}{% form 'contact' %}{% endraw %}, el formulario nativo de Shopify: la reseña
+  llega al correo de la tienda y desde ahí la publicas como metaobject. Un
+  formulario que dice «enviado» sin mandar nada a ningún sitio deja al cliente
+  convencido de que ha dejado su reseña cuando no existe.
+  ============================================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign bp = s.mobile_breakpoint
+  assign bp_max = bp | minus: 1
+
+  case s.heading_font
+    when 'thin2'
+      assign heading_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign heading_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign heading_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign heading_stack = 'var(--font-body-family)'
+    else
+      assign heading_stack = s.heading_font_custom
+  endcase
+
+  case s.body_font
+    when 'helvetica'
+      assign body_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'thin2'
+      assign body_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'theme_heading'
+      assign body_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign body_stack = 'var(--font-body-family)'
+    else
+      assign body_stack = s.body_font_custom
+  endcase
+
+  if s.content_max_width == 0
+    assign max_w = 'none'
+  else
+    assign max_w = s.content_max_width | append: 'px'
+  endif
+
+  # ------------------------------------------------------------------
+  # Origen de los datos. Primero el metafield de producto; si está vacío,
+  # los bloques.
+  # ------------------------------------------------------------------
+  assign mf_ns = s.metafield_namespace | default: 'custom'
+  assign mf_key = s.metafield_key | default: 'resenas'
+  assign reviews = product.metafields[mf_ns][mf_key].value
+  assign use_meta = false
+  if reviews != blank and reviews.size > 0
+    assign use_meta = true
+  endif
+
+  # ------------------------------------------------------------------
+  # Nota media y total, calculados sobre las reseñas reales.
+  # Escribir estos números a mano y que no cuadren con lo que se ve es lo
+  # que hace que Google retire las estrellas de los resultados.
+  # ------------------------------------------------------------------
+  assign sum_r = 0
+  assign n_r = 0
+  assign c5 = 0
+  assign c4 = 0
+  assign c3 = 0
+  assign c2 = 0
+  assign c1 = 0
+
+  if use_meta
+    for r in reviews
+      assign rv = r.puntuacion.value | default: 5 | round
+      if rv < 1
+        assign rv = 1
+      endif
+      if rv > 5
+        assign rv = 5
+      endif
+      assign sum_r = sum_r | plus: rv
+      assign n_r = n_r | plus: 1
+      case rv
+        when 5
+          assign c5 = c5 | plus: 1
+        when 4
+          assign c4 = c4 | plus: 1
+        when 3
+          assign c3 = c3 | plus: 1
+        when 2
+          assign c2 = c2 | plus: 1
+        else
+          assign c1 = c1 | plus: 1
+      endcase
+    endfor
+  else
+    for block in section.blocks
+      assign rv = block.settings.rating | plus: 0
+      assign sum_r = sum_r | plus: rv
+      assign n_r = n_r | plus: 1
+      case rv
+        when 5
+          assign c5 = c5 | plus: 1
+        when 4
+          assign c4 = c4 | plus: 1
+        when 3
+          assign c3 = c3 | plus: 1
+        when 2
+          assign c2 = c2 | plus: 1
+        else
+          assign c1 = c1 | plus: 1
+      endcase
+    endfor
+  endif
+
+  assign avg_raw = 0
+  if n_r > 0
+    assign avg_raw = sum_r | times: 1.0 | divided_by: n_r
+  endif
+  assign avg_1 = avg_raw | round: 1
+  assign avg_txt = avg_1 | append: ''
+  if s.decimal_comma
+    assign avg_txt = avg_txt | replace: '.', ','
+  endif
+  assign avg_stars = avg_raw | round
+
+  assign total_pages = 0
+  if s.per_page > 0
+    assign total_pages = n_r | divided_by: s.per_page
+    assign rest = n_r | modulo: s.per_page
+    if rest > 0
+      assign total_pages = total_pages | plus: 1
+    endif
+  endif
+-%}
+
+{%- style -%}
+  @font-face {
+    font-family: 'Helvetica neue';
+    src: url('{{ 'HelveticaNeueCyr-Light.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'thin2';
+    src: url('{{ 'lawrence-regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ================= Variables: PC ================= */
+  .zrev-{{ section.id }} {
+    --zr-bg: {{ s.bg_color }};
+    --zr-max-w: {{ max_w }};
+    --zr-pt: {{ s.padding_top_d }}px;
+    --zr-pb: {{ s.padding_bottom_d }}px;
+    --zr-pl: {{ s.padding_left_d }}px;
+    --zr-pr: {{ s.padding_right_d }}px;
+    --zr-anim: {{ s.transition_ms }}ms;
+
+    --zr-h-font: {{ heading_stack }};
+    --zr-h-size: {{ s.heading_size_d }}px;
+    --zr-h-weight: {{ s.heading_weight }};
+    --zr-h-color: {{ s.heading_color }};
+    --zr-h-mb: {{ s.heading_margin_bottom_d }}px;
+
+    --zr-b-font: {{ body_stack }};
+    --zr-text: {{ s.text_color }};
+    --zr-muted: {{ s.muted_color }};
+    --zr-line: {{ s.line_color }};
+
+    --zr-star: {{ s.star_color }};
+    --zr-star-off: {{ s.star_off_color }};
+    --zr-star-sum: {{ s.star_size_summary_d }}px;
+    --zr-star-item: {{ s.star_size_item_d }}px;
+    --zr-star-gap: {{ s.star_gap }}px;
+
+    --zr-sum-size: {{ s.summary_size_d }}px;
+    --zr-sum-gap: {{ s.summary_gap_d }}px;
+    --zr-sum-pb: {{ s.summary_padding_bottom_d }}px;
+
+    --zr-btn-bg: {{ s.button_bg }};
+    --zr-btn-color: {{ s.button_color }};
+    --zr-btn-bg-hover: {{ s.button_bg_hover }};
+    --zr-btn-color-hover: {{ s.button_color_hover }};
+    --zr-btn-size: {{ s.button_size_d }}px;
+    --zr-btn-py: {{ s.button_padding_y }}px;
+    --zr-btn-px: {{ s.button_padding_x }}px;
+    --zr-btn-radius: {{ s.button_radius }}px;
+    --zr-btn-weight: {{ s.button_weight }};
+
+    --zr-item-py: {{ s.item_padding_y_d }}px;
+    --zr-item-col: {{ s.author_col_width_d }}px;
+    --zr-item-gap: {{ s.item_gap_d }}px;
+
+    --zr-name-size: {{ s.name_size_d }}px;
+    --zr-title-size: {{ s.review_title_size_d }}px;
+    --zr-title-weight: {{ s.review_title_weight }};
+    --zr-body-size: {{ s.review_body_size_d }}px;
+    --zr-body-lh: {{ s.review_body_line_height }};
+
+    --zr-badge-bg: {{ s.badge_bg }};
+    --zr-badge-color: {{ s.badge_color }};
+    --zr-badge-size: {{ s.badge_size }}px;
+    --zr-badge-radius: {{ s.badge_radius }}px;
+
+    --zr-avatar: {{ s.avatar_size_d }}px;
+    --zr-avatar-bg: {{ s.avatar_bg }};
+    --zr-avatar-color: {{ s.avatar_color }};
+
+    --zr-field-border: {{ s.field_border_color }};
+    --zr-field-radius: {{ s.field_radius }}px;
+    --zr-field-py: {{ s.field_padding_y }}px;
+    --zr-field-px: {{ s.field_padding_x }}px;
+    --zr-field-bg: {{ s.field_bg }};
+
+    --zr-form-w: {{ s.form_max_width }}px;
+  }
+
+  /* ================= Estructura ================= */
+  .zrev { background-color: var(--zr-bg); }
+
+  zzen-reviews { display: block; }
+
+  .zrev__inner {
+    display: block;
+    max-width: var(--zr-max-w);
+    margin-inline: auto;
+    padding: var(--zr-pt) var(--zr-pr) var(--zr-pb) var(--zr-pl);
+    box-sizing: border-box;
+    font-family: var(--zr-b-font);
+    color: var(--zr-text);
+  }
+
+  .zrev__heading {
+    margin: 0 0 var(--zr-h-mb);
+    font-family: var(--zr-h-font);
+    font-size: var(--zr-h-size);
+    font-weight: var(--zr-h-weight);
+    line-height: 1.2;
+    text-align: center;
+    color: var(--zr-h-color);
+  }
+
+  /* ================= Estrellas ================= */
+  .zrev__stars {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--zr-star-gap);
+    line-height: 0;
+  }
+
+  .zrev__star {
+    width: 1em;
+    height: 1em;
+    display: block;
+    fill: var(--zr-star-off);
+  }
+
+  .zrev__star.is-on { fill: var(--zr-star); }
+
+  /* ================= Resumen ================= */
+  .zrev__summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--zr-sum-gap);
+    padding-bottom: var(--zr-sum-pb);
+    border-bottom: 1px solid var(--zr-line);
+  }
+
+  .zrev__score { font-size: var(--zr-sum-size); }
+
+  .zrev__score-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+    font-size: var(--zr-star-sum);
+  }
+
+  .zrev__score-value { font-size: var(--zr-sum-size); }
+  .zrev__score-sub { color: var(--zr-text); }
+
+  .zrev__divider {
+    width: 1px;
+    align-self: stretch;
+    background-color: var(--zr-line);
+  }
+
+  /* ================= Botón ================= */
+  .zrev__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--zr-btn-py) var(--zr-btn-px);
+    border: 1px solid var(--zr-btn-bg);
+    border-radius: var(--zr-btn-radius);
+    background-color: var(--zr-btn-bg);
+    color: var(--zr-btn-color);
+    font-family: inherit;
+    font-size: var(--zr-btn-size);
+    font-weight: var(--zr-btn-weight);
+    line-height: 1.2;
+    cursor: pointer;
+    transition: background-color var(--zr-anim) ease, color var(--zr-anim) ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .zrev__btn:hover {
+    background-color: var(--zr-btn-bg-hover);
+    color: var(--zr-btn-color-hover);
+  }
+
+  .zrev__btn:focus-visible {
+    outline: 2px solid var(--zr-btn-bg);
+    outline-offset: 3px;
+  }
+
+  .zrev__btn--ghost {
+    background-color: transparent;
+    color: var(--zr-btn-bg);
+  }
+
+  .zrev__btn--ghost:hover {
+    background-color: var(--zr-btn-bg);
+    color: var(--zr-btn-color);
+  }
+
+  /* ================= Barra de orden ================= */
+  .zrev__toolbar {
+    display: flex;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--zr-line);
+  }
+
+  .zrev__sort {
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 4px 26px 4px 0;
+    border: 0;
+    background: transparent;
+    font-family: inherit;
+    font-size: {{ s.sort_size }}px;
+    color: var(--zr-text);
+    cursor: pointer;
+  }
+
+  .zrev__sort-wrap { position: relative; display: inline-flex; align-items: center; }
+
+  .zrev__sort-wrap svg {
+    position: absolute;
+    right: 4px;
+    width: 12px;
+    height: 12px;
+    pointer-events: none;
+    fill: none;
+    stroke: var(--zr-text);
+    stroke-width: 1.4;
+  }
+
+  /* ================= Lista ================= */
+  .zrev__list { display: block; }
+
+  .zrev__item {
+    display: grid;
+    grid-template-columns: var(--zr-item-col) minmax(0, 1fr);
+    gap: var(--zr-item-gap);
+    padding: var(--zr-item-py) 0;
+    border-bottom: 1px solid var(--zr-line);
+  }
+
+  .zrev__item[hidden] { display: none; }
+
+  .zrev__author {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .zrev__avatar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--zr-avatar);
+    height: var(--zr-avatar);
+    border-radius: 6px;
+    background-color: var(--zr-avatar-bg);
+    color: var(--zr-avatar-color);
+  }
+
+  .zrev__avatar svg { width: 60%; height: 60%; }
+
+  .zrev__name-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .zrev__name {
+    font-size: var(--zr-name-size);
+    line-height: 1.3;
+  }
+
+  .zrev__badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: var(--zr-badge-radius);
+    background-color: var(--zr-badge-bg);
+    color: var(--zr-badge-color);
+    font-size: var(--zr-badge-size);
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+
+  .zrev__place {
+    margin-top: 2px;
+    font-size: var(--zr-name-size);
+    color: var(--zr-muted);
+  }
+
+  .zrev__content { min-width: 0; }
+
+  .zrev__item-stars {
+    font-size: var(--zr-star-item);
+    margin-bottom: 12px;
+  }
+
+  .zrev__item-title {
+    margin: 0 0 8px;
+    font-size: var(--zr-title-size);
+    font-weight: var(--zr-title-weight);
+    line-height: 1.3;
+  }
+
+  .zrev__item-body {
+    font-size: var(--zr-body-size);
+    line-height: var(--zr-body-lh);
+    white-space: pre-line;
+  }
+
+  .zrev__date {
+    margin-top: 10px;
+    font-size: calc(var(--zr-body-size) * 0.85);
+    color: var(--zr-muted);
+  }
+
+  .zrev__empty {
+    padding: 40px 0;
+    text-align: center;
+    color: var(--zr-muted);
+  }
+
+  /* ================= Paginación ================= */
+  .zrev__pager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--zr-line);
+  }
+
+  .zrev__page {
+    min-width: 28px;
+    height: 28px;
+    padding: 0 6px;
+    border: 0;
+    background: none;
+    font-family: inherit;
+    font-size: {{ s.pager_size }}px;
+    color: var(--zr-muted);
+    cursor: pointer;
+    transition: color var(--zr-anim) ease;
+  }
+
+  .zrev__page:hover { color: var(--zr-text); }
+
+  .zrev__page[aria-current='true'] {
+    color: var(--zr-text);
+    font-weight: 600;
+  }
+
+  .zrev__page[disabled] { opacity: 0.3; cursor: default; }
+
+  .zrev__page svg {
+    width: 14px;
+    height: 14px;
+    display: block;
+    margin: 0 auto;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ================= Formulario ================= */
+  .zrev__form-panel {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height var(--zr-anim) ease;
+  }
+
+  .zrev__form-inner {
+    max-width: var(--zr-form-w);
+    margin: 0 auto;
+    padding: 34px 0 10px;
+    text-align: center;
+  }
+
+  .zrev__form-title {
+    margin: 0 0 18px;
+    font-family: var(--zr-h-font);
+    font-size: {{ s.form_title_size }}px;
+    font-weight: 600;
+    color: var(--zr-h-color);
+  }
+
+  .zrev__field { margin-bottom: 18px; }
+
+  .zrev__label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: {{ s.label_size }}px;
+    line-height: 1.4;
+    color: var(--zr-text);
+  }
+
+  .zrev__hint { color: var(--zr-muted); font-size: 0.85em; }
+
+  .zrev__input,
+  .zrev__textarea {
+    width: 100%;
+    padding: var(--zr-field-py) var(--zr-field-px);
+    border: 1px solid var(--zr-field-border);
+    border-radius: var(--zr-field-radius);
+    background-color: var(--zr-field-bg);
+    font-family: inherit;
+    font-size: {{ s.field_size }}px;
+    color: var(--zr-text);
+    box-sizing: border-box;
+    transition: border-color var(--zr-anim) ease;
+  }
+
+  .zrev__input:focus,
+  .zrev__textarea:focus {
+    outline: none;
+    border-color: var(--zr-text);
+  }
+
+  .zrev__textarea {
+    min-height: {{ s.textarea_height }}px;
+    resize: vertical;
+    border-radius: calc(var(--zr-field-radius) / 2);
+  }
+
+  .zrev__input::placeholder,
+  .zrev__textarea::placeholder { color: var(--zr-muted); }
+
+  /* Puntuación: radios de verdad, para que funcione con teclado y se envíe
+     con el formulario. El input real se oculta, no se elimina. */
+  .zrev__rating {
+    display: inline-flex;
+    gap: 6px;
+    direction: rtl;
+  }
+
+  .zrev__rating input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .zrev__rating label {
+    cursor: pointer;
+    line-height: 0;
+    font-size: {{ s.form_star_size }}px;
+  }
+
+  .zrev__rating label svg {
+    width: 1em;
+    height: 1em;
+    display: block;
+    fill: none;
+    stroke: var(--zr-star);
+    stroke-width: 1.5;
+    transition: fill var(--zr-anim) ease;
+  }
+
+  /* En rtl, el hermano posterior en el HTML es el visualmente anterior: al
+     marcar una estrella se rellenan ella y todas las de su izquierda. */
+  .zrev__rating input:checked ~ label svg,
+  .zrev__rating label:hover svg,
+  .zrev__rating label:hover ~ label svg {
+    fill: var(--zr-star);
+  }
+
+  .zrev__rating input:focus-visible + label svg {
+    outline: 2px solid var(--zr-text);
+    outline-offset: 3px;
+  }
+
+  .zrev__counter {
+    font-size: 0.8em;
+    color: var(--zr-muted);
+  }
+
+  .zrev__legal {
+    margin: 14px 0 20px;
+    font-size: {{ s.legal_size }}px;
+    line-height: 1.5;
+    color: var(--zr-text);
+  }
+
+  .zrev__form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding-bottom: 20px;
+  }
+
+  .zrev__error {
+    margin-bottom: 14px;
+    font-size: {{ s.label_size }}px;
+    color: {{ s.error_color }};
+  }
+
+  .zrev__error:empty { display: none; }
+
+  .zrev__hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  /* ================= Aviso de envío ================= */
+  .zrev__dialog {
+    width: min(440px, calc(100vw - 32px));
+    padding: 0;
+    border: 0;
+    border-radius: {{ s.dialog_radius }}px;
+    background-color: {{ s.dialog_bg }};
+    color: {{ s.dialog_color }};
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+  }
+
+  .zrev__dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(2px);
+  }
+
+  .zrev__dialog-in {
+    padding: 40px 32px 32px;
+    text-align: center;
+    font-family: var(--zr-b-font);
+  }
+
+  .zrev__check {
+    width: {{ s.dialog_icon_size }}px;
+    height: {{ s.dialog_icon_size }}px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: {{ s.dialog_icon_bg }};
+    color: {{ s.dialog_icon_color }};
+  }
+
+  .zrev__check svg {
+    width: 46%;
+    height: 46%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 32;
+    stroke-dashoffset: 32;
+    animation: zrev-draw 520ms 140ms ease forwards;
+  }
+
+  @keyframes zrev-draw {
+    to { stroke-dashoffset: 0; }
+  }
+
+  .zrev__dialog-title {
+    margin: 0 0 10px;
+    font-family: var(--zr-h-font);
+    font-size: {{ s.dialog_title_size }}px;
+    font-weight: 600;
+  }
+
+  .zrev__dialog-text {
+    margin: 0 0 26px;
+    font-size: {{ s.dialog_text_size }}px;
+    line-height: 1.55;
+    opacity: 0.85;
+  }
+
+  /* ================= Móvil ================= */
+  @media screen and (max-width: {{ bp_max }}px) {
+    .zrev-{{ section.id }} {
+      --zr-max-w: none;
+      --zr-pt: {{ s.padding_top_m }}px;
+      --zr-pb: {{ s.padding_bottom_m }}px;
+      --zr-pl: {{ s.padding_left_m }}px;
+      --zr-pr: {{ s.padding_right_m }}px;
+
+      --zr-h-size: {{ s.heading_size_m }}px;
+      --zr-h-mb: {{ s.heading_margin_bottom_m }}px;
+
+      --zr-star-sum: {{ s.star_size_summary_m }}px;
+      --zr-star-item: {{ s.star_size_item_m }}px;
+      --zr-sum-size: {{ s.summary_size_m }}px;
+      --zr-sum-gap: {{ s.summary_gap_m }}px;
+      --zr-sum-pb: {{ s.summary_padding_bottom_m }}px;
+
+      --zr-btn-size: {{ s.button_size_m }}px;
+
+      --zr-item-py: {{ s.item_padding_y_m }}px;
+      --zr-item-gap: {{ s.item_gap_m }}px;
+      --zr-avatar: {{ s.avatar_size_m }}px;
+
+      --zr-name-size: {{ s.name_size_m }}px;
+      --zr-title-size: {{ s.review_title_size_m }}px;
+      --zr-body-size: {{ s.review_body_size_m }}px;
+    }
+
+    .zrev-{{ section.id }} .zrev__summary {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .zrev-{{ section.id }} .zrev__score-top { justify-content: center; }
+
+    .zrev-{{ section.id }} .zrev__divider {
+      width: 100%;
+      height: 1px;
+      align-self: auto;
+    }
+
+    /* La ficha se apila: primero quién la escribe, luego la reseña. */
+    .zrev-{{ section.id }} .zrev__item {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .zrev-{{ section.id }} { --zr-anim: 1ms; }
+    .zrev__check svg { animation: none; stroke-dashoffset: 0; }
+  }
+{%- endstyle -%}
+
+{%- comment -%} Sin JavaScript se ven todas las reseñas y se retira la paginación. {%- endcomment -%}
+<noscript>
+  <style>
+    .zrev-{{ section.id }} .zrev__item { display: grid !important; }
+    .zrev-{{ section.id }} .zrev__pager { display: none !important; }
+    .zrev-{{ section.id }} .zrev__form-panel { max-height: none !important; }
+    .zrev-{{ section.id }} .zrev__toggle { display: none !important; }
+  </style>
+</noscript>
+
+{%- comment -%}
+  Marcado de estrellas reutilizable. Se genera una vez y se pinta con la
+  clase is-on según la puntuación de cada reseña.
+{%- endcomment -%}
+{%- capture star_path -%}M12 2.6l2.82 6.03 6.43.87-4.7 4.5 1.16 6.5L12 17.4l-5.71 3.1 1.16-6.5-4.7-4.5 6.43-.87z{%- endcapture -%}
+
+<div class="zrev zrev-{{ section.id }}">
+  <zzen-reviews
+    class="zrev__inner"
+    id="zrev-{{ section.id }}"
+    data-per-page="{{ s.per_page }}"
+    data-label-open="{{ s.button_open_label | escape }}"
+    data-label-close="{{ s.button_close_label | escape }}"
+    data-error-rating="{{ s.error_rating | escape }}"
+    data-dialog-id="zrev-sent-{{ section.id }}"
+  >
+    {%- if s.heading != blank -%}
+      <h2 class="zrev__heading">{{ s.heading }}</h2>
+    {%- endif -%}
+
+    {%- comment -%} ---------- Resumen ---------- {%- endcomment -%}
+    <div class="zrev__summary">
+      <div class="zrev__score">
+        <div class="zrev__score-top">
+          <span class="zrev__stars" role="img" aria-label="{{ avg_txt }} {{ s.out_of_label }}">
+            {%- for i in (1..5) -%}
+              <svg class="zrev__star{% if i <= avg_stars %} is-on{% endif %}" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="{{ star_path }}"></path>
+              </svg>
+            {%- endfor -%}
+          </span>
+          <span class="zrev__score-value">{{ avg_txt }} {{ s.out_of_label }}</span>
+        </div>
+        <div class="zrev__score-sub">
+          {%- if s.count_label != blank -%}
+            {{ s.count_label }}
+          {%- else -%}
+            {{ s.based_on_label }} {{ n_r }}
+          {%- endif -%}
+        </div>
+      </div>
+
+      <div class="zrev__divider" aria-hidden="true"></div>
+
+      <button
+        type="button"
+        class="zrev__btn zrev__toggle"
+        data-zr-toggle
+        aria-expanded="false"
+        aria-controls="zrev-form-{{ section.id }}"
+      >
+        <span data-zr-toggle-label>{{ s.button_open_label }}</span>
+      </button>
+    </div>
+
+    {%- comment -%} ---------- Formulario ---------- {%- endcomment -%}
+    <div class="zrev__form-panel" id="zrev-form-{{ section.id }}" data-zr-form-panel>
+      <div class="zrev__form-inner">
+        <h3 class="zrev__form-title">{{ s.form_title }}</h3>
+
+        {%- form 'contact', id: 'zrev-contact-form', class: 'zrev__form' -%}
+          {%- comment -%}
+            Shopify vuelve a la página con el formulario marcado como enviado.
+            Este marcador es lo que dispara el aviso: no se finge nada, se
+            confirma solo cuando el envío ha salido de verdad.
+          {%- endcomment -%}
+          {%- if form.posted_successfully? -%}
+            <span data-zr-posted hidden></span>
+          {%- endif -%}
+
+          <div class="zrev__error" data-zr-error role="alert">
+            {%- if form.errors -%}
+              {{ form.errors | default_errors }}
+            {%- endif -%}
+          </div>
+
+          {%- comment -%} Trampa para robots: si viene rellena, no se envía. {%- endcomment -%}
+          <div class="zrev__hp" aria-hidden="true">
+            <label for="zrev-website-{{ section.id }}">No rellenar</label>
+            <input type="text" id="zrev-website-{{ section.id }}" name="contact[website]" tabindex="-1" autocomplete="off">
+          </div>
+
+          {%- if product != blank -%}
+            <input type="hidden" name="contact[Producto]" value="{{ product.title | escape }}">
+            <input type="hidden" name="contact[URL]" value="{{ shop.url }}{{ product.url }}">
+          {%- endif -%}
+          <input type="hidden" name="contact[Tipo]" value="Reseña de producto">
+
+          <div class="zrev__field">
+            <span class="zrev__label">{{ s.label_rating }}</span>
+            <div class="zrev__rating" data-zr-rating>
+              {%- for i in (1..5) -%}
+                {%- assign v = 6 | minus: i -%}
+                <input
+                  type="radio"
+                  id="zrev-star-{{ section.id }}-{{ v }}"
+                  name="contact[Puntuación]"
+                  value="{{ v }}"
+                  required
+                >
+                <label for="zrev-star-{{ section.id }}-{{ v }}">
+                  <span class="visually-hidden">{{ v }} {{ s.out_of_label }}</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="{{ star_path }}"></path></svg>
+                </label>
+              {%- endfor -%}
+            </div>
+          </div>
+
+          <div class="zrev__field">
+            <label class="zrev__label" for="zrev-title-{{ section.id }}">
+              {{ s.label_title }}
+              <span class="zrev__counter" data-zr-counter>({{ s.title_maxlength }})</span>
+            </label>
+            <input
+              class="zrev__input"
+              type="text"
+              id="zrev-title-{{ section.id }}"
+              name="contact[Título de la reseña]"
+              maxlength="{{ s.title_maxlength }}"
+              placeholder="{{ s.placeholder_title | escape }}"
+              data-zr-title
+              required
+            >
+          </div>
+
+          <div class="zrev__field">
+            <label class="zrev__label" for="zrev-body-{{ section.id }}">{{ s.label_body }}</label>
+            <textarea
+              class="zrev__textarea"
+              id="zrev-body-{{ section.id }}"
+              name="contact[body]"
+              placeholder="{{ s.placeholder_body | escape }}"
+              required
+            ></textarea>
+          </div>
+
+          {%- if s.show_video_field -%}
+            <div class="zrev__field">
+              <label class="zrev__label" for="zrev-video-{{ section.id }}">{{ s.label_video }}</label>
+              <input
+                class="zrev__input"
+                type="url"
+                id="zrev-video-{{ section.id }}"
+                name="contact[Vídeo]"
+                placeholder="{{ s.placeholder_video | escape }}"
+              >
+            </div>
+          {%- endif -%}
+
+          <div class="zrev__field">
+            <label class="zrev__label" for="zrev-name-{{ section.id }}">{{ s.label_name }}</label>
+            <input
+              class="zrev__input"
+              type="text"
+              id="zrev-name-{{ section.id }}"
+              name="contact[Nombre]"
+              placeholder="{{ s.placeholder_name | escape }}"
+              autocomplete="name"
+              required
+            >
+          </div>
+
+          <div class="zrev__field">
+            <label class="zrev__label" for="zrev-email-{{ section.id }}">{{ s.label_email }}</label>
+            <input
+              class="zrev__input"
+              type="email"
+              id="zrev-email-{{ section.id }}"
+              name="contact[email]"
+              placeholder="{{ s.placeholder_email | escape }}"
+              autocomplete="email"
+              required
+            >
+          </div>
+
+          {%- if s.legal_text != blank -%}
+            <div class="zrev__legal">{{ s.legal_text }}</div>
+          {%- endif -%}
+
+          <div class="zrev__form-actions">
+            <button type="button" class="zrev__btn zrev__btn--ghost" data-zr-cancel>
+              {{ s.button_close_label }}
+            </button>
+            <button type="submit" class="zrev__btn">{{ s.button_submit_label }}</button>
+          </div>
+        {%- endform -%}
+      </div>
+    </div>
+
+    {%- comment -%} ---------- Orden ---------- {%- endcomment -%}
+    {%- if s.show_sort and n_r > 1 -%}
+      <div class="zrev__toolbar">
+        <span class="zrev__sort-wrap">
+          <label class="visually-hidden" for="zrev-sort-{{ section.id }}">{{ s.sort_label }}</label>
+          <select class="zrev__sort" id="zrev-sort-{{ section.id }}" data-zr-sort>
+            <option value="recent">{{ s.sort_recent }}</option>
+            <option value="oldest">{{ s.sort_oldest }}</option>
+            <option value="high">{{ s.sort_high }}</option>
+            <option value="low">{{ s.sort_low }}</option>
+          </select>
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 8l5 5 5-5"></path></svg>
+        </span>
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} ---------- Lista ---------- {%- endcomment -%}
+    <div class="zrev__list" data-zr-list>
+      {%- if use_meta -%}
+        {%- for r in reviews -%}
+          {%- liquid
+            assign rv = r.puntuacion.value | default: 5 | round
+            if rv < 1
+              assign rv = 1
+            endif
+            if rv > 5
+              assign rv = 5
+            endif
+            assign r_author = r.autor.value | default: s.anonymous_label
+            assign r_place = r.pais.value
+            assign r_flag = r.bandera.value
+            assign r_title = r.titulo.value
+            assign r_body = r.texto.value
+            assign r_ver = r.verificada.value
+            assign r_date = r.fecha.value
+            assign r_stamp = 0
+            if r_date != blank
+              assign r_stamp = r_date | date: '%s'
+            endif
+          -%}
+          <article
+            class="zrev__item"
+            data-zr-item
+            data-rating="{{ rv }}"
+            data-date="{{ r_stamp }}"
+          >
+            <div class="zrev__author">
+              {%- if s.show_avatar -%}
+                <span class="zrev__avatar" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="8" r="3.4"></circle>
+                    <path d="M4.8 20c.7-3.6 3.6-5.6 7.2-5.6 1.5 0 2.8.3 3.9.9"></path>
+                    <path d="M17 18.4l1.4 1.4 2.8-2.8"></path>
+                  </svg>
+                </span>
+              {%- endif -%}
+              <div>
+                <div class="zrev__name-row">
+                  <span class="zrev__name">{{ r_author }}</span>
+                  {%- if r_ver -%}
+                    <span class="zrev__badge">{{ s.verified_label }}</span>
+                  {%- endif -%}
+                </div>
+                {%- if r_place != blank -%}
+                  <div class="zrev__place">{{ r_place }}{% if r_flag != blank %} {{ r_flag }}{% endif %}</div>
+                {%- endif -%}
+              </div>
+            </div>
+
+            <div class="zrev__content">
+              <span class="zrev__stars zrev__item-stars" role="img" aria-label="{{ rv }} {{ s.out_of_label }}">
+                {%- for i in (1..5) -%}
+                  <svg class="zrev__star{% if i <= rv %} is-on{% endif %}" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="{{ star_path }}"></path>
+                  </svg>
+                {%- endfor -%}
+              </span>
+              {%- if r_title != blank -%}
+                <h3 class="zrev__item-title">{{ r_title }}</h3>
+              {%- endif -%}
+              {%- if r_body != blank -%}
+                <div class="zrev__item-body">{{ r_body }}</div>
+              {%- endif -%}
+              {%- if s.show_date and r_date != blank -%}
+                <div class="zrev__date">{{ r_date | date: s.date_format }}</div>
+              {%- endif -%}
+            </div>
+          </article>
+        {%- endfor -%}
+
+      {%- else -%}
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign rv = block.settings.rating | plus: 0
+            assign r_stamp = 0
+            if block.settings.date != blank
+              assign r_stamp = block.settings.date | date: '%s'
+            endif
+          -%}
+          <article
+            class="zrev__item"
+            data-zr-item
+            data-rating="{{ rv }}"
+            data-date="{{ r_stamp }}"
+            {{ block.shopify_attributes }}
+          >
+            <div class="zrev__author">
+              {%- if s.show_avatar -%}
+                <span class="zrev__avatar" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="8" r="3.4"></circle>
+                    <path d="M4.8 20c.7-3.6 3.6-5.6 7.2-5.6 1.5 0 2.8.3 3.9.9"></path>
+                    <path d="M17 18.4l1.4 1.4 2.8-2.8"></path>
+                  </svg>
+                </span>
+              {%- endif -%}
+              <div>
+                <div class="zrev__name-row">
+                  <span class="zrev__name">{{ block.settings.author | default: s.anonymous_label }}</span>
+                  {%- if block.settings.verified -%}
+                    <span class="zrev__badge">{{ s.verified_label }}</span>
+                  {%- endif -%}
+                </div>
+                {%- if block.settings.place != blank -%}
+                  <div class="zrev__place">
+                    {{ block.settings.place }}{% if block.settings.flag != blank %} {{ block.settings.flag }}{% endif %}
+                  </div>
+                {%- endif -%}
+              </div>
+            </div>
+
+            <div class="zrev__content">
+              <span class="zrev__stars zrev__item-stars" role="img" aria-label="{{ rv }} {{ s.out_of_label }}">
+                {%- for i in (1..5) -%}
+                  <svg class="zrev__star{% if i <= rv %} is-on{% endif %}" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="{{ star_path }}"></path>
+                  </svg>
+                {%- endfor -%}
+              </span>
+              {%- if block.settings.title != blank -%}
+                <h3 class="zrev__item-title">{{ block.settings.title }}</h3>
+              {%- endif -%}
+              {%- if block.settings.body != blank -%}
+                <div class="zrev__item-body">{{ block.settings.body }}</div>
+              {%- endif -%}
+              {%- if s.show_date and block.settings.date != blank -%}
+                <div class="zrev__date">{{ block.settings.date | date: s.date_format }}</div>
+              {%- endif -%}
+            </div>
+          </article>
+        {%- endfor -%}
+      {%- endif -%}
+
+      {%- if n_r == 0 -%}
+        <p class="zrev__empty">{{ s.empty_label }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} ---------- Paginación ---------- {%- endcomment -%}
+    {%- if total_pages > 1 -%}
+      <nav class="zrev__pager" data-zr-pager aria-label="{{ s.pager_label | escape }}"></nav>
+    {%- endif -%}
+  </zzen-reviews>
+</div>
+
+{%- comment -%} ---------- Aviso de envío ---------- {%- endcomment -%}
+<dialog class="zrev__dialog" id="zrev-sent-{{ section.id }}" data-zr-dialog>
+  <div class="zrev__dialog-in">
+    <div class="zrev__check" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M4.5 12.5l5 5 10-11"></path></svg>
+    </div>
+    <h2 class="zrev__dialog-title">{{ s.dialog_title }}</h2>
+    <p class="zrev__dialog-text">{{ s.dialog_text }}</p>
+    <button type="button" class="zrev__btn" data-zr-dialog-close>{{ s.dialog_button }}</button>
+  </div>
+</dialog>
+
+{%- if s.enable_schema and n_r > 0 and product != blank -%}
+  {%- comment -%}
+    Datos estructurados con la media y el total REALES, calculados arriba.
+    Si estos números no coinciden con lo que se ve en la página, Google quita
+    las estrellas de los resultados de todo el dominio.
+  {%- endcomment -%}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": {{ product.title | json }},
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "{{ avg_1 }}",
+        "reviewCount": "{{ n_r }}",
+        "bestRating": "5",
+        "worstRating": "1"
+      }
+    }
+  </script>
+{%- endif -%}
+
+<script>
+  if (!customElements.get('zzen-reviews')) {
+    customElements.define(
+      'zzen-reviews',
+      class ZzenReviews extends HTMLElement {
+        connectedCallback() {
+          this.list = this.querySelector('[data-zr-list]');
+          this.items = Array.from(this.querySelectorAll('[data-zr-item]'));
+          this.pager = this.querySelector('[data-zr-pager]');
+          this.panel = this.querySelector('[data-zr-form-panel]');
+          this.toggle = this.querySelector('[data-zr-toggle]');
+          this.toggleLabel = this.querySelector('[data-zr-toggle-label]');
+          this.sortSel = this.querySelector('[data-zr-sort]');
+          this.form = this.querySelector('form');
+          this.errorBox = this.querySelector('[data-zr-error]');
+
+          this.perPage = parseInt(this.dataset.perPage, 10) || 6;
+          this.page = 1;
+          this.open = false;
+
+          this.bindForm();
+          this.bindSort();
+          this.sort('recent');
+          this.render();
+
+          // Shopify vuelve a la página tras enviar: si el marcador está en el
+          // HTML es que el envío ha salido, y solo entonces se avisa.
+          if (this.querySelector('[data-zr-posted]')) {
+            this.setOpen(false);
+            this.showDialog();
+          } else if (this.errorBox && this.errorBox.textContent.trim() !== '') {
+            // Shopify ha devuelto errores: se reabre el formulario para que
+            // se vean, en vez de dejarlos escondidos dentro del panel.
+            this.setOpen(true);
+          }
+        }
+
+        /* ---------- Formulario ---------- */
+        bindForm() {
+          if (this.toggle) {
+            this.toggle.addEventListener('click', () => this.setOpen(!this.open));
+          }
+
+          const cancel = this.querySelector('[data-zr-cancel]');
+          if (cancel) cancel.addEventListener('click', () => this.setOpen(false));
+
+          const title = this.querySelector('[data-zr-title]');
+          const counter = this.querySelector('[data-zr-counter]');
+          if (title && counter) {
+            const max = parseInt(title.getAttribute('maxlength'), 10);
+            const paint = () => {
+              counter.textContent = '(' + (max - title.value.length) + ')';
+            };
+            title.addEventListener('input', paint);
+            paint();
+          }
+
+          if (this.form) {
+            this.form.addEventListener('submit', (e) => {
+              const picked = this.form.querySelector('input[name="contact[Puntuación]"]:checked');
+              if (!picked) {
+                e.preventDefault();
+                if (this.errorBox) this.errorBox.textContent = this.dataset.errorRating;
+                const rating = this.querySelector('[data-zr-rating]');
+                if (rating) rating.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+              }
+              if (this.errorBox) this.errorBox.textContent = '';
+            });
+          }
+        }
+
+        setOpen(open) {
+          this.open = open;
+          if (!this.panel) return;
+
+          this.panel.style.maxHeight = open ? this.panel.scrollHeight + 'px' : '0px';
+          if (this.toggle) this.toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+          if (this.toggleLabel) {
+            this.toggleLabel.textContent = open ? this.dataset.labelClose : this.dataset.labelOpen;
+          }
+
+          if (open) {
+            // Al terminar de abrir se suelta el alto: si el navegador rellena
+            // campos o el texto crece, el panel ya no se queda corto.
+            const done = () => {
+              if (this.open) this.panel.style.maxHeight = 'none';
+              this.panel.removeEventListener('transitionend', done);
+            };
+            this.panel.addEventListener('transitionend', done);
+            const first = this.panel.querySelector('input, textarea');
+            if (first) setTimeout(() => first.focus({ preventScroll: true }), 250);
+          } else {
+            this.panel.style.maxHeight = this.panel.scrollHeight + 'px';
+            void this.panel.offsetHeight;
+            this.panel.style.maxHeight = '0px';
+          }
+        }
+
+        /* ---------- Orden ---------- */
+        bindSort() {
+          if (!this.sortSel) return;
+          this.sortSel.addEventListener('change', () => {
+            this.sort(this.sortSel.value);
+            this.page = 1;
+            this.render();
+          });
+        }
+
+        sort(mode) {
+          const num = (el, attr) => parseFloat(el.getAttribute(attr)) || 0;
+          const sorted = this.items.slice().sort((a, b) => {
+            if (mode === 'high') return num(b, 'data-rating') - num(a, 'data-rating');
+            if (mode === 'low') return num(a, 'data-rating') - num(b, 'data-rating');
+            if (mode === 'oldest') return num(a, 'data-date') - num(b, 'data-date');
+            return num(b, 'data-date') - num(a, 'data-date');
+          });
+          sorted.forEach((el) => this.list.appendChild(el));
+          this.items = sorted;
+        }
+
+        /* ---------- Paginación ---------- */
+        get totalPages() {
+          return Math.max(Math.ceil(this.items.length / this.perPage), 1);
+        }
+
+        goTo(p, scroll) {
+          this.page = Math.min(Math.max(p, 1), this.totalPages);
+          this.render();
+          if (scroll) {
+            this.scrollIntoView({
+              behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+              block: 'start'
+            });
+          }
+        }
+
+        render() {
+          const from = (this.page - 1) * this.perPage;
+          const to = from + this.perPage;
+          this.items.forEach((el, i) => {
+            if (i >= from && i < to) el.removeAttribute('hidden');
+            else el.setAttribute('hidden', '');
+          });
+          this.renderPager();
+        }
+
+        renderPager() {
+          if (!this.pager) return;
+          const total = this.totalPages;
+          this.pager.textContent = '';
+          if (total < 2) return;
+
+          const btn = (label, page, opts) => {
+            opts = opts || {};
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'zrev__page';
+            if (opts.svg) b.innerHTML = opts.svg;
+            else b.textContent = label;
+            if (opts.aria) b.setAttribute('aria-label', opts.aria);
+            if (opts.current) b.setAttribute('aria-current', 'true');
+            if (opts.disabled) b.disabled = true;
+            else b.addEventListener('click', () => this.goTo(page, true));
+            return b;
+          };
+
+          // Ventana de páginas alrededor de la actual: con 15 páginas no se
+          // pintan 15 botones.
+          const win = 3;
+          let start = Math.max(1, this.page - Math.floor(win / 2));
+          let end = Math.min(total, start + win - 1);
+          start = Math.max(1, end - win + 1);
+
+          if (this.page > 1) {
+            this.pager.appendChild(
+              btn('', this.page - 1, {
+                svg: '<svg viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6"/></svg>',
+                aria: 'Anterior'
+              })
+            );
+          }
+
+          for (let p = start; p <= end; p++) {
+            this.pager.appendChild(btn(String(p), p, { current: p === this.page }));
+          }
+
+          if (this.page < total) {
+            this.pager.appendChild(
+              btn('', this.page + 1, {
+                svg: '<svg viewBox="0 0 20 20"><path d="M8 4l6 6-6 6"/></svg>',
+                aria: 'Siguiente'
+              })
+            );
+            this.pager.appendChild(
+              btn('', total, {
+                svg: '<svg viewBox="0 0 20 20"><path d="M6 4l6 6-6 6"/><path d="M15 4v12"/></svg>',
+                aria: 'Última página'
+              })
+            );
+          }
+        }
+
+        /* ---------- Aviso ---------- */
+        showDialog() {
+          const dlg = document.getElementById(this.dataset.dialogId);
+          if (!dlg) return;
+          const close = dlg.querySelector('[data-zr-dialog-close]');
+          if (close) close.addEventListener('click', () => dlg.close());
+          if (typeof dlg.showModal === 'function') dlg.showModal();
+          else dlg.setAttribute('open', '');
+        }
+      }
+    );
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Reseñas",
+  "tag": "section",
+  "class": "section-zrev",
+  "max_blocks": 50,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Origen de las reseñas"
+    },
+    {
+      "type": "paragraph",
+      "content": "Las reseñas se leen de un metafield de producto de tipo lista de metaobjects. Si está vacío, se usan los bloques de abajo (máximo 50, límite de Shopify)."
+    },
+    {
+      "type": "text",
+      "id": "metafield_namespace",
+      "label": "Espacio de nombres del metafield",
+      "default": "custom"
+    },
+    {
+      "type": "text",
+      "id": "metafield_key",
+      "label": "Clave del metafield",
+      "default": "resenas"
+    },
+    {
+      "type": "range",
+      "id": "per_page",
+      "min": 3,
+      "max": 30,
+      "step": 1,
+      "label": "Reseñas por página",
+      "default": 6
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_schema",
+      "label": "Publicar datos estructurados de valoración",
+      "info": "Genera el AggregateRating con la media y el total calculados sobre las reseñas reales de esta página. Actívalo solo si las reseñas son auténticas: si los datos no cuadran con lo que se ve, Google retira las estrellas de todo el dominio.",
+      "default": false
+    },
+
+    {
+      "type": "header",
+      "content": "Textos"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Título",
+      "default": "Reseñas Verificadas"
+    },
+    {
+      "type": "text",
+      "id": "out_of_label",
+      "label": "Texto tras la nota",
+      "default": "de 5"
+    },
+    {
+      "type": "text",
+      "id": "based_on_label",
+      "label": "Texto antes del total",
+      "info": "Se usa junto al número real de reseñas publicadas.",
+      "default": "Basado en"
+    },
+    {
+      "type": "text",
+      "id": "count_label",
+      "label": "O escribe la línea completa a mano",
+      "info": "Si lo rellenas sustituye a lo anterior. Cualquier cifra que pongas aquí tiene que poder justificarse: en España es infracción anunciar valoraciones sin comprobar que vienen de compradores reales."
+    },
+    {
+      "type": "text",
+      "id": "verified_label",
+      "label": "Etiqueta de verificado",
+      "default": "Verificado"
+    },
+    {
+      "type": "text",
+      "id": "anonymous_label",
+      "label": "Nombre cuando no hay autor",
+      "default": "Cliente"
+    },
+    {
+      "type": "text",
+      "id": "empty_label",
+      "label": "Texto cuando no hay reseñas",
+      "default": "Todavía no hay reseñas. Sé la primera persona en dejar la tuya."
+    },
+    {
+      "type": "text",
+      "id": "pager_label",
+      "label": "Texto accesible de la paginación",
+      "default": "Páginas de reseñas"
+    },
+    {
+      "type": "checkbox",
+      "id": "decimal_comma",
+      "label": "Usar coma decimal (4,9 en vez de 4.9)",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_date",
+      "label": "Mostrar la fecha de cada reseña",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "date_format",
+      "label": "Formato de fecha",
+      "default": "%d/%m/%Y"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_avatar",
+      "label": "Mostrar el icono junto al nombre",
+      "default": true
+    },
+
+    {
+      "type": "header",
+      "content": "Orden"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sort",
+      "label": "Mostrar el selector de orden",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "sort_label",
+      "label": "Texto accesible del selector",
+      "default": "Ordenar reseñas"
+    },
+    {
+      "type": "text",
+      "id": "sort_recent",
+      "label": "Opción: más recientes",
+      "default": "Más Recientes"
+    },
+    {
+      "type": "text",
+      "id": "sort_oldest",
+      "label": "Opción: más antiguas",
+      "default": "Más Antiguas"
+    },
+    {
+      "type": "text",
+      "id": "sort_high",
+      "label": "Opción: mejor valoradas",
+      "default": "Mejor Valoradas"
+    },
+    {
+      "type": "text",
+      "id": "sort_low",
+      "label": "Opción: peor valoradas",
+      "default": "Peor Valoradas"
+    },
+    {
+      "type": "range",
+      "id": "sort_size",
+      "min": 10,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del selector",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "pager_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de la paginación",
+      "default": 16
+    },
+
+    {
+      "type": "header",
+      "content": "Formulario"
+    },
+    {
+      "type": "text",
+      "id": "button_open_label",
+      "label": "Botón para abrir",
+      "default": "Escribe tu reseña"
+    },
+    {
+      "type": "text",
+      "id": "button_close_label",
+      "label": "Botón para cerrar",
+      "default": "Cancelar reseña"
+    },
+    {
+      "type": "text",
+      "id": "button_submit_label",
+      "label": "Botón de envío",
+      "default": "Enviar reseña"
+    },
+    {
+      "type": "text",
+      "id": "form_title",
+      "label": "Título del formulario",
+      "default": "Escribe tu reseña"
+    },
+    {
+      "type": "text",
+      "id": "label_rating",
+      "label": "Etiqueta de la puntuación",
+      "default": "¿Cómo calificarías tu experiencia?"
+    },
+    {
+      "type": "text",
+      "id": "label_title",
+      "label": "Etiqueta del título",
+      "default": "Escribe un título para tu reseña (¡Sé breve y claro!)"
+    },
+    {
+      "type": "text",
+      "id": "placeholder_title",
+      "label": "Marcador del título",
+      "default": "Dale un título a tu reseña"
+    },
+    {
+      "type": "range",
+      "id": "title_maxlength",
+      "min": 20,
+      "max": 200,
+      "step": 10,
+      "label": "Máximo de caracteres del título",
+      "default": 100
+    },
+    {
+      "type": "text",
+      "id": "label_body",
+      "label": "Etiqueta del texto",
+      "default": "Cuéntanos sobre tu experiencia. ¿Qué te gustó? ¿Qué podríamos mejorar?"
+    },
+    {
+      "type": "text",
+      "id": "placeholder_body",
+      "label": "Marcador del texto",
+      "default": "Cuéntanos cómo te ha ayudado o por qué lo recomendarías a otros"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_video_field",
+      "label": "Pedir enlace de vídeo",
+      "info": "El formulario nativo de Shopify no admite subir archivos, así que en lugar de una caja de subida que descarte la imagen se pide un enlace. Para subida de fotos hace falta una app de reseñas.",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "label_video",
+      "label": "Etiqueta del vídeo",
+      "default": "Enlace a un vídeo (opcional)"
+    },
+    {
+      "type": "text",
+      "id": "placeholder_video",
+      "label": "Marcador del vídeo",
+      "default": "https://"
+    },
+    {
+      "type": "text",
+      "id": "label_name",
+      "label": "Etiqueta del nombre",
+      "default": "Nombre"
+    },
+    {
+      "type": "text",
+      "id": "placeholder_name",
+      "label": "Marcador del nombre",
+      "default": "Ingresa tu nombre"
+    },
+    {
+      "type": "text",
+      "id": "label_email",
+      "label": "Etiqueta del correo",
+      "default": "Dirección de correo electrónico"
+    },
+    {
+      "type": "text",
+      "id": "placeholder_email",
+      "label": "Marcador del correo",
+      "default": "Tu dirección de correo electrónico"
+    },
+    {
+      "type": "richtext",
+      "id": "legal_text",
+      "label": "Aviso legal",
+      "default": "<p>Cómo usamos tus datos: solo te contactaremos sobre la reseña que dejaste, y solo si es necesario.</p>"
+    },
+    {
+      "type": "text",
+      "id": "error_rating",
+      "label": "Aviso si falta la puntuación",
+      "default": "Elige cuántas estrellas le das antes de enviar."
+    },
+    {
+      "type": "color",
+      "id": "error_color",
+      "label": "Color del aviso de error",
+      "default": "#c0392b"
+    },
+    {
+      "type": "range",
+      "id": "form_max_width",
+      "min": 320,
+      "max": 900,
+      "step": 10,
+      "unit": "px",
+      "label": "Ancho del formulario",
+      "default": 520
+    },
+    {
+      "type": "range",
+      "id": "form_title_size",
+      "min": 14,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del título del formulario",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "form_star_size",
+      "min": 16,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de las estrellas del formulario",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "label_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de las etiquetas",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "field_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del texto de los campos",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "legal_size",
+      "min": 9,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del aviso legal",
+      "default": 13
+    },
+    {
+      "type": "color",
+      "id": "field_bg",
+      "label": "Fondo de los campos",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "field_border_color",
+      "label": "Borde de los campos",
+      "default": "#c9c9c9"
+    },
+    {
+      "type": "range",
+      "id": "field_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo de los campos",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "field_padding_y",
+      "min": 6,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Alto interior de los campos",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "field_padding_x",
+      "min": 6,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Sangría lateral de los campos",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "textarea_height",
+      "min": 80,
+      "max": 400,
+      "step": 10,
+      "unit": "px",
+      "label": "Alto del área de texto",
+      "default": 160
+    },
+
+    {
+      "type": "header",
+      "content": "Aviso de envío"
+    },
+    {
+      "type": "text",
+      "id": "dialog_title",
+      "label": "Título",
+      "default": "¡Reseña enviada!"
+    },
+    {
+      "type": "textarea",
+      "id": "dialog_text",
+      "label": "Texto",
+      "default": "Gracias por contarnos tu experiencia. La revisamos y la publicamos en cuanto esté lista."
+    },
+    {
+      "type": "text",
+      "id": "dialog_button",
+      "label": "Botón",
+      "default": "Cerrar"
+    },
+    {
+      "type": "color",
+      "id": "dialog_bg",
+      "label": "Fondo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "dialog_color",
+      "label": "Color del texto",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "dialog_icon_bg",
+      "label": "Fondo del icono",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "dialog_icon_color",
+      "label": "Color del icono",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "dialog_icon_size",
+      "min": 32,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Tamaño del icono",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "dialog_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "dialog_title_size",
+      "min": 14,
+      "max": 42,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del título",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "dialog_text_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del texto",
+      "default": 15
+    },
+
+    {
+      "type": "header",
+      "content": "Diseño general"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color del texto",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Color del texto secundario",
+      "default": "#8a8a8a"
+    },
+    {
+      "type": "color",
+      "id": "line_color",
+      "label": "Color de las líneas",
+      "default": "#e2e2e2"
+    },
+    {
+      "type": "color",
+      "id": "star_color",
+      "label": "Color de las estrellas",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "star_off_color",
+      "label": "Color de las estrellas vacías",
+      "default": "#d8d8d8"
+    },
+    {
+      "type": "range",
+      "id": "star_gap",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre estrellas",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "mobile_breakpoint",
+      "min": 480,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "label": "Punto de cambio a móvil",
+      "default": 750
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 0,
+      "max": 1600,
+      "step": 20,
+      "unit": "px",
+      "label": "Ancho máximo del contenido",
+      "default": 1100
+    },
+    {
+      "type": "range",
+      "id": "transition_ms",
+      "min": 0,
+      "max": 800,
+      "step": 25,
+      "unit": "ms",
+      "label": "Duración de las transiciones",
+      "default": 300
+    },
+    {
+      "type": "range",
+      "id": "padding_top_d",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding superior — PC",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_d",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding inferior — PC",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_left_d",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding izquierdo — PC",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_right_d",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding derecho — PC",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_top_m",
+      "min": 0,
+      "max": 140,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding superior — Móvil",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_m",
+      "min": 0,
+      "max": 140,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding inferior — Móvil",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "padding_left_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding izquierdo — Móvil",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding derecho — Móvil",
+      "default": 20
+    },
+
+    {
+      "type": "header",
+      "content": "Botón"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Fondo",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Color del texto",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_hover",
+      "label": "Fondo al pasar el ratón",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "button_color_hover",
+      "label": "Color del texto al pasar el ratón",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "button_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "range",
+      "id": "button_size_d",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "button_size_m",
+      "min": 9,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "button_padding_y",
+      "min": 6,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Alto interior",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "button_padding_x",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Sangría lateral",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "button_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo",
+      "default": 30
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía"
+    },
+    {
+      "type": "select",
+      "id": "heading_font",
+      "label": "Fuente de los títulos",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "heading_font_custom",
+      "label": "Font-family personalizada de títulos",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "select",
+      "id": "body_font",
+      "label": "Fuente del texto",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "body_font_custom",
+      "label": "Font-family personalizada del texto",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Grosor del título",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color del título",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_d",
+      "min": 16,
+      "max": 70,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del título — PC",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "heading_size_m",
+      "min": 14,
+      "max": 44,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del título — Móvil",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen bajo el título — PC",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen bajo el título — Móvil",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "summary_size_d",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del resumen — PC",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "summary_size_m",
+      "min": 9,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del resumen — Móvil",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "summary_gap_d",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación del resumen — PC",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "summary_gap_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación del resumen — Móvil",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "summary_padding_bottom_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Espacio bajo el resumen — PC",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "summary_padding_bottom_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Espacio bajo el resumen — Móvil",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "star_size_summary_d",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Estrellas del resumen — PC",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "star_size_summary_m",
+      "min": 10,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Estrellas del resumen — Móvil",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "star_size_item_d",
+      "min": 10,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "label": "Estrellas de cada reseña — PC",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "star_size_item_m",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Estrellas de cada reseña — Móvil",
+      "default": 14
+    },
+
+    {
+      "type": "header",
+      "content": "Ficha de reseña"
+    },
+    {
+      "type": "range",
+      "id": "author_col_width_d",
+      "min": 140,
+      "max": 480,
+      "step": 10,
+      "unit": "px",
+      "label": "Ancho de la columna del autor — PC",
+      "default": 300
+    },
+    {
+      "type": "range",
+      "id": "item_gap_d",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre columnas — PC",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "item_gap_m",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre columnas — Móvil",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "item_padding_y_d",
+      "min": 8,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Alto interior de la ficha — PC",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "item_padding_y_m",
+      "min": 8,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Alto interior de la ficha — Móvil",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "name_size_d",
+      "min": 10,
+      "max": 26,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del nombre — PC",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "name_size_m",
+      "min": 9,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del nombre — Móvil",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "review_title_size_d",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del título de reseña — PC",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "review_title_size_m",
+      "min": 9,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del título de reseña — Móvil",
+      "default": 15
+    },
+    {
+      "type": "select",
+      "id": "review_title_weight",
+      "label": "Grosor del título de reseña",
+      "options": [
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "range",
+      "id": "review_body_size_d",
+      "min": 10,
+      "max": 26,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del texto — PC",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "review_body_size_m",
+      "min": 9,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del texto — Móvil",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "review_body_line_height",
+      "min": 1,
+      "max": 2.4,
+      "step": 0.1,
+      "label": "Interlineado del texto",
+      "default": 1.6
+    },
+    {
+      "type": "range",
+      "id": "avatar_size_d",
+      "min": 20,
+      "max": 64,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del icono de autor — PC",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "avatar_size_m",
+      "min": 18,
+      "max": 56,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del icono de autor — Móvil",
+      "default": 28
+    },
+    {
+      "type": "color",
+      "id": "avatar_bg",
+      "label": "Fondo del icono de autor",
+      "default": "#f0f0f0"
+    },
+    {
+      "type": "color",
+      "id": "avatar_color",
+      "label": "Color del icono de autor",
+      "default": "#555555"
+    },
+    {
+      "type": "color",
+      "id": "badge_bg",
+      "label": "Fondo de la etiqueta de verificado",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "badge_color",
+      "label": "Color de la etiqueta de verificado",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "badge_size",
+      "min": 8,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de la etiqueta",
+      "default": 11
+    },
+    {
+      "type": "range",
+      "id": "badge_radius",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo de la etiqueta",
+      "default": 4
+    }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Reseña",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Respaldo para pocas reseñas. Con más de 50 hay que usar metaobjects: es el límite de bloques de Shopify. Publica solo reseñas de clientes reales."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Nombre"
+        },
+        {
+          "type": "text",
+          "id": "place",
+          "label": "Lugar"
+        },
+        {
+          "type": "text",
+          "id": "flag",
+          "label": "Bandera (emoji)"
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "label": "Estrellas",
+          "default": 5
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Título"
+        },
+        {
+          "type": "textarea",
+          "id": "body",
+          "label": "Texto"
+        },
+        {
+          "type": "text",
+          "id": "date",
+          "label": "Fecha",
+          "info": "Formato AAAA-MM-DD. Se usa para ordenar."
+        },
+        {
+          "type": "checkbox",
+          "id": "verified",
+          "label": "Compra verificada",
+          "info": "Márcalo solo si has comprobado que esta persona compró el producto.",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Reseñas"
+    }
+  ]
+}
+{% endschema %}
