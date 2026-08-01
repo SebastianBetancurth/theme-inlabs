@@ -1,0 +1,1689 @@
+{%- comment -%}
+  ============================================================================
+  SECCIÓN: Barra fija de compra (sticky add to cart)
+  Tema: Dawn / Online Store 2.0
+  Ruta: sections/custom-sticky-atc.liquid
+
+  Móvil  -> barra fija al fondo de la pantalla: píldora con la etiqueta y el
+            precio (más el precio tachado si hay descuento) y, debajo, una
+            fila de sellos con icono.
+  PC     -> no existe. Se apaga con CSS, no con JS, para que nunca aparezca
+            un parpadeo antes de que cargue el script.
+
+  APARECE SOLO CUANDO YA HAS PASADO EL BOTÓN PRINCIPAL.
+  Se vigila el botón de compra real con un IntersectionObserver: la barra sale
+  cuando ese botón queda por encima del borde superior de la pantalla y se
+  esconde en cuanto vuelve a estar a la vista. Así nunca hay dos botones de
+  compra visibles al mismo tiempo.
+
+  ESTA SECCIÓN NO LLEVA <form> PROPIO. A PROPÓSITO.
+  Es el punto donde casi todos los sticky se rompen. Duplicar el formulario de
+  producto crea un segundo campo name="id" y un segundo botón name="add" en la
+  página; Dawn y la mayoría de apps de suscripción, descuentos o bundles
+  engancham el PRIMER formulario que encuentran, así que a partir de ahí una de
+  las dos compras deja de aplicar la lógica correcta y el bug es dificilísimo
+  de encontrar. Aquí, en modo "Añadir al carrito", lo que se hace es pulsar el
+  botón real que ya existe en la página. Todo lo que ese botón sabe hacer
+  (cantidad, plan de suscripción, propiedades de línea, apertura del cajón,
+  mensajes de error) se hereda gratis. El modo AJAX queda como alternativa para
+  temas donde el botón no exista.
+
+  DOS AVISOS DE POSICIONAMIENTO:
+  1. position:fixed deja de ser relativo a la pantalla si algún elemento padre
+     tiene transform, filter, perspective o contain:paint. Coloca la sección
+     como hija directa del template de producto, no dentro de otra sección o
+     de un contenedor de app.
+  2. El iPhone tiene la barra de gestos abajo. El relleno inferior suma
+     env(safe-area-inset-bottom) para que el botón no quede debajo de ella.
+  ============================================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign bp = s.mobile_breakpoint
+  assign bp_max = bp | minus: 1
+
+  # El picker manda; si está vacío se usa el producto de la página.
+  assign p = s.product | default: product
+  assign cv = p.selected_or_first_available_variant
+
+  case s.label_font
+    when 'thin2'
+      assign label_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign label_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign label_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign label_stack = 'var(--font-body-family)'
+    else
+      assign label_stack = s.label_font_custom
+  endcase
+
+  case s.badge_font
+    when 'thin2'
+      assign badge_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign badge_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign badge_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign badge_stack = 'var(--font-body-family)'
+    else
+      assign badge_stack = label_stack
+  endcase
+
+  if s.bar_max_width == 0
+    assign bar_max_w = 'none'
+  else
+    assign bar_max_w = s.bar_max_width | append: 'px'
+  endif
+
+  if s.label_uppercase
+    assign label_transform = 'uppercase'
+  else
+    assign label_transform = 'none'
+  endif
+
+  # Con solo una variante no hace falta vigilar cambios de selector.
+  assign multi = false
+  if p.variants.size > 1
+    assign multi = true
+  endif
+-%}
+
+{%- comment -%}
+  Mapa de variantes: id -> precio, precio tachado y disponibilidad, ya con el
+  formato de moneda de la tienda resuelto por Liquid. Se inyecta como JSON en
+  lugar de calcularse en JavaScript para que el símbolo, los separadores y la
+  divisa activa sean siempre los correctos, incluso con multidivisa.
+{%- endcomment -%}
+{%- capture variants_json -%}
+{
+{%- for v in p.variants -%}
+  "{{ v.id }}": {
+    "price": {{ v.price | money | json }},
+    "compare": {%- if v.compare_at_price > v.price -%}{{ v.compare_at_price | money | json }}{%- else -%}null{%- endif -%},
+    "available": {{ v.available | json }}
+  }{%- unless forloop.last -%},{%- endunless -%}
+{%- endfor -%}
+}
+{%- endcapture -%}
+
+{%- style -%}
+  @font-face {
+    font-family: 'Helvetica neue';
+    src: url('{{ 'HelveticaNeueCyr-Light.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'thin2';
+    src: url('{{ 'lawrence-regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ================= Variables ================= */
+  .zsa-{{ section.id }} {
+    --zs-z: {{ s.z_index }};
+    --zs-bg: {{ s.bar_bg }};
+    --zs-max-w: {{ bar_max_w }};
+    --zs-radius-top: {{ s.bar_radius_top }}px;
+    --zs-border-w: {{ s.bar_border_width }}px;
+    --zs-border-c: {{ s.bar_border_color }};
+    --zs-shadow: {% if s.bar_shadow > 0 %}0 -{{ s.bar_shadow }}px {{ s.bar_shadow | times: 2 }}px rgba(0, 0, 0, {{ s.bar_shadow_opacity | divided_by: 100.0 }}){% else %}none{% endif %};
+    --zs-pt: {{ s.bar_padding_top }}px;
+    --zs-pb: {{ s.bar_padding_bottom }}px;
+    --zs-px: {{ s.bar_padding_x }}px;
+    --zs-gap: {{ s.bar_inner_gap }}px;
+
+    --zs-btn-bg: {{ s.btn_bg }};
+    --zs-btn-bg-active: {{ s.btn_bg_active }};
+    --zs-btn-color: {{ s.btn_color }};
+    --zs-btn-h: {{ s.btn_height }}px;
+    --zs-btn-radius: {{ s.btn_radius }}px;
+    --zs-btn-border-w: {{ s.btn_border_width }}px;
+    --zs-btn-border-c: {{ s.btn_border_color }};
+    --zs-btn-px: {{ s.btn_padding_x }}px;
+
+    --zs-label-font: {{ label_stack }};
+    --zs-label-size: {{ s.label_size }}px;
+    --zs-label-weight: {{ s.label_weight }};
+    --zs-label-ls: {{ s.label_letter_spacing }}px;
+    --zs-label-transform: {{ label_transform }};
+    --zs-label-gap: {{ s.label_price_gap }}px;
+
+    --zs-price-size: {{ s.price_size }}px;
+    --zs-price-weight: {{ s.price_weight }};
+    --zs-price-color: {{ s.price_color }};
+    --zs-compare-size: {{ s.compare_size }}px;
+    --zs-compare-color: {{ s.compare_color }};
+    --zs-compare-gap: {{ s.compare_gap }}px;
+
+    --zs-badge-font: {{ badge_stack }};
+    --zs-badge-size: {{ s.badge_size }}px;
+    --zs-badge-weight: {{ s.badge_weight }};
+    --zs-badge-color: {{ s.badge_color }};
+    --zs-badge-gap: {{ s.badge_gap }}px;
+    --zs-badge-icon: {{ s.badge_icon_size }}px;
+    --zs-badge-icon-gap: {{ s.badge_icon_gap }}px;
+    --zs-badge-icon-color: {{ s.badge_icon_color }};
+    --zs-badge-row-gap: {{ s.badge_row_gap }}px;
+
+    --zs-anim: {{ s.transition_ms }}ms;
+  }
+
+  /* ================= Solo móvil =================
+     El apagado en PC se hace aquí, en CSS. Si se dejara al JavaScript la barra
+     se pintaría durante un instante en escritorio antes de esconderse. */
+  .zsa-wrap {
+    display: none;
+  }
+
+  @media screen and (max-width: {{ bp_max }}px) {
+    .zsa-wrap {
+      display: block;
+    }
+  }
+
+  /* ================= Barra ================= */
+  .zsa {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--zs-z);
+    box-sizing: border-box;
+    background-color: var(--zs-bg);
+    border-top: var(--zs-border-w) solid var(--zs-border-c);
+    border-radius: var(--zs-radius-top) var(--zs-radius-top) 0 0;
+    box-shadow: var(--zs-shadow);
+    padding: var(--zs-pt) var(--zs-px) calc(var(--zs-pb) + env(safe-area-inset-bottom, 0px));
+
+    /* Estado oculto. visibility además de opacity para que los botones no
+       sean pulsables ni alcanzables con el teclado mientras no se ven. */
+    transform: translateY(110%);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      transform var(--zs-anim) cubic-bezier(0.33, 1, 0.68, 1),
+      opacity var(--zs-anim) ease,
+      visibility var(--zs-anim);
+  }
+
+  .zsa.is-visible {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .zsa__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--zs-gap);
+    max-width: var(--zs-max-w);
+    margin-inline: auto;
+  }
+
+  /* ================= Botón ================= */
+  .zsa__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--zs-label-gap);
+    width: 100%;
+    min-height: var(--zs-btn-h);
+    padding: 4px var(--zs-btn-px);
+    box-sizing: border-box;
+    border: var(--zs-btn-border-w) solid var(--zs-btn-border-c);
+    border-radius: var(--zs-btn-radius);
+    background-color: var(--zs-btn-bg);
+    color: var(--zs-btn-color);
+    font-family: var(--zs-label-font);
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--zs-anim) ease, opacity var(--zs-anim) ease;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .zsa__btn:active {
+    background-color: var(--zs-btn-bg-active);
+  }
+
+  .zsa__btn:focus-visible {
+    outline: 2px solid var(--zs-btn-bg);
+    outline-offset: 2px;
+  }
+
+  .zsa__btn[disabled] {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  .zsa__label {
+    font-size: var(--zs-label-size);
+    font-weight: var(--zs-label-weight);
+    letter-spacing: var(--zs-label-ls);
+    text-transform: var(--zs-label-transform);
+    line-height: 1.2;
+  }
+
+  .zsa__prices {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--zs-compare-gap);
+    line-height: 1.2;
+  }
+
+  .zsa__price {
+    font-size: var(--zs-price-size);
+    font-weight: var(--zs-price-weight);
+    color: var(--zs-price-color);
+    white-space: nowrap;
+  }
+
+  .zsa__compare {
+    font-size: var(--zs-compare-size);
+    color: var(--zs-compare-color);
+    text-decoration: line-through;
+    white-space: nowrap;
+  }
+
+  .zsa__compare[hidden],
+  .zsa__prices[hidden] {
+    display: none;
+  }
+
+  /* Girito de carga mientras se añade al carrito. */
+  .zsa__spinner {
+    display: none;
+    width: 1em;
+    height: 1em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: zsa-spin 0.6s linear infinite;
+  }
+
+  .zsa__btn.is-loading .zsa__spinner {
+    display: block;
+  }
+
+  .zsa__btn.is-loading .zsa__label,
+  .zsa__btn.is-loading .zsa__prices {
+    display: none;
+  }
+
+  @keyframes zsa-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ================= Sellos ================= */
+  .zsa__badges {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    column-gap: var(--zs-badge-gap);
+    row-gap: var(--zs-badge-row-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .zsa__badge {
+    display: flex;
+    align-items: center;
+    gap: var(--zs-badge-icon-gap);
+    font-family: var(--zs-badge-font);
+    font-size: var(--zs-badge-size);
+    font-weight: var(--zs-badge-weight);
+    color: var(--zs-badge-color);
+    line-height: 1.2;
+  }
+
+  .zsa__badge-icon {
+    flex: 0 0 auto;
+    display: block;
+    width: var(--zs-badge-icon);
+    height: var(--zs-badge-icon);
+    object-fit: contain;
+    color: var(--zs-badge-icon-color);
+  }
+
+  .zsa__badge-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* El camión por defecto se dibuja con trazo, así hereda el color. */
+  .zsa__badge-icon svg [data-zsa-stroke] {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ================= Aviso de añadido ================= */
+  .zsa__toast {
+    position: absolute;
+    left: var(--zs-px);
+    right: var(--zs-px);
+    bottom: calc(100% + 8px);
+    padding: 10px 14px;
+    box-sizing: border-box;
+    border-radius: {{ s.btn_radius }}px;
+    background-color: {{ s.toast_bg }};
+    color: {{ s.toast_color }};
+    font-family: var(--zs-badge-font);
+    font-size: var(--zs-badge-size);
+    text-align: center;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity var(--zs-anim) ease, transform var(--zs-anim) ease;
+    pointer-events: none;
+  }
+
+  .zsa__toast.is-on {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .zsa-{{ section.id }} { --zs-anim: 1ms; }
+    .zsa__spinner { animation-duration: 1.6s; }
+  }
+{%- endstyle -%}
+
+<div class="zsa-wrap zsa-{{ section.id }}">
+  <zzen-sticky-atc
+    class="zsa"
+    data-action="{{ s.action }}"
+    data-add-method="{{ s.add_method }}"
+    data-form-selector="{{ s.form_selector | escape }}"
+    data-submit-selector="{{ s.submit_selector | escape }}"
+    data-trigger="{{ s.trigger }}"
+    data-trigger-selector="{{ s.trigger_selector | escape }}"
+    data-trigger-offset="{{ s.trigger_offset }}"
+    data-trigger-px="{{ s.trigger_px }}"
+    data-trigger-pct="{{ s.trigger_pct }}"
+    data-hide-selector="{{ s.hide_selector | escape }}"
+    data-scroll-offset="{{ s.scroll_offset }}"
+    data-after-add="{{ s.after_add }}"
+    data-use-main-quantity="{{ s.use_main_quantity }}"
+    data-pad-body="{{ s.pad_body }}"
+    data-cart-add-url="{{ routes.cart_add_url }}"
+    data-cart-url="{{ routes.cart_url }}"
+    data-default-id="{{ cv.id }}"
+    data-multi-variant="{{ multi }}"
+    data-label="{{ s.label | escape }}"
+    data-sold-out-label="{{ s.sold_out_label | escape }}"
+    data-toast-text="{{ s.toast_text | escape }}"
+    data-error-text="{{ s.error_text | escape }}"
+    data-toast-ms="{{ s.toast_ms }}"
+  >
+    <script type="application/json" data-zsa-variants>
+      {{ variants_json }}
+    </script>
+
+    <div class="zsa__inner">
+      {%- comment -%}
+        En modo enlace es un <a> de verdad: se puede abrir en pestaña nueva y
+        los rastreadores lo leen como enlace. En los otros dos modos es un
+        <button> porque dispara una acción, no una navegación.
+      {%- endcomment -%}
+      {%- if s.action == 'link' -%}
+        <a
+          class="zsa__btn"
+          data-zsa-btn
+          href="{{ s.link_url | default: p.url | default: '#' }}"
+        >
+      {%- else -%}
+        <button class="zsa__btn" data-zsa-btn type="button">
+      {%- endif -%}
+
+        <span class="zsa__spinner" aria-hidden="true"></span>
+
+        <span class="zsa__label" data-zsa-label>
+          {{- s.label -}}
+        </span>
+
+        {%- if s.show_price -%}
+          <span class="zsa__prices" data-zsa-prices>
+            <span class="zsa__price" data-zsa-price>{{ cv.price | money }}</span>
+            {%- if s.show_compare -%}
+              <span
+                class="zsa__compare"
+                data-zsa-compare
+                {% unless cv.compare_at_price > cv.price %}hidden{% endunless %}
+              >
+                {%- if cv.compare_at_price > cv.price -%}
+                  {{- cv.compare_at_price | money -}}
+                {%- endif -%}
+              </span>
+            {%- endif -%}
+          </span>
+        {%- endif -%}
+
+      {%- if s.action == 'link' -%}
+        </a>
+      {%- else -%}
+        </button>
+      {%- endif -%}
+
+      {%- if section.blocks.size > 0 -%}
+        <ul class="zsa__badges">
+          {%- for block in section.blocks -%}
+            {%- liquid
+              assign icon_svg = block.settings.icon_svg
+              assign icon_img = block.settings.icon
+            -%}
+            <li class="zsa__badge" {{ block.shopify_attributes }}>
+              {%- if icon_svg != blank -%}
+                <span class="zsa__badge-icon" aria-hidden="true">{{ icon_svg }}</span>
+              {%- elsif icon_img != blank -%}
+                <img
+                  class="zsa__badge-icon"
+                  src="{{ icon_img | image_url: width: 80 }}"
+                  width="{{ icon_img.width }}"
+                  height="{{ icon_img.height }}"
+                  alt=""
+                  aria-hidden="true"
+                  loading="lazy"
+                  decoding="async"
+                >
+              {%- elsif block.settings.icon_preset != 'none' -%}
+                <span class="zsa__badge-icon" aria-hidden="true">
+                  {%- case block.settings.icon_preset -%}
+                    {%- when 'truck' -%}
+                      <svg viewBox="0 0 24 24" focusable="false">
+                        <path data-zsa-stroke d="M1.5 6h11v9.5h-11z"></path>
+                        <path data-zsa-stroke d="M12.5 9.5h5l3 3v3h-8z"></path>
+                        <circle data-zsa-stroke cx="6" cy="18" r="2"></circle>
+                        <circle data-zsa-stroke cx="17" cy="18" r="2"></circle>
+                        <path data-zsa-stroke d="M8 18h7"></path>
+                      </svg>
+                    {%- when 'return' -%}
+                      <svg viewBox="0 0 24 24" focusable="false">
+                        <path data-zsa-stroke d="M3.5 9.5h11.5a4.5 4.5 0 0 1 0 9H9"></path>
+                        <path data-zsa-stroke d="M7 5.5 3 9.5l4 4"></path>
+                      </svg>
+                    {%- when 'shield' -%}
+                      <svg viewBox="0 0 24 24" focusable="false">
+                        <path data-zsa-stroke d="M12 2.5 20 5.5v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10v-6z"></path>
+                        <path data-zsa-stroke d="M8.5 12l2.5 2.5 4.5-5"></path>
+                      </svg>
+                    {%- when 'leaf' -%}
+                      <svg viewBox="0 0 24 24" focusable="false">
+                        <path data-zsa-stroke d="M20 3.5c0 9-5.5 13-11 13a5.5 5.5 0 0 1 0-11c4 0 7-1 11-2z"></path>
+                        <path data-zsa-stroke d="M4 20.5C6 14 11 9.5 16.5 7.5"></path>
+                      </svg>
+                    {%- when 'lock' -%}
+                      <svg viewBox="0 0 24 24" focusable="false">
+                        <path data-zsa-stroke d="M5 10.5h14v10H5z"></path>
+                        <path data-zsa-stroke d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path>
+                      </svg>
+                    {%- when 'clock' -%}
+                      <svg viewBox="0 0 24 24" focusable="false">
+                        <circle data-zsa-stroke cx="12" cy="12" r="8.5"></circle>
+                        <path data-zsa-stroke d="M12 7v5.5l3.5 2"></path>
+                      </svg>
+                  {%- endcase -%}
+                </span>
+              {%- endif -%}
+
+              {%- if block.settings.text != blank -%}
+                <span>{{ block.settings.text }}</span>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+
+    <div class="zsa__toast" data-zsa-toast role="status" aria-live="polite"></div>
+  </zzen-sticky-atc>
+</div>
+
+<script>
+  if (!customElements.get('zzen-sticky-atc')) {
+    customElements.define(
+      'zzen-sticky-atc',
+      class ZzenStickyAtc extends HTMLElement {
+        connectedCallback() {
+          const d = this.dataset;
+
+          this.action = d.action || 'add';
+          this.addMethod = d.addMethod || 'click';
+          this.afterAdd = d.afterAdd || 'drawer';
+          this.useMainQty = d.useMainQuantity === 'true';
+          this.padBody = d.padBody === 'true';
+          this.multi = d.multiVariant === 'true';
+          this.labelText = d.label || '';
+          this.soldOutText = d.soldOutLabel || '';
+          this.toastMs = parseInt(d.toastMs, 10) || 2200;
+
+          this.btn = this.querySelector('[data-zsa-btn]');
+          this.labelEl = this.querySelector('[data-zsa-label]');
+          this.priceEl = this.querySelector('[data-zsa-price]');
+          this.compareEl = this.querySelector('[data-zsa-compare]');
+          this.pricesEl = this.querySelector('[data-zsa-prices]');
+          this.toastEl = this.querySelector('[data-zsa-toast]');
+
+          this.variants = {};
+          const raw = this.querySelector('[data-zsa-variants]');
+          if (raw) {
+            try {
+              this.variants = JSON.parse(raw.textContent);
+            } catch (e) {
+              this.variants = {};
+            }
+          }
+
+          this.setupReveal();
+          this.setupActions();
+          if (this.multi) this.watchVariant();
+          if (this.padBody) this.setupBodyPadding();
+
+          this.syncVariant();
+        }
+
+        disconnectedCallback() {
+          if (this.io) this.io.disconnect();
+          if (this.hideIo) this.hideIo.disconnect();
+          if (this.ro) this.ro.disconnect();
+          if (this._onScroll) window.removeEventListener('scroll', this._onScroll);
+          if (this._onChange) document.removeEventListener('change', this._onChange, true);
+          if (this._mq && this._onMq) this._mq.removeEventListener('change', this._onMq);
+          if (this.padBody) document.body.style.paddingBottom = '';
+        }
+
+        /* ------------------------------------------------------------------
+           Cuándo se muestra
+        ------------------------------------------------------------------ */
+        setupReveal() {
+          const d = this.dataset;
+          const mode = d.trigger || 'after_cta';
+
+          // En el editor de temas la barra se queda fija a la vista: si no,
+          // sería imposible ajustar colores y tamaños sin scrollear a ciegas.
+          if (window.Shopify && window.Shopify.designMode) {
+            this.show(true);
+            document.addEventListener('shopify:section:select', () => this.show(true));
+            document.addEventListener('shopify:block:select', () => this.show(true));
+            if (mode !== 'always') return;
+          }
+
+          if (mode === 'always') {
+            this.show(true);
+            return;
+          }
+
+          if (mode === 'after_cta') {
+            const target = this.findTarget(d.triggerSelector);
+
+            // Sin referencia no se puede vigilar nada: se cae al modo por
+            // píxeles en lugar de dejar la barra muerta.
+            if (!target) {
+              this.revealByScroll(parseInt(d.triggerPx, 10) || 600, null);
+              return;
+            }
+
+            const offset = parseInt(d.triggerOffset, 10) || 0;
+            this.io = new IntersectionObserver(
+              (entries) => {
+                const e = entries[0];
+                const limit = e.rootBounds ? e.rootBounds.top : 0;
+                // Solo cuando el objetivo ya quedó por encima de la pantalla.
+                const passed = !e.isIntersecting && e.boundingClientRect.bottom <= limit;
+                this.show(passed);
+              },
+              { threshold: 0, rootMargin: offset + 'px 0px 0px 0px' }
+            );
+            this.io.observe(target);
+          } else if (mode === 'px') {
+            this.revealByScroll(parseInt(d.triggerPx, 10) || 600, null);
+          } else if (mode === 'pct') {
+            this.revealByScroll(null, parseInt(d.triggerPct, 10) || 25);
+          }
+
+          // Ocultado extra opcional, normalmente para el pie de página.
+          const hideSel = (d.hideSelector || '').trim();
+          if (hideSel) {
+            const hideEl = document.querySelector(hideSel);
+            if (hideEl) {
+              this.hideIo = new IntersectionObserver(
+                (entries) => {
+                  this.blocked = entries[0].isIntersecting;
+                  this.show(this.wanted);
+                },
+                { threshold: 0 }
+              );
+              this.hideIo.observe(hideEl);
+            }
+          }
+        }
+
+        findTarget(selector) {
+          const list = (selector || '').split(',');
+          for (let i = 0; i < list.length; i++) {
+            const sel = list[i].trim();
+            if (!sel) continue;
+            let el;
+            try {
+              el = document.querySelector(sel);
+            } catch (e) {
+              continue;
+            }
+            // Nunca vigilar algo dentro de esta misma barra.
+            if (el && !this.contains(el)) return el;
+          }
+          return null;
+        }
+
+        revealByScroll(px, pct) {
+          this._onScroll = () => {
+            if (this._raf) return;
+            this._raf = requestAnimationFrame(() => {
+              this._raf = null;
+              const y = window.scrollY || window.pageYOffset;
+              let limit = px;
+              if (limit === null) {
+                const total = Math.max(
+                  document.documentElement.scrollHeight - window.innerHeight,
+                  1
+                );
+                limit = (total * pct) / 100;
+              }
+              this.show(y > limit);
+            });
+          };
+          window.addEventListener('scroll', this._onScroll, { passive: true });
+          this._onScroll();
+        }
+
+        show(on) {
+          this.wanted = on;
+          const visible = on && !this.blocked;
+          this.classList.toggle('is-visible', visible);
+          this.setAttribute('aria-hidden', visible ? 'false' : 'true');
+          if (this.padBody) this.applyBodyPadding();
+        }
+
+        /* ------------------------------------------------------------------
+           Relleno inferior del body: evita que la barra tape el final de la
+           página (el pie, los avisos legales, un chat...).
+        ------------------------------------------------------------------ */
+        setupBodyPadding() {
+          this._mq = window.matchMedia('(max-width: {{ bp_max }}px)');
+          this._onMq = () => this.applyBodyPadding();
+          this._mq.addEventListener('change', this._onMq);
+
+          if ('ResizeObserver' in window) {
+            this.ro = new ResizeObserver(() => this.applyBodyPadding());
+            this.ro.observe(this);
+          }
+          this.applyBodyPadding();
+        }
+
+        applyBodyPadding() {
+          if (!this._mq || !this._mq.matches || !this.classList.contains('is-visible')) {
+            document.body.style.paddingBottom = '';
+            return;
+          }
+          document.body.style.paddingBottom = this.offsetHeight + 'px';
+        }
+
+        /* ------------------------------------------------------------------
+           Variante activa
+        ------------------------------------------------------------------ */
+        get form() {
+          // Se vuelve a buscar si el formulario cacheado ya no está en la
+          // página: la Section Rendering API lo reemplaza al cambiar variante.
+          if (this._form && this._form.isConnected) return this._form;
+          this._form = this.findTarget(this.dataset.formSelector);
+          return this._form;
+        }
+
+        currentId() {
+          const form = this.form;
+          if (form) {
+            const input = form.querySelector('[name="id"]');
+            if (input && input.value) return String(input.value);
+          }
+          return String(this.dataset.defaultId || '');
+        }
+
+        currentQty() {
+          if (!this.useMainQty) return 1;
+          const form = this.form;
+          const input = form && form.querySelector('[name="quantity"]');
+          const n = input ? parseInt(input.value, 10) : 1;
+          return n > 0 ? n : 1;
+        }
+
+        watchVariant() {
+          // Dawn actualiza el input oculto name="id" y lanza un change que
+          // burbujea. Se escucha en captura sobre document para que funcione
+          // igual si el formulario se ha vuelto a renderizar entero.
+          this._onChange = () => {
+            requestAnimationFrame(() => this.syncVariant());
+          };
+          document.addEventListener('change', this._onChange, true);
+
+          // Temas y apps que anuncian el cambio con un evento propio.
+          ['variant:change', 'variantChange', 'on:variant:change'].forEach((name) => {
+            document.addEventListener(name, this._onChange);
+          });
+        }
+
+        syncVariant() {
+          const v = this.variants[this.currentId()];
+          if (!v) return;
+
+          if (this.priceEl) this.priceEl.innerHTML = v.price;
+
+          if (this.compareEl) {
+            if (v.compare) {
+              this.compareEl.innerHTML = v.compare;
+              this.compareEl.hidden = false;
+            } else {
+              this.compareEl.innerHTML = '';
+              this.compareEl.hidden = true;
+            }
+          }
+
+          const soldOut = v.available === false;
+          if (this.labelEl) {
+            this.labelEl.textContent = soldOut && this.soldOutText
+              ? this.soldOutText
+              : this.labelText;
+          }
+          if (this.pricesEl) this.pricesEl.hidden = soldOut;
+          if (this.action === 'add' && this.btn && this.btn.tagName === 'BUTTON') {
+            this.btn.disabled = soldOut;
+          }
+        }
+
+        /* ------------------------------------------------------------------
+           Acción del botón
+        ------------------------------------------------------------------ */
+        setupActions() {
+          if (!this.btn || this.action === 'link') return;
+
+          this.btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (this.action === 'scroll') {
+              this.scrollToCta();
+            } else {
+              this.add();
+            }
+          });
+        }
+
+        scrollToCta() {
+          const target =
+            this.findTarget(this.dataset.triggerSelector) ||
+            this.findTarget(this.dataset.formSelector);
+          if (!target) return;
+
+          const offset = parseInt(this.dataset.scrollOffset, 10) || 0;
+          const top =
+            target.getBoundingClientRect().top + (window.scrollY || window.pageYOffset) - offset;
+          window.scrollTo({ top: top < 0 ? 0 : top, behavior: 'smooth' });
+
+          // Al llegar, se resalta el botón real para que quede claro dónde
+          // sigue el flujo. focus() sin preventScroll pelearía con el scroll
+          // suave que acabamos de lanzar.
+          const btn = this.findTarget(this.dataset.submitSelector);
+          if (btn && typeof btn.focus === 'function') {
+            setTimeout(() => btn.focus({ preventScroll: true }), 500);
+          }
+        }
+
+        async add() {
+          if (this.busy) return;
+
+          // Camino recomendado: pulsar el botón real. Hereda cantidad, plan de
+          // suscripción, campos de apps y el cajón del carrito del tema.
+          if (this.addMethod === 'click') {
+            const btn = this.findTarget(this.dataset.submitSelector);
+            if (btn && !btn.disabled) {
+              btn.click();
+              this.toast(this.dataset.toastText);
+              return;
+            }
+            // Si no hay botón que pulsar, se sigue por AJAX.
+          }
+
+          this.busy = true;
+          this.btn.classList.add('is-loading');
+
+          try {
+            const body = new FormData();
+            body.append('id', this.currentId());
+            body.append('quantity', this.currentQty());
+
+            // Pedir las secciones del cajón en la misma llamada evita un
+            // segundo viaje al servidor para refrescarlo.
+            const drawer = document.querySelector('cart-drawer');
+            if (drawer && typeof drawer.getSectionsToRender === 'function') {
+              body.append(
+                'sections',
+                drawer.getSectionsToRender().map((sec) => sec.id).join(',')
+              );
+              body.append('sections_url', window.location.pathname);
+            }
+
+            const res = await fetch((this.dataset.cartAddUrl || '/cart/add') + '.js', {
+              method: 'POST',
+              headers: { Accept: 'application/json' },
+              body: body,
+            });
+            const data = await res.json();
+
+            if (!res.ok || data.status) {
+              this.toast(data.description || data.message || this.dataset.errorText);
+            } else {
+              this.afterAddDone(data, drawer);
+            }
+          } catch (err) {
+            this.toast(this.dataset.errorText);
+          } finally {
+            this.busy = false;
+            this.btn.classList.remove('is-loading');
+          }
+        }
+
+        afterAddDone(data, drawer) {
+          if (this.afterAdd === 'cart') {
+            window.location.href = this.dataset.cartUrl || '/cart';
+            return;
+          }
+          if (this.afterAdd === 'checkout') {
+            window.location.href = '/checkout';
+            return;
+          }
+
+          if (this.afterAdd === 'drawer' && drawer && typeof drawer.renderContents === 'function') {
+            drawer.renderContents(data);
+            if (drawer.classList) drawer.classList.remove('is-empty');
+          } else {
+            this.refreshCartCount();
+          }
+
+          this.toast(this.dataset.toastText);
+
+          // Aviso para que el resto del tema y las apps se enteren.
+          document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
+        }
+
+        async refreshCartCount() {
+          // Sin cajón de carrito, al menos se actualiza el contador del icono.
+          const bubble = document.getElementById('cart-icon-bubble');
+          if (!bubble) return;
+          try {
+            const res = await fetch(window.location.pathname + '?section_id=cart-icon-bubble');
+            const html = await res.text();
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            const fresh = doc.querySelector('#cart-icon-bubble');
+            if (fresh) bubble.innerHTML = fresh.innerHTML;
+          } catch (e) {
+            /* el contador se pondrá al día en la siguiente carga */
+          }
+        }
+
+        toast(text) {
+          if (!this.toastEl || !text) return;
+          this.toastEl.textContent = text;
+          this.toastEl.classList.add('is-on');
+          clearTimeout(this._toastT);
+          this._toastT = setTimeout(() => {
+            this.toastEl.classList.remove('is-on');
+          }, this.toastMs);
+        }
+      }
+    );
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Barra fija de compra",
+  "tag": "section",
+  "class": "section-zsa",
+  "limit": 1,
+  "max_blocks": 4,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Solo se ve en móvil. Aparece cuando el visitante ya ha pasado el botón de compra principal y se esconde si vuelve a verlo. En el editor se queda siempre visible para que puedas ajustarla."
+    },
+
+    {
+      "type": "header",
+      "content": "Producto"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Producto",
+      "info": "Déjalo vacío en la página de producto: coge el producto que se está viendo. Solo hace falta si pones la barra en una landing."
+    },
+    {
+      "type": "range",
+      "id": "mobile_breakpoint",
+      "min": 480,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "label": "La barra se ve por debajo de",
+      "info": "Por encima de este ancho no aparece.",
+      "default": 750
+    },
+
+    {
+      "type": "header",
+      "content": "Qué hace el botón"
+    },
+    {
+      "type": "select",
+      "id": "action",
+      "label": "Acción al pulsar",
+      "options": [
+        { "value": "add", "label": "Añadir al carrito" },
+        { "value": "scroll", "label": "Subir al botón de compra principal" },
+        { "value": "link", "label": "Ir a una página" }
+      ],
+      "default": "add"
+    },
+    {
+      "type": "select",
+      "id": "add_method",
+      "label": "Cómo añade al carrito",
+      "info": "«Pulsar el botón real» es lo recomendado: reutiliza el formulario del producto, así respeta la cantidad, la suscripción y las apps instaladas. Usa AJAX solo si tu tema no tiene un botón de compra visible.",
+      "options": [
+        { "value": "click", "label": "Pulsar el botón real de la página" },
+        { "value": "ajax", "label": "AJAX propio" }
+      ],
+      "default": "click"
+    },
+    {
+      "type": "select",
+      "id": "after_add",
+      "label": "Después de añadir",
+      "info": "Solo aplica al método AJAX.",
+      "options": [
+        { "value": "drawer", "label": "Abrir el carrito lateral" },
+        { "value": "none", "label": "Quedarse en la página" },
+        { "value": "cart", "label": "Ir al carrito" },
+        { "value": "checkout", "label": "Ir directo al pago" }
+      ],
+      "default": "drawer"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_main_quantity",
+      "label": "Respetar la cantidad elegida arriba",
+      "info": "Si está desmarcado siempre añade 1 unidad.",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "Página de destino",
+      "info": "Solo para la acción «Ir a una página»."
+    },
+    {
+      "type": "range",
+      "id": "scroll_offset",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Margen al subir al botón principal",
+      "info": "Súbelo si tu cabecera fija tapa el botón al llegar.",
+      "default": 90
+    },
+
+    {
+      "type": "header",
+      "content": "Cuándo aparece"
+    },
+    {
+      "type": "select",
+      "id": "trigger",
+      "label": "Momento de aparición",
+      "options": [
+        { "value": "after_cta", "label": "Al pasar el botón de compra" },
+        { "value": "px", "label": "Tras bajar X píxeles" },
+        { "value": "pct", "label": "Tras bajar un % de la página" },
+        { "value": "always", "label": "Siempre visible" }
+      ],
+      "default": "after_cta"
+    },
+    {
+      "type": "text",
+      "id": "trigger_selector",
+      "label": "Elemento que se vigila",
+      "info": "Selector CSS del botón de compra principal. Los valores por defecto ya funcionan en Dawn. Puedes poner varios separados por comas: se usa el primero que exista.",
+      "default": ".product-form__buttons, product-form, .product-form__submit"
+    },
+    {
+      "type": "range",
+      "id": "trigger_offset",
+      "min": -200,
+      "max": 300,
+      "step": 10,
+      "unit": "px",
+      "label": "Ajuste fino de la aparición",
+      "info": "Positivo = aparece más tarde. Negativo = más pronto.",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "trigger_px",
+      "min": 100,
+      "max": 2000,
+      "step": 50,
+      "unit": "px",
+      "label": "Píxeles a bajar",
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "trigger_pct",
+      "min": 5,
+      "max": 90,
+      "step": 5,
+      "unit": "%",
+      "label": "Porcentaje de la página",
+      "default": 25
+    },
+    {
+      "type": "text",
+      "id": "hide_selector",
+      "label": "Esconder cuando se vea este elemento",
+      "info": "Opcional. Por ejemplo el pie de página, para que la barra no tape los enlaces legales. Déjalo vacío para no usarlo."
+    },
+    {
+      "type": "checkbox",
+      "id": "pad_body",
+      "label": "Reservar espacio al final de la página",
+      "info": "Añade un hueco del alto de la barra para que no tape el último contenido.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "transition_ms",
+      "min": 0,
+      "max": 800,
+      "step": 25,
+      "unit": "ms",
+      "label": "Duración de la animación",
+      "default": 300
+    },
+
+    {
+      "type": "header",
+      "content": "Selectores avanzados"
+    },
+    {
+      "type": "paragraph",
+      "content": "No hace falta tocar esto en Dawn. Cámbialo solo si has renombrado clases o usas un tema hijo."
+    },
+    {
+      "type": "text",
+      "id": "form_selector",
+      "label": "Formulario del producto",
+      "default": "product-form form, form[action*=\"/cart/add\"]"
+    },
+    {
+      "type": "text",
+      "id": "submit_selector",
+      "label": "Botón de compra real",
+      "default": ".product-form__submit, button[name=\"add\"]"
+    },
+
+    {
+      "type": "header",
+      "content": "Barra"
+    },
+    {
+      "type": "color",
+      "id": "bar_bg",
+      "label": "Color de fondo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "bar_max_width",
+      "min": 0,
+      "max": 900,
+      "step": 20,
+      "unit": "px",
+      "label": "Ancho máximo del contenido",
+      "info": "0 = ancho completo.",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "bar_radius_top",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo de las esquinas superiores",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "bar_border_width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor de la línea superior",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "bar_border_color",
+      "label": "Color de la línea superior",
+      "default": "#e6e6e6"
+    },
+    {
+      "type": "range",
+      "id": "bar_shadow",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Sombra hacia arriba",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "bar_shadow_opacity",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "%",
+      "label": "Intensidad de la sombra",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "bar_padding_top",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Relleno superior",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "bar_padding_bottom",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Relleno inferior",
+      "info": "En iPhone se le suma automáticamente el hueco de la barra de gestos.",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "bar_padding_x",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Relleno lateral",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "bar_inner_gap",
+      "min": 0,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación botón / sellos",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "z_index",
+      "min": 0,
+      "max": 500,
+      "step": 5,
+      "label": "Prioridad de apilado (z-index)",
+      "info": "Bájalo si tapa el carrito lateral. Súbelo si una app se le pone encima.",
+      "default": 90
+    },
+
+    {
+      "type": "header",
+      "content": "Botón"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Texto del botón",
+      "default": "+ Añadir al carrito"
+    },
+    {
+      "type": "text",
+      "id": "sold_out_label",
+      "label": "Texto cuando está agotado",
+      "default": "Agotado"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "Mostrar el precio",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_compare",
+      "label": "Mostrar el precio tachado",
+      "info": "Solo se ve si la variante tiene precio de comparación.",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "btn_bg",
+      "label": "Fondo",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg_active",
+      "label": "Fondo al pulsar",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "btn_color",
+      "label": "Color del texto",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_border_color",
+      "label": "Color del borde",
+      "default": "#111111"
+    },
+    {
+      "type": "range",
+      "id": "btn_border_width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor del borde",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "btn_height",
+      "min": 36,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Alto mínimo",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "btn_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo",
+      "info": "40 deja la forma de píldora de la referencia.",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "btn_padding_x",
+      "min": 8,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Relleno lateral interno",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "label_price_gap",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación texto / precio",
+      "default": 10
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía del botón"
+    },
+    {
+      "type": "select",
+      "id": "label_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "label_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "range",
+      "id": "label_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del texto",
+      "default": 13
+    },
+    {
+      "type": "select",
+      "id": "label_weight",
+      "label": "Grosor del texto",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "range",
+      "id": "label_letter_spacing",
+      "min": -1,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0.4
+    },
+    {
+      "type": "checkbox",
+      "id": "label_uppercase",
+      "label": "Texto en mayúsculas",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "price_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del precio",
+      "default": 13
+    },
+    {
+      "type": "select",
+      "id": "price_weight",
+      "label": "Grosor del precio",
+      "options": [
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "color",
+      "id": "price_color",
+      "label": "Color del precio",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "compare_size",
+      "min": 8,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del precio tachado",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "compare_color",
+      "label": "Color del precio tachado",
+      "default": "#8f8f8f"
+    },
+    {
+      "type": "range",
+      "id": "compare_gap",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre los dos precios",
+      "default": 7
+    },
+
+    {
+      "type": "header",
+      "content": "Sellos de confianza"
+    },
+    {
+      "type": "select",
+      "id": "badge_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "same_as_label", "label": "La misma del botón" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "range",
+      "id": "badge_size",
+      "min": 9,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del texto",
+      "default": 13
+    },
+    {
+      "type": "select",
+      "id": "badge_weight",
+      "label": "Grosor del texto",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "badge_color",
+      "label": "Color del texto",
+      "default": "#4a4a4a"
+    },
+    {
+      "type": "color",
+      "id": "badge_icon_color",
+      "label": "Color del icono",
+      "default": "#4a4a4a"
+    },
+    {
+      "type": "range",
+      "id": "badge_icon_size",
+      "min": 10,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del icono",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "badge_icon_gap",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación icono / texto",
+      "default": 7
+    },
+    {
+      "type": "range",
+      "id": "badge_gap",
+      "min": 4,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre sellos",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "badge_row_gap",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación si bajan de línea",
+      "default": 6
+    },
+
+    {
+      "type": "header",
+      "content": "Mensajes"
+    },
+    {
+      "type": "text",
+      "id": "toast_text",
+      "label": "Aviso al añadir",
+      "default": "Añadido al carrito"
+    },
+    {
+      "type": "text",
+      "id": "error_text",
+      "label": "Aviso si algo falla",
+      "default": "No se ha podido añadir. Vuelve a intentarlo."
+    },
+    {
+      "type": "range",
+      "id": "toast_ms",
+      "min": 800,
+      "max": 6000,
+      "step": 200,
+      "unit": "ms",
+      "label": "Duración del aviso",
+      "default": 2200
+    },
+    {
+      "type": "color",
+      "id": "toast_bg",
+      "label": "Fondo del aviso",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "toast_color",
+      "label": "Texto del aviso",
+      "default": "#ffffff"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "badge",
+      "name": "Sello",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon_preset",
+          "label": "Icono",
+          "options": [
+            { "value": "truck", "label": "Camión" },
+            { "value": "return", "label": "Devolución" },
+            { "value": "shield", "label": "Escudo" },
+            { "value": "leaf", "label": "Hoja" },
+            { "value": "lock", "label": "Candado" },
+            { "value": "clock", "label": "Reloj" },
+            { "value": "none", "label": "Sin icono" }
+          ],
+          "default": "truck"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Texto",
+          "default": "Envíos 48h"
+        },
+        {
+          "type": "image_picker",
+          "id": "icon",
+          "label": "Icono propio",
+          "info": "Opcional. Sustituye al icono de la lista."
+        },
+        {
+          "type": "textarea",
+          "id": "icon_svg",
+          "label": "O pega aquí el SVG",
+          "info": "Tiene prioridad sobre la imagen y sobre la lista."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Barra fija de compra",
+      "blocks": [
+        {
+          "type": "badge",
+          "settings": { "icon_preset": "truck", "text": "Envíos 48h" }
+        },
+        {
+          "type": "badge",
+          "settings": { "icon_preset": "return", "text": "Devoluciones 30d" }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
