@@ -606,8 +606,9 @@
   margin-top: 6px;
 }
 
-/* El spinner de Dawn tapa el bloque de precios mientras se recalcula la línea.
-   Va sobre el fondo del panel para que no se lea el importe viejo debajo. */
+/* Este overlay ya solo se usa en las líneas de regalo, que tienen la cantidad
+   bloqueada y por tanto no pintan selector donde alojar el spinner. En el
+   resto de líneas el spinner vive dentro del botón + (ver sección 7). */
 .zsd .zsd-line .zsd-line__prices .loading__spinner {
   position: absolute;
   inset: 0;
@@ -666,6 +667,7 @@
    base: el flex-grow que Dawn pone sobre .quantity__button lo ignoraría y el
    botón seguiría creciendo. */
 .zsd quantity-input.zsd-qty .zsd-qty__btn {
+  position: relative;
   display: grid;
   place-items: center;
   flex: 0 0 26px;
@@ -686,7 +688,7 @@
 /* pointer-events:none es obligatorio, no cosmético. quantity-input.js lee
    event.target.name para saber si sumas o restas; si el clic cae en el <svg>,
    que no tiene name, el botón deja de responder. */
-.zsd quantity-input.zsd-qty .zsd-qty__btn svg {
+.zsd quantity-input.zsd-qty .zsd-qty__btn > svg {
   width: 11px;
   height: 11px;
   pointer-events: none;
@@ -722,6 +724,46 @@
 .zsd quantity-input.zsd-qty .zsd-qty__input:focus-visible {
   outline: 2px solid var(--zsd-qty-color);
   outline-offset: -2px;
+}
+
+
+/* --------------------------------------------------------------------------
+   SPINNER DE CARGA DENTRO DEL BOTON +
+
+   enableLoading() de cart.js hace esto al cambiar una cantidad o borrar una
+   linea:
+
+     this.querySelectorAll(`#CartDrawer-Item-${line} .loading__spinner`)
+         .forEach((o) => o.classList.remove('hidden'));
+
+   No le importa donde este el spinner, solo que cuelgue de la linea. Por eso
+   moverlo dentro del boton + basta y no hay que tocar JavaScript.
+
+   El fondo opaco tapa el icono mientras gira: sin el se verian el + y el
+   spinner superpuestos. pointer-events:none evita que el spinner intercepte
+   el clic y rompa la lectura de event.target.name en quantity-input.js.
+   -------------------------------------------------------------------------- */
+.zsd quantity-input.zsd-qty .zsd-qty__btn .loading__spinner {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  background-color: var(--zsd-panel-bg);
+  pointer-events: none;
+}
+
+/* base.css declara .hidden { display: none !important }, pero el display:grid
+   de arriba se aplica al mismo elemento: se repite para no depender del orden. */
+.zsd quantity-input.zsd-qty .zsd-qty__btn .loading__spinner.hidden {
+  display: none;
+}
+
+.zsd quantity-input.zsd-qty .zsd-qty__btn .loading__spinner svg,
+.zsd quantity-input.zsd-qty .zsd-qty__btn .loading__spinner .spinner {
+  width: 14px;
+  height: 14px;
+  margin: 0;
 }
 
 /* Total: 26 + 30 + 26 = 82px fijos.
@@ -1030,4 +1072,12 @@
   .zsd-reco__spinner {
     animation-duration: 2s;
   }
+}
+
+/* El número atenuado mientras se guarda el cambio. No se puede congelar en su
+   valor anterior: validateQuantity() lee event.target.value al vencer el
+   debounce, así que revertirlo enviaría al carrito la cantidad equivocada. */
+.zsd quantity-input.zsd-qty.is-updating .zsd-qty__input {
+  opacity: 0.35;
+  transition: opacity 0.15s ease;
 }
