@@ -257,6 +257,7 @@
           "qty_color": "#111111",
           "qty_height": 32,
           "qty_radius": 20,
+          "qty_width": 114,
           "gift_lock_qty": true,
           "gift_hide_remove": true,
           "reco_enabled": true,
