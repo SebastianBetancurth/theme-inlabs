@@ -593,6 +593,15 @@
                                     <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
                                       <path d="M10 4.5v11M4.5 10h11" />
                                     </svg>
+                                    <button class="zsd-qty__btn zsd-qty__btn--plus quantity__button" name="plus" type="button">
+                                        <span class="visually-hidden">
+                                          {{- 'products.product.quantity.increase' | t: product: item.product.title | escape -}}
+                                        </span>
+                                        <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                                          <path d="M10 4.5v11M4.5 10h11" />
+                                        </svg>
+                                        {%- render 'loading-spinner' -%}
+                                      </button>
                                   </button>
                                 </quantity-input>
                               </div>
@@ -656,7 +665,9 @@
                         {%- endif -%}
 
                         <div class="zsd-line__prices">
-                          {%- render 'loading-spinner' -%}
+                          {%- if lock_qty -%}
+                            {%- render 'loading-spinner' -%}
+                          {%- endif -%}
                           <div class="zsd-line__price-row">
                             {%- if saving > 0 -%}
                               <s class="zsd-line__compare cart-item__old-price">{{ base | money }}</s>
