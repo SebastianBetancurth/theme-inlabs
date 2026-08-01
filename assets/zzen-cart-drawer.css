@@ -1111,3 +1111,8 @@
 .zsd__pay-icon {
   height: var(--zsd-pay-h, 26px);
 }
+
+.zsd,
+.zsd * {
+  font-family: var(--zsd-font);
+}
