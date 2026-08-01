@@ -1866,6 +1866,74 @@
         "color_overlay": "#000000",
         "overlay_opacity": 60
       }
+    },
+    "doctors_endorse_WVzzar": {
+      "type": "doctors-endorse",
+      "blocks": {
+        "doctor_WKfGnf": {
+          "type": "doctor",
+          "settings": {
+            "name": "Dra. Isabel Belaustegui",
+            "specialty": "Medicina Integrativa",
+            "quote": "<p>\"El descanso nocturno es una parte esencial del bienestar. Combina ingredientes con respaldo científico para favorecer un descanso profundo y de calidad.\"</p>",
+            "link_label": "Conoce Modo ZZEN.",
+            "link_url": "shopify://products/modo-zzen"
+          }
+        },
+        "doctor_LXnk9b": {
+          "type": "doctor",
+          "settings": {
+            "name": "Dr. Marcos Bodoque",
+            "specialty": "Nutrición y Medicina Funcional",
+            "quote": "<p>\"El descanso nocturno es una parte esencial del bienestar. Combina ingredientes con respaldo científico para favorecer un sueño profundo y de calidad.\"</p>",
+            "link_label": "Conoce Modo ZZEN.",
+            "link_url": ""
+          }
+        },
+        "doctor_qy46AF": {
+          "type": "doctor",
+          "settings": {
+            "name": "Dr. Carlos Jaramillo",
+            "specialty": "Medicina Funcional",
+            "quote": "<p>\"El descanso nocturno es una parte esencial del bienestar. Combina ingredientes con respaldo científico para favorecer un sueño profundo y de calidad.\"</p>",
+            "link_label": "Conoce Modo ZZEN.",
+            "link_url": ""
+          }
+        }
+      },
+      "block_order": [
+        "doctor_WKfGnf",
+        "doctor_LXnk9b",
+        "doctor_qy46AF"
+      ],
+      "name": "Doctores que avalan",
+      "settings": {
+        "heading": "Doctores que avalan nuestro producto",
+        "heading_size": 38,
+        "heading_size_mobile": 28,
+        "image_ratio": "square",
+        "image_radius": 0,
+        "max_width": 1100,
+        "padding_top": 80,
+        "padding_bottom": 80,
+        "padding_x": 60,
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "gap_heading": 40,
+        "padding_top_mobile": 48,
+        "padding_bottom_mobile": 48,
+        "padding_x_mobile": 16,
+        "margin_top_mobile": 0,
+        "margin_bottom_mobile": 0,
+        "gap_heading_mobile": 28,
+        "color_bg": "#ffffff",
+        "color_heading": "#121212",
+        "color_name": "#121212",
+        "color_specialty": "#3a3a3a",
+        "color_quote": "#121212",
+        "color_link": "#121212",
+        "color_arrow": "#121212"
+      }
     }
   },
   "order": [
@@ -1880,6 +1948,7 @@
     "custom_compare_table_GxYNFp",
     "custom_day_routine_YnBe9K",
     "custom_audience_carouse_aCyYB6",
-    "ingredientes_premium_CQTqrC"
+    "ingredientes_premium_CQTqrC",
+    "doctors_endorse_WVzzar"
   ]
 }
