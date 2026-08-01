@@ -2432,7 +2432,7 @@
         "button_color": "#111111",
         "button_bg_hover": "#e4e4e4",
         "button_color_hover": "#111111",
-        "button_border_color": "#00000000",
+        "button_border_color": "rgba(0,0,0,0)",
         "button_border_width": 0,
         "button_weight": "400",
         "button_size_d": 15,
@@ -2471,6 +2471,103 @@
         "heading_margin_bottom_d": 34,
         "heading_margin_bottom_m": 22
       }
+    },
+    "custom_sticky_atc_LtQMxj": {
+      "type": "custom-sticky-atc",
+      "blocks": {
+        "badge_WXAdx6": {
+          "type": "badge",
+          "settings": {
+            "icon_preset": "truck",
+            "text": "Envíos 48h",
+            "icon_svg": ""
+          }
+        },
+        "badge_EX3CHj": {
+          "type": "badge",
+          "settings": {
+            "icon_preset": "return",
+            "text": "Devoluciones 30d",
+            "icon_svg": ""
+          }
+        }
+      },
+      "block_order": [
+        "badge_WXAdx6",
+        "badge_EX3CHj"
+      ],
+      "name": "Barra fija de compra",
+      "settings": {
+        "product": "",
+        "mobile_breakpoint": 750,
+        "action": "add",
+        "add_method": "click",
+        "after_add": "drawer",
+        "use_main_quantity": true,
+        "link_url": "",
+        "scroll_offset": 90,
+        "trigger": "after_cta",
+        "trigger_selector": ".product-form__buttons, product-form, .product-form__submit",
+        "trigger_offset": 0,
+        "trigger_px": 600,
+        "trigger_pct": 25,
+        "hide_selector": "",
+        "pad_body": true,
+        "transition_ms": 300,
+        "form_selector": "product-form form, form[action*=\"/cart/add\"]",
+        "submit_selector": ".product-form__submit, button[name=\"add\"]",
+        "bar_bg": "#ffffff",
+        "bar_max_width": 0,
+        "bar_radius_top": 14,
+        "bar_border_width": 0,
+        "bar_border_color": "#e6e6e6",
+        "bar_shadow": 6,
+        "bar_shadow_opacity": 8,
+        "bar_padding_top": 12,
+        "bar_padding_bottom": 12,
+        "bar_padding_x": 14,
+        "bar_inner_gap": 10,
+        "z_index": 90,
+        "label": "+ Añadir al carrito",
+        "sold_out_label": "Agotado",
+        "show_price": true,
+        "show_compare": true,
+        "btn_bg": "#020408",
+        "btn_bg_active": "#333333",
+        "btn_color": "#ffffff",
+        "btn_border_color": "#111111",
+        "btn_border_width": 0,
+        "btn_height": 48,
+        "btn_radius": 40,
+        "btn_padding_x": 18,
+        "label_price_gap": 10,
+        "label_font": "helvetica",
+        "label_font_custom": "'Helvetica neue', sans-serif",
+        "label_size": 13,
+        "label_weight": "600",
+        "label_letter_spacing": 0.4,
+        "label_uppercase": true,
+        "price_size": 13,
+        "price_weight": "600",
+        "price_color": "#ffffff",
+        "compare_size": 12,
+        "compare_color": "#8f8f8f",
+        "compare_gap": 7,
+        "badge_font": "helvetica",
+        "badge_size": 13,
+        "badge_weight": "400",
+        "badge_color": "#4a4a4a",
+        "badge_icon_color": "#4a4a4a",
+        "badge_icon_size": 17,
+        "badge_icon_gap": 7,
+        "badge_gap": 22,
+        "badge_row_gap": 6,
+        "toast_text": "Añadido al carrito",
+        "error_text": "No se ha podido añadir. Vuelve a intentarlo.",
+        "toast_ms": 2200,
+        "toast_bg": "#111111",
+        "toast_color": "#ffffff"
+      }
     }
   },
   "order": [
@@ -2491,6 +2588,7 @@
     "custom_seo_readmore_rKreec",
     "custom_reviews_aKyaMC",
     "prod_slider_cKCyb8",
-    "custom_article_cards_8HUWmg"
+    "custom_article_cards_8HUWmg",
+    "custom_sticky_atc_LtQMxj"
   ]
 }
