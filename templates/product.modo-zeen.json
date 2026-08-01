@@ -1688,7 +1688,7 @@
         "arrow_next_label": "Siguiente",
         "arrow_color": "#ffffff",
         "arrow_color_hover": "#000000",
-        "arrow_bg": "#00000000",
+        "arrow_bg": "rgba(0,0,0,0)",
         "arrow_bg_hover": "#ffffff",
         "arrow_border_color": "#5a5a5a",
         "arrow_border_width": 1,
@@ -2013,6 +2013,161 @@
         "color_line": "#3a3a3a",
         "color_chevron": "#ffffff"
       }
+    },
+    "custom_seo_readmore_rKreec": {
+      "type": "custom-seo-readmore",
+      "blocks": {
+        "text_gB7xNF": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Modo ZZEN es un pack de suplementos naturales diseñado para trabajar tres momentos clave del día: rendimiento mental, gestión del estrés y recuperación nocturna. En lugar de elegir un producto aislado para cada problema, propone una rutina organizada con ZZEN Focus, ZZEN Calm y ZZEN Sleep.</p><p>La lógica del pack es sencilla: Focus acompaña las horas de mayor exigencia cognitiva, Calm ayuda a sostener el equilibrio emocional durante el día y Sleep prepara el descanso por la noche. Esta estructura es perfecta para personas que sienten que su energía, su estrés y su sueño están conectados.</p>"
+          }
+        },
+        "subheading_BE6rKG": {
+          "type": "subheading",
+          "settings": {
+            "text": "Para quienes necesitan una rutina completa, no otro bote más",
+            "tag": "h3"
+          }
+        },
+        "text_nqCChG": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Muchas rutinas de suplementación fallan porque se construyen sin orden: demasiados productos, tomas confusas y objetivos poco claros. Modo ZZEN reduce esa fricción agrupando tres fórmulas con un uso diferenciado y fácil de recordar.</p><p>Tiene sentido para profesionales con alta carga mental, estudiantes, emprendedores, deportistas recreativos o personas que quieren cuidar su bienestar desde una visión más global. Si el objetivo principal es solo la concentración, <a href=\"https://zzenlabs.com/products/zzen-nootropic\">ZZEN Focus</a> puede ser suficiente; si el reto está en todo el ciclo del día, Modo ZZEN aporta más contexto.</p>"
+          }
+        },
+        "subheading_twzh9V": {
+          "type": "subheading",
+          "settings": {
+            "text": "Cómo se complementan Focus, Calm y Sleep",
+            "tag": "h3"
+          }
+        },
+        "text_cd9tQG": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Focus está orientado a la concentración, la energía mental y la claridad durante los bloques activos. Calm trabaja el eje del estrés y la estabilidad emocional. Sleep cierra el día con una fórmula enfocada en relajación, desconexión y descanso reparador.</p><p>Esta combinación es interesante porque evita tratar cada síntoma de forma aislada. Dormir mal puede afectar al foco; el estrés puede dificultar el descanso; y una jornada sin energía puede aumentar la sensación de saturación. Por eso, el pack conecta productos que también existen por separado: <a href=\"https://zzenlabs.com/products/zzen-calm-ashwagandha\">ZZEN Calm</a> y <a href=\"https://zzenlabs.com/products/zzen-sleep\">ZZEN Sleep</a> completan lo que Focus empieza durante el día.</p>"
+          }
+        },
+        "subheading_3ftq9t": {
+          "type": "subheading",
+          "settings": {
+            "text": "Cuándo tomar cada suplemento dentro de Modo ZZEN",
+            "tag": "h3"
+          }
+        },
+        "text_rYLAHD": {
+          "type": "text",
+          "settings": {
+            "text": "<p>La rutina más simple es usar Focus por la mañana o antes del primer bloque exigente, Calm por la mañana o al mediodía junto con comida, y Sleep entre 30 y 60 minutos antes de acostarse. Así, cada fórmula ocupa un momento concreto y no compite con las demás.</p><p>La constancia es más importante que la perfección. Modo ZZEN funciona mejor cuando se integra en hábitos repetibles: desayuno, inicio de jornada, pausa de comida y ritual nocturno.</p>"
+          }
+        },
+        "subheading_RzfKfN": {
+          "type": "subheading",
+          "settings": {
+            "text": "Por qué elegir Modo ZZEN para tu día a día",
+            "tag": "h3"
+          }
+        },
+        "text_CEfTa9": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Modo ZZEN es una opción práctica para quienes quieren simplificar decisiones y sostener una rutina completa de bienestar mental y físico. No promete transformar el día de forma automática, pero sí ofrece una estructura clara para apoyar foco, calma y descanso con productos diseñados para complementarse.</p><p>Frente a comprar suplementos sueltos sin una estrategia, Modo ZZEN aporta orden: mañana para rendir, día para regular y noche para recuperar.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "text_gB7xNF",
+        "subheading_BE6rKG",
+        "text_nqCChG",
+        "subheading_twzh9V",
+        "text_cd9tQG",
+        "subheading_3ftq9t",
+        "text_rYLAHD",
+        "subheading_RzfKfN",
+        "text_CEfTa9"
+      ],
+      "name": "Texto ampliable",
+      "settings": {
+        "heading": "Una rutina diaria para foco, calma y descanso",
+        "heading_tag": "h2",
+        "intro": "<p>Modo ZZEN reúne Focus, Calm y Sleep en una rutina sencilla para quienes quieren ordenar su energía mental, gestionar mejor el estrés y cuidar el descanso sin depender de soluciones sueltas.</p>",
+        "collapse_mode": "clamp",
+        "clamp_height_d": 180,
+        "clamp_height_m": 140,
+        "fade_height_d": 70,
+        "fade_height_m": 50,
+        "transition_ms": 400,
+        "scroll_on_close": true,
+        "label_more": "Ver más",
+        "label_less": "Ver menos",
+        "button_color": "#1a1a1a",
+        "button_color_hover": "#6b6b6b",
+        "button_weight": "400",
+        "button_uppercase": false,
+        "button_letter_spacing": 0,
+        "button_underline_offset": 4,
+        "button_size_d": 14,
+        "button_size_m": 13,
+        "button_icon_size_d": 14,
+        "button_icon_size_m": 13,
+        "button_icon_stroke": 1.4,
+        "button_icon_gap": 6,
+        "button_align_d": "flex-start",
+        "button_align_m": "flex-start",
+        "button_margin_top_d": 26,
+        "button_margin_top_m": 18,
+        "bg_color": "#ffffff",
+        "mobile_breakpoint": 750,
+        "content_max_width": 1500,
+        "text_max_width_d": 780,
+        "text_align_d": "left",
+        "text_align_m": "left",
+        "padding_top_d": 60,
+        "padding_bottom_d": 60,
+        "padding_left_d": 60,
+        "padding_right_d": 60,
+        "padding_top_m": 28,
+        "padding_bottom_m": 28,
+        "padding_left_m": 16,
+        "padding_right_m": 16,
+        "panel_gap_d": 20,
+        "panel_gap_m": 14,
+        "block_gap_d": 18,
+        "block_gap_m": 14,
+        "heading_font": "thin2",
+        "heading_font_custom": "'thin2', serif",
+        "heading_weight": "400",
+        "heading_color": "#000000",
+        "em_color": "#000000",
+        "em_italic": true,
+        "heading_size_d": 36,
+        "heading_line_height_d": 1.2,
+        "heading_letter_spacing_d": 0,
+        "heading_margin_bottom_d": 16,
+        "heading_size_m": 19,
+        "heading_line_height_m": 1.3,
+        "heading_margin_bottom_m": 10,
+        "body_font": "helvetica",
+        "body_font_custom": "'Helvetica neue', sans-serif",
+        "body_color": "#2b2b2b",
+        "body_size_d": 17,
+        "body_line_height_d": 1.6,
+        "paragraph_gap_d": 16,
+        "body_size_m": 14,
+        "body_line_height_m": 1.5,
+        "paragraph_gap_m": 12,
+        "sub_font": "helvetica",
+        "sub_weight": "600",
+        "sub_color": "#000000",
+        "sub_line_height": 1.3,
+        "sub_size_d": 19,
+        "sub_size_m": 15,
+        "sub_margin_top_d": 16,
+        "sub_margin_bottom_d": 8,
+        "sub_margin_top_m": 12,
+        "sub_margin_bottom_m": 6
+      }
     }
   },
   "order": [
@@ -2029,6 +2184,7 @@
     "custom_audience_carouse_aCyYB6",
     "ingredientes_premium_CQTqrC",
     "doctors_endorse_WVzzar",
-    "faqs_accordion_kDWF6W"
+    "faqs_accordion_kDWF6W",
+    "custom_seo_readmore_rKreec"
   ]
 }
