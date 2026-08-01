@@ -108,6 +108,15 @@
   endif
 
   assign anim_ms = s.transition_ms
+
+  # ------------------------------------------------------------------
+  # Gris del icono inactivo (modo "imagen circular completa").
+  # invertir -> bajar brillo -> invertir: el negro sube a gris claro y el
+  # blanco del dibujo se queda en blanco. Un brightness() a secas no sirve,
+  # porque multiplica y el negro por cualquier cosa sigue siendo negro.
+  # ------------------------------------------------------------------
+  assign idle_k = 100 | minus: s.tab_idle_lighten
+  assign idle_k_hover = idle_k | times: 55 | divided_by: 100
 -%}
 
 {%- style -%}
@@ -170,6 +179,9 @@
     --zd-tab-border: {{ s.tab_border_color }};
     --zd-tab-border-w: {{ s.tab_border_width }}px;
     --zd-tab-icon: {{ s.tab_icon_size }}%;
+    --zd-tab-badge: {{ s.tab_badge_size }}%;
+    --zd-idle-k: {{ idle_k }}%;
+    --zd-idle-k-hover: {{ idle_k_hover }}%;
     --zd-tab-opacity: {{ s.tab_icon_opacity }}%;
     --zd-tab-opacity-active: {{ s.tab_icon_opacity_active }}%;
     --zd-tab-justify: {{ s.tab_align_d }};
@@ -377,7 +389,6 @@
     width: var(--zd-tab-icon);
     height: var(--zd-tab-icon);
     object-fit: contain;
-    opacity: calc(var(--zd-tab-opacity) / 100);
     transition: opacity var(--zd-anim) ease, filter var(--zd-anim) ease;
   }
 
@@ -387,18 +398,48 @@
     display: block;
   }
 
-  .zday__tab[aria-selected='true'] .zday__tab-icon {
+  /* ---- Modo "icono suelto" ----
+     La imagen es solo el dibujo; el círculo lo pinta el botón. */
+  .zday--mode-glyph .zday__tab-icon {
+    opacity: calc(var(--zd-tab-opacity) / 100);
+  }
+
+  .zday--mode-glyph .zday__tab[aria-selected='true'] .zday__tab-icon {
     opacity: calc(var(--zd-tab-opacity-active) / 100);
   }
 
-  /* Para iconos de un solo color: el mismo archivo sirve para el círculo
+  /* Para dibujos de un solo color: el mismo archivo sirve para el círculo
      claro y para el oscuro sin tener que subirlo dos veces. */
-  .zday--invert-active .zday__tab[aria-selected='true'] .zday__tab-icon {
+  .zday--mode-glyph.zday--invert-active .zday__tab[aria-selected='true'] .zday__tab-icon {
     filter: invert(1);
   }
 
-  .zday--invert-idle .zday__tab:not([aria-selected='true']) .zday__tab-icon {
+  .zday--mode-glyph.zday--invert-idle .zday__tab:not([aria-selected='true']) .zday__tab-icon {
     filter: invert(1);
+  }
+
+  /* ---- Modo "imagen circular completa" ----
+     La imagen ya trae el círculo, así que el botón no pinta fondo ni borde
+     y el dibujo ocupa todo el hueco. */
+  .zday--mode-badge .zday__tab {
+    background-color: transparent;
+    border: 0;
+  }
+
+  .zday--mode-badge .zday__tab-icon {
+    width: var(--zd-tab-badge);
+    height: var(--zd-tab-badge);
+  }
+
+  /* Inactivo en gris: invertir, bajar el brillo y volver a invertir sube el
+     negro del círculo a gris claro y deja intacto el blanco del dibujo. Con
+     un brightness() a secas el negro seguiría siendo negro. */
+  .zday--mode-badge .zday__tab:not([aria-selected='true']) .zday__tab-icon {
+    filter: grayscale(1) invert(1) brightness(var(--zd-idle-k)) invert(1);
+  }
+
+  .zday--mode-badge .zday__tab:not([aria-selected='true']):hover .zday__tab-icon {
+    filter: grayscale(1) invert(1) brightness(var(--zd-idle-k-hover)) invert(1);
   }
 
   /* ================= Pie de imagen ================= */
@@ -543,7 +584,7 @@
 {%- endstyle -%}
 
 <div
-  class="zday zday-{{ section.id }}{% unless s.equal_height %} zday--flow{% endunless %}{% if s.tab_invert_active %} zday--invert-active{% endif %}{% if s.tab_invert_idle %} zday--invert-idle{% endif %}"
+  class="zday zday-{{ section.id }} zday--mode-{{ s.tab_icon_mode }}{% unless s.equal_height %} zday--flow{% endunless %}{% if s.tab_invert_active %} zday--invert-active{% endif %}{% if s.tab_invert_idle %} zday--invert-idle{% endif %}"
 >
   <zzen-day-routine
     class="zday__inner"
@@ -1305,6 +1346,39 @@
       "default": false
     },
     {
+      "type": "select",
+      "id": "tab_icon_mode",
+      "label": "Tipo de imagen del icono",
+      "info": "«Imagen circular completa»: tu PNG ya trae el círculo negro con el dibujo dentro. «Icono suelto»: tu PNG es solo el dibujo y el círculo lo pinta el tema con los colores de abajo.",
+      "options": [
+        { "value": "badge", "label": "Imagen circular completa" },
+        { "value": "glyph", "label": "Icono suelto (el tema pinta el círculo)" }
+      ],
+      "default": "badge"
+    },
+    {
+      "type": "range",
+      "id": "tab_idle_lighten",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Gris del icono inactivo",
+      "info": "Solo en «Imagen circular completa». Aclara el negro del círculo dejando el dibujo blanco. 0 = igual que el activo, 100 = casi blanco.",
+      "default": 85
+    },
+    {
+      "type": "range",
+      "id": "tab_badge_size",
+      "min": 50,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Tamaño de la imagen circular dentro del botón",
+      "info": "Solo en «Imagen circular completa». Bájalo si tu PNG lleva margen transparente alrededor.",
+      "default": 100
+    },
+    {
       "type": "range",
       "id": "tab_size_d",
       "min": 24,
@@ -1369,13 +1443,13 @@
     {
       "type": "color",
       "id": "tab_bg",
-      "label": "Fondo del círculo inactivo",
+      "label": "Fondo del círculo inactivo", "info": "Solo en «Icono suelto».",
       "default": "#d9d9d9"
     },
     {
       "type": "color",
       "id": "tab_bg_active",
-      "label": "Fondo del círculo activo",
+      "label": "Fondo del círculo activo", "info": "Solo en «Icono suelto».",
       "default": "#000000"
     },
     {
@@ -1401,7 +1475,7 @@
       "max": 100,
       "step": 1,
       "unit": "%",
-      "label": "Tamaño del icono dentro del círculo",
+      "label": "Tamaño del icono dentro del círculo", "info": "Solo en «Icono suelto».",
       "default": 52
     },
     {
@@ -1411,7 +1485,7 @@
       "max": 100,
       "step": 5,
       "unit": "%",
-      "label": "Opacidad del icono inactivo",
+      "label": "Opacidad del icono inactivo", "info": "Solo en «Icono suelto».",
       "default": 65
     },
     {
@@ -1421,20 +1495,20 @@
       "max": 100,
       "step": 5,
       "unit": "%",
-      "label": "Opacidad del icono activo",
+      "label": "Opacidad del icono activo", "info": "Solo en «Icono suelto».",
       "default": 100
     },
     {
       "type": "checkbox",
       "id": "tab_invert_active",
       "label": "Invertir el color del icono activo",
-      "info": "Para iconos de un solo color: el mismo archivo vale para el círculo claro y para el oscuro.",
+      "info": "Solo en «Icono suelto». El mismo archivo vale para el círculo claro y para el oscuro.",
       "default": false
     },
     {
       "type": "checkbox",
       "id": "tab_invert_idle",
-      "label": "Invertir el color de los iconos inactivos",
+      "label": "Invertir el color de los iconos inactivos", "info": "Solo en «Icono suelto».",
       "default": false
     },
     {
@@ -1890,7 +1964,7 @@
           "type": "image_picker",
           "id": "icon",
           "label": "Icono del círculo",
-          "info": "Se recomienda PNG cuadrado con fondo transparente."
+          "info": "PNG cuadrado con fondo transparente. Súbelo al doble del tamaño en el que se ve (p. ej. 112px para círculos de 56px)."
         },
         {
           "type": "textarea",
