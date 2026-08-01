@@ -320,7 +320,7 @@
 
       {%- comment -%} ---------------- Zona con scroll ---------------- {%- endcomment -%}
       <cart-drawer-items
-        class="zsd__body{% if cart == empty %} is-empty{% endif %}"
+        class="zsd__body{% if cart.item_count == 0 %} is-empty{% endif %}"
         view-event-payload="{{ cart | standard_event_data: 'view', context: 'dialog' | escape }}"
         view-event-trigger="manual"
       >
@@ -430,11 +430,7 @@
           method="post"
         >
           <div id="CartDrawer-CartItems" class="drawer__contents js-contents zsd__items">
-            {%- if cart == empty -%}
-              <div class="zsd__empty">
-                <p class="zsd__empty-text">{{ s.empty_text }}</p>
-              </div>
-            {%- else -%}
+            {%- unless cart.item_count == 0 -%}
               <div class="zsd__lines">
                 {%- for item in cart.items -%}
                   {%- liquid
@@ -697,7 +693,7 @@
                   </div>
                 {%- endfor -%}
               </div>
-            {%- endif -%}
+            {%- endunless -%}
 
             <p id="CartDrawer-LiveRegionText" class="visually-hidden" role="status"></p>
             <p id="CartDrawer-LineItemStatus" class="visually-hidden" aria-hidden="true" role="status">
@@ -707,6 +703,14 @@
 
           <div id="CartDrawer-CartErrors" class="zsd__errors" role="alert"></div>
         </form>
+
+        {%- if cart.item_count == 0 -%}
+          <div class="zsd__empty">
+            <p class="zsd__empty-text">
+              {{- s.empty_text | default: 'Tu carrito está vacío' -}}
+            </p>
+          </div>
+        {%- endif -%}
 
         {%- comment -%}
           ---------------- Recomendaciones ----------------
@@ -844,7 +848,7 @@
             class="cart__checkout-button zsd__checkout"
             name="checkout"
             form="CartDrawer-Form"
-            {% if cart == empty %}
+            {% if cart.item_count == 0 %}
               disabled
             {% endif %}
           >
