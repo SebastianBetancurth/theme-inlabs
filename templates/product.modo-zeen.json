@@ -1526,6 +1526,200 @@
         "heading_align_m": "left",
         "heading_margin_bottom_m": 18
       }
+    },
+    "custom_audience_carouse_aCyYB6": {
+      "type": "custom-audience-carouse",
+      "blocks": {
+        "profile_xLRnBC": {
+          "type": "profile",
+          "settings": {
+            "image": "shopify://shop_images/u1259281183_httpss.mj.runR-itlKy6PI4_httpss.mj.runJn53sHTw_ww_a7c17b99-2a25-4ae2-8776-9c4c471043bf_1_1.webp",
+            "number": "",
+            "title": "Estudiantes que necesitan claridad",
+            "copy": "<p>Porque memorizar no es lo mismo que comprender.</p>",
+            "icon_svg": ""
+          }
+        },
+        "profile_inAmJd": {
+          "type": "profile",
+          "settings": {
+            "image": "shopify://shop_images/u4457334132_httpss.mj.runDTKEYsU01n4_Black_and_white_photo_of_a_4b5942ab-e0c7-48ab-b3c6-46d75ad4b488.webp",
+            "number": "",
+            "title": "Estudiantes que necesitan claridad",
+            "copy": "<p>Porque memorizar no es lo mismo que comprender.</p>",
+            "icon_svg": ""
+          }
+        },
+        "profile_kc4Q7M": {
+          "type": "profile",
+          "settings": {
+            "image": "shopify://shop_images/u4457334132_httpss.mj.runUqgjlH2XYKE_A_man_is_sitting_at_the_ta_043e4ed2-a8ef-4e2f-90d0-3d4caad8e9de-2_1.webp",
+            "number": "",
+            "title": "Estudiantes que necesitan claridad",
+            "copy": "<p>Porque memorizar no es lo mismo que comprender.</p>",
+            "icon_svg": ""
+          }
+        },
+        "profile_zUzhzP": {
+          "type": "profile",
+          "settings": {
+            "image": "shopify://shop_images/u4457334132_Mid-shot_of_a_mom_and_a_dad_happy_wearing_simple__f9b84d48-a7e2-400e-93e2-69c3700dc22d_1_1.webp",
+            "number": "",
+            "title": "Estudiantes que necesitan claridad",
+            "copy": "<p>Porque memorizar no es lo mismo que comprender.</p>",
+            "icon_svg": ""
+          }
+        },
+        "profile_eaYy9k": {
+          "type": "profile",
+          "settings": {
+            "image": "shopify://shop_images/u4457334132_Mid-shot_of_a_strong_individual_standing_confidentl_6f186457-6d3c-462d-ac39-3f113660a02f.webp",
+            "number": "",
+            "title": "Estudiantes que necesitan claridad",
+            "copy": "<p>Porque memorizar no es lo mismo que comprender.</p>",
+            "icon_svg": ""
+          }
+        },
+        "profile_dB8azy": {
+          "type": "profile",
+          "settings": {
+            "image": "shopify://shop_images/u4457334132_Portrait_of_a_man_in_his_late_30s_dressed_in_a_high_03813734-fd75-4239-a1f3-1b6e19ef8c32.jpg",
+            "number": "",
+            "title": "Estudiantes que necesitan claridad",
+            "copy": "<p>Porque memorizar no es lo mismo que comprender.</p>",
+            "icon_svg": ""
+          }
+        }
+      },
+      "block_order": [
+        "profile_xLRnBC",
+        "profile_inAmJd",
+        "profile_kc4Q7M",
+        "profile_zUzhzP",
+        "profile_eaYy9k",
+        "profile_dB8azy"
+      ],
+      "name": "Carrusel de perfiles",
+      "settings": {
+        "heading": "¿Para <em>quién</em> es Modo ZZEN?",
+        "heading_tag": "h2",
+        "title_tag": "h3",
+        "bg_color": "#000000",
+        "mobile_breakpoint": 750,
+        "content_max_width": 1500,
+        "transition_ms": 200,
+        "padding_top_d": 80,
+        "padding_bottom_d": 80,
+        "padding_left_d": 60,
+        "padding_right_d": 60,
+        "bleed_right_d": true,
+        "padding_top_m": 28,
+        "padding_bottom_m": 28,
+        "padding_left_m": 16,
+        "padding_right_m": 16,
+        "bleed_right_m": false,
+        "carousel_label": "Perfiles",
+        "scroll_by": "card",
+        "card_width_d": 670,
+        "card_gap_d": 48,
+        "card_inner_gap_d": 26,
+        "media_width_d": 46,
+        "body_align_d": "flex-start",
+        "card_width_m": 100,
+        "card_gap_m": 16,
+        "card_inner_gap_m": 16,
+        "body_align_m": "flex-start",
+        "media_ratio_d": 0.7,
+        "media_ratio_m": 0.7,
+        "media_fit": "cover",
+        "media_bg": "#1a1a1a",
+        "media_radius_d": 4,
+        "media_radius_m": 2,
+        "show_num_d": true,
+        "show_num_m": false,
+        "num_font": "helvetica",
+        "num_weight": "400",
+        "num_color": "#ffffff",
+        "num_size_d": 40,
+        "num_size_m": 24,
+        "num_margin_bottom_d": 18,
+        "num_margin_bottom_m": 10,
+        "show_icon_d": false,
+        "show_icon_m": true,
+        "icon_svg": "",
+        "icon_size_d": 18,
+        "icon_size_m": 16,
+        "icon_gap_d": 10,
+        "icon_gap_m": 10,
+        "body_font": "helvetica",
+        "body_font_custom": "'Helvetica neue', sans-serif",
+        "title_weight": "400",
+        "title_color": "#ffffff",
+        "title_size_d": 19,
+        "title_size_m": 15,
+        "title_line_height_d": 1.3,
+        "title_line_height_m": 1.3,
+        "title_margin_bottom_d": 14,
+        "title_margin_bottom_m": 0,
+        "show_copy_d": true,
+        "show_copy_m": false,
+        "copy_color": "#c9c9c9",
+        "copy_size_d": 17,
+        "copy_size_m": 13,
+        "copy_line_height_d": 1.5,
+        "copy_line_height_m": 1.5,
+        "copy_paragraph_gap_d": 14,
+        "copy_paragraph_gap_m": 10,
+        "nav_d": "bar_arrows",
+        "nav_m": "dots",
+        "nav_align_d": "space-between",
+        "nav_align_m": "center",
+        "nav_margin_top_d": 46,
+        "nav_margin_top_m": 20,
+        "nav_gap_d": 40,
+        "nav_gap_m": 16,
+        "bar_mode": "thumb",
+        "bar_track_color": "#3d3d3d",
+        "bar_fill_color": "#ffffff",
+        "bar_height": 1,
+        "bar_fill_height": 2,
+        "bar_radius": 0,
+        "arrow_prev_label": "Anterior",
+        "arrow_next_label": "Siguiente",
+        "arrow_color": "#ffffff",
+        "arrow_color_hover": "#000000",
+        "arrow_bg": "#00000000",
+        "arrow_bg_hover": "#ffffff",
+        "arrow_border_color": "#5a5a5a",
+        "arrow_border_width": 1,
+        "arrow_size_d": 46,
+        "arrow_size_m": 38,
+        "arrow_icon_size_d": 16,
+        "arrow_icon_size_m": 14,
+        "arrow_stroke": 1.4,
+        "arrow_gap": 12,
+        "dots_label": "Ir a la tarjeta",
+        "dot_color": "#5a5a5a",
+        "dot_color_active": "#ffffff",
+        "dot_size": 5,
+        "dot_size_active": 8,
+        "dot_gap": 8,
+        "heading_font": "thin2",
+        "heading_font_custom": "'thin2', serif",
+        "heading_weight": "400",
+        "heading_color": "#ffffff",
+        "em_color": "#ffffff",
+        "em_italic": true,
+        "heading_size_d": 58,
+        "heading_line_height_d": 1.1,
+        "heading_letter_spacing_d": 0,
+        "heading_align_d": "left",
+        "heading_margin_bottom_d": 62,
+        "heading_size_m": 21,
+        "heading_line_height_m": 1.2,
+        "heading_align_m": "center",
+        "heading_margin_bottom_m": 18
+      }
     }
   },
   "order": [
@@ -1538,6 +1732,7 @@
     "custom_timeline_4idfyt",
     "stats_results_C87kQR",
     "custom_compare_table_GxYNFp",
-    "custom_day_routine_YnBe9K"
+    "custom_day_routine_YnBe9K",
+    "custom_audience_carouse_aCyYB6"
   ]
 }
