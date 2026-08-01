@@ -1,0 +1,1466 @@
+{%- comment -%}
+  ============================================================================
+  SECCIÓN: Texto ampliable (Ver más / Ver menos)
+  Tema: Dawn / Online Store 2.0
+  Ruta: sections/custom-seo-readmore.liquid
+
+  Pensada para el bloque de texto largo de final de ficha: se ve el título y
+  un par de frases, y el resto se despliega al pulsar «Ver más».
+
+  EL TEXTO OCULTO SIGUE EN EL HTML.
+  No se carga al pulsar el botón ni se esconde con display:none. Se recorta
+  con max-height y overflow, así que Google lo lee entero desde la primera
+  carga y la sección conserva todo su valor de posicionamiento. Cargarlo por
+  JS al hacer clic sería tirar a la basura el motivo por el que existe este
+  bloque.
+
+  Sin JavaScript el texto aparece desplegado y el botón desaparece: nadie se
+  queda sin poder leerlo.
+
+  El despliegue se anima midiendo el alto real del contenido, no con un
+  max-height inventado: da igual que un día el texto ocupe el doble.
+  ============================================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign bp = s.mobile_breakpoint
+  assign bp_max = bp | minus: 1
+
+  case s.heading_font
+    when 'thin2'
+      assign heading_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign heading_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign heading_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign heading_stack = 'var(--font-body-family)'
+    else
+      assign heading_stack = s.heading_font_custom
+  endcase
+
+  case s.body_font
+    when 'thin2'
+      assign body_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign body_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign body_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign body_stack = 'var(--font-body-family)'
+    else
+      assign body_stack = s.body_font_custom
+  endcase
+
+  case s.sub_font
+    when 'thin2'
+      assign sub_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign sub_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign sub_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign sub_stack = 'var(--font-body-family)'
+    else
+      assign sub_stack = body_stack
+  endcase
+
+  if s.content_max_width == 0
+    assign max_w = 'none'
+  else
+    assign max_w = s.content_max_width | append: 'px'
+  endif
+
+  if s.text_max_width_d == 0
+    assign text_w = 'none'
+  else
+    assign text_w = s.text_max_width_d | append: 'px'
+  endif
+
+  if s.em_italic
+    assign em_style = 'italic'
+  else
+    assign em_style = 'normal'
+  endif
+
+  # Altura del texto cuando está plegado. En modo «solo la entradilla» es
+  # cero: lo que se ve arriba ya está fuera del plegable.
+  if s.collapse_mode == 'clamp'
+    assign collapsed_d = s.clamp_height_d | append: 'px'
+    assign collapsed_m = s.clamp_height_m | append: 'px'
+  else
+    assign collapsed_d = '0px'
+    assign collapsed_m = '0px'
+  endif
+-%}
+
+{%- style -%}
+  @font-face {
+    font-family: 'Helvetica neue';
+    src: url('{{ 'HelveticaNeueCyr-Light.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'thin2';
+    src: url('{{ 'lawrence-regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ================= Variables: PC ================= */
+  .zseo-{{ section.id }} {
+    --zs-bg: {{ s.bg_color }};
+    --zs-max-w: {{ max_w }};
+    --zs-text-w: {{ text_w }};
+    --zs-pt: {{ s.padding_top_d }}px;
+    --zs-pb: {{ s.padding_bottom_d }}px;
+    --zs-pl: {{ s.padding_left_d }}px;
+    --zs-pr: {{ s.padding_right_d }}px;
+    --zs-align: {{ s.text_align_d }};
+    --zs-collapsed: {{ collapsed_d }};
+    --zs-anim: {{ s.transition_ms }}ms;
+
+    --zs-h-font: {{ heading_stack }};
+    --zs-h-size: {{ s.heading_size_d }}px;
+    --zs-h-lh: {{ s.heading_line_height_d }};
+    --zs-h-ls: {{ s.heading_letter_spacing_d }}px;
+    --zs-h-weight: {{ s.heading_weight }};
+    --zs-h-color: {{ s.heading_color }};
+    --zs-h-mb: {{ s.heading_margin_bottom_d }}px;
+    --zs-em-color: {{ s.em_color }};
+    --zs-em-style: {{ em_style }};
+
+    --zs-b-font: {{ body_stack }};
+    --zs-b-size: {{ s.body_size_d }}px;
+    --zs-b-lh: {{ s.body_line_height_d }};
+    --zs-b-color: {{ s.body_color }};
+    --zs-b-gap: {{ s.paragraph_gap_d }}px;
+
+    --zs-sub-font: {{ sub_stack }};
+    --zs-sub-size: {{ s.sub_size_d }}px;
+    --zs-sub-lh: {{ s.sub_line_height }};
+    --zs-sub-weight: {{ s.sub_weight }};
+    --zs-sub-color: {{ s.sub_color }};
+    --zs-sub-mt: {{ s.sub_margin_top_d }}px;
+    --zs-sub-mb: {{ s.sub_margin_bottom_d }}px;
+
+    --zs-panel-gap: {{ s.panel_gap_d }}px;
+    --zs-block-gap: {{ s.block_gap_d }}px;
+    --zs-fade-h: {{ s.fade_height_d }}px;
+
+    --zs-btn-size: {{ s.button_size_d }}px;
+    --zs-btn-color: {{ s.button_color }};
+    --zs-btn-color-hover: {{ s.button_color_hover }};
+    --zs-btn-weight: {{ s.button_weight }};
+    --zs-btn-ls: {{ s.button_letter_spacing }}px;
+    --zs-btn-transform: {% if s.button_uppercase %}uppercase{% else %}none{% endif %};
+    --zs-btn-gap: {{ s.button_icon_gap }}px;
+    --zs-btn-icon: {{ s.button_icon_size_d }}px;
+    --zs-btn-stroke: {{ s.button_icon_stroke }};
+    --zs-btn-mt: {{ s.button_margin_top_d }}px;
+    --zs-btn-justify: {{ s.button_align_d }};
+    --zs-btn-underline: {{ s.button_underline_offset }}px;
+  }
+
+  /* ================= Estructura ================= */
+  .zseo {
+    background-color: var(--zs-bg);
+  }
+
+  .zseo__inner {
+    max-width: var(--zs-max-w);
+    margin-inline: auto;
+    padding: var(--zs-pt) var(--zs-pr) var(--zs-pb) var(--zs-pl);
+    box-sizing: border-box;
+  }
+
+  .zseo__col {
+    max-width: var(--zs-text-w);
+    text-align: var(--zs-align);
+  }
+
+  /* ================= Título ================= */
+  .zseo__heading {
+    margin: 0 0 var(--zs-h-mb);
+    font-family: var(--zs-h-font);
+    font-size: var(--zs-h-size);
+    font-weight: var(--zs-h-weight);
+    line-height: var(--zs-h-lh);
+    letter-spacing: var(--zs-h-ls);
+    color: var(--zs-h-color);
+  }
+
+  .zseo__heading em,
+  .zseo__heading i {
+    font-style: var(--zs-em-style);
+    color: var(--zs-em-color);
+  }
+
+  /* ================= Texto ================= */
+  .zseo__rte {
+    font-family: var(--zs-b-font);
+    font-size: var(--zs-b-size);
+    line-height: var(--zs-b-lh);
+    color: var(--zs-b-color);
+  }
+
+  .zseo__rte > * { margin: 0; }
+  .zseo__rte > * + * { margin-top: var(--zs-b-gap); }
+  .zseo__rte p:empty { display: none; }
+  .zseo__rte strong { font-weight: 600; }
+
+  .zseo__rte a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .zseo__rte ul,
+  .zseo__rte ol {
+    padding-left: 1.2em;
+  }
+
+  .zseo__rte li + li {
+    margin-top: calc(var(--zs-b-gap) / 2);
+  }
+
+  /* ================= Zona plegable =================
+     El contenido siempre está aquí, en el HTML. Solo se recorta su alto.
+     overflow:hidden es lo que lo esconde; nunca display:none, que le quitaría
+     valor de cara a los buscadores. */
+  .zseo__panel {
+    position: relative;
+    overflow: hidden;
+    max-height: var(--zs-collapsed);
+    transition: max-height var(--zs-anim) ease;
+  }
+
+  .zseo__panel-inner {
+    padding-top: var(--zs-panel-gap);
+  }
+
+  .zseo__panel-inner > * + * {
+    margin-top: var(--zs-block-gap);
+  }
+
+  /* Degradado del modo «recortar»: funde el final del texto con el fondo
+     para que se note que hay más abajo. */
+  .zseo--clamp .zseo__panel::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--zs-fade-h);
+    background: linear-gradient(to bottom, transparent, var(--zs-bg));
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity var(--zs-anim) ease;
+  }
+
+  .zseo--clamp .zseo__panel.is-open::after {
+    opacity: 0;
+  }
+
+  /* ================= Subtítulos e imágenes del plegable ================= */
+  .zseo__sub {
+    margin: var(--zs-sub-mt) 0 var(--zs-sub-mb);
+    font-family: var(--zs-sub-font);
+    font-size: var(--zs-sub-size);
+    font-weight: var(--zs-sub-weight);
+    line-height: var(--zs-sub-lh);
+    color: var(--zs-sub-color);
+  }
+
+  /* El primer subtítulo no necesita separarse: ya lo hace el hueco del
+     plegable. */
+  .zseo__panel-inner > .zseo__sub:first-child {
+    margin-top: 0;
+  }
+
+  .zseo__figure {
+    margin: 0;
+  }
+
+  .zseo__figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .zseo__figcaption {
+    margin-top: 8px;
+    font-family: var(--zs-b-font);
+    font-size: calc(var(--zs-b-size) * 0.85);
+    line-height: 1.4;
+    color: var(--zs-b-color);
+    opacity: 0.75;
+  }
+
+  /* ================= Botón Ver más ================= */
+  .zseo__toggle-wrap {
+    display: flex;
+    justify-content: var(--zs-btn-justify);
+    margin-top: var(--zs-btn-mt);
+  }
+
+  .zseo__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--zs-btn-gap);
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: var(--zs-b-font);
+    font-size: var(--zs-btn-size);
+    font-weight: var(--zs-btn-weight);
+    letter-spacing: var(--zs-btn-ls);
+    text-transform: var(--zs-btn-transform);
+    color: var(--zs-btn-color);
+    cursor: pointer;
+    transition: color var(--zs-anim) ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .zseo__toggle:hover { color: var(--zs-btn-color-hover); }
+
+  .zseo__toggle:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+  }
+
+  .zseo__toggle-text {
+    text-decoration: underline;
+    text-underline-offset: var(--zs-btn-underline);
+  }
+
+  .zseo__chev {
+    width: var(--zs-btn-icon);
+    height: var(--zs-btn-icon);
+    display: block;
+    transition: transform var(--zs-anim) ease;
+  }
+
+  .zseo__chev path {
+    stroke: currentColor;
+    stroke-width: var(--zs-btn-stroke);
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .zseo__toggle[aria-expanded='true'] .zseo__chev {
+    transform: rotate(180deg);
+  }
+
+  /* ================= Móvil ================= */
+  @media screen and (max-width: {{ bp_max }}px) {
+    .zseo-{{ section.id }} {
+      --zs-max-w: none;
+      --zs-text-w: none;
+      --zs-pt: {{ s.padding_top_m }}px;
+      --zs-pb: {{ s.padding_bottom_m }}px;
+      --zs-pl: {{ s.padding_left_m }}px;
+      --zs-pr: {{ s.padding_right_m }}px;
+      --zs-align: {{ s.text_align_m }};
+      --zs-collapsed: {{ collapsed_m }};
+
+      --zs-h-size: {{ s.heading_size_m }}px;
+      --zs-h-lh: {{ s.heading_line_height_m }};
+      --zs-h-mb: {{ s.heading_margin_bottom_m }}px;
+
+      --zs-b-size: {{ s.body_size_m }}px;
+      --zs-b-lh: {{ s.body_line_height_m }};
+      --zs-b-gap: {{ s.paragraph_gap_m }}px;
+
+      --zs-sub-size: {{ s.sub_size_m }}px;
+      --zs-sub-mt: {{ s.sub_margin_top_m }}px;
+      --zs-sub-mb: {{ s.sub_margin_bottom_m }}px;
+
+      --zs-panel-gap: {{ s.panel_gap_m }}px;
+      --zs-block-gap: {{ s.block_gap_m }}px;
+      --zs-fade-h: {{ s.fade_height_m }}px;
+
+      --zs-btn-size: {{ s.button_size_m }}px;
+      --zs-btn-icon: {{ s.button_icon_size_m }}px;
+      --zs-btn-mt: {{ s.button_margin_top_m }}px;
+      --zs-btn-justify: {{ s.button_align_m }};
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .zseo-{{ section.id }} { --zs-anim: 1ms; }
+  }
+{%- endstyle -%}
+
+{%- comment -%}
+  Sin JavaScript: el texto se muestra entero y el botón se retira. Nadie se
+  queda sin poder leerlo.
+{%- endcomment -%}
+<noscript>
+  <style>
+    .zseo-{{ section.id }} .zseo__panel {
+      max-height: none !important;
+      overflow: visible !important;
+    }
+    .zseo-{{ section.id }} .zseo__panel::after { display: none !important; }
+    .zseo-{{ section.id }} .zseo__toggle-wrap { display: none !important; }
+  </style>
+</noscript>
+
+<div class="zseo zseo-{{ section.id }} zseo--{{ s.collapse_mode }}">
+  <zzen-read-more
+    class="zseo__inner"
+    data-label-more="{{ s.label_more | escape }}"
+    data-label-less="{{ s.label_less | escape }}"
+    data-scroll-on-close="{{ s.scroll_on_close }}"
+  >
+    <div class="zseo__col">
+      {%- if s.heading != blank -%}
+        <{{ s.heading_tag }} class="zseo__heading">{{ s.heading | newline_to_br }}</{{ s.heading_tag }}>
+      {%- endif -%}
+
+      {%- if s.intro != blank -%}
+        <div class="zseo__rte zseo__intro">{{ s.intro }}</div>
+      {%- endif -%}
+
+      <div class="zseo__panel" id="zseo-panel-{{ section.id }}" data-zseo-panel>
+        <div class="zseo__panel-inner">
+          {%- for block in section.blocks -%}
+            {%- case block.type -%}
+              {%- when 'subheading' -%}
+                <{{ block.settings.tag }} class="zseo__sub" {{ block.shopify_attributes }}>
+                  {{- block.settings.text -}}
+                </{{ block.settings.tag }}>
+
+              {%- when 'text' -%}
+                <div class="zseo__rte" {{ block.shopify_attributes }}>{{ block.settings.text }}</div>
+
+              {%- when 'image' -%}
+                <figure
+                  class="zseo__figure"
+                  style="max-width: {% if block.settings.max_width == 0 %}none{% else %}{{ block.settings.max_width }}px{% endif %};"
+                  {{ block.shopify_attributes }}
+                >
+                  {%- if block.settings.image != blank -%}
+                    {%- assign im = block.settings.image -%}
+                    <img
+                      src="{{ im | image_url: width: 1000 }}"
+                      srcset="
+                        {{ im | image_url: width: 400 }} 400w,
+                        {{ im | image_url: width: 700 }} 700w,
+                        {{ im | image_url: width: 1000 }} 1000w,
+                        {{ im | image_url: width: 1400 }} 1400w
+                      "
+                      sizes="(min-width: {{ bp }}px) {{ s.text_max_width_d }}px, 100vw"
+                      width="{{ im.width }}"
+                      height="{{ im.height }}"
+                      alt="{{ im.alt | default: block.settings.caption | escape }}"
+                      loading="lazy"
+                      decoding="async"
+                      style="border-radius: {{ block.settings.radius }}px;"
+                    >
+                  {%- endif -%}
+                  {%- if block.settings.caption != blank -%}
+                    <figcaption class="zseo__figcaption">{{ block.settings.caption }}</figcaption>
+                  {%- endif -%}
+                </figure>
+            {%- endcase -%}
+          {%- endfor -%}
+        </div>
+      </div>
+
+      {%- if section.blocks.size > 0 -%}
+        <div class="zseo__toggle-wrap">
+          <button
+            type="button"
+            class="zseo__toggle"
+            data-zseo-toggle
+            aria-expanded="false"
+            aria-controls="zseo-panel-{{ section.id }}"
+          >
+            <span class="zseo__toggle-text" data-zseo-label>{{ s.label_more }}</span>
+            <svg class="zseo__chev" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+              <path d="M4.5 7.5 10 13l5.5-5.5"></path>
+            </svg>
+          </button>
+        </div>
+      {%- endif -%}
+    </div>
+  </zzen-read-more>
+</div>
+
+<script>
+  if (!customElements.get('zzen-read-more')) {
+    customElements.define(
+      'zzen-read-more',
+      class ZzenReadMore extends HTMLElement {
+        connectedCallback() {
+          this.panel = this.querySelector('[data-zseo-panel]');
+          this.toggle = this.querySelector('[data-zseo-toggle]');
+          this.label = this.querySelector('[data-zseo-label]');
+          if (!this.panel || !this.toggle) return;
+
+          this.isOpen = false;
+          this.onEnd = this.onEnd.bind(this);
+
+          // Con el texto plegado, los enlaces de dentro no deben poder
+          // recibir el foco con el tabulador: se estaría saltando a algo que
+          // no se ve. inert lo resuelve sin sacarlo del HTML.
+          this.panel.setAttribute('inert', '');
+
+          this.toggle.addEventListener('click', () => this.setOpen(!this.isOpen));
+
+          // Si alguien llega con un enlace a un ancla que está dentro del
+          // texto plegado, se abre solo.
+          if (window.location.hash) {
+            try {
+              if (this.panel.querySelector(window.location.hash)) this.setOpen(true, false);
+            } catch (err) {
+              /* hash no válido como selector */
+            }
+          }
+
+          // El editor de temas: al seleccionar un bloque de dentro, se abre.
+          this.addEventListener('shopify:block:select', () => this.setOpen(true, false));
+        }
+
+        onEnd(e) {
+          if (e.propertyName !== 'max-height') return;
+          // Abierto y ya animado: se suelta el alto para que el texto pueda
+          // refluir solo si cambia el ancho de la ventana.
+          if (this.isOpen) this.panel.style.maxHeight = 'none';
+        }
+
+        setOpen(open, animate) {
+          if (animate === undefined) animate = true;
+          this.isOpen = open;
+
+          this.toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+          if (this.label) {
+            this.label.textContent = open ? this.dataset.labelLess : this.dataset.labelMore;
+          }
+          this.panel.classList.toggle('is-open', open);
+
+          if (open) this.panel.removeAttribute('inert');
+          else this.panel.setAttribute('inert', '');
+
+          const collapsed = getComputedStyle(this).getPropertyValue('--zs-collapsed').trim() || '0px';
+
+          if (!animate) {
+            this.panel.style.maxHeight = open ? 'none' : collapsed;
+            return;
+          }
+
+          this.panel.removeEventListener('transitionend', this.onEnd);
+
+          if (open) {
+            // Se mide el alto real del contenido en vez de poner un valor
+            // grande a ojo: así la animación dura lo que tiene que durar.
+            this.panel.style.maxHeight = this.panel.scrollHeight + 'px';
+            this.panel.addEventListener('transitionend', this.onEnd);
+          } else {
+            // Al cerrar hay que partir de un valor concreto, porque desde
+            // 'none' el navegador no puede animar.
+            this.panel.style.maxHeight = this.panel.scrollHeight + 'px';
+            void this.panel.offsetHeight;
+            this.panel.style.maxHeight = collapsed;
+
+            if (this.dataset.scrollOnClose === 'true') {
+              const top = this.getBoundingClientRect().top;
+              if (top < 0) {
+                this.scrollIntoView({
+                  behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                    ? 'auto'
+                    : 'smooth',
+                  block: 'start'
+                });
+              }
+            }
+          }
+        }
+      }
+    );
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Texto ampliable",
+  "tag": "section",
+  "class": "section-zseo",
+  "max_blocks": 30,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Contenido visible"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Título",
+      "info": "Enter para salto de línea. Envuelve una palabra en <em>así</em> para el acento en cursiva.",
+      "default": "Una rutina diaria para foco, calma y descanso"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Etiqueta HTML del título (SEO)",
+      "options": [
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "div", "label": "div (sin peso SEO)" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "richtext",
+      "id": "intro",
+      "label": "Entradilla",
+      "info": "Se ve siempre, con el texto plegado. Dos o tres frases funcionan bien.",
+      "default": "<p>Resume aquí en dos frases de qué va el producto y a quién le sirve. El resto del texto queda debajo, desplegable con «Ver más».</p>"
+    },
+
+    {
+      "type": "header",
+      "content": "Plegado"
+    },
+    {
+      "type": "select",
+      "id": "collapse_mode",
+      "label": "Cómo se pliega",
+      "info": "«Solo la entradilla» es lo del original: se ve el título y la entradilla, y todo lo demás aparece al pulsar. «Recortar» deja asomar unos centímetros del texto largo con un degradado.",
+      "options": [
+        { "value": "intro", "label": "Solo la entradilla" },
+        { "value": "clamp", "label": "Recortar con degradado" }
+      ],
+      "default": "intro"
+    },
+    {
+      "type": "range",
+      "id": "clamp_height_d",
+      "min": 40,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "label": "Altura visible al recortar — PC",
+      "info": "Solo en modo «Recortar».",
+      "default": 180
+    },
+    {
+      "type": "range",
+      "id": "clamp_height_m",
+      "min": 40,
+      "max": 500,
+      "step": 10,
+      "unit": "px",
+      "label": "Altura visible al recortar — Móvil",
+      "default": 140
+    },
+    {
+      "type": "range",
+      "id": "fade_height_d",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Alto del degradado — PC",
+      "default": 70
+    },
+    {
+      "type": "range",
+      "id": "fade_height_m",
+      "min": 0,
+      "max": 160,
+      "step": 5,
+      "unit": "px",
+      "label": "Alto del degradado — Móvil",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "transition_ms",
+      "min": 0,
+      "max": 1200,
+      "step": 25,
+      "unit": "ms",
+      "label": "Duración del despliegue",
+      "default": 400
+    },
+    {
+      "type": "checkbox",
+      "id": "scroll_on_close",
+      "label": "Volver arriba al plegar",
+      "info": "Evita quedarse colgado a mitad de página cuando el texto se recoge de golpe.",
+      "default": true
+    },
+
+    {
+      "type": "header",
+      "content": "Botón Ver más"
+    },
+    {
+      "type": "text",
+      "id": "label_more",
+      "label": "Texto plegado",
+      "default": "Ver más"
+    },
+    {
+      "type": "text",
+      "id": "label_less",
+      "label": "Texto desplegado",
+      "default": "Ver menos"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "button_color_hover",
+      "label": "Color al pasar el ratón",
+      "default": "#6b6b6b"
+    },
+    {
+      "type": "select",
+      "id": "button_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "checkbox",
+      "id": "button_uppercase",
+      "label": "En mayúsculas",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "button_letter_spacing",
+      "min": -1,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "button_underline_offset",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Distancia del subrayado",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "button_size_d",
+      "min": 10,
+      "max": 26,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "button_size_m",
+      "min": 9,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "button_icon_size_d",
+      "min": 0,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de la flecha — PC",
+      "info": "0 para quitarla.",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "button_icon_size_m",
+      "min": 0,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de la flecha — Móvil",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "button_icon_stroke",
+      "min": 0.5,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Grosor del trazo de la flecha",
+      "default": 1.4
+    },
+    {
+      "type": "range",
+      "id": "button_icon_gap",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación texto / flecha",
+      "default": 6
+    },
+    {
+      "type": "select",
+      "id": "button_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "flex-start", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "flex-end", "label": "Derecha" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "select",
+      "id": "button_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "flex-start", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "flex-end", "label": "Derecha" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "range",
+      "id": "button_margin_top_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen superior — PC",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "button_margin_top_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen superior — Móvil",
+      "default": 18
+    },
+
+    {
+      "type": "header",
+      "content": "Diseño general"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo",
+      "info": "El degradado del modo «Recortar» usa este color: si el fondo real viene de fuera, ponlo aquí igual o el degradado se verá como una banda.",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "mobile_breakpoint",
+      "min": 480,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "label": "Punto de cambio a móvil",
+      "default": 750
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 0,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "label": "Ancho máximo del contenedor",
+      "info": "0 = ancho completo.",
+      "default": 1500
+    },
+    {
+      "type": "range",
+      "id": "text_max_width_d",
+      "min": 0,
+      "max": 1200,
+      "step": 20,
+      "unit": "px",
+      "label": "Ancho máximo del texto — PC",
+      "info": "0 = todo el contenedor. Entre 700 y 800 es lo cómodo de leer.",
+      "default": 780
+    },
+    {
+      "type": "select",
+      "id": "text_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "text_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding superior — PC",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding inferior — PC",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_left_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding izquierdo — PC",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_right_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding derecho — PC",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_top_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding superior — Móvil",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding inferior — Móvil",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "padding_left_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding izquierdo — Móvil",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_right_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding derecho — Móvil",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "panel_gap_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entradilla / texto desplegado — PC",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "panel_gap_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entradilla / texto desplegado — Móvil",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "block_gap_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre bloques — PC",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "block_gap_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre bloques — Móvil",
+      "default": 14
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía del título"
+    },
+    {
+      "type": "select",
+      "id": "heading_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "thin2"
+    },
+    {
+      "type": "text",
+      "id": "heading_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'thin2', serif"
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "em_color",
+      "label": "Color del acento <em>",
+      "default": "#000000"
+    },
+    {
+      "type": "checkbox",
+      "id": "em_italic",
+      "label": "Acento <em> en cursiva",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "heading_size_d",
+      "min": 16,
+      "max": 90,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_d",
+      "min": 0.8,
+      "max": 2,
+      "step": 0.1,
+      "label": "Interlineado — PC",
+      "default": 1.2
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing_d",
+      "min": -3,
+      "max": 6,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — PC",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "heading_size_m",
+      "min": 12,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 19
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_m",
+      "min": 0.8,
+      "max": 2,
+      "step": 0.1,
+      "label": "Interlineado — Móvil",
+      "default": 1.3
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — Móvil",
+      "default": 10
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía del texto"
+    },
+    {
+      "type": "select",
+      "id": "body_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "body_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Color",
+      "default": "#2b2b2b"
+    },
+    {
+      "type": "range",
+      "id": "body_size_d",
+      "min": 10,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "body_line_height_d",
+      "min": 1,
+      "max": 2.4,
+      "step": 0.1,
+      "label": "Interlineado — PC",
+      "default": 1.6
+    },
+    {
+      "type": "range",
+      "id": "paragraph_gap_d",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre párrafos — PC",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "body_size_m",
+      "min": 9,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "body_line_height_m",
+      "min": 1,
+      "max": 2.4,
+      "step": 0.1,
+      "label": "Interlineado — Móvil",
+      "default": 1.5
+    },
+    {
+      "type": "range",
+      "id": "paragraph_gap_m",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre párrafos — Móvil",
+      "default": 12
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía de los subtítulos"
+    },
+    {
+      "type": "select",
+      "id": "sub_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "same_as_body", "label": "La misma del texto" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "select",
+      "id": "sub_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "color",
+      "id": "sub_color",
+      "label": "Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "sub_line_height",
+      "min": 1,
+      "max": 2.2,
+      "step": 0.1,
+      "label": "Interlineado",
+      "default": 1.3
+    },
+    {
+      "type": "range",
+      "id": "sub_size_d",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 19
+    },
+    {
+      "type": "range",
+      "id": "sub_size_m",
+      "min": 9,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "sub_margin_top_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen superior — PC",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "sub_margin_bottom_d",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — PC",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "sub_margin_top_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen superior — Móvil",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "sub_margin_bottom_m",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — Móvil",
+      "default": 6
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Párrafo",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "<p>Desarrolla aquí el contenido largo. Este texto está en el HTML desde la primera carga aunque se vea plegado, así que cuenta para el posicionamiento.</p>"
+        }
+      ]
+    },
+    {
+      "type": "subheading",
+      "name": "Subtítulo",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Subtítulo",
+          "default": "Un subtítulo con la palabra clave"
+        },
+        {
+          "type": "select",
+          "id": "tag",
+          "label": "Etiqueta HTML (SEO)",
+          "info": "Respeta la jerarquía: si el título de la sección es H2, estos deberían ser H3.",
+          "options": [
+            { "value": "h3", "label": "H3" },
+            { "value": "h4", "label": "H4" },
+            { "value": "div", "label": "div (sin peso SEO)" }
+          ],
+          "default": "h3"
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Imagen",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Pie de imagen",
+          "info": "Opcional. También se usa como texto alternativo si la imagen no tiene uno."
+        },
+        {
+          "type": "range",
+          "id": "max_width",
+          "min": 0,
+          "max": 1000,
+          "step": 10,
+          "unit": "px",
+          "label": "Ancho máximo",
+          "info": "0 = todo el ancho del texto.",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "radius",
+          "min": 0,
+          "max": 40,
+          "step": 1,
+          "unit": "px",
+          "label": "Redondeo",
+          "default": 0
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Texto ampliable",
+      "blocks": [
+        { "type": "text" },
+        { "type": "subheading" },
+        { "type": "text" },
+        { "type": "subheading" },
+        { "type": "text" }
+      ]
+    }
+  ]
+}
+{% endschema %}
