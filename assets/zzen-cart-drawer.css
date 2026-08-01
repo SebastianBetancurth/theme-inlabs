@@ -766,14 +766,12 @@
   margin: 0;
 }
 
-/* Total: 26 + 30 + 26 = 82px fijos.
-   Si prefieres los separadores verticales entre botones y número, descomenta:
+
 
    .zsd quantity-input.zsd-qty .zsd-qty__input {
      border-left: 1px solid var(--zsd-qty-border);
      border-right: 1px solid var(--zsd-qty-border);
    }
-*/
 
 /* ==========================================================================
    8. Etiqueta de descuento

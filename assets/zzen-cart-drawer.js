@@ -2,9 +2,8 @@
    Motor del cart drawer ZZEN
    Ruta: assets/zzen-cart-drawer.js
 
-   Hace cuatro cosas: anima la barra de desbloqueos, añade y retira los regalos
-   automáticos, mete productos desde las recomendaciones sin recargar, y
-   destapa el spinner de carga en cuanto se pulsa + o -.
+   Hace tres cosas: anima la barra de desbloqueos, añade y retira los regalos
+   automáticos, y mete productos desde las recomendaciones sin recargar.
 
    ---------------------------------------------------------------------------
    POR QUÉ ES UN CUSTOM ELEMENT Y NO UN SCRIPT SUELTO
@@ -21,9 +20,8 @@
    en Liquid, y el motor solo tiene que decidir si toca escribir en el carrito.
 
    Lo único que NO puede ir dentro del elemento son los listeners de las
-   recomendaciones y de los botones de cantidad, porque esos nodos también se
-   destruyen. Van por delegación sobre <cart-drawer>, que es el único que
-   sobrevive a todo.
+   recomendaciones, porque los botones también se destruyen. Esos van por
+   delegación sobre <cart-drawer>, que es el único nodo que sobrevive a todo.
    ========================================================================== */
 
 (() => {
@@ -74,9 +72,6 @@
   let passesTimer = null;
   const MAX_PASSES = 8;
 
-  /* Red de seguridad del spinner manual: ver showLineSpinner(). */
-  const SPINNER_FALLBACK_MS = 5000;
-
   /* Regalos cuyo alta ha fallado (sin stock, variante borrada). No se
      reintentan en esta sesión: si no, cada cambio del carrito volvería a
      lanzar una petición condenada a fallar. */
@@ -113,52 +108,6 @@
       sections: 'cart-drawer,cart-icon-bubble',
       sections_url: window.location.pathname,
     };
-  }
-
-  /* ------------------------------------------------------------------------
-     SPINNER INMEDIATO AL PULSAR + O -
-
-     El recorrido normal de Dawn es este:
-
-       click  ->  quantity-input.js hace stepUp() y el número cambia YA
-       +300ms ->  vence el debounce de CartItems (ON_CHANGE_DEBOUNCE_TIMER)
-       +300ms ->  arranca el fetch y enableLoading() destapa el spinner
-
-     O sea que durante 300 ms el número ya ha cambiado pero no hay ningún
-     indicador de que se esté guardando nada. Se ve como si el spinner llegara
-     tarde, porque llega tarde.
-
-     Aquí se destapa el spinner en el propio click. enableLoading() volverá a
-     quitarle la clase `hidden` cuando le toque, lo cual es inofensivo, y
-     disableLoading() se la devuelve al terminar.
-
-     El número no se puede congelar: validateQuantity() lee event.target.value
-     cuando vence el debounce, así que revertirlo mandaría al carrito la
-     cantidad vieja. Se atenúa con la clase is-updating, que es la señal de
-     "pendiente de confirmar" sin tocar el dato.
-
-     El temporizador de respaldo cubre el caso en que el cambio nunca llegue a
-     dispararse (por ejemplo al chocar contra el máximo de la variante, donde
-     stepUp no cambia el valor y no se emite ningún evento). Sin él, el
-     spinner se quedaría girando para siempre.
-  ------------------------------------------------------------------------ */
-  function showLineSpinner(btn) {
-    const line = btn.closest('.zsd-line');
-    if (!line) return;
-
-    const spinners = line.querySelectorAll('.loading__spinner');
-    if (!spinners.length) return;
-
-    const qty = btn.closest('quantity-input');
-
-    spinners.forEach((sp) => sp.classList.remove('hidden'));
-    if (qty) qty.classList.add('is-updating');
-
-    clearTimeout(line.zzenSpinnerTimer);
-    line.zzenSpinnerTimer = setTimeout(() => {
-      spinners.forEach((sp) => sp.classList.add('hidden'));
-      if (qty) qty.classList.remove('is-updating');
-    }, SPINNER_FALLBACK_MS);
   }
 
   /* ------------------------------------------------------------------------
@@ -250,27 +199,16 @@
     }
   }
 
-  /* ------------------------------------------------------------------------
-     Delegación sobre <cart-drawer>, el único nodo que sobrevive a los
-     re-renders. Un solo listener para las dos cosas.
-  ------------------------------------------------------------------------ */
   function bindDrawer() {
     const d = drawer();
     if (!d || d.zzenBound) return;
     d.zzenBound = true;
 
     d.addEventListener('click', (event) => {
-      const addBtn = event.target.closest('[data-zsd-add]');
-      if (addBtn) {
-        event.preventDefault();
-        addReco(addBtn);
-        return;
-      }
-
-      const qtyBtn = event.target.closest('.zsd-qty__btn');
-      if (qtyBtn && !qtyBtn.disabled) {
-        showLineSpinner(qtyBtn);
-      }
+      const btn = event.target.closest('[data-zsd-add]');
+      if (!btn) return;
+      event.preventDefault();
+      addReco(btn);
     });
   }
 
