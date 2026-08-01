@@ -1720,6 +1720,152 @@
         "heading_align_m": "center",
         "heading_margin_bottom_m": 18
       }
+    },
+    "ingredientes_premium_CQTqrC": {
+      "type": "ingredientes-premium",
+      "blocks": {
+        "ingredient_YYyHDX": {
+          "type": "ingredient",
+          "settings": {
+            "tab": "Focus",
+            "title": "Ingrediente",
+            "dosage": "100mg",
+            "description": "<p>Describí aquí el ingrediente, su función y en qué alimentos está presente.</p>",
+            "benefits": "Contribuye al metabolismo energético\nAyuda a reducir el cansancio\nApoya el sistema inmunitario\nFavorece la función psicológica normal"
+          }
+        },
+        "ingredient_36RRf7": {
+          "type": "ingredient",
+          "settings": {
+            "tab": "Magnesium +´7",
+            "title": "Ingrediente",
+            "dosage": "100mg",
+            "description": "<p>Describí aquí el ingrediente, su función y en qué alimentos está presente.</p>",
+            "benefits": "Contribuye al metabolismo energético\nAyuda a reducir el cansancio\nApoya el sistema inmunitario\nFavorece la función psicológica normal"
+          }
+        },
+        "ingredient_xCnwGA": {
+          "type": "ingredient",
+          "settings": {
+            "tab": "Omega 3",
+            "title": "Ingrediente",
+            "dosage": "100mg",
+            "description": "<p>Describí aquí el ingrediente, su función y en qué alimentos está presente.</p>",
+            "benefits": "Contribuye al metabolismo energético\nAyuda a reducir el cansancio\nApoya el sistema inmunitario\nFavorece la función psicológica normal"
+          }
+        },
+        "ingredient_47wqpV": {
+          "type": "ingredient",
+          "settings": {
+            "tab": "Focus",
+            "title": "Bacopa Monieri",
+            "dosage": "300MG",
+            "description": "",
+            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
+          }
+        },
+        "ingredient_7Jfqe8": {
+          "type": "ingredient",
+          "settings": {
+            "tab": "Focus",
+            "title": "Rhodiola rosea",
+            "dosage": "200mg",
+            "description": "",
+            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
+          }
+        },
+        "ingredient_7ry86E": {
+          "type": "ingredient",
+          "settings": {
+            "tab": "Focus",
+            "title": "Cafeína",
+            "dosage": "120MG",
+            "description": "",
+            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
+          }
+        },
+        "ingredient_FzDynU": {
+          "type": "ingredient",
+          "settings": {
+            "tab": "Focus",
+            "title": "L-teanina",
+            "dosage": "120mg",
+            "description": "",
+            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
+          }
+        },
+        "ingredient_qqELT8": {
+          "type": "ingredient",
+          "settings": {
+            "tab": "Calm",
+            "title": "Ashwagandha",
+            "dosage": "300mg",
+            "description": "",
+            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
+          }
+        },
+        "ingredient_bhnWTy": {
+          "type": "ingredient",
+          "settings": {
+            "tab": "Sleep",
+            "title": "Melatonina",
+            "dosage": "1,9mg",
+            "description": "",
+            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
+          }
+        }
+      },
+      "block_order": [
+        "ingredient_YYyHDX",
+        "ingredient_36RRf7",
+        "ingredient_xCnwGA",
+        "ingredient_47wqpV",
+        "ingredient_7Jfqe8",
+        "ingredient_7ry86E",
+        "ingredient_FzDynU",
+        "ingredient_qqELT8",
+        "ingredient_bhnWTy"
+      ],
+      "custom_css": [
+        "{margin-top: 20px;}"
+      ],
+      "name": "Ingredientes ciencia",
+      "settings": {
+        "heading": "Ingredientes avalados por la ciencia",
+        "heading_size": 68,
+        "heading_size_mobile": 34,
+        "more_label": "Ver más",
+        "full_width": false,
+        "max_width": 1500,
+        "card_width": 300,
+        "card_width_mobile": 270,
+        "card_gap": 24,
+        "image_ratio": "square",
+        "card_radius": 10,
+        "container_radius": 12,
+        "show_arrows": true,
+        "show_scrollbar": true,
+        "padding_top": 48,
+        "padding_bottom": 48,
+        "color_bg": "#ffffff",
+        "color_heading": "#121212",
+        "color_carousel_bg": "#f0f0f0",
+        "color_arrow": "#121212",
+        "color_tab_bg": "#ffffff",
+        "color_tab_text": "#121212",
+        "color_tab_border": "#121212",
+        "color_tab_active_bg": "#000000",
+        "color_tab_active_text": "#ffffff",
+        "color_card_bg": "#ffffff",
+        "color_card_title": "#121212",
+        "color_card_dose": "#6a6a6a",
+        "color_link": "#121212",
+        "color_modal_bg": "#ffffff",
+        "color_modal_text": "#121212",
+        "color_modal_secondary": "#6a6a6a",
+        "color_overlay": "#000000",
+        "overlay_opacity": 60
+      }
     }
   },
   "order": [
@@ -1733,6 +1879,7 @@
     "stats_results_C87kQR",
     "custom_compare_table_GxYNFp",
     "custom_day_routine_YnBe9K",
-    "custom_audience_carouse_aCyYB6"
+    "custom_audience_carouse_aCyYB6",
+    "ingredientes_premium_CQTqrC"
   ]
 }
