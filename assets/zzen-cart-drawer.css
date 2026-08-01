@@ -438,18 +438,16 @@
   min-width: 0;
 }
 
-.zsd-line__top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+.zsd .zsd-line__top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
   gap: 10px;
 }
 
-.zsd-line__names {
+.zsd .zsd-line__names {
   min-width: 0;
-  flex: 1 1 auto;
 }
-
 .zsd-line__title {
   display: block;
   font-size: var(--zsd-line-title-size);
