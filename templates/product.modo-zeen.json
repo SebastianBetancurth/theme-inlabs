@@ -2093,7 +2093,7 @@
         "heading_tag": "h2",
         "intro": "<p>Modo ZZEN reúne Focus, Calm y Sleep en una rutina sencilla para quienes quieren ordenar su energía mental, gestionar mejor el estrés y cuidar el descanso sin depender de soluciones sueltas.</p>",
         "collapse_mode": "clamp",
-        "clamp_height_d": 180,
+        "clamp_height_d": 40,
         "clamp_height_m": 140,
         "fade_height_d": 70,
         "fade_height_m": 50,
