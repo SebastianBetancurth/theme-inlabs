@@ -341,7 +341,7 @@
 .zsd__form {
   display: flex;
   flex-direction: column;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   min-height: 0;
 }
 
@@ -374,10 +374,12 @@
    5. Estado vacío
    ========================================================================== */
 
-/* min-height explícito y no solo flex:1. Si el mensaje dependiera de que toda
-   la cadena flex se estire, cualquier regla de Dawn o de una app que toque
-   .drawer__contents o .cart-drawer__form lo dejaría con cero alto y el
-   mensaje desaparecería sin dejar rastro en el DOM. */
+/* Hermano del formulario, no hijo. Antes vivía dentro de #CartDrawer-CartItems,
+   colgando de tres clases de Dawn a la vez (.cart__contents, .cart-drawer__form
+   y .drawer__contents); la primera está en una hoja global que no controlamos y
+   cualquier display o grid suyo lo dejaba en cero alto. Aquí la cadena es solo
+   nuestra. El min-height explícito es el segundo cinturón: el mensaje se ve
+   aunque el flex no llegue a estirarse. */
 .zsd .zsd__empty {
   flex: 1 1 auto;
   display: grid;
@@ -445,6 +447,7 @@
 
 .zsd-line__names {
   min-width: 0;
+  flex: 1 1 auto;
 }
 
 .zsd-line__title {
@@ -454,6 +457,9 @@
   line-height: 1.3;
   color: var(--zsd-line-title);
   text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .zsd-line__title:hover {
