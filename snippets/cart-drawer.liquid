@@ -223,7 +223,16 @@
 {%- endcapture -%}
 
 {%- style -%}
+@font-face {
+      font-family: 'ZZEN Neue';
+      src: url('{{ 'HelveticaNeueCyr-Light.woff2' | asset_url }}') format('woff2');
+      font-weight: 300;
+      font-style: normal;
+      font-display: swap;
+    }
+
   .zsd {
+    --zsd-font: 'ZZEN Neue', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     --zsd-panel-w: {{ s.panel_width }}px;
     --zsd-panel-r: {{ s.panel_radius }}px;
     --zsd-panel-bg: {{ s.panel_bg }};
