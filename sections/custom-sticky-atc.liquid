@@ -173,6 +173,11 @@
     --zs-badge-icon-color: {{ s.badge_icon_color }};
     --zs-badge-row-gap: {{ s.badge_row_gap }}px;
 
+    --zs-toast-bg: {{ s.toast_bg }};
+    --zs-toast-color: {{ s.toast_color }};
+    --zs-toast-size: {{ s.toast_size }}px;
+    --zs-toast-radius: {{ s.toast_radius }}px;
+
     --zs-anim: {{ s.transition_ms }}ms;
   }
 
@@ -373,29 +378,40 @@
     stroke-linejoin: round;
   }
 
-  /* ================= Aviso de añadido ================= */
+  /* ================= Aviso de añadido =================
+     Se ajusta al texto y lleva su propio redondeo. Antes heredaba el radio de
+     40px del botón y el ancho completo de la barra, así que salía idéntico a
+     una segunda píldora de compra: parecía un botón más. Una etiqueta de
+     confirmación tiene que leerse como un mensaje, no como algo pulsable. */
   .zsa__toast {
     position: absolute;
-    left: var(--zs-px);
-    right: var(--zs-px);
-    bottom: calc(100% + 8px);
-    padding: 10px 14px;
+    left: 50%;
+    bottom: calc(100% + 6px);
+    width: max-content;
+    max-width: calc(100% - (var(--zs-px) * 2));
+    padding: 7px 13px;
     box-sizing: border-box;
-    border-radius: {{ s.btn_radius }}px;
-    background-color: {{ s.toast_bg }};
-    color: {{ s.toast_color }};
+    border-radius: var(--zs-toast-radius);
+    background-color: var(--zs-toast-bg);
+    color: var(--zs-toast-color);
     font-family: var(--zs-badge-font);
-    font-size: var(--zs-badge-size);
+    font-size: var(--zs-toast-size);
+    font-weight: 400;
+    line-height: 1.35;
+    letter-spacing: 0;
+    text-transform: none;
     text-align: center;
     opacity: 0;
-    transform: translateY(6px);
+    /* El translateX(-50%) centra; el Y es la animación. Van juntos en la misma
+       propiedad o el segundo transform anularía al primero. */
+    transform: translate(-50%, 6px);
     transition: opacity var(--zs-anim) ease, transform var(--zs-anim) ease;
     pointer-events: none;
   }
 
   .zsa__toast.is-on {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate(-50%, 0);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -419,6 +435,7 @@
     data-hide-selector="{{ s.hide_selector | escape }}"
     data-scroll-offset="{{ s.scroll_offset }}"
     data-after-add="{{ s.after_add }}"
+    data-feedback="{{ s.feedback }}"
     data-use-main-quantity="{{ s.use_main_quantity }}"
     data-pad-body="{{ s.pad_body }}"
     data-cart-add-url="{{ routes.cart_add_url }}"
@@ -565,6 +582,7 @@
           this.action = d.action || 'add';
           this.addMethod = d.addMethod || 'click';
           this.afterAdd = d.afterAdd || 'drawer';
+          this.feedback = d.feedback || 'button';
           this.useMainQty = d.useMainQuantity === 'true';
           this.padBody = d.padBody === 'true';
           this.multi = d.multiVariant === 'true';
@@ -604,6 +622,8 @@
           if (this._onScroll) window.removeEventListener('scroll', this._onScroll);
           if (this._onChange) document.removeEventListener('change', this._onChange, true);
           if (this._mq && this._onMq) this._mq.removeEventListener('change', this._onMq);
+          clearTimeout(this._chipT);
+          clearTimeout(this._flashT);
           if (this.padBody) document.body.style.paddingBottom = '';
         }
 
@@ -859,7 +879,7 @@
             const btn = this.findTarget(this.dataset.submitSelector);
             if (btn && !btn.disabled) {
               btn.click();
-              this.toast(this.dataset.toastText);
+              this.notify(this.dataset.toastText, false);
               return;
             }
             // Si no hay botón que pulsar, se sigue por AJAX.
@@ -892,12 +912,12 @@
             const data = await res.json();
 
             if (!res.ok || data.status) {
-              this.toast(data.description || data.message || this.dataset.errorText);
+              this.notify(data.description || data.message || this.dataset.errorText, true);
             } else {
               this.afterAddDone(data, drawer);
             }
           } catch (err) {
-            this.toast(this.dataset.errorText);
+            this.notify(this.dataset.errorText, true);
           } finally {
             this.busy = false;
             this.btn.classList.remove('is-loading');
@@ -921,7 +941,7 @@
             this.refreshCartCount();
           }
 
-          this.toast(this.dataset.toastText);
+          this.notify(this.dataset.toastText, false);
 
           // Aviso para que el resto del tema y las apps se enteren.
           document.dispatchEvent(new CustomEvent('cart:refresh', { bubbles: true }));
@@ -942,14 +962,45 @@
           }
         }
 
-        toast(text) {
-          if (!this.toastEl || !text) return;
+        /* ------------------------------------------------------------------
+           Confirmación
+        ------------------------------------------------------------------ */
+        notify(text, isError) {
+          if (!text) return;
+
+          // Un error nunca se silencia: si el visitante pulsa y no pasa nada,
+          // asume que la tienda está rota. Se muestra siempre como etiqueta,
+          // aunque el modo elegido sea "sin aviso" o "en el propio botón".
+          const mode = isError ? 'chip' : this.feedback;
+
+          if (mode === 'none') return;
+          if (mode === 'button') {
+            this.flashButton(text);
+            return;
+          }
+          this.chip(text);
+        }
+
+        chip(text) {
+          if (!this.toastEl) return;
           this.toastEl.textContent = text;
           this.toastEl.classList.add('is-on');
-          clearTimeout(this._toastT);
-          this._toastT = setTimeout(() => {
+          clearTimeout(this._chipT);
+          this._chipT = setTimeout(() => {
             this.toastEl.classList.remove('is-on');
           }, this.toastMs);
+        }
+
+        flashButton(text) {
+          if (!this.labelEl) return this.chip(text);
+
+          this.labelEl.textContent = text;
+          if (this.pricesEl) this.pricesEl.hidden = true;
+
+          // syncVariant vuelve a poner la etiqueta y el precio de la variante
+          // activa, así que sirve de restauración sin guardar estado aparte.
+          clearTimeout(this._flashT);
+          this._flashT = setTimeout(() => this.syncVariant(), this.toastMs);
         }
       }
     );
@@ -1592,18 +1643,30 @@
 
     {
       "type": "header",
-      "content": "Mensajes"
+      "content": "Confirmación al añadir"
+    },
+    {
+      "type": "select",
+      "id": "feedback",
+      "label": "Cómo se confirma",
+      "info": "Si el carrito lateral se abre al añadir, ya es confirmación suficiente y puedes elegir «Sin aviso». Los errores se muestran siempre, pase lo que pase.",
+      "options": [
+        { "value": "button", "label": "El propio botón cambia de texto" },
+        { "value": "chip", "label": "Etiqueta encima de la barra" },
+        { "value": "none", "label": "Sin aviso" }
+      ],
+      "default": "button"
     },
     {
       "type": "text",
       "id": "toast_text",
-      "label": "Aviso al añadir",
-      "default": "Añadido al carrito"
+      "label": "Texto al añadir",
+      "default": "Añadido ✓"
     },
     {
       "type": "text",
       "id": "error_text",
-      "label": "Aviso si algo falla",
+      "label": "Texto si algo falla",
       "default": "No se ha podido añadir. Vuelve a intentarlo."
     },
     {
@@ -1614,19 +1677,40 @@
       "step": 200,
       "unit": "ms",
       "label": "Duración del aviso",
-      "default": 2200
+      "default": 2000
     },
     {
       "type": "color",
       "id": "toast_bg",
-      "label": "Fondo del aviso",
+      "label": "Fondo de la etiqueta",
       "default": "#111111"
     },
     {
       "type": "color",
       "id": "toast_color",
-      "label": "Texto del aviso",
+      "label": "Texto de la etiqueta",
       "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "toast_size",
+      "min": 9,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del texto de la etiqueta",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "toast_radius",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo de la etiqueta",
+      "info": "Mantenlo bajo: con el mismo redondeo que el botón, la etiqueta parece un segundo botón.",
+      "default": 8
     }
   ],
   "blocks": [
