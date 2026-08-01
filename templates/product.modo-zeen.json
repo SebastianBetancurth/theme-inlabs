@@ -2119,7 +2119,7 @@
         "button_margin_top_m": 18,
         "bg_color": "#ffffff",
         "mobile_breakpoint": 750,
-        "content_max_width": 540,
+        "content_max_width": 1800,
         "text_max_width_d": 780,
         "text_align_d": "left",
         "text_align_m": "left",
