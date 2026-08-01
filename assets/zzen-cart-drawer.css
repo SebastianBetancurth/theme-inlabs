@@ -585,9 +585,12 @@
   padding: 0;
 }
 
+css
 .zsd-qty {
   display: inline-flex;
   align-items: stretch;
+  width: auto; /* anula el ancho fijo de 14rem que .quantity trae de base.css */
+  min-width: 0;
   height: var(--zsd-qty-h);
   min-height: 0;
   border: 1px solid var(--zsd-qty-border);
@@ -596,10 +599,18 @@
   overflow: hidden;
 }
 
+/* base.css dibuja un borde y un fondo extra sobre .quantity con
+   pseudoelementos; sin esto el selector sale con doble marco. */
+.zsd-qty::before,
+.zsd-qty::after {
+  content: none;
+}
+
+
 .zsd-qty__btn {
   display: grid;
   place-items: center;
-  width: 30px;
+  width: 26px;
   padding: 0;
   border: 0;
   background: none;
@@ -622,14 +633,13 @@
 }
 
 .zsd-qty__input {
-  width: 34px;
+  width: 26px;
   padding: 0;
-  border: 0;
-  border-left: 1px solid var(--zsd-qty-border);
-  border-right: 1px solid var(--zsd-qty-border);
+  border: 0; /* sin separadores internos, como la referencia */
   border-radius: 0;
   background: none;
   font-size: 13px;
+  font-weight: 600;
   text-align: center;
   color: var(--zsd-qty-color);
   -moz-appearance: textfield;
