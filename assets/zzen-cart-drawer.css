@@ -13,8 +13,18 @@
    1. Anulaciones de Dawn
    ========================================================================== */
 
+/* Estado cerrado. component-cart-drawer.css solo declara
+   .drawer.active { visibility: visible } y nunca el oculto: lo ponía un <style>
+   dentro del snippet. Se repite aquí para que el drawer no pueda quedarse
+   visible si alguien limpia ese bloque inline. Sin esto, <cart-drawer> es un
+   fijo a pantalla completa con z-index 1000 y bloquea todos los clics. */
 .zsd.drawer {
+  visibility: hidden;
   background-color: var(--zsd-overlay);
+}
+
+.zsd.drawer.active {
+  visibility: visible;
 }
 
 /* Dawn deja el panel con padding lateral, borde y overflow hidden. Aquí cada
