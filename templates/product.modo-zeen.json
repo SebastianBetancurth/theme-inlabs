@@ -1934,6 +1934,85 @@
         "color_link": "#121212",
         "color_arrow": "#121212"
       }
+    },
+    "faqs_accordion_kDWF6W": {
+      "type": "faqs-accordion",
+      "blocks": {
+        "faq_hHgT8q": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Qué diferencia a ZZEN de otras marcas?",
+            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+          }
+        },
+        "faq_jqAzpA": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Las fórmulas generan dependencia?",
+            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+          }
+        },
+        "faq_xB6bkK": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Las dosis son adecuadas?",
+            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+          }
+        },
+        "faq_Bd6NRJ": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Existen efectos secundarios?",
+            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+          }
+        },
+        "faq_fjX7Eq": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Cuánto tiempo tarda el envío?",
+            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "faq_hHgT8q",
+        "faq_jqAzpA",
+        "faq_xB6bkK",
+        "faq_Bd6NRJ",
+        "faq_fjX7Eq"
+      ],
+      "name": "FAQs",
+      "settings": {
+        "heading": "FAQs",
+        "subtext": "Si tienes alguna duda adicional puedes escribirnos aquí",
+        "single_open": false,
+        "heading_size": 56,
+        "heading_size_mobile": 36,
+        "question_size": 17,
+        "question_size_mobile": 16,
+        "question_padding": 22,
+        "question_padding_mobile": 20,
+        "max_width": 940,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "padding_x": 24,
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "gap_heading": 48,
+        "padding_top_mobile": 48,
+        "padding_bottom_mobile": 48,
+        "padding_x_mobile": 20,
+        "margin_top_mobile": 0,
+        "margin_bottom_mobile": 0,
+        "gap_heading_mobile": 36,
+        "color_bg": "#0b0b0b",
+        "color_heading": "#ffffff",
+        "color_subtext": "#ffffff",
+        "color_question": "#ffffff",
+        "color_answer": "#d6d6d6",
+        "color_line": "#3a3a3a",
+        "color_chevron": "#ffffff"
+      }
     }
   },
   "order": [
@@ -1949,6 +2028,7 @@
     "custom_day_routine_YnBe9K",
     "custom_audience_carouse_aCyYB6",
     "ingredientes_premium_CQTqrC",
-    "doctors_endorse_WVzzar"
+    "doctors_endorse_WVzzar",
+    "faqs_accordion_kDWF6W"
   ]
 }
