@@ -1,1 +1,753 @@
-{%- render 'cart-drawer' -%}
+{%- comment -%}
+  ============================================================================
+  SECCIÓN: Cart drawer ZZEN
+  Ruta: sections/cart-drawer.liquid   (SUSTITUYE al archivo actual)
+
+  IMPORTANTE — PASO OBLIGATORIO ANTES DE PROBAR:
+  En layout/theme.liquid el drawer TIENE que incluirse como sección:
+
+      {%- if settings.cart_type == 'drawer' -%}
+        {% section 'cart-drawer' %}
+      {%- endif -%}
+
+  Si ahí pone {% render 'cart-drawer' %} (el snippet directo), en la primera
+  carga de la página no existe el objeto `section` y todos los settings salen
+  vacíos: el drawer se vería sin colores ni textos. Curiosamente al añadir un
+  producto sí se arreglaría, porque la Cart AJAX API pide `section_id=cart-drawer`
+  y eso sí pasa por este archivo. Ese "funciona a medias" es la pista de que
+  falta cambiar theme.liquid.
+
+  El snippet recibe los settings de forma explícita porque {% render %} aísla
+  el ámbito: no doy por hecho que `section` viaje solo hasta dentro.
+  ============================================================================
+{%- endcomment -%}
+
+{%- render 'cart-drawer', s: section.settings, blocks: section.blocks -%}
+
+{% schema %}
+{
+  "name": "Cart drawer",
+  "max_blocks": 24,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "El carrito lateral. Para que se use, en Configuración del tema → Carrito elige «Carrito lateral»."
+    },
+
+    {
+      "type": "header",
+      "content": "Panel"
+    },
+    {
+      "type": "range",
+      "id": "panel_width",
+      "min": 320,
+      "max": 620,
+      "step": 10,
+      "unit": "px",
+      "label": "Ancho — PC",
+      "default": 420
+    },
+    {
+      "type": "range",
+      "id": "panel_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Redondeo de las esquinas",
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "panel_full_mobile",
+      "label": "Ancho completo en móvil",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "panel_bg",
+      "label": "Fondo del panel",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Color del velo de fondo",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "Opacidad del velo",
+      "default": 45
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Color de las líneas separadoras",
+      "default": "#eaeaea"
+    },
+    {
+      "type": "range",
+      "id": "pad_x",
+      "min": 8,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Relleno lateral",
+      "default": 18
+    },
+
+    {
+      "type": "header",
+      "content": "Cabecera"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título",
+      "default": "Cesta"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 16,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del título",
+      "default": 24
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Color del título",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "close_bg",
+      "label": "Fondo del botón cerrar",
+      "default": "#f1f1f1"
+    },
+    {
+      "type": "color",
+      "id": "close_color",
+      "label": "Color del icono cerrar",
+      "default": "#7a7a7a"
+    },
+    {
+      "type": "range",
+      "id": "close_size",
+      "min": 24,
+      "max": 52,
+      "step": 2,
+      "unit": "px",
+      "label": "Diámetro del botón cerrar",
+      "default": 34
+    },
+
+    {
+      "type": "header",
+      "content": "Barra de desbloqueos"
+    },
+    {
+      "type": "paragraph",
+      "content": "Añade un bloque «Hito» por cada recompensa. Ponlos de menor a mayor importe. El importe se escribe en la moneda de la tienda: 50 = 50,00 €."
+    },
+    {
+      "type": "checkbox",
+      "id": "progress_enabled",
+      "label": "Mostrar la barra",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "progress_basis",
+      "label": "Importe que cuenta",
+      "info": "Los productos de regalo nunca cuentan para el cálculo, o la barra se quedaría atascada al desbloquear uno.",
+      "options": [
+        { "value": "subtotal", "label": "Subtotal de productos" },
+        { "value": "total", "label": "Total tras descuentos" }
+      ],
+      "default": "subtotal"
+    },
+    {
+      "type": "select",
+      "id": "progress_spacing",
+      "label": "Colocación de los hitos",
+      "info": "«Repartidos» los separa por igual y se ve mejor. «Proporcional» los coloca según el importe real, más honesto pero puede apelotonarlos.",
+      "options": [
+        { "value": "even", "label": "Repartidos por igual" },
+        { "value": "amount", "label": "Proporcional al importe" }
+      ],
+      "default": "even"
+    },
+    {
+      "type": "text",
+      "id": "progress_text",
+      "label": "Texto mientras falta",
+      "info": "Usa {amount} para el importe que falta y {reward} para el nombre de la recompensa.",
+      "default": "Añade {amount} más para desbloquear tu {reward}"
+    },
+    {
+      "type": "text",
+      "id": "progress_done_text",
+      "label": "Texto con todo desbloqueado",
+      "default": "¡Has desbloqueado todas las recompensas!"
+    },
+    {
+      "type": "color",
+      "id": "progress_text_color",
+      "label": "Color del texto",
+      "default": "#6b6b6b"
+    },
+    {
+      "type": "range",
+      "id": "progress_text_size",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del texto",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "track_color",
+      "label": "Color de la barra vacía",
+      "default": "#ececec"
+    },
+    {
+      "type": "color",
+      "id": "fill_color",
+      "label": "Color de la barra llena",
+      "default": "#111111"
+    },
+    {
+      "type": "range",
+      "id": "track_height",
+      "min": 2,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor de la barra",
+      "default": 7
+    },
+    {
+      "type": "range",
+      "id": "milestone_size",
+      "min": 28,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "label": "Diámetro de los círculos",
+      "default": 42
+    },
+    {
+      "type": "color",
+      "id": "milestone_bg",
+      "label": "Fondo del círculo bloqueado",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "milestone_border",
+      "label": "Borde del círculo bloqueado",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "milestone_icon",
+      "label": "Icono del círculo bloqueado",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "milestone_bg_on",
+      "label": "Fondo del círculo desbloqueado",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "milestone_icon_on",
+      "label": "Icono del círculo desbloqueado",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "milestone_label_color",
+      "label": "Color de la etiqueta",
+      "default": "#6b6b6b"
+    },
+    {
+      "type": "range",
+      "id": "milestone_label_size",
+      "min": 8,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño de la etiqueta",
+      "default": 11
+    },
+
+    {
+      "type": "header",
+      "content": "Líneas del carrito"
+    },
+    {
+      "type": "range",
+      "id": "line_img_size",
+      "min": 48,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Tamaño de la imagen",
+      "default": 68
+    },
+    {
+      "type": "range",
+      "id": "line_img_radius",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo de la imagen",
+      "default": 6
+    },
+    {
+      "type": "color",
+      "id": "line_img_bg",
+      "label": "Fondo del hueco de imagen",
+      "default": "#f6f6f6"
+    },
+    {
+      "type": "color",
+      "id": "line_title_color",
+      "label": "Color del título",
+      "default": "#111111"
+    },
+    {
+      "type": "range",
+      "id": "line_title_size",
+      "min": 12,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del título",
+      "default": 15
+    },
+    {
+      "type": "color",
+      "id": "line_meta_color",
+      "label": "Color de la variante",
+      "default": "#9a9a9a"
+    },
+    {
+      "type": "color",
+      "id": "line_price_color",
+      "label": "Color del precio",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "line_compare_color",
+      "label": "Color del precio tachado",
+      "default": "#9a9a9a"
+    },
+    {
+      "type": "checkbox",
+      "id": "line_show_saving",
+      "label": "Mostrar el ahorro por línea",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "line_saving_text",
+      "label": "Texto del ahorro",
+      "info": "Usa {amount} para el importe.",
+      "default": "(Ahorro {amount})"
+    },
+    {
+      "type": "color",
+      "id": "line_saving_color",
+      "label": "Color del ahorro",
+      "default": "#e02b2b"
+    },
+    {
+      "type": "checkbox",
+      "id": "line_show_discount_chip",
+      "label": "Mostrar la etiqueta de descuento",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "qty_border",
+      "label": "Borde del selector de cantidad",
+      "default": "#dcdcdc"
+    },
+    {
+      "type": "color",
+      "id": "qty_color",
+      "label": "Texto del selector de cantidad",
+      "default": "#111111"
+    },
+    {
+      "type": "range",
+      "id": "qty_height",
+      "min": 26,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Alto del selector de cantidad",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "qty_radius",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo del selector de cantidad",
+      "default": 20
+    },
+    {
+      "type": "checkbox",
+      "id": "gift_lock_qty",
+      "label": "Bloquear la cantidad en los regalos",
+      "info": "Recomendado: un regalo automático no debería poder duplicarse a mano.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "gift_hide_remove",
+      "label": "Ocultar la papelera en los regalos",
+      "info": "Si lo desmarcas, el visitante puede quitar el regalo, pero volverá a añadirse solo al siguiente cambio del carrito.",
+      "default": true
+    },
+
+    {
+      "type": "header",
+      "content": "Recomendaciones"
+    },
+    {
+      "type": "checkbox",
+      "id": "reco_enabled",
+      "label": "Mostrar recomendaciones",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "reco_title",
+      "label": "Título",
+      "default": "Nuestra recomendación"
+    },
+    {
+      "type": "range",
+      "id": "reco_max",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "label": "Cuántas se muestran a la vez",
+      "default": 3
+    },
+    {
+      "type": "checkbox",
+      "id": "reco_exclude_in_cart",
+      "label": "Ocultar las que ya están en el carrito",
+      "info": "Al eliminarlas del carrito vuelven a aparecer solas.",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "reco_button",
+      "label": "Texto del botón",
+      "default": "Añadir"
+    },
+    {
+      "type": "select",
+      "id": "reco_multi_variant",
+      "label": "Productos con varias variantes",
+      "info": "Si un producto tiene tallas o sabores, añadir a ciegas la primera variante suele acabar en devolución.",
+      "options": [
+        { "value": "first", "label": "Añadir la primera disponible" },
+        { "value": "link", "label": "Llevar a la página del producto" }
+      ],
+      "default": "link"
+    },
+    {
+      "type": "color",
+      "id": "reco_card_bg",
+      "label": "Fondo de la tarjeta",
+      "default": "#f4f4f4"
+    },
+    {
+      "type": "range",
+      "id": "reco_card_radius",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo de la tarjeta",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "reco_img_size",
+      "min": 40,
+      "max": 110,
+      "step": 2,
+      "unit": "px",
+      "label": "Tamaño de la imagen",
+      "default": 62
+    },
+    {
+      "type": "color",
+      "id": "reco_btn_bg",
+      "label": "Fondo del botón",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "reco_btn_color",
+      "label": "Texto del botón",
+      "default": "#ffffff"
+    },
+
+    {
+      "type": "header",
+      "content": "Pie"
+    },
+    {
+      "type": "color",
+      "id": "footer_bg",
+      "label": "Fondo del pie",
+      "default": "#f4f4f4"
+    },
+    {
+      "type": "text",
+      "id": "checkout_label",
+      "label": "Texto del botón de pago",
+      "info": "Usa {total} para el importe total.",
+      "default": "Pago Seguro - {total}"
+    },
+    {
+      "type": "checkbox",
+      "id": "checkout_lock_icon",
+      "label": "Mostrar el candado",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "checkout_bg",
+      "label": "Fondo del botón",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "checkout_color",
+      "label": "Texto del botón",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "checkout_height",
+      "min": 40,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "label": "Alto del botón",
+      "default": 52
+    },
+    {
+      "type": "range",
+      "id": "checkout_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo del botón",
+      "default": 40
+    },
+    {
+      "type": "checkbox",
+      "id": "show_discounts_row",
+      "label": "Mostrar la fila de descuentos",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "discounts_label",
+      "label": "Etiqueta de la fila de descuentos",
+      "default": "Descuentos"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_icons",
+      "label": "Mostrar los iconos de pago",
+      "info": "Se cogen solos de las pasarelas activas en tu tienda.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_note",
+      "label": "Mostrar el campo de nota",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_tax_note",
+      "label": "Mostrar el aviso de impuestos y envío",
+      "default": false
+    },
+
+    {
+      "type": "header",
+      "content": "Carrito vacío"
+    },
+    {
+      "type": "text",
+      "id": "empty_text",
+      "label": "Mensaje",
+      "default": "Tu carrito está vacío"
+    },
+    {
+      "type": "range",
+      "id": "empty_size",
+      "min": 14,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del mensaje",
+      "default": 21
+    },
+    {
+      "type": "color",
+      "id": "empty_color",
+      "label": "Color del mensaje",
+      "default": "#111111"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "milestone",
+      "name": "Hito de la barra",
+      "settings": [
+        {
+          "type": "number",
+          "id": "threshold",
+          "label": "Importe para desbloquear",
+          "info": "En la moneda de la tienda. 50 = 50,00 €.",
+          "default": 50
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Etiqueta bajo el círculo",
+          "default": "Envío Gratis"
+        },
+        {
+          "type": "text",
+          "id": "reward",
+          "label": "Nombre de la recompensa en el texto",
+          "info": "Lo que sustituye a {reward}. Si lo dejas vacío se usa la etiqueta.",
+          "default": "Envío Gratis"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icono",
+          "options": [
+            { "value": "truck", "label": "Camión" },
+            { "value": "discount", "label": "Etiqueta de descuento" },
+            { "value": "gift", "label": "Regalo" },
+            { "value": "star", "label": "Estrella" },
+            { "value": "custom", "label": "Personalizado (abajo)" }
+          ],
+          "default": "truck"
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_image",
+          "label": "Icono personalizado"
+        },
+        {
+          "type": "textarea",
+          "id": "icon_svg",
+          "label": "O pega aquí el SVG"
+        },
+        {
+          "type": "header",
+          "content": "Regalo automático"
+        },
+        {
+          "type": "paragraph",
+          "content": "Si eliges un producto aquí, se añade solo al carrito al alcanzar el importe y se retira solo si el carrito baja. AVISO: el tema no puede poner el precio a cero. Para que salga a 0,00 € hay que crear un descuento automático en Descuentos → Automático que regale ese producto. Sin ese descuento, el regalo se cobraría."
+        },
+        {
+          "type": "product",
+          "id": "gift_product",
+          "label": "Producto de regalo"
+        },
+        {
+          "type": "checkbox",
+          "id": "gift_auto_remove",
+          "label": "Retirarlo si el carrito baja del importe",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "reco",
+      "name": "Recomendación",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Producto"
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      {
+        "type": "milestone",
+        "settings": {
+          "threshold": 50,
+          "label": "Envío Gratis",
+          "reward": "Envío Gratis",
+          "icon": "truck"
+        }
+      },
+      {
+        "type": "milestone",
+        "settings": {
+          "threshold": 100,
+          "label": "15% de Descuento",
+          "reward": "15% de Descuento",
+          "icon": "discount"
+        }
+      },
+      {
+        "type": "milestone",
+        "settings": {
+          "threshold": 150,
+          "label": "Tote Bag de regalo",
+          "reward": "Tote Bag de regalo",
+          "icon": "gift"
+        }
+      },
+      { "type": "reco" },
+      { "type": "reco" },
+      { "type": "reco" }
+    ]
+  }
+}
+{% endschema %}
