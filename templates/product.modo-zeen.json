@@ -1587,7 +1587,7 @@
             "number": "",
             "title": "Estudiantes que necesitan claridad",
             "copy": "<p>Porque memorizar no es lo mismo que comprender.</p>",
-            "icon_svg": ""
+            "icon_svg": "<svg width=\"17\" height=\"17\" viewbox=\"0 0 17 17\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n                        <path d=\"M16 15.8831L15.6729 15.8831L15.6729 1.56035L1.23044 16L1 15.7662L15.4394 1.32951L1.11522 1.32951L1.11522 1L16 1L16 15.8831Z\" fill=\"white\" stroke=\"white\"></path>\n                      </svg>"
           }
         }
       },
