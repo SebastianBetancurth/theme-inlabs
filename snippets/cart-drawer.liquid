@@ -51,6 +51,14 @@
 {%- endcomment -%}
 
 {{ 'zzen-cart-drawer.css' | asset_url | stylesheet_tag }}
+
+<style>
+  /* Estado cerrado. No borrar: .drawer.active es lo único que Dawn declara,
+     y sin este oculto el velo del carrito tapa la página entera. */
+  .drawer {
+    visibility: hidden;
+  }
+</style>
 <script src="{{ 'cart.js' | asset_url }}" defer="defer"></script>
 <script src="{{ 'quantity-popover.js' | asset_url }}" defer="defer"></script>
 <script src="{{ 'zzen-cart-drawer.js' | asset_url }}" defer="defer"></script>
@@ -62,6 +70,11 @@
   assign PH_AMOUNT = '{amount}'
   assign PH_REWARD = '{reward}'
   assign PH_TOTAL = '{total}'
+
+  # La opacidad del velo se calcula aquí, no dentro del filtro de color:
+  # Liquid encadena de izquierda a derecha y el divided_by acabaría
+  # aplicándose al color en lugar de al número.
+  assign overlay_alpha = s.overlay_opacity | divided_by: 100.0
 
   # --------------------------------------------------------------------------
   # Importe que cuenta para los hitos.
@@ -204,7 +217,7 @@
     --zsd-panel-w: {{ s.panel_width }}px;
     --zsd-panel-r: {{ s.panel_radius }}px;
     --zsd-panel-bg: {{ s.panel_bg }};
-    --zsd-overlay: {{ s.overlay_color | color_modify: 'alpha', s.overlay_opacity | divided_by: 100.0 }};
+    --zsd-overlay: {{ s.overlay_color | color_modify: 'alpha', overlay_alpha }};
     --zsd-divider: {{ s.divider_color }};
     --zsd-pad-x: {{ s.pad_x }}px;
 
