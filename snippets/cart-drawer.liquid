@@ -76,6 +76,16 @@
   # aplicándose al color en lugar de al número.
   assign overlay_alpha = s.overlay_opacity | divided_by: 100.0
 
+  # Qué parte del círculo se apoya en el punto del hito.
+  case s.milestone_anchor
+    when 'right'
+      assign mark_shift = '-100%'
+    when 'left'
+      assign mark_shift = '0%'
+    else
+      assign mark_shift = '-50%'
+  endcase
+
   # --------------------------------------------------------------------------
   # Importe que cuenta para los hitos.
   # Los regalos se descuentan siempre. Si no, al desbloquear uno su precio
@@ -240,6 +250,9 @@
     --zsd-dot-icon-on: {{ s.milestone_icon_on }};
     --zsd-dot-label: {{ s.milestone_label_color }};
     --zsd-dot-label-size: {{ s.milestone_label_size }}px;
+    --zsd-dot-label-w: {{ s.milestone_label_width }}px;
+    --zsd-mark-shift: {{ mark_shift }};
+    --zsd-prog-pad: {{ s.progress_side_pad }}px;
 
     --zsd-img: {{ s.line_img_size }}px;
     --zsd-img-r: {{ s.line_img_radius }}px;
@@ -269,6 +282,7 @@
 
     --zsd-empty-size: {{ s.empty_size }}px;
     --zsd-empty-color: {{ s.empty_color }};
+    --zsd-empty-h: {{ s.empty_min_height }}px;
   }
   {%- if s.panel_full_mobile -%}
     @media screen and (max-width: 749px) {
@@ -344,11 +358,7 @@
                   <span
                     class="zsd-prog__fill"
                     data-zsd-fill
-                    {% if fill > 0 %}
-                      style="width: calc(var(--zsd-dot) / 2 + (100% - var(--zsd-dot)) * {{ fill }} / 100);"
-                    {% else %}
-                      style="width: 0;"
-                    {% endif %}
+                    style="width: {{ fill }}%;"
                   ></span>
                 </div>
 
@@ -368,7 +378,7 @@
 
                   <div
                     class="zsd-prog__mark{% if is_on %} is-on{% endif %}"
-                    style="left: calc(var(--zsd-dot) / 2 + (100% - var(--zsd-dot)) * {{ pos | round: 2 }} / 100);"
+                    style="left: {{ pos | round: 2 }}%;"
                     {{ b.shopify_attributes }}
                   >
                     <span class="zsd-prog__dot" aria-hidden="true">
