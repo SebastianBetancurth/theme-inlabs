@@ -1,0 +1,1944 @@
+{%- comment -%}
+  ============================================================================
+  SECCIÓN: Momentos del día con selector de iconos (Tu día en Modo ZZEN)
+  Tema: Dawn / Online Store 2.0
+  Ruta: sections/custom-day-routine.liquid
+
+  PC     -> imagen grande a un lado (con flechas encima y el pie debajo) y al
+            otro lado el título, la fila de iconos redondos y el texto.
+  Móvil  -> todo en una columna: título, imagen con flechas, iconos, pie y
+            texto.
+
+  El orden cambia entre PC y móvil, pero el marcado es uno solo: los cinco
+  bloques se colocan por nombre de zona (grid-template-areas), así que
+  reordenarlos en móvil es cambiar el mapa de zonas y nada más. No hay
+  contenido duplicado ni riesgo de que se desincronice.
+
+  Cada punto del día (bloque) trae su icono, su imagen, su pie y su texto.
+  Se cambia con los iconos, con las flechas, con el teclado o deslizando.
+
+  Pie y texto van apilados en la misma celda: la altura la fija el más largo,
+  de modo que al pasar de un punto a otro nada salta de sitio.
+  ============================================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign bp = s.mobile_breakpoint
+  assign bp_max = bp | minus: 1
+  assign n_blocks = section.blocks.size
+
+  case s.heading_font
+    when 'thin2'
+      assign heading_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign heading_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign heading_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign heading_stack = 'var(--font-body-family)'
+    else
+      assign heading_stack = s.heading_font_custom
+  endcase
+
+  case s.body_font
+    when 'thin2'
+      assign body_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign body_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign body_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign body_stack = 'var(--font-body-family)'
+    else
+      assign body_stack = s.body_font_custom
+  endcase
+
+  if s.content_max_width == 0
+    assign max_w = 'none'
+  else
+    assign max_w = s.content_max_width | append: 'px'
+  endif
+
+  if s.em_italic
+    assign em_style = 'italic'
+  else
+    assign em_style = 'normal'
+  endif
+
+  # ------------------------------------------------------------------
+  # Proporción del hueco de la imagen.
+  # Se toma de la primera imagen cargada para que no queden franjas
+  # vacías arriba y abajo. Si las imágenes no son todas iguales conviene
+  # desactivarlo y fijar la proporción a mano.
+  # ------------------------------------------------------------------
+  assign first_img = blank
+  assign first_img_m = blank
+  for block in section.blocks
+    if first_img == blank and block.settings.image != blank
+      assign first_img = block.settings.image
+    endif
+    if first_img_m == blank and block.settings.image_mobile != blank
+      assign first_img_m = block.settings.image_mobile
+    endif
+  endfor
+  if first_img_m == blank
+    assign first_img_m = first_img
+  endif
+
+  assign ar_d = s.media_ratio_d
+  assign ar_m = s.media_ratio_m
+  if s.media_ratio_auto
+    if first_img != blank
+      assign ar_d = first_img.aspect_ratio
+    endif
+    if first_img_m != blank
+      assign ar_m = first_img_m.aspect_ratio
+    endif
+  endif
+
+  # Zonas del grid. Invertir el lado de la imagen es cambiar el mapa,
+  # no tocar el marcado.
+  if s.media_position_d == 'right'
+    assign cols_d = 'minmax(0, 1fr) ' | append: s.media_width_d | append: '%'
+    assign areas_d = '"heading media" "tabs media" "copy media" "copy caption"'
+  else
+    assign cols_d = s.media_width_d | append: '% minmax(0, 1fr)'
+    assign areas_d = '"media heading" "media tabs" "media copy" "caption copy"'
+  endif
+
+  assign anim_ms = s.transition_ms
+-%}
+
+{%- style -%}
+  @font-face {
+    font-family: 'Helvetica neue';
+    src: url('{{ 'HelveticaNeueCyr-Light.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'thin2';
+    src: url('{{ 'lawrence-regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ================= Variables: PC ================= */
+  .zday-{{ section.id }} {
+    --zd-bg: {{ s.bg_color }};
+    --zd-max-w: {{ max_w }};
+    --zd-pt: {{ s.padding_top_d }}px;
+    --zd-pb: {{ s.padding_bottom_d }}px;
+    --zd-pl: {{ s.padding_left_d }}px;
+    --zd-pr: {{ s.padding_right_d }}px;
+    --zd-gap: {{ s.gap_d }}px;
+    --zd-anim: {{ anim_ms }}ms;
+
+    --zd-h-font: {{ heading_stack }};
+    --zd-h-size: {{ s.heading_size_d }}px;
+    --zd-h-lh: {{ s.heading_line_height_d }};
+    --zd-h-ls: {{ s.heading_letter_spacing_d }}px;
+    --zd-h-weight: {{ s.heading_weight }};
+    --zd-h-color: {{ s.heading_color }};
+    --zd-h-align: {{ s.heading_align_d }};
+    --zd-h-mb: {{ s.heading_margin_bottom_d }}px;
+    --zd-em-color: {{ s.em_color }};
+    --zd-em-style: {{ em_style }};
+
+    --zd-b-font: {{ body_stack }};
+
+    --zd-ar: {{ ar_d }};
+    --zd-media-max: {% if s.media_max_width_d == 0 %}none{% else %}{{ s.media_max_width_d }}px{% endif %};
+    --zd-media-radius: {{ s.media_radius_d }}px;
+    --zd-media-fit: {{ s.media_fit }};
+    --zd-media-bg: {{ s.media_bg }};
+
+    --zd-arrow-color: {{ s.arrow_color }};
+    --zd-arrow-color-hover: {{ s.arrow_color_hover }};
+    --zd-arrow-size: {{ s.arrow_size_d }}px;
+    --zd-arrow-stroke: {{ s.arrow_stroke }};
+    --zd-arrow-offset: {{ s.arrow_offset_d }}px;
+    --zd-arrow-hit: {{ s.arrow_hit_area }}px;
+
+    --zd-tab-size: {{ s.tab_size_d }}px;
+    --zd-tab-gap: {{ s.tab_gap_d }}px;
+    --zd-tab-bg: {{ s.tab_bg }};
+    --zd-tab-bg-active: {{ s.tab_bg_active }};
+    --zd-tab-border: {{ s.tab_border_color }};
+    --zd-tab-border-w: {{ s.tab_border_width }}px;
+    --zd-tab-icon: {{ s.tab_icon_size }}%;
+    --zd-tab-opacity: {{ s.tab_icon_opacity }}%;
+    --zd-tab-opacity-active: {{ s.tab_icon_opacity_active }}%;
+    --zd-tab-justify: {{ s.tab_align_d }};
+    --zd-tab-mt: {{ s.tab_margin_top_d }}px;
+    --zd-tab-mb: {{ s.tab_margin_bottom_d }}px;
+
+    --zd-cap-size: {{ s.caption_size_d }}px;
+    --zd-cap-lh: {{ s.caption_line_height }};
+    --zd-cap-ls: {{ s.caption_letter_spacing }}px;
+    --zd-cap-weight: {{ s.caption_weight }};
+    --zd-cap-color: {{ s.caption_color }};
+    --zd-cap-align: {{ s.caption_align_d }};
+    --zd-cap-transform: {% if s.caption_uppercase %}uppercase{% else %}none{% endif %};
+    --zd-cap-mt: {{ s.caption_margin_top_d }}px;
+
+    --zd-copy-size: {{ s.copy_size_d }}px;
+    --zd-copy-lh: {{ s.copy_line_height_d }};
+    --zd-copy-color: {{ s.copy_color }};
+    --zd-copy-align: {{ s.copy_align_d }};
+    --zd-copy-gap: {{ s.copy_paragraph_gap_d }}px;
+    --zd-copy-mt: {{ s.copy_margin_top_d }}px;
+    --zd-copy-max: {% if s.copy_max_width_d == 0 %}none{% else %}{{ s.copy_max_width_d }}px{% endif %};
+  }
+
+  /* ================= Estructura ================= */
+  .zday {
+    background-color: var(--zd-bg);
+  }
+
+  .zday__inner {
+    display: grid;
+    grid-template-columns: {{ cols_d }};
+    /* Solo la fila del texto absorbe el alto sobrante de la imagen: así el
+       título y los iconos no se separan al crecer la foto. */
+    grid-template-rows: auto auto 1fr auto;
+    grid-template-areas: {{ areas_d }};
+    column-gap: var(--zd-gap);
+    max-width: var(--zd-max-w);
+    margin-inline: auto;
+    padding: var(--zd-pt) var(--zd-pr) var(--zd-pb) var(--zd-pl);
+    box-sizing: border-box;
+  }
+
+  .zday__heading  { grid-area: heading; }
+  .zday__media    { grid-area: media; }
+  .zday__tabs     { grid-area: tabs; }
+  .zday__captions { grid-area: caption; }
+  .zday__copies   { grid-area: copy; align-self: start; }
+
+  /* ================= Título ================= */
+  .zday__heading {
+    margin: 0 0 var(--zd-h-mb);
+    font-family: var(--zd-h-font);
+    font-size: var(--zd-h-size);
+    font-weight: var(--zd-h-weight);
+    line-height: var(--zd-h-lh);
+    letter-spacing: var(--zd-h-ls);
+    text-align: var(--zd-h-align);
+    color: var(--zd-h-color);
+  }
+
+  .zday__heading em,
+  .zday__heading i {
+    font-style: var(--zd-em-style);
+    color: var(--zd-em-color);
+  }
+
+  /* ================= Imagen ================= */
+  .zday__media {
+    position: relative;
+    width: 100%;
+    max-width: var(--zd-media-max);
+    margin-inline: auto;
+  }
+
+  .zday__stage {
+    position: relative;
+    aspect-ratio: var(--zd-ar);
+    background-color: var(--zd-media-bg);
+    border-radius: var(--zd-media-radius);
+    overflow: hidden;
+  }
+
+  /* Las diapositivas se superponen y se funden. Nada se mueve de sitio al
+     cambiar de punto, ni siquiera si una imagen pesa más y tarda. */
+  .zday__slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--zd-anim) ease, visibility 0s linear var(--zd-anim);
+  }
+
+  .zday__slide.is-active {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity var(--zd-anim) ease, visibility 0s;
+  }
+
+  .zday__slide picture,
+  .zday__slide > svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .zday__img {
+    width: 100%;
+    height: 100%;
+    object-fit: var(--zd-media-fit);
+    display: block;
+  }
+
+  /* ================= Flechas ================= */
+  .zday__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--zd-arrow-hit);
+    height: var(--zd-arrow-hit);
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--zd-arrow-color);
+    cursor: pointer;
+    transition: color var(--zd-anim) ease, opacity var(--zd-anim) ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .zday__arrow:hover { color: var(--zd-arrow-color-hover); }
+
+  .zday__arrow:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+    border-radius: 50%;
+  }
+
+  .zday__arrow--prev { left: var(--zd-arrow-offset); }
+  .zday__arrow--next { right: var(--zd-arrow-offset); }
+
+  .zday__arrow[disabled] {
+    opacity: 0.25;
+    cursor: default;
+  }
+
+  .zday__arrow svg {
+    width: var(--zd-arrow-size);
+    height: var(--zd-arrow-size);
+    display: block;
+  }
+
+  .zday__arrow svg path {
+    stroke: currentColor;
+    stroke-width: var(--zd-arrow-stroke);
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ================= Iconos redondos ================= */
+  .zday__tabs {
+    display: flex;
+    align-items: center;
+    justify-content: var(--zd-tab-justify);
+    gap: var(--zd-tab-gap);
+    margin: var(--zd-tab-mt) 0 var(--zd-tab-mb);
+    padding: 0;
+  }
+
+  .zday__tab {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--zd-tab-size);
+    height: var(--zd-tab-size);
+    padding: 0;
+    border: var(--zd-tab-border-w) solid var(--zd-tab-border);
+    border-radius: 50%;
+    background-color: var(--zd-tab-bg);
+    cursor: pointer;
+    overflow: hidden;
+    transition: background-color var(--zd-anim) ease, transform var(--zd-anim) ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .zday__tab:hover { transform: scale(1.06); }
+
+  .zday__tab:focus-visible {
+    outline: 2px solid var(--zd-tab-bg-active);
+    outline-offset: 3px;
+  }
+
+  .zday__tab[aria-selected='true'] {
+    background-color: var(--zd-tab-bg-active);
+  }
+
+  .zday__tab-icon {
+    display: block;
+    flex: 0 0 auto;
+    width: var(--zd-tab-icon);
+    height: var(--zd-tab-icon);
+    object-fit: contain;
+    opacity: calc(var(--zd-tab-opacity) / 100);
+    transition: opacity var(--zd-anim) ease, filter var(--zd-anim) ease;
+  }
+
+  .zday__tab-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .zday__tab[aria-selected='true'] .zday__tab-icon {
+    opacity: calc(var(--zd-tab-opacity-active) / 100);
+  }
+
+  /* Para iconos de un solo color: el mismo archivo sirve para el círculo
+     claro y para el oscuro sin tener que subirlo dos veces. */
+  .zday--invert-active .zday__tab[aria-selected='true'] .zday__tab-icon {
+    filter: invert(1);
+  }
+
+  .zday--invert-idle .zday__tab:not([aria-selected='true']) .zday__tab-icon {
+    filter: invert(1);
+  }
+
+  /* ================= Pie de imagen ================= */
+  .zday__captions,
+  .zday__copies {
+    display: grid;
+  }
+
+  /* Todos los textos ocupan la misma celda: el alto lo marca el más largo y
+     al cambiar de punto no se mueve nada de lo que hay debajo. */
+  .zday__caption,
+  .zday__copy {
+    grid-area: 1 / 1;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--zd-anim) ease, visibility 0s linear var(--zd-anim);
+  }
+
+  .zday__caption.is-active,
+  .zday__copy.is-active {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity var(--zd-anim) ease, visibility 0s;
+  }
+
+  /* Con la igualación desactivada solo existe el activo y el alto se ajusta
+     a cada texto (puede dar saltos al cambiar). */
+  .zday--flow .zday__caption,
+  .zday--flow .zday__copy {
+    display: none;
+  }
+
+  .zday--flow .zday__caption.is-active,
+  .zday--flow .zday__copy.is-active {
+    display: block;
+  }
+
+  .zday__captions {
+    margin-top: var(--zd-cap-mt);
+  }
+
+  .zday__caption {
+    font-family: var(--zd-b-font);
+    font-size: var(--zd-cap-size);
+    font-weight: var(--zd-cap-weight);
+    line-height: var(--zd-cap-lh);
+    letter-spacing: var(--zd-cap-ls);
+    text-transform: var(--zd-cap-transform);
+    text-align: var(--zd-cap-align);
+    color: var(--zd-cap-color);
+  }
+
+  /* ================= Texto ================= */
+  .zday__copies {
+    margin-top: var(--zd-copy-mt);
+    max-width: var(--zd-copy-max);
+  }
+
+  .zday__copy {
+    font-family: var(--zd-b-font);
+    font-size: var(--zd-copy-size);
+    line-height: var(--zd-copy-lh);
+    text-align: var(--zd-copy-align);
+    color: var(--zd-copy-color);
+  }
+
+  .zday__copy > * { margin: 0; }
+  .zday__copy > * + * { margin-top: var(--zd-copy-gap); }
+  .zday__copy p:empty { display: none; }
+  .zday__copy strong { font-weight: 600; }
+
+  .zday__copy a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  /* ================= Móvil ================= */
+  @media screen and (max-width: {{ bp_max }}px) {
+    .zday-{{ section.id }} {
+      --zd-max-w: none;
+      --zd-pt: {{ s.padding_top_m }}px;
+      --zd-pb: {{ s.padding_bottom_m }}px;
+      --zd-pl: {{ s.padding_left_m }}px;
+      --zd-pr: {{ s.padding_right_m }}px;
+
+      --zd-h-size: {{ s.heading_size_m }}px;
+      --zd-h-lh: {{ s.heading_line_height_m }};
+      --zd-h-align: {{ s.heading_align_m }};
+      --zd-h-mb: {{ s.heading_margin_bottom_m }}px;
+
+      --zd-ar: {{ ar_m }};
+      --zd-media-max: {% if s.media_max_width_m == 0 %}none{% else %}{{ s.media_max_width_m }}px{% endif %};
+      --zd-media-radius: {{ s.media_radius_m }}px;
+
+      --zd-arrow-size: {{ s.arrow_size_m }}px;
+      --zd-arrow-offset: {{ s.arrow_offset_m }}px;
+
+      --zd-tab-size: {{ s.tab_size_m }}px;
+      --zd-tab-gap: {{ s.tab_gap_m }}px;
+      --zd-tab-justify: {{ s.tab_align_m }};
+      --zd-tab-mt: {{ s.tab_margin_top_m }}px;
+      --zd-tab-mb: {{ s.tab_margin_bottom_m }}px;
+
+      --zd-cap-size: {{ s.caption_size_m }}px;
+      --zd-cap-align: {{ s.caption_align_m }};
+      --zd-cap-mt: {{ s.caption_margin_top_m }}px;
+
+      --zd-copy-size: {{ s.copy_size_m }}px;
+      --zd-copy-lh: {{ s.copy_line_height_m }};
+      --zd-copy-align: {{ s.copy_align_m }};
+      --zd-copy-gap: {{ s.copy_paragraph_gap_m }}px;
+      --zd-copy-mt: {{ s.copy_margin_top_m }}px;
+      --zd-copy-max: none;
+    }
+
+    /* Una sola columna y el orden del móvil: título, imagen, iconos, pie,
+       texto. */
+    .zday-{{ section.id }} .zday__inner {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: repeat(5, auto);
+      grid-template-areas:
+        'heading'
+        'media'
+        'tabs'
+        'caption'
+        'copy';
+      column-gap: 0;
+    }
+  }
+
+  {%- if s.hide_arrows_m -%}
+    @media screen and (max-width: {{ bp_max }}px) {
+      .zday-{{ section.id }} .zday__arrow { display: none; }
+    }
+  {%- endif -%}
+
+  @media (prefers-reduced-motion: reduce) {
+    .zday-{{ section.id }} { --zd-anim: 1ms; }
+    .zday-{{ section.id }} .zday__tab:hover { transform: none; }
+  }
+{%- endstyle -%}
+
+<div
+  class="zday zday-{{ section.id }}{% unless s.equal_height %} zday--flow{% endunless %}{% if s.tab_invert_active %} zday--invert-active{% endif %}{% if s.tab_invert_idle %} zday--invert-idle{% endif %}"
+>
+  <zzen-day-routine
+    class="zday__inner"
+    data-loop="{{ s.loop }}"
+    data-swipe="{{ s.enable_swipe }}"
+    data-autoplay="{{ s.autoplay }}"
+    data-interval="{{ s.autoplay_interval | times: 1000 }}"
+  >
+    {%- if s.heading != blank -%}
+      <{{ s.heading_tag }} class="zday__heading">{{ s.heading | newline_to_br }}</{{ s.heading_tag }}>
+    {%- endif -%}
+
+    {%- comment -%} ---------- Imagen ---------- {%- endcomment -%}
+    <div class="zday__media" data-zd-media>
+      <div class="zday__stage">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign img = block.settings.image
+            assign img_m = block.settings.image_mobile
+            if img_m == blank
+              assign img_m = img
+            endif
+            assign alt_text = block.settings.caption | default: section.settings.heading | strip_html
+          -%}
+          <div
+            class="zday__slide{% if forloop.first %} is-active{% endif %}"
+            data-zd-slide
+            {% unless forloop.first %}
+              aria-hidden="true"
+            {% endunless %}
+            {{ block.shopify_attributes }}
+          >
+            {%- if img != blank -%}
+              <picture>
+                {%- if img_m != img -%}
+                  <source
+                    media="(max-width: {{ bp_max }}px)"
+                    srcset="
+                      {{ img_m | image_url: width: 400 }} 400w,
+                      {{ img_m | image_url: width: 600 }} 600w,
+                      {{ img_m | image_url: width: 900 }} 900w,
+                      {{ img_m | image_url: width: 1200 }} 1200w
+                    "
+                    sizes="100vw"
+                    width="{{ img_m.width }}"
+                    height="{{ img_m.height }}"
+                  >
+                {%- endif -%}
+                <img
+                  class="zday__img"
+                  src="{{ img | image_url: width: 900 }}"
+                  srcset="
+                    {{ img | image_url: width: 500 }} 500w,
+                    {{ img | image_url: width: 700 }} 700w,
+                    {{ img | image_url: width: 900 }} 900w,
+                    {{ img | image_url: width: 1200 }} 1200w,
+                    {{ img | image_url: width: 1600 }} 1600w
+                  "
+                  sizes="(min-width: {{ bp }}px) {{ s.media_width_d }}vw, 100vw"
+                  width="{{ img.width }}"
+                  height="{{ img.height }}"
+                  alt="{{ img.alt | default: alt_text | escape }}"
+                  loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                  decoding="async"
+                >
+              </picture>
+            {%- else -%}
+              {{ 'product-1' | placeholder_svg_tag: 'zday__img' }}
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+
+      {%- if s.show_arrows and n_blocks > 1 -%}
+        <button
+          type="button"
+          class="zday__arrow zday__arrow--prev"
+          data-zd-prev
+          aria-label="{{ s.arrow_prev_label | escape }}"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M15.5 3.5 7 12l8.5 8.5"></path>
+          </svg>
+        </button>
+        <button
+          type="button"
+          class="zday__arrow zday__arrow--next"
+          data-zd-next
+          aria-label="{{ s.arrow_next_label | escape }}"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M8.5 3.5 17 12l-8.5 8.5"></path>
+          </svg>
+        </button>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} ---------- Iconos redondos ---------- {%- endcomment -%}
+    {%- if n_blocks > 1 or s.show_single_tab -%}
+      <div class="zday__tabs" role="tablist" aria-label="{{ s.tablist_label | escape }}">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign tab_name = block.settings.tab_label
+            if tab_name == blank
+              assign tab_name = block.settings.caption
+            endif
+          -%}
+          <button
+            type="button"
+            class="zday__tab"
+            data-zd-tab
+            role="tab"
+            id="zd-tab-{{ section.id }}-{{ forloop.index }}"
+            aria-controls="zd-panel-{{ section.id }}-{{ forloop.index }}"
+            aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+            tabindex="{% if forloop.first %}0{% else %}-1{% endif %}"
+          >
+            <span class="visually-hidden">{{ tab_name | escape }}</span>
+            {%- if block.settings.icon_svg != blank -%}
+              <span class="zday__tab-icon" aria-hidden="true">{{ block.settings.icon_svg }}</span>
+            {%- elsif block.settings.icon != blank -%}
+              <img
+                class="zday__tab-icon"
+                src="{{ block.settings.icon | image_url: width: 160 }}"
+                width="{{ block.settings.icon.width }}"
+                height="{{ block.settings.icon.height }}"
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+              >
+            {%- endif -%}
+          </button>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} ---------- Pie de imagen ---------- {%- endcomment -%}
+    <div class="zday__captions">
+      {%- for block in section.blocks -%}
+        <div class="zday__caption{% if forloop.first %} is-active{% endif %}" data-zd-caption>
+          {{- block.settings.caption -}}
+        </div>
+      {%- endfor -%}
+    </div>
+
+    {%- comment -%} ---------- Texto ---------- {%- endcomment -%}
+    <div class="zday__copies">
+      {%- for block in section.blocks -%}
+        <div
+          class="zday__copy{% if forloop.first %} is-active{% endif %}"
+          data-zd-copy
+          role="tabpanel"
+          id="zd-panel-{{ section.id }}-{{ forloop.index }}"
+          aria-labelledby="zd-tab-{{ section.id }}-{{ forloop.index }}"
+          {% unless forloop.first %}
+            aria-hidden="true"
+          {% endunless %}
+        >
+          {{ block.settings.copy }}
+        </div>
+      {%- endfor -%}
+    </div>
+  </zzen-day-routine>
+</div>
+
+<script>
+  if (!customElements.get('zzen-day-routine')) {
+    customElements.define(
+      'zzen-day-routine',
+      class ZzenDayRoutine extends HTMLElement {
+        connectedCallback() {
+          this.slides = Array.from(this.querySelectorAll('[data-zd-slide]'));
+          this.tabs = Array.from(this.querySelectorAll('[data-zd-tab]'));
+          this.captions = Array.from(this.querySelectorAll('[data-zd-caption]'));
+          this.copies = Array.from(this.querySelectorAll('[data-zd-copy]'));
+          this.total = this.slides.length;
+          if (this.total === 0) return;
+
+          this.loop = this.dataset.loop === 'true';
+          this.prevBtn = this.querySelector('[data-zd-prev]');
+          this.nextBtn = this.querySelector('[data-zd-next]');
+          this.index = 0;
+
+          this.tabs.forEach((tab, i) => {
+            tab.addEventListener('click', () => this.go(i));
+          });
+
+          if (this.prevBtn) this.prevBtn.addEventListener('click', () => this.step(-1));
+          if (this.nextBtn) this.nextBtn.addEventListener('click', () => this.step(1));
+
+          this.addEventListener('keydown', (e) => this.onKeydown(e));
+
+          if (this.dataset.swipe === 'true') this.bindSwipe();
+          if (this.dataset.autoplay === 'true') this.bindAutoplay();
+
+          // El editor de temas: al seleccionar un bloque se muestra ese punto.
+          this.addEventListener('shopify:block:select', (e) => {
+            const slide = e.target.closest('[data-zd-slide]');
+            const i = this.slides.indexOf(slide);
+            if (i > -1) this.go(i);
+            this.stopAuto();
+          });
+          this.addEventListener('shopify:block:deselect', () => this.startAuto());
+
+          this.render();
+        }
+
+        disconnectedCallback() {
+          this.stopAuto();
+        }
+
+        go(i, moveFocus) {
+          if (i === this.index) return;
+          this.index = i;
+          this.render();
+          if (moveFocus && this.tabs[i]) this.tabs[i].focus();
+        }
+
+        step(dir) {
+          let next = this.index + dir;
+          if (next < 0) next = this.loop ? this.total - 1 : 0;
+          if (next > this.total - 1) next = this.loop ? 0 : this.total - 1;
+          this.go(next);
+        }
+
+        render() {
+          const i = this.index;
+
+          this.slides.forEach((el, n) => {
+            el.classList.toggle('is-active', n === i);
+            if (n === i) el.removeAttribute('aria-hidden');
+            else el.setAttribute('aria-hidden', 'true');
+          });
+
+          this.captions.forEach((el, n) => el.classList.toggle('is-active', n === i));
+
+          this.copies.forEach((el, n) => {
+            el.classList.toggle('is-active', n === i);
+            if (n === i) el.removeAttribute('aria-hidden');
+            else el.setAttribute('aria-hidden', 'true');
+          });
+
+          this.tabs.forEach((el, n) => {
+            el.setAttribute('aria-selected', n === i ? 'true' : 'false');
+            el.setAttribute('tabindex', n === i ? '0' : '-1');
+          });
+
+          if (this.prevBtn && !this.loop) this.prevBtn.disabled = i === 0;
+          if (this.nextBtn && !this.loop) this.nextBtn.disabled = i === this.total - 1;
+        }
+
+        onKeydown(e) {
+          if (!this.tabs.includes(document.activeElement)) return;
+          const keys = { ArrowLeft: -1, ArrowRight: 1 };
+          if (keys[e.key]) {
+            e.preventDefault();
+            this.stopAuto();
+            let next = this.index + keys[e.key];
+            if (next < 0) next = this.total - 1;
+            if (next > this.total - 1) next = 0;
+            this.go(next, true);
+          } else if (e.key === 'Home') {
+            e.preventDefault();
+            this.go(0, true);
+          } else if (e.key === 'End') {
+            e.preventDefault();
+            this.go(this.total - 1, true);
+          }
+        }
+
+        bindSwipe() {
+          const media = this.querySelector('[data-zd-media]');
+          if (!media) return;
+          let x0 = null;
+          let y0 = null;
+
+          media.addEventListener(
+            'touchstart',
+            (e) => {
+              x0 = e.changedTouches[0].clientX;
+              y0 = e.changedTouches[0].clientY;
+            },
+            { passive: true }
+          );
+
+          media.addEventListener(
+            'touchend',
+            (e) => {
+              if (x0 === null) return;
+              const dx = e.changedTouches[0].clientX - x0;
+              const dy = e.changedTouches[0].clientY - y0;
+              // Solo si el gesto es claramente horizontal: no secuestra el scroll.
+              if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+                this.stopAuto();
+                this.step(dx < 0 ? 1 : -1);
+              }
+              x0 = null;
+              y0 = null;
+            },
+            { passive: true }
+          );
+        }
+
+        bindAutoplay() {
+          if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+          this.interval = parseInt(this.dataset.interval, 10) || 6000;
+          this.autoOn = true;
+          this.addEventListener('pointerenter', () => this.stopAuto());
+          this.addEventListener('pointerleave', () => this.startAuto());
+          this.addEventListener('focusin', () => this.stopAuto());
+          document.addEventListener('visibilitychange', () => {
+            if (document.hidden) this.stopAuto();
+            else this.startAuto();
+          });
+          this.startAuto();
+        }
+
+        startAuto() {
+          if (!this.autoOn || this.timer) return;
+          this.timer = setInterval(() => {
+            let next = this.index + 1;
+            if (next > this.total - 1) next = 0;
+            this.go(next);
+          }, this.interval);
+        }
+
+        stopAuto() {
+          if (this.timer) {
+            clearInterval(this.timer);
+            this.timer = null;
+          }
+        }
+      }
+    );
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Momentos del día",
+  "tag": "section",
+  "class": "section-zday",
+  "max_blocks": 8,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Título"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Título",
+      "info": "Enter para salto de línea. Envuelve una palabra en <em>así</em> para el acento en cursiva.",
+      "default": "Tu <em>día</em> en\nModo ZZEN"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Etiqueta HTML del título (SEO)",
+      "options": [
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "div", "label": "div (sin peso SEO)" }
+      ],
+      "default": "h2"
+    },
+
+    {
+      "type": "header",
+      "content": "Diseño general"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "mobile_breakpoint",
+      "min": 480,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "label": "Punto de cambio a móvil",
+      "default": 750
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 0,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "label": "Ancho máximo del contenido",
+      "info": "0 = ancho completo.",
+      "default": 1500
+    },
+    {
+      "type": "select",
+      "id": "media_position_d",
+      "label": "Imagen en PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "media_width_d",
+      "min": 25,
+      "max": 70,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho de la columna de imagen — PC",
+      "default": 46
+    },
+    {
+      "type": "range",
+      "id": "gap_d",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Separación imagen / texto — PC",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_top_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding superior — PC",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding inferior — PC",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_left_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding izquierdo — PC",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_right_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding derecho — PC",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_top_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding superior — Móvil",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding inferior — Móvil",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_left_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding izquierdo — Móvil",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_right_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding derecho — Móvil",
+      "default": 16
+    },
+
+    {
+      "type": "header",
+      "content": "Imagen"
+    },
+    {
+      "type": "checkbox",
+      "id": "media_ratio_auto",
+      "label": "Usar la proporción de la primera imagen",
+      "info": "Desactívalo si las imágenes tienen formatos distintos y quieres fijar una proporción común.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "media_ratio_d",
+      "min": 0.4,
+      "max": 2,
+      "step": 0.1,
+      "label": "Proporción ancho/alto — PC",
+      "info": "Solo se usa con la opción de arriba desactivada. 1 = cuadrada, menos de 1 = vertical.",
+      "default": 0.7
+    },
+    {
+      "type": "range",
+      "id": "media_ratio_m",
+      "min": 0.4,
+      "max": 2,
+      "step": 0.1,
+      "label": "Proporción ancho/alto — Móvil",
+      "default": 0.7
+    },
+    {
+      "type": "select",
+      "id": "media_fit",
+      "label": "Ajuste de la imagen",
+      "options": [
+        { "value": "contain", "label": "Entera (sin recortar)" },
+        { "value": "cover", "label": "Rellenar (recorta)" }
+      ],
+      "default": "contain"
+    },
+    {
+      "type": "color",
+      "id": "media_bg",
+      "label": "Fondo del hueco de imagen",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "media_max_width_d",
+      "min": 0,
+      "max": 900,
+      "step": 10,
+      "unit": "px",
+      "label": "Ancho máximo de la imagen — PC",
+      "info": "0 = ocupa toda su columna.",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "media_max_width_m",
+      "min": 0,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "label": "Ancho máximo de la imagen — Móvil",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "media_radius_d",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo — PC",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "media_radius_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo — Móvil",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "transition_ms",
+      "min": 0,
+      "max": 1200,
+      "step": 25,
+      "unit": "ms",
+      "label": "Duración del cambio",
+      "default": 350
+    },
+
+    {
+      "type": "header",
+      "content": "Flechas"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_arrows",
+      "label": "Mostrar flechas",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_arrows_m",
+      "label": "Ocultar flechas en móvil",
+      "info": "Si las ocultas, deja activado el deslizamiento.",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "loop",
+      "label": "Continuar del último al primero",
+      "info": "Desactivado, las flechas se apagan al llegar al extremo.",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "arrow_color",
+      "label": "Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "arrow_color_hover",
+      "label": "Color al pasar el ratón",
+      "default": "#6b6b6b"
+    },
+    {
+      "type": "range",
+      "id": "arrow_size_d",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "arrow_size_m",
+      "min": 10,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "arrow_stroke",
+      "min": 0.5,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Grosor del trazo",
+      "default": 1.2
+    },
+    {
+      "type": "range",
+      "id": "arrow_offset_d",
+      "min": -40,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Distancia al borde — PC",
+      "info": "Valores negativos sacan la flecha fuera de la imagen.",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "arrow_offset_m",
+      "min": -40,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Distancia al borde — Móvil",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "arrow_hit_area",
+      "min": 24,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "label": "Área táctil de la flecha",
+      "info": "Zona pulsable alrededor del icono. 44px es lo recomendado en móvil.",
+      "default": 44
+    },
+    {
+      "type": "text",
+      "id": "arrow_prev_label",
+      "label": "Texto accesible de la flecha izquierda",
+      "default": "Momento anterior"
+    },
+    {
+      "type": "text",
+      "id": "arrow_next_label",
+      "label": "Texto accesible de la flecha derecha",
+      "default": "Momento siguiente"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_swipe",
+      "label": "Cambiar deslizando en móvil",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "Pasar solo",
+      "info": "Se detiene al pasar el ratón o al usar el teclado.",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "autoplay_interval",
+      "min": 2,
+      "max": 15,
+      "step": 1,
+      "unit": "s",
+      "label": "Segundos entre cambios",
+      "default": 6
+    },
+
+    {
+      "type": "header",
+      "content": "Iconos redondos"
+    },
+    {
+      "type": "text",
+      "id": "tablist_label",
+      "label": "Texto accesible del grupo de iconos",
+      "default": "Momentos del día"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_single_tab",
+      "label": "Mostrar el icono aunque solo haya un momento",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "tab_size_d",
+      "min": 24,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "label": "Diámetro — PC",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "tab_size_m",
+      "min": 24,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Diámetro — Móvil",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "tab_gap_d",
+      "min": 0,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre iconos — PC",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "tab_gap_m",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre iconos — Móvil",
+      "default": 10
+    },
+    {
+      "type": "select",
+      "id": "tab_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "flex-start", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "flex-end", "label": "Derecha" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "select",
+      "id": "tab_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "flex-start", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "flex-end", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "color",
+      "id": "tab_bg",
+      "label": "Fondo del círculo inactivo",
+      "default": "#d9d9d9"
+    },
+    {
+      "type": "color",
+      "id": "tab_bg_active",
+      "label": "Fondo del círculo activo",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "tab_border_color",
+      "label": "Borde del círculo",
+      "default": "#00000000"
+    },
+    {
+      "type": "range",
+      "id": "tab_border_width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor del borde",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "tab_icon_size",
+      "min": 20,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Tamaño del icono dentro del círculo",
+      "default": 52
+    },
+    {
+      "type": "range",
+      "id": "tab_icon_opacity",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Opacidad del icono inactivo",
+      "default": 65
+    },
+    {
+      "type": "range",
+      "id": "tab_icon_opacity_active",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Opacidad del icono activo",
+      "default": 100
+    },
+    {
+      "type": "checkbox",
+      "id": "tab_invert_active",
+      "label": "Invertir el color del icono activo",
+      "info": "Para iconos de un solo color: el mismo archivo vale para el círculo claro y para el oscuro.",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "tab_invert_idle",
+      "label": "Invertir el color de los iconos inactivos",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "tab_margin_top_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen superior — PC",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "tab_margin_bottom_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — PC",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "tab_margin_top_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen superior — Móvil",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "tab_margin_bottom_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — Móvil",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "Pie de imagen"
+    },
+    {
+      "type": "color",
+      "id": "caption_color",
+      "label": "Color",
+      "default": "#000000"
+    },
+    {
+      "type": "select",
+      "id": "caption_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "checkbox",
+      "id": "caption_uppercase",
+      "label": "En mayúsculas",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "caption_letter_spacing",
+      "min": -1,
+      "max": 6,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "caption_line_height",
+      "min": 1,
+      "max": 2.2,
+      "step": 0.1,
+      "label": "Interlineado",
+      "default": 1.3
+    },
+    {
+      "type": "range",
+      "id": "caption_size_d",
+      "min": 10,
+      "max": 44,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "caption_size_m",
+      "min": 9,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 15
+    },
+    {
+      "type": "select",
+      "id": "caption_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "caption_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "caption_margin_top_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen superior — PC",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "caption_margin_top_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen superior — Móvil",
+      "default": 16
+    },
+
+    {
+      "type": "header",
+      "content": "Texto"
+    },
+    {
+      "type": "select",
+      "id": "body_font",
+      "label": "Fuente (texto y pie)",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "body_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "checkbox",
+      "id": "equal_height",
+      "label": "Reservar el alto del texto más largo",
+      "info": "Recomendado: evita que la página dé saltos al cambiar de momento.",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "copy_color",
+      "label": "Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "range",
+      "id": "copy_size_d",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "copy_line_height_d",
+      "min": 1,
+      "max": 2.4,
+      "step": 0.1,
+      "label": "Interlineado — PC",
+      "default": 1.6
+    },
+    {
+      "type": "select",
+      "id": "copy_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "copy_paragraph_gap_d",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre párrafos — PC",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "copy_margin_top_d",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen superior — PC",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "copy_max_width_d",
+      "min": 0,
+      "max": 900,
+      "step": 10,
+      "unit": "px",
+      "label": "Ancho máximo del texto — PC",
+      "info": "0 = ocupa toda su columna.",
+      "default": 560
+    },
+    {
+      "type": "range",
+      "id": "copy_size_m",
+      "min": 9,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "copy_line_height_m",
+      "min": 1,
+      "max": 2.4,
+      "step": 0.1,
+      "label": "Interlineado — Móvil",
+      "default": 1.6
+    },
+    {
+      "type": "select",
+      "id": "copy_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "copy_paragraph_gap_m",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre párrafos — Móvil",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "copy_margin_top_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen superior — Móvil",
+      "default": 20
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía del título"
+    },
+    {
+      "type": "select",
+      "id": "heading_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "thin2"
+    },
+    {
+      "type": "text",
+      "id": "heading_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'thin2', serif"
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "em_color",
+      "label": "Color del acento <em>",
+      "default": "#000000"
+    },
+    {
+      "type": "checkbox",
+      "id": "em_italic",
+      "label": "Acento <em> en cursiva",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "heading_size_d",
+      "min": 20,
+      "max": 110,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_d",
+      "min": 0.8,
+      "max": 2,
+      "step": 0.1,
+      "label": "Interlineado — PC",
+      "default": 1.1
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing_d",
+      "min": -3,
+      "max": 6,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "heading_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_d",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — PC",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "heading_size_m",
+      "min": 14,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_m",
+      "min": 0.8,
+      "max": 2,
+      "step": 0.1,
+      "label": "Interlineado — Móvil",
+      "default": 1.1
+    },
+    {
+      "type": "select",
+      "id": "heading_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — Móvil",
+      "default": 18
+    }
+  ],
+  "blocks": [
+    {
+      "type": "moment",
+      "name": "Momento",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "icon",
+          "label": "Icono del círculo",
+          "info": "Se recomienda PNG cuadrado con fondo transparente."
+        },
+        {
+          "type": "textarea",
+          "id": "icon_svg",
+          "label": "O pega aquí el SVG del icono",
+          "info": "Si rellenas este campo tiene prioridad sobre la imagen. Pega el código <svg>…</svg> completo."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Imagen para móvil",
+          "info": "Opcional. Si la dejas vacía se usa la de arriba."
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "Pie de la imagen",
+          "default": "SLEEP 10:00 P.M."
+        },
+        {
+          "type": "richtext",
+          "id": "copy",
+          "label": "Texto",
+          "default": "<p>Describe aquí este momento del día: cuándo tomarlo, con qué acompañarlo y qué aporta a la rutina.</p>"
+        },
+        {
+          "type": "text",
+          "id": "tab_label",
+          "label": "Texto accesible del icono",
+          "info": "Solo lo leen los lectores de pantalla. Si lo dejas vacío se usa el pie de la imagen."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Momentos del día",
+      "blocks": [
+        { "type": "moment" },
+        { "type": "moment" },
+        { "type": "moment" }
+      ]
+    }
+  ]
+}
+{% endschema %}
