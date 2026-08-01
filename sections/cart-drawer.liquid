@@ -286,6 +286,40 @@
       "default": "#6b6b6b"
     },
     {
+      "type": "select",
+      "id": "milestone_anchor",
+      "label": "Cómo se apoya el círculo en la barra",
+      "info": "«Borde derecho» deja el último círculo entero dentro de la barra, como en la referencia. «Centro» lo parte por la mitad en el extremo.",
+      "options": [
+        { "value": "right", "label": "Borde derecho sobre el punto" },
+        { "value": "center", "label": "Centro sobre el punto" },
+        { "value": "left", "label": "Borde izquierdo sobre el punto" }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "range",
+      "id": "progress_side_pad",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen lateral de la barra",
+      "info": "Mete toda la barra y sus etiquetas hacia dentro del panel. Súbelo si el último círculo o su texto quedan pegados al borde.",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "milestone_label_width",
+      "min": 50,
+      "max": 140,
+      "step": 2,
+      "unit": "px",
+      "label": "Ancho de la etiqueta",
+      "info": "Manda cuándo el texto parte en dos líneas.",
+      "default": 82
+    },
+    {
       "type": "range",
       "id": "milestone_label_size",
       "min": 8,
@@ -632,6 +666,17 @@
       "id": "empty_color",
       "label": "Color del mensaje",
       "default": "#111111"
+    },
+    {
+      "type": "range",
+      "id": "empty_min_height",
+      "min": 80,
+      "max": 480,
+      "step": 10,
+      "unit": "px",
+      "label": "Alto del hueco del mensaje",
+      "info": "El espacio que ocupa el mensaje entre la barra y las recomendaciones.",
+      "default": 260
     }
   ],
   "blocks": [
