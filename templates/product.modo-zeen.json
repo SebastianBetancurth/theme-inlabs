@@ -2173,6 +2173,7 @@
     },
     "custom_reviews_aKyaMC": {
       "type": "custom-reviews",
+      "custom_css": [],
       "name": "Reseñas",
       "settings": {
         "demo_mode": true,
@@ -2562,11 +2563,14 @@
         "badge_icon_gap": 7,
         "badge_gap": 22,
         "badge_row_gap": 6,
+        "feedback": "button",
         "toast_text": "Añadido al carrito",
         "error_text": "No se ha podido añadir. Vuelve a intentarlo.",
         "toast_ms": 2200,
         "toast_bg": "#111111",
-        "toast_color": "#ffffff"
+        "toast_color": "#ffffff",
+        "toast_size": 12,
+        "toast_radius": 8
       }
     }
   },
