@@ -7,6 +7,21 @@
    lleva por delante este trabajo. El precio a pagar es que hay que anular
    unas cuantas reglas suyas, y están agrupadas al principio para que se vea
    de un golpe qué se está desactivando y por qué.
+
+   ---------------------------------------------------------------------------
+   NOTA SOBRE ESPECIFICIDAD — leer antes de tocar nada
+
+   Las líneas del carrito conservan la clase `cart-item` porque cart.js la
+   necesita para contar filas. Con ella entra toda la maquetación de Dawn, y
+   sus selectores son del tipo `cart-drawer .cart-item` (0,1,1). Una regla
+   nuestra escrita como `.zsd-line` (0,1,0) PIERDE contra eso aunque se cargue
+   después, porque la especificidad manda sobre el orden.
+
+   Por eso todo lo que afecta a la línea va prefijado con `.zsd ` como mínimo,
+   y la rejilla lleva además `.cart-item` para no depender de conjeturas sobre
+   lo que Dawn declare en cada versión. Si añades una propiedad nueva a una
+   línea y no se aplica, casi seguro es esto: sube la especificidad antes de
+   recurrir a !important.
    ========================================================================== */
 
 /* ==========================================================================
@@ -58,36 +73,6 @@
   .zsd .drawer__inner {
     overflow: hidden;
   }
-}
-
-/* --------------------------------------------------------------------------
-   La clase cart-item vuelve a las filas, y aquí se desactivan una por una las
-   reglas de maquetación que Dawn le cuelga. No es decorativo: updateQuantity
-   compara document.querySelectorAll('.cart-item').length con el recuento nuevo
-   del carrito para decidir si la cantidad pedida se aplicó. Sin la clase ese
-   contador siempre da 0, y al vaciar el carrito se cumple 0 === 0, con lo que
-   Dawn anuncia por el lector de pantalla un error que no ha ocurrido.
-   -------------------------------------------------------------------------- */
-.zsd .zsd-line {
-  grid-template-rows: auto;
-  grid-template-areas: none;
-  gap: 12px;
-  margin-bottom: 0;
-}
-
-.zsd .zsd-line:last-child,
-.zsd .zsd-line:first-child {
-  margin-bottom: 0;
-}
-
-.zsd .zsd-line--nested .zsd-line__img {
-  max-width: 100%;
-  float: none;
-}
-
-.zsd .zsd-line__prices .loading__spinner {
-  right: auto;
-  padding-top: 0;
 }
 
 /* --------------------------------------------------------------------------
@@ -397,6 +382,14 @@
 
 /* ==========================================================================
    6. Líneas del carrito
+
+   Estructura de cada fila, y la que hay que respetar si se toca el snippet:
+
+     .zsd-line                 grid  [imagen | contenido]
+       .zsd-line__media        columna 1, ancho fijo
+       .zsd-line__main         columna 2, se come todo el resto
+         .zsd-line__top        grid  [nombres | papelera]
+         .zsd-line__bottom     flex  [cantidad | precios]
    ========================================================================== */
 
 /* column-reverse pinta la última línea arriba sin tocar el orden del DOM. Ver
@@ -406,58 +399,84 @@
   flex-direction: column-reverse;
 }
 
-.zsd-line {
+/* --------------------------------------------------------------------------
+   ESTA ES LA REGLA CRÍTICA.
+
+   Va con `.zsd .zsd-line.cart-item` (0,3,0) y declara la rejilla ENTERA:
+   columnas, filas y áreas. Antes las columnas se declaraban aparte en un
+   `.zsd-line` suelto (0,1,0) que perdía contra el `cart-drawer .cart-item`
+   de Dawn (0,1,1). Con la rejilla de Dawn ganando, la columna de contenido
+   se quedaba en ~90px: el título se recortaba a «MO…», la papelera aparecía
+   flotando en mitad de la fila y los precios se salían por la derecha.
+
+   Todo eso era un único síntoma. No se arregla tocando el interior.
+   -------------------------------------------------------------------------- */
+.zsd .zsd-line.cart-item {
   display: grid;
   grid-template-columns: var(--zsd-img) minmax(0, 1fr);
+  grid-template-rows: auto;
+  grid-template-areas: none;
+  align-items: start;
   gap: 12px;
+  margin-bottom: 0;
   padding: 15px var(--zsd-pad-x);
   border-bottom: 1px solid var(--zsd-divider);
 }
 
-.zsd-line--nested {
+/* Dawn puede asignar grid-area a los hijos de .cart-item. Si lo hace, los
+   manda a celdas que aquí ya no existen y la fila se descuadra. */
+.zsd .zsd-line.cart-item > * {
+  grid-area: auto;
+}
+
+.zsd .zsd-line--nested.cart-item {
   padding-left: calc(var(--zsd-pad-x) + 16px);
 }
 
-.zsd-line__media {
+.zsd .zsd-line .zsd-line__media {
   display: block;
   width: var(--zsd-img);
   height: var(--zsd-img);
+  flex: 0 0 auto;
   border-radius: var(--zsd-img-r);
   background-color: var(--zsd-img-bg);
   overflow: hidden;
 }
 
-.zsd-line__img {
+.zsd .zsd-line .zsd-line__img {
   width: 100%;
   height: 100%;
+  max-width: 100%;
+  float: none;
   object-fit: cover;
   display: block;
 }
 
-.zsd-line__main {
+/* min-width:0 permite que la columna se encoja por debajo de su contenido, que
+   es requisito para que el ellipsis del título funcione. width:100% obliga a
+   ocupar toda la celda aunque algo intente encogerla. */
+.zsd .zsd-line .zsd-line__main {
   min-width: 0;
+  width: 100%;
 }
 
-/* Grid en lugar de flex a propósito. Con flex, `flex: 1 1 auto` calcula la
-   base a partir del contenido y, combinado con nowrap en el título, el
-   navegador colapsa la caja de nombres a su ancho mínimo: el título se queda
-   en «MO…» y la papelera se pega al texto. minmax(0, 1fr) reserva todo el
-   hueco sobrante para los nombres pase lo que pase, y deja la papelera
-   clavada en el borde derecho. */
-.zsd .zsd-line__top {
+/* Grid, no flex. Con flex la caja de nombres calcula su base a partir del
+   contenido y, con nowrap, el navegador la colapsa al mínimo: el título se
+   corta y la papelera se pega al texto. minmax(0,1fr) reserva todo el hueco
+   sobrante pase lo que pase y deja la papelera clavada en el borde derecho. */
+.zsd .zsd-line .zsd-line__top {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
   gap: 10px;
+  width: 100%;
 }
 
-.zsd .zsd-line__names {
+.zsd .zsd-line .zsd-line__names {
   min-width: 0;
 }
 
-/* min-width:0 arriba + overflow hidden aquí: sin las dos, el ellipsis no
-   recorta y el título desborda la columna. */
-.zsd-line__title {
+.zsd .zsd-line .zsd-line__title {
   display: block;
   font-size: var(--zsd-line-title-size);
   font-weight: 700;
@@ -469,13 +488,14 @@
   text-overflow: ellipsis;
 }
 
-.zsd-line__title:hover {
+.zsd .zsd-line .zsd-line__title:hover {
   text-decoration: underline;
   text-underline-offset: 0.15em;
 }
 
-/* La variante sí puede partir: es secundaria y suele ser más larga. */
-.zsd-line__meta {
+/* La variante sí puede partir en dos líneas: es secundaria y suele ser larga
+   («MODO ZZEN - Envío mensual»). El título nunca. */
+.zsd .zsd-line .zsd-line__meta {
   margin: 2px 0 0;
   font-size: 13px;
   line-height: 1.35;
@@ -483,11 +503,19 @@
   word-break: break-word;
 }
 
-.zsd-line__remove {
+/* justify-self:end la pega al borde derecho de la celda aunque el botón sea
+   más estrecho. margin:0 mata el margin-left de Dawn sobre cart-remove-button,
+   que la desplazaba hacia dentro. */
+.zsd .zsd-line .zsd-line__remove {
+  display: flex;
+  justify-self: end;
+  align-items: flex-start;
   flex: 0 0 auto;
+  width: auto;
+  margin: 0;
 }
 
-.zsd-line__remove-btn {
+.zsd .zsd-line .zsd-line__remove-btn {
   display: grid;
   place-items: center;
   width: 26px;
@@ -500,13 +528,14 @@
   transition: color 0.2s ease;
 }
 
-.zsd-line__remove-btn:hover {
+.zsd .zsd-line .zsd-line__remove-btn:hover {
   color: var(--zsd-line-title);
 }
 
-.zsd-line__remove-btn svg {
+.zsd .zsd-line .zsd-line__remove-btn svg {
   width: 17px;
   height: 17px;
+  pointer-events: none;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.5;
@@ -514,29 +543,30 @@
   stroke-linejoin: round;
 }
 
-/* align-items:center alinea el selector con el bloque de precios, como en la
-   referencia: la cantidad queda a la altura del importe, no pegada arriba. */
-.zsd-line__bottom {
+/* Cantidad a la izquierda, precios a la derecha, alineados entre sí. */
+.zsd .zsd-line .zsd-line__bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  width: 100%;
   margin-top: 9px;
 }
 
-.zsd-line__qty-static {
+.zsd .zsd-line .zsd-line__qty-static {
   font-size: 13px;
   color: var(--zsd-line-meta);
   align-self: center;
 }
 
-.zsd-line__prices {
+.zsd .zsd-line .zsd-line__prices {
   position: relative;
   margin-left: auto;
   text-align: right;
+  flex: 0 0 auto;
 }
 
-.zsd-line__price-row {
+.zsd .zsd-line .zsd-line__price-row {
   display: flex;
   align-items: baseline;
   justify-content: flex-end;
@@ -544,22 +574,21 @@
   white-space: nowrap;
 }
 
-.zsd-line__compare {
+.zsd .zsd-line .zsd-line__compare {
   font-size: 13px;
   color: var(--zsd-line-compare);
+  text-decoration: line-through;
 }
 
-.zsd-line__price {
+.zsd .zsd-line .zsd-line__price {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--zsd-line-price);
   white-space: nowrap;
 }
 
-/* nowrap para que «(Ahorro 20,80 €)» no parta en dos líneas como en la
-   captura. Si el panel es muy estrecho preferimos que se salga un pelo del
-   ancho del bloque antes que romper la frase. */
-.zsd-line__saving {
+/* nowrap para que «(Ahorro 20,80 €)» no parta en dos líneas. */
+.zsd .zsd-line .zsd-line__saving {
   margin: 3px 0 0;
   font-size: 13px;
   font-weight: 500;
@@ -567,23 +596,25 @@
   white-space: nowrap;
 }
 
-.zsd-line__error {
+.zsd .zsd-line .zsd-line__error {
   color: #e02b2b;
   font-size: 12px;
   line-height: 1.35;
 }
 
-.zsd-line__error:has(.cart-item__error-text:not(:empty)) {
+.zsd .zsd-line .zsd-line__error:has(.cart-item__error-text:not(:empty)) {
   margin-top: 6px;
 }
 
 /* El spinner de Dawn tapa el bloque de precios mientras se recalcula la línea.
    Va sobre el fondo del panel para que no se lea el importe viejo debajo. */
-.zsd-line__prices .loading__spinner {
+.zsd .zsd-line .zsd-line__prices .loading__spinner {
   position: absolute;
   inset: 0;
+  right: auto;
   display: grid;
   place-items: center;
+  padding-top: 0;
   background-color: var(--zsd-panel-bg);
 }
 
@@ -596,9 +627,8 @@
    Como <quantity-input> tiene que conservar las clases `quantity` y
    `cart-quantity` para que cart.js lo reconozca, esas reglas vienen de serie.
 
-   Se anulan con `quantity-input.zsd-qty` (elemento + clase, más específico que
-   `.quantity` a secas) en vez de con !important, para que mañana se puedan
-   seguir sobrescribiendo puntualmente sin una guerra de importancias.
+   Se anulan con `quantity-input.zsd-qty` (elemento + clase) en vez de con
+   !important, para poder seguir sobrescribiendo puntualmente más adelante.
    ========================================================================== */
 
 /* Los tres envoltorios que Dawn interpone entre la fila y el selector. Sin
@@ -632,9 +662,9 @@
   content: none;
 }
 
-/* flex:0 0 26px, no width. En un contenedor flex el width es solo la base:
-   el flex-grow que Dawn pone sobre .quantity__button lo ignoraría y el botón
-   seguiría creciendo. */
+/* flex:0 0 26px, no width a secas. En un contenedor flex el width es solo la
+   base: el flex-grow que Dawn pone sobre .quantity__button lo ignoraría y el
+   botón seguiría creciendo. */
 .zsd quantity-input.zsd-qty .zsd-qty__btn {
   display: grid;
   place-items: center;
@@ -988,11 +1018,6 @@
 
   .zsd-reco__name {
     white-space: normal;
-  }
-
-  .zsd .cart-item cart-remove-button,
-  .zsd .zsd-line__remove {
-    margin-left: 0;
   }
 }
 
