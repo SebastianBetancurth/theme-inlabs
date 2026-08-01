@@ -207,7 +207,7 @@
         ],
         "settings": {
           "panel_width": 420,
-          "panel_radius": 0,
+          "panel_radius": 12,
           "panel_full_mobile": true,
           "panel_bg": "#ffffff",
           "overlay_color": "#000000",
