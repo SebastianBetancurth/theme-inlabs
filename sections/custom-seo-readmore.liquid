@@ -84,32 +84,6 @@
     assign em_style = 'normal'
   endif
 
-  # Colocación de la columna de texto dentro del contenedor.
-  # margin-inline con auto en un lado, en el otro o en los dos.
-  case s.col_align_d
-    when 'center'
-      assign col_ml_d = 'auto'
-      assign col_mr_d = 'auto'
-    when 'right'
-      assign col_ml_d = 'auto'
-      assign col_mr_d = '0'
-    else
-      assign col_ml_d = '0'
-      assign col_mr_d = 'auto'
-  endcase
-
-  case s.col_align_m
-    when 'center'
-      assign col_ml_m = 'auto'
-      assign col_mr_m = 'auto'
-    when 'right'
-      assign col_ml_m = 'auto'
-      assign col_mr_m = '0'
-    else
-      assign col_ml_m = '0'
-      assign col_mr_m = 'auto'
-  endcase
-
   # Altura del texto cuando está plegado. En modo «solo la entradilla» es
   # cero: lo que se ve arriba ya está fuera del plegable.
   if s.collapse_mode == 'clamp'
@@ -147,8 +121,6 @@
     --zs-pl: {{ s.padding_left_d }}px;
     --zs-pr: {{ s.padding_right_d }}px;
     --zs-align: {{ s.text_align_d }};
-    --zs-col-ml: {{ col_ml_d }};
-    --zs-col-mr: {{ col_mr_d }};
     --zs-collapsed: {{ collapsed_d }};
     --zs-anim: {{ s.transition_ms }}ms;
 
@@ -199,17 +171,7 @@
     background-color: var(--zs-bg);
   }
 
-  /* Los custom elements nacen como display:inline. Sin esta línea, el
-     max-width y el margin-inline:auto no hacen nada y los hijos de bloque se
-     salen de la caja de relleno: el texto se pega al borde izquierdo
-     ignorando el padding. Va también en el selector de etiqueta para que
-     ninguna regla suelta pueda dejarlo en inline otra vez. */
-  zzen-read-more {
-    display: block;
-  }
-
   .zseo__inner {
-    display: block;
     max-width: var(--zs-max-w);
     margin-inline: auto;
     padding: var(--zs-pt) var(--zs-pr) var(--zs-pb) var(--zs-pl);
@@ -218,7 +180,6 @@
 
   .zseo__col {
     max-width: var(--zs-text-w);
-    margin-inline: var(--zs-col-ml) var(--zs-col-mr);
     text-align: var(--zs-align);
   }
 
@@ -406,8 +367,6 @@
       --zs-pl: {{ s.padding_left_m }}px;
       --zs-pr: {{ s.padding_right_m }}px;
       --zs-align: {{ s.text_align_m }};
-      --zs-col-ml: {{ col_ml_m }};
-      --zs-col-mr: {{ col_mr_m }};
       --zs-collapsed: {{ collapsed_m }};
 
       --zs-h-size: {{ s.heading_size_m }}px;
@@ -958,31 +917,8 @@
     },
     {
       "type": "select",
-      "id": "col_align_d",
-      "label": "Posición del bloque de texto — PC",
-      "info": "Dónde se coloca la columna dentro del contenedor. Distinto de la alineación de abajo, que es cómo se alinean las líneas dentro de la columna.",
-      "options": [
-        { "value": "center", "label": "Centrado" },
-        { "value": "left", "label": "Pegado a la izquierda" },
-        { "value": "right", "label": "Pegado a la derecha" }
-      ],
-      "default": "center"
-    },
-    {
-      "type": "select",
-      "id": "col_align_m",
-      "label": "Posición del bloque de texto — Móvil",
-      "options": [
-        { "value": "center", "label": "Centrado" },
-        { "value": "left", "label": "Pegado a la izquierda" },
-        { "value": "right", "label": "Pegado a la derecha" }
-      ],
-      "default": "center"
-    },
-    {
-      "type": "select",
       "id": "text_align_d",
-      "label": "Alineación del texto — PC",
+      "label": "Alineación — PC",
       "options": [
         { "value": "left", "label": "Izquierda" },
         { "value": "center", "label": "Centro" },
@@ -993,7 +929,7 @@
     {
       "type": "select",
       "id": "text_align_m",
-      "label": "Alineación del texto — Móvil",
+      "label": "Alineación — Móvil",
       "options": [
         { "value": "left", "label": "Izquierda" },
         { "value": "center", "label": "Centro" },
@@ -1069,7 +1005,7 @@
       "step": 2,
       "unit": "px",
       "label": "Padding izquierdo — Móvil",
-      "default": 22
+      "default": 16
     },
     {
       "type": "range",
@@ -1079,7 +1015,7 @@
       "step": 2,
       "unit": "px",
       "label": "Padding derecho — Móvil",
-      "default": 22
+      "default": 16
     },
     {
       "type": "range",
