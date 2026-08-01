@@ -1,0 +1,909 @@
+/* ==========================================================================
+   Cart drawer ZZEN
+   Ruta: assets/zzen-cart-drawer.css
+
+   Se carga DESPUÉS de component-cart-drawer.css, que sigue en el tema. No se
+   toca el archivo original a propósito: así una actualización de Dawn no se
+   lleva por delante este trabajo. El precio a pagar es que hay que anular
+   unas cuantas reglas suyas, y están agrupadas al principio para que se vea
+   de un golpe qué se está desactivando y por qué.
+   ========================================================================== */
+
+/* ==========================================================================
+   1. Anulaciones de Dawn
+   ========================================================================== */
+
+.zsd.drawer {
+  background-color: var(--zsd-overlay);
+}
+
+/* Dawn deja el panel con padding lateral, borde y overflow hidden. Aquí cada
+   zona lleva su propio relleno y su propio fondo (la cabecera es blanca, el
+   pie gris), así que el padding tiene que estar dentro, no en el panel. */
+.zsd .drawer__inner {
+  width: var(--zsd-panel-w);
+  max-width: calc(100vw - 2rem);
+  padding: 0;
+  border: 0;
+  background-color: var(--zsd-panel-bg);
+  border-radius: var(--zsd-panel-r) 0 0 var(--zsd-panel-r);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Dawn, por debajo de 650px de alto, pasa el scroll al panel entero y lo quita
+   de la lista. Eso aquí rompe el pie: dejaría de estar anclado abajo y se
+   iría con el scroll, que es justo lo contrario de lo que muestra la
+   referencia. El scroll se queda siempre en su contenedor. */
+@media screen and (max-height: 650px) {
+  .zsd cart-drawer-items {
+    overflow: visible;
+  }
+
+  .zsd__scroll {
+    overflow-y: auto;
+  }
+
+  .zsd .drawer__inner {
+    overflow: hidden;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   La clase cart-item vuelve a las filas, y aquí se desactivan una por una las
+   reglas de maquetación que Dawn le cuelga. No es decorativo: updateQuantity
+   compara document.querySelectorAll('.cart-item').length con el recuento nuevo
+   del carrito para decidir si la cantidad pedida se aplicó. Sin la clase ese
+   contador siempre da 0, y al vaciar el carrito se cumple 0 === 0, con lo que
+   Dawn anuncia por el lector de pantalla un error que no ha ocurrido.
+   -------------------------------------------------------------------------- */
+.zsd .zsd-line {
+  grid-template-rows: auto;
+  grid-template-areas: none;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.zsd .zsd-line:last-child,
+.zsd .zsd-line:first-child {
+  margin-bottom: 0;
+}
+
+.zsd .zsd-line--nested .zsd-line__img {
+  max-width: 100%;
+  float: none;
+}
+
+.zsd .zsd-line__prices .loading__spinner {
+  right: auto;
+  padding-top: 0;
+}
+
+.zsd .drawer__header {
+  position: relative;
+  padding: 16px var(--zsd-pad-x) 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex: 0 0 auto;
+}
+
+.zsd .drawer__heading {
+  margin: 0;
+}
+
+/* Dawn saca el botón de cerrar fuera del panel con right:-10px y un mínimo de
+   4.4rem. Aquí es un círculo dentro del flujo de la cabecera. */
+.zsd .drawer__close {
+  position: static;
+  top: auto;
+  right: auto;
+  min-width: 0;
+  min-height: 0;
+  box-shadow: none;
+}
+
+.zsd .drawer__footer {
+  border-top: 0;
+  padding: 0;
+  flex: 0 0 auto;
+}
+
+/* El pie lleva ahora la clase cart-drawer__footer para que onCartUpdate()
+   pueda reemplazarlo. Con ella entra la regla de Dawn que separa todos sus
+   hijos 1rem, y aquí cada bloque ya trae su propio margen. */
+.zsd .cart-drawer__footer > * + * {
+  margin-top: 0;
+}
+
+.zsd .cart-drawer__form,
+.zsd .drawer__contents {
+  flex-wrap: nowrap;
+}
+
+/* ==========================================================================
+   2. Cabecera
+   ========================================================================== */
+
+.zsd__title {
+  font-size: var(--zsd-title-size);
+  line-height: 1.1;
+  font-weight: 700;
+  color: var(--zsd-title-color);
+  letter-spacing: -0.01em;
+}
+
+.zsd__close {
+  flex: 0 0 auto;
+  width: var(--zsd-close-size);
+  height: var(--zsd-close-size);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background-color: var(--zsd-close-bg);
+  color: var(--zsd-close-color);
+  cursor: pointer;
+  transition: filter 0.2s ease;
+}
+
+.zsd__close:hover {
+  filter: brightness(0.94);
+}
+
+.zsd__close svg {
+  width: 45%;
+  height: 45%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+/* ==========================================================================
+   3. Barra de desbloqueos
+   ========================================================================== */
+
+.zsd__engine {
+  display: block;
+  flex: 0 0 auto;
+}
+
+.zsd-prog {
+  padding: 4px var(--zsd-pad-x) 0;
+}
+
+.zsd-prog__text {
+  margin: 0 0 14px;
+  font-size: var(--zsd-prog-size);
+  line-height: 1.4;
+  color: var(--zsd-prog-color);
+  text-align: center;
+}
+
+/* El carril mide exactamente lo que el círculo. La barra se centra encima con
+   position absolute y las etiquetas cuelgan también en absolute, así ninguna
+   de las dos altera el alto: la reserva de espacio para las etiquetas es el
+   margin-bottom, que es un número que se puede ajustar sin efectos laterales. */
+.zsd-prog__rail {
+  position: relative;
+  height: var(--zsd-dot);
+  margin-bottom: 38px;
+}
+
+.zsd-prog__track {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: var(--zsd-track-h);
+  border-radius: 999px;
+  background-color: var(--zsd-track);
+  transform: translateY(-50%);
+  overflow: hidden;
+}
+
+.zsd-prog__fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background-color: var(--zsd-fill);
+  transition: width 0.55s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+/* Los círculos se colocan dentro de una banda metida media anchura de círculo
+   por cada lado. Sin ese retranqueo, el hito del 100% asomaría medio fuera del
+   panel y el del 0% quedaría cortado por la izquierda. La barra usa la misma
+   fórmula para que el relleno muera justo en el centro del círculo. */
+.zsd-prog__mark {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+.zsd-prog__dot {
+  display: grid;
+  place-items: center;
+  width: var(--zsd-dot);
+  height: var(--zsd-dot);
+  box-sizing: border-box;
+  border: 1.5px solid var(--zsd-dot-border);
+  border-radius: 50%;
+  background-color: var(--zsd-dot-bg);
+  color: var(--zsd-dot-icon);
+  transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+}
+
+.zsd-prog__mark.is-on .zsd-prog__dot {
+  background-color: var(--zsd-dot-bg-on);
+  border-color: var(--zsd-dot-bg-on);
+  color: var(--zsd-dot-icon-on);
+}
+
+.zsd-prog__dot svg {
+  width: 52%;
+  height: 52%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.zsd-prog__dot img {
+  width: 52%;
+  height: 52%;
+  object-fit: contain;
+}
+
+.zsd-prog__label {
+  position: absolute;
+  top: calc(var(--zsd-dot) + 6px);
+  left: 50%;
+  width: 82px;
+  transform: translateX(-50%);
+  font-size: var(--zsd-dot-label-size);
+  line-height: 1.25;
+  color: var(--zsd-dot-label);
+  text-align: center;
+}
+
+/* ==========================================================================
+   4. Zona con scroll
+   ========================================================================== */
+
+/* min-height:0 no es decorativo. Sin él, un hijo flexible dentro de una
+   columna flex se niega a encogerse por debajo de su contenido y el scroll
+   nunca aparece: el pie se va empujado fuera de la pantalla.
+
+   cart-drawer-items ya no es el elemento que hace scroll, solo la columna.
+   El motivo está en cart.js: onCartUpdate() reemplaza exactamente
+   'cart-drawer-items' y '.cart-drawer__footer', nada más. Metiendo la barra de
+   desbloqueos dentro de cart-drawer-items, ese camino también la refresca; si
+   se quedara fuera, un añadido lanzado por una app dejaría la barra congelada
+   y los regalos sin reevaluar. El scroll baja entonces al div interior. */
+.zsd .zsd__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: visible;
+}
+
+.zsd__scroll {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.zsd__form {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.zsd__items {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+
+.zsd__scroll::-webkit-scrollbar {
+  width: 3px;
+}
+
+.zsd__scroll::-webkit-scrollbar-thumb {
+  border-radius: 100px;
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+.zsd__errors:empty {
+  display: none;
+}
+
+.zsd__errors {
+  margin: 0 var(--zsd-pad-x) 10px;
+  font-size: 13px;
+  color: #e02b2b;
+}
+
+/* ==========================================================================
+   5. Estado vacío
+   ========================================================================== */
+
+.zsd__empty {
+  flex: 1 1 auto;
+  display: grid;
+  place-items: center;
+  min-height: 180px;
+  padding: 48px var(--zsd-pad-x);
+}
+
+.zsd__empty-text {
+  margin: 0;
+  font-size: var(--zsd-empty-size);
+  color: var(--zsd-empty-color);
+  text-align: center;
+}
+
+/* ==========================================================================
+   6. Líneas del carrito
+   ========================================================================== */
+
+/* column-reverse pinta la última línea arriba sin tocar el orden del DOM. Ver
+   la nota del snippet: invertir en Liquid desordenaría el name="updates[]". */
+.zsd__lines {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.zsd-line {
+  display: grid;
+  grid-template-columns: var(--zsd-img) minmax(0, 1fr);
+  gap: 12px;
+  padding: 15px var(--zsd-pad-x);
+  border-bottom: 1px solid var(--zsd-divider);
+}
+
+.zsd-line--nested {
+  padding-left: calc(var(--zsd-pad-x) + 16px);
+}
+
+.zsd-line__media {
+  display: block;
+  width: var(--zsd-img);
+  height: var(--zsd-img);
+  border-radius: var(--zsd-img-r);
+  background-color: var(--zsd-img-bg);
+  overflow: hidden;
+}
+
+.zsd-line__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.zsd-line__main {
+  min-width: 0;
+}
+
+.zsd-line__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.zsd-line__names {
+  min-width: 0;
+}
+
+.zsd-line__title {
+  display: block;
+  font-size: var(--zsd-line-title-size);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--zsd-line-title);
+  text-decoration: none;
+}
+
+.zsd-line__title:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.zsd-line__meta {
+  margin: 2px 0 0;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--zsd-line-meta);
+  word-break: break-word;
+}
+
+.zsd-line__remove {
+  flex: 0 0 auto;
+}
+
+.zsd-line__remove-btn {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--zsd-line-meta);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.zsd-line__remove-btn:hover {
+  color: var(--zsd-line-title);
+}
+
+.zsd-line__remove-btn svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.zsd-line__bottom {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 9px;
+}
+
+.zsd-line__qty-static {
+  font-size: 13px;
+  color: var(--zsd-line-meta);
+  align-self: center;
+}
+
+.zsd-line__prices {
+  position: relative;
+  margin-left: auto;
+  text-align: right;
+}
+
+.zsd-line__price-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.zsd-line__compare {
+  font-size: 13px;
+  color: var(--zsd-line-compare);
+}
+
+.zsd-line__price {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--zsd-line-price);
+  white-space: nowrap;
+}
+
+.zsd-line__saving {
+  margin: 3px 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--zsd-line-saving);
+}
+
+.zsd-line__error {
+  color: #e02b2b;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.zsd-line__error:has(.cart-item__error-text:not(:empty)) {
+  margin-top: 6px;
+}
+
+/* El spinner de Dawn tapa el bloque de precios mientras se recalcula la línea.
+   Va sobre el fondo del panel para que no se lea el importe viejo debajo. */
+.zsd-line__prices .loading__spinner {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background-color: var(--zsd-panel-bg);
+}
+
+/* ==========================================================================
+   7. Selector de cantidad
+   ========================================================================== */
+
+.zsd-line__qty-wrap {
+  display: flex;
+}
+
+.zsd .quantity-popover-container {
+  padding: 0;
+}
+
+.zsd-qty {
+  display: inline-flex;
+  align-items: stretch;
+  height: var(--zsd-qty-h);
+  min-height: 0;
+  border: 1px solid var(--zsd-qty-border);
+  border-radius: var(--zsd-qty-r);
+  background-color: transparent;
+  overflow: hidden;
+}
+
+.zsd-qty__btn {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--zsd-qty-color);
+  cursor: pointer;
+}
+
+.zsd-qty__btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.zsd-qty__btn svg {
+  width: 11px;
+  height: 11px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+}
+
+.zsd-qty__input {
+  width: 34px;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid var(--zsd-qty-border);
+  border-right: 1px solid var(--zsd-qty-border);
+  border-radius: 0;
+  background: none;
+  font-size: 13px;
+  text-align: center;
+  color: var(--zsd-qty-color);
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.zsd-qty__input::-webkit-outer-spin-button,
+.zsd-qty__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.zsd-qty__input:focus-visible {
+  outline: 2px solid var(--zsd-qty-color);
+  outline-offset: -2px;
+}
+
+/* ==========================================================================
+   8. Etiqueta de descuento
+   ========================================================================== */
+
+.zsd-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background-color: #ededed;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #4a4a4a;
+  white-space: nowrap;
+}
+
+.zsd-chip svg {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ==========================================================================
+   9. Recomendaciones
+   ========================================================================== */
+
+.zsd-reco {
+  padding: 18px var(--zsd-pad-x) 22px;
+}
+
+.zsd-reco__title {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--zsd-line-title);
+}
+
+.zsd-reco__list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.zsd-reco__card {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--zsd-reco-img) minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: var(--zsd-reco-r);
+  background-color: var(--zsd-reco-bg);
+  transition: opacity 0.2s ease;
+}
+
+.zsd-reco__card.is-loading {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.zsd-reco__media {
+  display: block;
+  width: var(--zsd-reco-img);
+  height: var(--zsd-reco-img);
+  overflow: hidden;
+}
+
+.zsd-reco__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.zsd-reco__body {
+  min-width: 0;
+}
+
+.zsd-reco__name {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--zsd-line-title);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.zsd-reco__price {
+  margin: 2px 0 7px;
+  font-size: 14px;
+  color: var(--zsd-line-price);
+}
+
+.zsd-reco__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background-color: var(--zsd-reco-btn-bg);
+  color: var(--zsd-reco-btn-color);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: filter 0.2s ease;
+}
+
+.zsd-reco__btn:hover {
+  filter: brightness(1.25);
+}
+
+.zsd-reco__spinner {
+  display: none;
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  width: 22px;
+  height: 22px;
+  margin-top: -11px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-top-color: #111111;
+  border-radius: 50%;
+  animation: zsd-spin 0.7s linear infinite;
+}
+
+.zsd-reco__card.is-loading .zsd-reco__spinner {
+  display: block;
+}
+
+@keyframes zsd-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================================
+   10. Pie
+   ========================================================================== */
+
+.zsd__footer {
+  background-color: var(--zsd-footer-bg);
+  padding: 14px var(--zsd-pad-x) calc(16px + env(safe-area-inset-bottom, 0px));
+}
+
+.zsd__note {
+  margin: 0 0 10px;
+  border-bottom: 1px solid var(--zsd-divider);
+}
+
+.zsd__note summary {
+  padding: 8px 0;
+  cursor: pointer;
+}
+
+.zsd__discounts {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: var(--zsd-line-title);
+}
+
+.zsd__discounts-label {
+  flex: 0 0 auto;
+}
+
+.zsd__discounts-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-width: 0;
+}
+
+.zsd__discounts-chips .zsd-chip {
+  margin-top: 0;
+}
+
+.zsd__discounts-amount {
+  margin-left: auto;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.zsd__tax {
+  display: block;
+  margin: 0 0 10px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.zsd__ctas {
+  margin: 0;
+}
+
+.zsd__checkout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  max-width: none;
+  min-height: var(--zsd-co-h);
+  padding: 6px 18px;
+  border: 0;
+  border-radius: var(--zsd-co-r);
+  background-color: var(--zsd-co-bg);
+  color: var(--zsd-co-color);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.2s ease;
+}
+
+.zsd__checkout::after {
+  display: none;
+}
+
+.zsd__checkout:hover {
+  filter: brightness(1.3);
+}
+
+.zsd__checkout[disabled] {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.zsd__checkout-lock {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.zsd__pay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.zsd__pay-icon {
+  display: block;
+  height: 21px;
+}
+
+.zsd__pay-icon svg {
+  width: auto;
+  height: 100%;
+  display: block;
+}
+
+/* ==========================================================================
+   11. Móvil
+   ========================================================================== */
+
+@media screen and (max-width: 749px) {
+  .zsd .drawer__inner {
+    border-radius: 0;
+  }
+
+  .zsd-prog__label {
+    width: 74px;
+  }
+
+  .zsd-reco__name {
+    white-space: normal;
+  }
+
+  .zsd .cart-item cart-remove-button,
+  .zsd .zsd-line__remove {
+    margin-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zsd-prog__fill,
+  .zsd-prog__dot {
+    transition: none;
+  }
+
+  .zsd-reco__spinner {
+    animation-duration: 2s;
+  }
+}
