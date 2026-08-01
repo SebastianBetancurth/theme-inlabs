@@ -1384,25 +1384,29 @@
             "icon_svg": "",
             "image": "shopify://shop_images/download_5e8c0c29-37fe-4a12-88a7-5d3ab060b945.webp",
             "caption": "SLEEP 10:00 P.M.",
-            "copy": "<p>Describe aquí este momento del día: cuándo tomarlo, con qué acompañarlo y qué aporta a la rutina.</p>",
+            "copy": "<p>Nuestra recomendación es tomar FOCUS por la mañana, justo después de desayunar. No solo porque su formulación está pensada para acompañarte en las horas más activas del día, sino porque es en ese momento cuando decides qué tipo de jornada vas a tener.<br/><br/>En lugar de arrancar el día en automático, FOCUS actúa como una palanca que te ayuda a entrar con claridad, energía sostenida y enfoque real.</p>",
             "tab_label": ""
           }
         },
         "moment_pJQADc": {
           "type": "moment",
           "settings": {
+            "icon": "shopify://shop_images/download_d7899db7-856e-4590-a8ee-550d020affb7.svg",
             "icon_svg": "",
-            "caption": "SLEEP 10:00 P.M.",
-            "copy": "<p>Describe aquí este momento del día: cuándo tomarlo, con qué acompañarlo y qué aporta a la rutina.</p>",
+            "image": "shopify://shop_images/download_d21a3873-9f8b-483e-9e4a-cc70a69aebc4.webp",
+            "caption": "CALM 5:00 P.M.",
+            "copy": "<p>CALM es más flexible en cuanto a su momento de toma. Puedes usarlo tanto por la mañana como por la tarde, según cuándo sientas más el desgaste mental o la carga emocional. Algunas personas lo toman junto a FOCUS, para acompañar la energía con estabilidad. Otras prefieren usarlo como reset en las horas medias del día, cuando el estrés acumulado empieza a notarse en el cuerpo o en la cabeza. También hay quienes eligen tomarlo antes de dormir, ya que favorece el descanso.</p>",
             "tab_label": ""
           }
         },
         "moment_tfAew9": {
           "type": "moment",
           "settings": {
+            "icon": "shopify://shop_images/download_2a0129da-9a40-4559-8416-6e7ce660d9ef.svg",
             "icon_svg": "",
+            "image": "shopify://shop_images/download_91bd4b24-78e9-4051-9640-c69802caf484.webp",
             "caption": "SLEEP 10:00 P.M.",
-            "copy": "<p>Describe aquí este momento del día: cuándo tomarlo, con qué acompañarlo y qué aporta a la rutina.</p>",
+            "copy": "<p>SLEEP se recomienda 30 minutos antes de dormir, acompañado de un vaso de agua. No es solo un suplemento para ayudarte a dormir mejor. Es una invitación a cerrar el día con dignidad, con intención, sin arrastrar todo lo que ha pasado como si no tuvieras derecho al descanso.</p>",
             "tab_label": ""
           }
         }
@@ -1458,6 +1462,9 @@
         "autoplay_interval": 6,
         "tablist_label": "Momentos del día",
         "show_single_tab": false,
+        "tab_icon_mode": "badge",
+        "tab_idle_lighten": 85,
+        "tab_badge_size": 100,
         "tab_size_d": 56,
         "tab_size_m": 40,
         "tab_gap_d": 12,
@@ -1466,7 +1473,7 @@
         "tab_align_m": "center",
         "tab_bg": "#d9d9d9",
         "tab_bg_active": "#000000",
-        "tab_border_color": "#00000000",
+        "tab_border_color": "rgba(0,0,0,0)",
         "tab_border_width": 0,
         "tab_icon_size": 52,
         "tab_icon_opacity": 65,
