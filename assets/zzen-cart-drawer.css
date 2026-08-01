@@ -550,6 +550,7 @@
   font-size: 13px;
   font-weight: 500;
   color: var(--zsd-line-saving);
+  white-space: nowrap;
 }
 
 .zsd-line__error {
