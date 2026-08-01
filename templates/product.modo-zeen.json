@@ -2175,6 +2175,7 @@
       "type": "custom-reviews",
       "name": "Reseñas",
       "settings": {
+        "demo_mode": true,
         "metafield_namespace": "custom",
         "metafield_key": "resenas",
         "per_page": 6,
