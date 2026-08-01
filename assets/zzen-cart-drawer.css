@@ -1079,3 +1079,34 @@
   opacity: 0.35;
   transition: opacity 0.15s ease;
 }
+
+/* El ancho total lo fija el contenedor y el número absorbe el sobrante: los
+   botones se quedan en sus 26px y las líneas verticales no se mueven de sitio
+   al ensanchar. Con flex-basis en el input, en cambio, el reparto dependería
+   del contenido y el selector bailaría entre una fila y otra. */
+.zsd quantity-input.zsd-qty {
+  width: var(--zsd-qty-w, 82px);
+}
+
+.zsd quantity-input.zsd-qty .zsd-qty__input {
+  flex: 1 1 auto;
+  width: auto;
+}
+
+/* Elemento con tres clases: .drawer__footer (de Dawn), .cart-drawer__footer
+   (que cart.js necesita para reemplazarlo) y .zsd__footer. La regla de la
+   sección 1 lo anula todo con (0,2,0), así que aquí hacen falta (0,3,0). */
+.zsd .drawer__footer.zsd__footer {
+  border-top: 1px solid var(--zsd-divider);
+  padding: 18px var(--zsd-pad-x) calc(18px + env(safe-area-inset-bottom, 0px));
+  background-color: var(--zsd-footer-bg);
+}
+
+.zsd__pay {
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.zsd__pay-icon {
+  height: var(--zsd-pay-h, 26px);
+}
