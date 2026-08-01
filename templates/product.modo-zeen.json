@@ -1678,7 +1678,7 @@
         "nav_margin_top_m": 20,
         "nav_gap_d": 40,
         "nav_gap_m": 16,
-        "bar_mode": "thumb",
+        "bar_mode": "progress",
         "bar_track_color": "#3d3d3d",
         "bar_fill_color": "#ffffff",
         "bar_height": 1,
