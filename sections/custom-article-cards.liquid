@@ -1,0 +1,1396 @@
+{%- comment -%}
+  ============================================================================
+  SECCIÓN: Tarjetas de artículos (Descubre más con nuestros artículos)
+  Tema: Dawn / Online Store 2.0
+  Ruta: sections/custom-article-cards.liquid
+
+  PC     -> título arriba y una fila de tarjetas. Cada tarjeta es una imagen a
+            sangre con el título, el resumen y el botón centrados encima, tanto
+            en horizontal como en vertical.
+  Móvil  -> las mismas tarjetas, una debajo de otra.
+
+  DE DÓNDE SALE EL CONTENIDO
+  De un blog o de bloques, a elegir. Con el blog las tarjetas se actualizan
+  solas al publicar una entrada nueva; con bloques el botón puede apuntar a
+  donde quieras, no solo a artículos.
+
+  Sea cual sea la fuente, el marcado de la tarjeta se escribe UNA vez: la
+  colección se guarda en una variable y solo cambia de dónde se leen los
+  cuatro campos. Duplicar el marcado por fuente es lo que acaba dejando una
+  de las dos versiones sin los últimos arreglos.
+
+  EL ENLACE
+  Por defecto la tarjeta entera es pulsable y el botón es un span dentro de
+  ella: un enlace no puede contener otro enlace, y un rectángulo grande es
+  bastante más fácil de acertar con el dedo que una pastilla de 40px. Si
+  prefieres que solo el botón lleve a la página, hay un ajuste para ello.
+  ============================================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign bp = s.mobile_breakpoint
+  assign bp_max = bp | minus: 1
+
+  case s.heading_font
+    when 'thin2'
+      assign heading_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign heading_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign heading_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign heading_stack = 'var(--font-body-family)'
+    else
+      assign heading_stack = s.heading_font_custom
+  endcase
+
+  case s.body_font
+    when 'helvetica'
+      assign body_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'thin2'
+      assign body_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'theme_heading'
+      assign body_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign body_stack = 'var(--font-body-family)'
+    else
+      assign body_stack = s.body_font_custom
+  endcase
+
+  if s.content_max_width == 0
+    assign max_w = 'none'
+  else
+    assign max_w = s.content_max_width | append: 'px'
+  endif
+
+  if s.em_italic
+    assign em_style = 'italic'
+  else
+    assign em_style = 'normal'
+  endif
+
+  # ------------------------------------------------------------------
+  # Fuente del contenido. El blog manda si está elegido y tiene entradas;
+  # si no, los bloques. Así la sección nunca sale vacía.
+  # ------------------------------------------------------------------
+  assign the_blog = blogs[s.blog]
+  assign use_blog = false
+  if s.use_blog and the_blog != blank and the_blog.articles_count > 0
+    assign use_blog = true
+  endif
+
+  if use_blog
+    assign items = the_blog.articles
+    assign max_items = s.posts_count
+  else
+    assign items = section.blocks
+    assign max_items = section.blocks.size
+  endif
+
+  # ------------------------------------------------------------------
+  # Capa sobre la imagen. Un color plano con opacidad, o un degradado que
+  # aprieta en el centro y deja respirar los bordes. Sin filtros de color
+  # en Liquid: color y opacidad por separado, que no fallan nunca.
+  # ------------------------------------------------------------------
+  case s.overlay_style
+    when 'none'
+      assign overlay_bg = 'transparent'
+    when 'gradient_center'
+      assign overlay_bg = 'radial-gradient(ellipse at center, var(--za-ov) 0%, var(--za-ov) 38%, transparent 78%)'
+    when 'gradient_bottom'
+      assign overlay_bg = 'linear-gradient(to top, var(--za-ov) 12%, transparent 85%)'
+    else
+      assign overlay_bg = 'var(--za-ov)'
+  endcase
+-%}
+
+{%- style -%}
+  @font-face {
+    font-family: 'Helvetica neue';
+    src: url('{{ 'HelveticaNeueCyr-Light.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'thin2';
+    src: url('{{ 'lawrence-regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ================= Variables: PC ================= */
+  .zart-{{ section.id }} {
+    --za-bg: {{ s.bg_color }};
+    --za-max-w: {{ max_w }};
+    --za-pt: {{ s.padding_top_d }}px;
+    --za-pb: {{ s.padding_bottom_d }}px;
+    --za-pl: {{ s.padding_left_d }}px;
+    --za-pr: {{ s.padding_right_d }}px;
+    --za-anim: {{ s.transition_ms }}ms;
+
+    --za-h-font: {{ heading_stack }};
+    --za-h-size: {{ s.heading_size_d }}px;
+    --za-h-lh: {{ s.heading_line_height_d }};
+    --za-h-ls: {{ s.heading_letter_spacing_d }}px;
+    --za-h-weight: {{ s.heading_weight }};
+    --za-h-color: {{ s.heading_color }};
+    --za-h-align: {{ s.heading_align_d }};
+    --za-h-mb: {{ s.heading_margin_bottom_d }}px;
+    --za-em-color: {{ s.em_color }};
+    --za-em-style: {{ em_style }};
+
+    --za-b-font: {{ body_stack }};
+
+    --za-cols: {{ s.columns_d }};
+    --za-gap: {{ s.gap_d }}px;
+    --za-ar: {{ s.card_ratio_d }};
+    --za-radius: {{ s.card_radius_d }}px;
+    --za-card-bg: {{ s.card_bg }};
+    --za-fit: {{ s.image_fit }};
+    --za-zoom: {{ s.hover_zoom }};
+
+    --za-ov: {{ s.overlay_color }};
+    --za-ov-op: {{ s.overlay_opacity }}%;
+    --za-ov-op-hover: {{ s.overlay_opacity_hover }}%;
+
+    --za-body-px: {{ s.card_padding_x_d }}px;
+    --za-body-w: {{ s.card_text_width_d }}%;
+    --za-body-align: {{ s.card_text_align }};
+    --za-body-justify: {{ s.card_vertical_align }};
+
+    --za-t-size: {{ s.card_title_size_d }}px;
+    --za-t-lh: {{ s.card_title_line_height }};
+    --za-t-weight: {{ s.card_title_weight }};
+    --za-t-color: {{ s.card_title_color }};
+    --za-t-mb: {{ s.card_title_margin_bottom_d }}px;
+
+    --za-x-size: {{ s.excerpt_size_d }}px;
+    --za-x-lh: {{ s.excerpt_line_height }};
+    --za-x-color: {{ s.excerpt_color }};
+    --za-x-mb: {{ s.excerpt_margin_bottom_d }}px;
+
+    --za-btn-bg: {{ s.button_bg }};
+    --za-btn-color: {{ s.button_color }};
+    --za-btn-bg-hover: {{ s.button_bg_hover }};
+    --za-btn-color-hover: {{ s.button_color_hover }};
+    --za-btn-border: {{ s.button_border_color }};
+    --za-btn-border-w: {{ s.button_border_width }}px;
+    --za-btn-size: {{ s.button_size_d }}px;
+    --za-btn-weight: {{ s.button_weight }};
+    --za-btn-py: {{ s.button_padding_y_d }}px;
+    --za-btn-px: {{ s.button_padding_x_d }}px;
+    --za-btn-radius: {{ s.button_radius }}px;
+  }
+
+  /* ================= Estructura ================= */
+  .zart { background-color: var(--za-bg); }
+
+  .zart__inner {
+    display: block;
+    max-width: var(--za-max-w);
+    margin-inline: auto;
+    padding: var(--za-pt) var(--za-pr) var(--za-pb) var(--za-pl);
+    box-sizing: border-box;
+  }
+
+  .zart__heading {
+    margin: 0 0 var(--za-h-mb);
+    font-family: var(--za-h-font);
+    font-size: var(--za-h-size);
+    font-weight: var(--za-h-weight);
+    line-height: var(--za-h-lh);
+    letter-spacing: var(--za-h-ls);
+    text-align: var(--za-h-align);
+    color: var(--za-h-color);
+  }
+
+  .zart__heading em,
+  .zart__heading i {
+    font-style: var(--za-em-style);
+    color: var(--za-em-color);
+  }
+
+  .zart__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--za-cols), minmax(0, 1fr));
+    gap: var(--za-gap);
+  }
+
+  /* ================= Tarjeta ================= */
+  .zart__card {
+    position: relative;
+    display: block;
+    aspect-ratio: var(--za-ar);
+    border-radius: var(--za-radius);
+    background-color: var(--za-card-bg);
+    overflow: hidden;
+    text-decoration: none;
+    isolation: isolate;
+  }
+
+  /* La imagen se agranda un poco al pasar por encima. transform en vez de
+     width: no reflota la página y va sobre la GPU. */
+  .zart__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: var(--za-fit);
+    display: block;
+    transition: transform calc(var(--za-anim) * 2) ease;
+  }
+
+  .zart__card:hover .zart__img { transform: scale(var(--za-zoom)); }
+
+  .zart__overlay {
+    position: absolute;
+    inset: 0;
+    background: {{ overlay_bg }};
+    opacity: calc(var(--za-ov-op) / 100);
+    transition: opacity var(--za-anim) ease;
+    pointer-events: none;
+  }
+
+  .zart__card:hover .zart__overlay { opacity: calc(var(--za-ov-op-hover) / 100); }
+
+  /* Contenido centrado en los dos ejes sobre la imagen. */
+  .zart__body {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: var(--za-body-justify);
+    padding: 0 var(--za-body-px);
+    text-align: var(--za-body-align);
+    font-family: var(--za-b-font);
+  }
+
+  .zart__body-in { width: var(--za-body-w); max-width: 100%; }
+
+  .zart--shadow .zart__title,
+  .zart--shadow .zart__excerpt {
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.55);
+  }
+
+  .zart__title {
+    margin: 0 0 var(--za-t-mb);
+    font-size: var(--za-t-size);
+    font-weight: var(--za-t-weight);
+    line-height: var(--za-t-lh);
+    color: var(--za-t-color);
+  }
+
+  .zart__excerpt {
+    margin: 0 0 var(--za-x-mb);
+    font-size: var(--za-x-size);
+    line-height: var(--za-x-lh);
+    color: var(--za-x-color);
+  }
+
+  /* ================= Botón ================= */
+  .zart__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--za-btn-py) var(--za-btn-px);
+    border: var(--za-btn-border-w) solid var(--za-btn-border);
+    border-radius: var(--za-btn-radius);
+    background-color: var(--za-btn-bg);
+    color: var(--za-btn-color);
+    font-family: inherit;
+    font-size: var(--za-btn-size);
+    font-weight: var(--za-btn-weight);
+    line-height: 1.2;
+    text-decoration: none;
+    transition: background-color var(--za-anim) ease, color var(--za-anim) ease;
+  }
+
+  .zart__card:hover .zart__btn,
+  .zart__btn:hover {
+    background-color: var(--za-btn-bg-hover);
+    color: var(--za-btn-color-hover);
+  }
+
+  /* El foco se marca sobre la tarjeta, que es lo que se activa al pulsar
+     Intro, no sobre la pastilla. */
+  .zart__card:focus-visible,
+  .zart__btn:focus-visible {
+    outline: 2px solid var(--za-btn-bg);
+    outline-offset: 3px;
+  }
+
+  /* ================= Móvil ================= */
+  @media screen and (max-width: {{ bp_max }}px) {
+    .zart-{{ section.id }} {
+      --za-max-w: none;
+      --za-pt: {{ s.padding_top_m }}px;
+      --za-pb: {{ s.padding_bottom_m }}px;
+      --za-pl: {{ s.padding_left_m }}px;
+      --za-pr: {{ s.padding_right_m }}px;
+
+      --za-h-size: {{ s.heading_size_m }}px;
+      --za-h-lh: {{ s.heading_line_height_m }};
+      --za-h-align: {{ s.heading_align_m }};
+      --za-h-mb: {{ s.heading_margin_bottom_m }}px;
+
+      --za-cols: {{ s.columns_m }};
+      --za-gap: {{ s.gap_m }}px;
+      --za-ar: {{ s.card_ratio_m }};
+      --za-radius: {{ s.card_radius_m }}px;
+
+      --za-body-px: {{ s.card_padding_x_m }}px;
+      --za-body-w: {{ s.card_text_width_m }}%;
+
+      --za-t-size: {{ s.card_title_size_m }}px;
+      --za-t-mb: {{ s.card_title_margin_bottom_m }}px;
+
+      --za-x-size: {{ s.excerpt_size_m }}px;
+      --za-x-mb: {{ s.excerpt_margin_bottom_m }}px;
+
+      --za-btn-size: {{ s.button_size_m }}px;
+      --za-btn-py: {{ s.button_padding_y_m }}px;
+      --za-btn-px: {{ s.button_padding_x_m }}px;
+    }
+
+    {%- unless s.show_excerpt_m -%}
+      .zart-{{ section.id }} .zart__excerpt { display: none; }
+    {%- endunless -%}
+  }
+
+  @media screen and (min-width: {{ bp }}px) {
+    {%- unless s.show_excerpt_d -%}
+      .zart-{{ section.id }} .zart__excerpt { display: none; }
+    {%- endunless -%}
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .zart-{{ section.id }} { --za-anim: 1ms; --za-zoom: 1; }
+  }
+{%- endstyle -%}
+
+<div class="zart zart-{{ section.id }}{% if s.text_shadow %} zart--shadow{% endif %}">
+  <div class="zart__inner">
+    {%- if s.heading != blank -%}
+      <{{ s.heading_tag }} class="zart__heading">{{ s.heading | newline_to_br }}</{{ s.heading_tag }}>
+    {%- endif -%}
+
+    <div class="zart__grid">
+      {%- for item in items limit: max_items -%}
+        {%- comment -%}
+          Los cuatro campos se leen aquí según la fuente. A partir de este
+          punto el marcado es el mismo, venga de donde venga.
+        {%- endcomment -%}
+        {%- liquid
+          if use_blog
+            assign c_img = item.image
+            assign c_title = item.title
+            assign c_url = item.url
+            assign c_text = item.excerpt_or_content | strip_html | strip
+            assign c_btn = s.button_label
+          else
+            assign c_img = item.settings.image
+            assign c_title = item.settings.title
+            assign c_url = item.settings.url
+            assign c_text = item.settings.text | strip_html | strip
+            assign c_btn = item.settings.button_label | default: s.button_label
+          endif
+
+          assign c_text = c_text | truncate: s.excerpt_length
+          assign alt_text = c_img.alt | default: c_title
+        -%}
+
+        {%- if s.whole_card_link and c_url != blank -%}
+          <a
+            class="zart__card"
+            href="{{ c_url }}"
+            {%- unless use_blog %} {{ item.shopify_attributes }}{% endunless -%}
+          >
+        {%- else -%}
+          <div class="zart__card" {% unless use_blog %}{{ item.shopify_attributes }}{% endunless %}>
+        {%- endif -%}
+
+          {%- if c_img != blank -%}
+            <img
+              class="zart__img"
+              src="{{ c_img | image_url: width: 800 }}"
+              srcset="
+                {{ c_img | image_url: width: 400 }} 400w,
+                {{ c_img | image_url: width: 600 }} 600w,
+                {{ c_img | image_url: width: 800 }} 800w,
+                {{ c_img | image_url: width: 1100 }} 1100w
+              "
+              sizes="(min-width: {{ bp }}px) {{ 100 | divided_by: s.columns_d }}vw, {{ 100 | divided_by: s.columns_m }}vw"
+              width="{{ c_img.width }}"
+              height="{{ c_img.height }}"
+              alt="{{ alt_text | escape }}"
+              loading="{% if forloop.index <= 2 %}eager{% else %}lazy{% endif %}"
+              decoding="async"
+            >
+          {%- else -%}
+            {{ 'image' | placeholder_svg_tag: 'zart__img' }}
+          {%- endif -%}
+
+          <span class="zart__overlay" aria-hidden="true"></span>
+
+          <div class="zart__body">
+            <div class="zart__body-in">
+              {%- if c_title != blank -%}
+                <{{ s.card_title_tag }} class="zart__title">{{ c_title }}</{{ s.card_title_tag }}>
+              {%- endif -%}
+
+              {%- if c_text != blank -%}
+                <p class="zart__excerpt">{{ c_text }}</p>
+              {%- endif -%}
+
+              {%- if c_btn != blank -%}
+                {%- if s.whole_card_link and c_url != blank -%}
+                  {%- comment -%}
+                    La tarjeta entera ya es el enlace, así que aquí va un span:
+                    anidar un enlace dentro de otro es marcado inválido y los
+                    navegadores lo resuelven cada uno a su manera.
+                  {%- endcomment -%}
+                  <span class="zart__btn">{{ c_btn }}</span>
+                {%- else -%}
+                  <a class="zart__btn" href="{{ c_url | default: '#' }}">
+                    {{- c_btn -}}
+                    <span class="visually-hidden">{{ c_title }}</span>
+                  </a>
+                {%- endif -%}
+              {%- endif -%}
+            </div>
+          </div>
+
+        {%- if s.whole_card_link and c_url != blank -%}
+          </a>
+        {%- else -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Tarjetas de artículos",
+  "tag": "section",
+  "class": "section-zart",
+  "max_blocks": 12,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Título"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Título",
+      "info": "Enter para salto de línea. Envuelve una palabra en <em>así</em> para el acento en cursiva.",
+      "default": "Descubre más con nuestros artículos"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Etiqueta HTML del título (SEO)",
+      "options": [
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "div", "label": "div (sin peso SEO)" }
+      ],
+      "default": "h2"
+    },
+
+    {
+      "type": "header",
+      "content": "Contenido"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_blog",
+      "label": "Usar entradas de un blog",
+      "info": "Activado, las tarjetas se sacan del blog de abajo y se actualizan solas al publicar. Desactivado, se usan los bloques, cuyo botón puede llevar a cualquier página. Si el blog está vacío se usan los bloques igualmente.",
+      "default": false
+    },
+    {
+      "type": "blog",
+      "id": "blog",
+      "label": "Blog"
+    },
+    {
+      "type": "range",
+      "id": "posts_count",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "label": "Número de entradas",
+      "default": 3
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Texto del botón",
+      "default": "Leer más"
+    },
+    {
+      "type": "checkbox",
+      "id": "whole_card_link",
+      "label": "Toda la tarjeta es pulsable",
+      "info": "Recomendado: es mucho más fácil de acertar en móvil que solo la pastilla. El botón sigue viéndose igual.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "excerpt_length",
+      "min": 40,
+      "max": 400,
+      "step": 10,
+      "label": "Longitud del resumen",
+      "info": "Caracteres antes de cortar con puntos suspensivos.",
+      "default": 170
+    },
+    {
+      "type": "checkbox",
+      "id": "show_excerpt_d",
+      "label": "Mostrar el resumen — PC",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_excerpt_m",
+      "label": "Mostrar el resumen — Móvil",
+      "default": true
+    },
+
+    {
+      "type": "header",
+      "content": "Cuadrícula"
+    },
+    {
+      "type": "range",
+      "id": "columns_d",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "label": "Columnas — PC",
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "columns_m",
+      "label": "Columnas — Móvil",
+      "info": "Como solo tiene sentido elegir entre una y dos, va como lista: un deslizador de dos posiciones no lo admite Shopify y además se maneja peor.",
+      "options": [
+        { "value": "1", "label": "1 columna" },
+        { "value": "2", "label": "2 columnas" }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "range",
+      "id": "gap_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre tarjetas — PC",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "gap_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre tarjetas — Móvil",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "card_ratio_d",
+      "min": 0.4,
+      "max": 2,
+      "step": 0.1,
+      "label": "Proporción ancho/alto de la tarjeta — PC",
+      "info": "1 = cuadrada, menos de 1 = vertical.",
+      "default": 0.8
+    },
+    {
+      "type": "range",
+      "id": "card_ratio_m",
+      "min": 0.4,
+      "max": 2,
+      "step": 0.1,
+      "label": "Proporción ancho/alto de la tarjeta — Móvil",
+      "default": 0.8
+    },
+    {
+      "type": "range",
+      "id": "card_radius_d",
+      "min": 0,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo — PC",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "card_radius_m",
+      "min": 0,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo — Móvil",
+      "default": 12
+    },
+
+    {
+      "type": "header",
+      "content": "Imagen y capa"
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "Ajuste de la imagen",
+      "options": [
+        { "value": "cover", "label": "Rellenar (recorta)" },
+        { "value": "contain", "label": "Entera (sin recortar)" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Fondo de la tarjeta",
+      "info": "Se ve mientras carga la imagen y por detrás si eliges «Entera».",
+      "default": "#1c1c1c"
+    },
+    {
+      "type": "select",
+      "id": "overlay_style",
+      "label": "Capa sobre la imagen",
+      "info": "Sin capa el texto blanco puede quedar ilegible sobre fotos claras. El degradado central oscurece donde está el texto y deja limpios los bordes.",
+      "options": [
+        { "value": "solid", "label": "Color plano" },
+        { "value": "gradient_center", "label": "Degradado desde el centro" },
+        { "value": "gradient_bottom", "label": "Degradado desde abajo" },
+        { "value": "none", "label": "Sin capa" }
+      ],
+      "default": "solid"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Color de la capa",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Intensidad de la capa",
+      "default": 25
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity_hover",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Intensidad al pasar el ratón",
+      "default": 40
+    },
+    {
+      "type": "checkbox",
+      "id": "text_shadow",
+      "label": "Sombra bajo el texto",
+      "info": "Da legibilidad sobre fotos claras sin tener que oscurecer toda la imagen.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "hover_zoom",
+      "min": 1,
+      "max": 1.3,
+      "step": 0.1,
+      "label": "Zoom de la imagen al pasar el ratón",
+      "info": "1 = sin zoom.",
+      "default": 1.1
+    },
+    {
+      "type": "range",
+      "id": "transition_ms",
+      "min": 0,
+      "max": 800,
+      "step": 25,
+      "unit": "ms",
+      "label": "Duración de las transiciones",
+      "default": 250
+    },
+
+    {
+      "type": "header",
+      "content": "Texto de la tarjeta"
+    },
+    {
+      "type": "select",
+      "id": "card_title_tag",
+      "label": "Etiqueta HTML del título de tarjeta (SEO)",
+      "options": [
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "div", "label": "div (sin peso SEO)" }
+      ],
+      "default": "h3"
+    },
+    {
+      "type": "select",
+      "id": "card_vertical_align",
+      "label": "Posición vertical del texto",
+      "options": [
+        { "value": "center", "label": "Centrado" },
+        { "value": "flex-start", "label": "Arriba" },
+        { "value": "flex-end", "label": "Abajo" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "card_text_align",
+      "label": "Alineación del texto",
+      "options": [
+        { "value": "center", "label": "Centro" },
+        { "value": "left", "label": "Izquierda" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "card_text_width_d",
+      "min": 50,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho del bloque de texto — PC",
+      "default": 88
+    },
+    {
+      "type": "range",
+      "id": "card_text_width_m",
+      "min": 50,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho del bloque de texto — Móvil",
+      "default": 88
+    },
+    {
+      "type": "range",
+      "id": "card_padding_x_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Sangría lateral — PC",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "card_padding_x_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Sangría lateral — Móvil",
+      "default": 18
+    },
+    {
+      "type": "color",
+      "id": "card_title_color",
+      "label": "Color del título",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "card_title_weight",
+      "label": "Grosor del título",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "range",
+      "id": "card_title_size_d",
+      "min": 12,
+      "max": 44,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del título — PC",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "card_title_size_m",
+      "min": 10,
+      "max": 34,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del título — Móvil",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "card_title_line_height",
+      "min": 1,
+      "max": 2.2,
+      "step": 0.1,
+      "label": "Interlineado del título",
+      "default": 1.3
+    },
+    {
+      "type": "range",
+      "id": "card_title_margin_bottom_d",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen bajo el título — PC",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "card_title_margin_bottom_m",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen bajo el título — Móvil",
+      "default": 12
+    },
+    {
+      "type": "color",
+      "id": "excerpt_color",
+      "label": "Color del resumen",
+      "default": "#f2f2f2"
+    },
+    {
+      "type": "range",
+      "id": "excerpt_size_d",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del resumen — PC",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "excerpt_size_m",
+      "min": 9,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del resumen — Móvil",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "excerpt_line_height",
+      "min": 1,
+      "max": 2.4,
+      "step": 0.1,
+      "label": "Interlineado del resumen",
+      "default": 1.5
+    },
+    {
+      "type": "range",
+      "id": "excerpt_margin_bottom_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen bajo el resumen — PC",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "excerpt_margin_bottom_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen bajo el resumen — Móvil",
+      "default": 22
+    },
+
+    {
+      "type": "header",
+      "content": "Botón"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Fondo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Color del texto",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_hover",
+      "label": "Fondo al pasar el ratón",
+      "default": "#e4e4e4"
+    },
+    {
+      "type": "color",
+      "id": "button_color_hover",
+      "label": "Color del texto al pasar el ratón",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "Color del borde",
+      "default": "#00000000"
+    },
+    {
+      "type": "range",
+      "id": "button_border_width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor del borde",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "button_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "range",
+      "id": "button_size_d",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "button_size_m",
+      "min": 9,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "button_padding_y_d",
+      "min": 4,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Alto interior — PC",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "button_padding_y_m",
+      "min": 4,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Alto interior — Móvil",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "button_padding_x_d",
+      "min": 8,
+      "max": 70,
+      "step": 1,
+      "unit": "px",
+      "label": "Sangría lateral — PC",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "button_padding_x_m",
+      "min": 8,
+      "max": 70,
+      "step": 1,
+      "unit": "px",
+      "label": "Sangría lateral — Móvil",
+      "default": 34
+    },
+    {
+      "type": "range",
+      "id": "button_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo",
+      "default": 30
+    },
+
+    {
+      "type": "header",
+      "content": "Diseño general"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo",
+      "default": "#0d0d0d"
+    },
+    {
+      "type": "range",
+      "id": "mobile_breakpoint",
+      "min": 480,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "label": "Punto de cambio a móvil",
+      "default": 750
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 0,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "label": "Ancho máximo del contenido",
+      "info": "0 = ancho completo.",
+      "default": 1480
+    },
+    {
+      "type": "range",
+      "id": "padding_top_d",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding superior — PC",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_d",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding inferior — PC",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_left_d",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding izquierdo — PC",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_right_d",
+      "min": 0,
+      "max": 200,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding derecho — PC",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_top_m",
+      "min": 0,
+      "max": 140,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding superior — Móvil",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_m",
+      "min": 0,
+      "max": 140,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding inferior — Móvil",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_left_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding izquierdo — Móvil",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_right_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding derecho — Móvil",
+      "default": 16
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía"
+    },
+    {
+      "type": "select",
+      "id": "heading_font",
+      "label": "Fuente del título",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "heading_font_custom",
+      "label": "Font-family personalizada del título",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "select",
+      "id": "body_font",
+      "label": "Fuente de las tarjetas",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "body_font_custom",
+      "label": "Font-family personalizada de las tarjetas",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Grosor del título",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color del título",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "em_color",
+      "label": "Color del acento <em>",
+      "default": "#ffffff"
+    },
+    {
+      "type": "checkbox",
+      "id": "em_italic",
+      "label": "Acento <em> en cursiva",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "heading_size_d",
+      "min": 16,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del título — PC",
+      "default": 34
+    },
+    {
+      "type": "range",
+      "id": "heading_size_m",
+      "min": 14,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del título — Móvil",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_d",
+      "min": 0.8,
+      "max": 2,
+      "step": 0.1,
+      "label": "Interlineado — PC",
+      "default": 1.2
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_m",
+      "min": 0.8,
+      "max": 2,
+      "step": 0.1,
+      "label": "Interlineado — Móvil",
+      "default": 1.3
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing_d",
+      "min": -3,
+      "max": 6,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "heading_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "heading_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_d",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen bajo el título — PC",
+      "default": 34
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen bajo el título — Móvil",
+      "default": 22
+    }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Tarjeta",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen de fondo"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Título",
+          "default": "Título del artículo"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Resumen",
+          "info": "Se corta automáticamente según la longitud fijada arriba.",
+          "default": "Escribe aquí la entradilla del artículo. Se recorta sola si se pasa de largo."
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Enlace del botón",
+          "info": "Página, artículo, colección o cualquier URL."
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Texto del botón",
+          "info": "Opcional. Si lo dejas vacío se usa el de la sección."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Tarjetas de artículos",
+      "blocks": [
+        { "type": "card" },
+        { "type": "card" },
+        { "type": "card" }
+      ]
+    }
+  ]
+}
+{% endschema %}
