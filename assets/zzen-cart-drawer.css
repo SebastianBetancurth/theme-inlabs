@@ -251,7 +251,7 @@
   width: var(--zsd-dot);
   height: var(--zsd-dot);
   box-sizing: border-box;
-  border: 1.5px solid var(--zsd-dot-border);
+  border: 2px solid var(--zsd-dot-border);
   border-radius: 50%;
   background-color: var(--zsd-dot-bg);
   color: var(--zsd-dot-icon);
