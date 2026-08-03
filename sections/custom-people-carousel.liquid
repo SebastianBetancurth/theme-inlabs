@@ -1,0 +1,1988 @@
+{%- comment -%}
+  ============================================================================
+  SECCIÓN: Carrusel de personas (¿Quiénes han pasado por ZZEN?)
+  Tema: Dawn / Online Store 2.0
+  Ruta: sections/custom-people-carousel.liquid
+
+  Hermana de "Carrusel de perfiles", con la tarjeta reducida a lo mínimo:
+  una imagen y el nombre encima. Nada de número, icono ni texto.
+
+  PC     -> título arriba y una fila de retratos verticales que se deslizan.
+            Debajo, la barra de avance y las dos flechas redondas.
+  Móvil  -> un retrato centrado con los vecinos asomando por los lados, y la
+            barra de avance debajo.
+
+  LA BARRA DE AVANCE VA FUERA DEL CARRUSEL.
+  Si se mete dentro del contenedor que hace scroll, se desplaza junto con las
+  tarjetas y desaparece de la vista: parece que "no se ve" cuando en realidad
+  se ha ido hacia la izquierda. Aquí es hermana del carrusel, nunca hija, y
+  lleva alto, fondo y visibilidad marcados como !important para que ni el
+  tema ni ninguna app la puedan tapar con una regla genérica.
+
+  EL SANGRADO SE HACE CON MARGEN NEGATIVO + RELLENO DEL MISMO VALOR.
+  Así las tarjetas se recortan contra el borde de la pantalla mientras la
+  barra y las flechas se quedan dentro del ancho de contenido. El
+  scroll-padding acompaña al padding para que el imán ancle en el borde del
+  contenido y no en el de la pantalla.
+
+  LA PROPORCIÓN DE LA TARJETA ES UN DESPLEGABLE, NO UN RANGO.
+  Shopify obliga a que el step de un range tenga un solo decimal, así que un
+  rango jamás podría dar 0,5625 (9/16), que es la proporción del original.
+  ============================================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign bp = s.mobile_breakpoint
+  assign bp_max = bp | minus: 1
+  assign n_blocks = section.blocks.size
+
+  case s.heading_font
+    when 'thin2'
+      assign heading_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign heading_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign heading_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign heading_stack = 'var(--font-body-family)'
+    else
+      assign heading_stack = s.heading_font_custom
+  endcase
+
+  case s.name_font
+    when 'thin2'
+      assign name_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign name_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign name_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign name_stack = 'var(--font-body-family)'
+    else
+      assign name_stack = s.name_font_custom
+  endcase
+
+  if s.content_max_width == 0
+    assign max_w = 'none'
+  else
+    assign max_w = s.content_max_width | append: 'px'
+  endif
+
+  if s.em_italic
+    assign em_style = 'italic'
+  else
+    assign em_style = 'normal'
+  endif
+
+  # Proporción de la tarjeta: desplegable con ratios exactos y salida libre.
+  if s.ratio_d == 'custom'
+    assign ar_d = s.ratio_custom_d
+  else
+    assign ar_d = s.ratio_d
+  endif
+  if s.ratio_m == 'custom'
+    assign ar_m = s.ratio_custom_m
+  else
+    assign ar_m = s.ratio_m
+  endif
+
+  # ------------------------------------------------------------------
+  # Qué controles se ven en cada dispositivo.
+  # ------------------------------------------------------------------
+  assign bar_d = false
+  assign arrows_d = false
+  assign dots_d = false
+  case s.nav_d
+    when 'bar_arrows'
+      assign bar_d = true
+      assign arrows_d = true
+    when 'bar'
+      assign bar_d = true
+    when 'arrows'
+      assign arrows_d = true
+    when 'dots'
+      assign dots_d = true
+    when 'bar_dots'
+      assign bar_d = true
+      assign dots_d = true
+  endcase
+
+  assign bar_m = false
+  assign arrows_m = false
+  assign dots_m = false
+  case s.nav_m
+    when 'bar_arrows'
+      assign bar_m = true
+      assign arrows_m = true
+    when 'bar'
+      assign bar_m = true
+    when 'arrows'
+      assign arrows_m = true
+    when 'dots'
+      assign dots_m = true
+    when 'bar_dots'
+      assign bar_m = true
+      assign dots_m = true
+  endcase
+
+  # Sangrado: cuánto se sale el carrusel del ancho de contenido.
+  if s.bleed_left_d
+    assign bleed_l_d = s.padding_left_d
+  else
+    assign bleed_l_d = 0
+  endif
+  if s.bleed_right_d
+    assign bleed_r_d = s.padding_right_d
+  else
+    assign bleed_r_d = 0
+  endif
+  if s.bleed_left_m
+    assign bleed_l_m = s.padding_left_m
+  else
+    assign bleed_l_m = 0
+  endif
+  if s.bleed_right_m
+    assign bleed_r_m = s.padding_right_m
+  else
+    assign bleed_r_m = 0
+  endif
+
+  # Ancho inicial de la barra antes de que arranque el JS: así nunca se ve un
+  # hueco vacío en la primera pintada.
+  assign init_pct = 100
+  if n_blocks > 1
+    assign init_pct = 100 | divided_by: n_blocks
+  endif
+
+  # Clases de comportamiento
+  assign root_class = 'zppl zppl-' | append: section.id
+  assign root_class = root_class | append: ' zppl--name-' | append: s.name_position
+  if s.show_scrim
+    assign root_class = root_class | append: ' zppl--scrim'
+  endif
+  if s.image_hover_zoom
+    assign root_class = root_class | append: ' zppl--zoom'
+  endif
+-%}
+
+{%- style -%}
+  @font-face {
+    font-family: 'Helvetica neue';
+    src: url('{{ 'HelveticaNeueCyr-Light.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'thin2';
+    src: url('{{ 'lawrence-regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ================= Variables: PC ================= */
+  .zppl-{{ section.id }} {
+    --zn-bg: {{ s.bg_color }};
+    --zn-max-w: {{ max_w }};
+    --zn-pt: {{ s.padding_top_d }}px;
+    --zn-pb: {{ s.padding_bottom_d }}px;
+    --zn-pl: {{ s.padding_left_d }}px;
+    --zn-pr: {{ s.padding_right_d }}px;
+    --zn-bleed-l: {{ bleed_l_d }}px;
+    --zn-bleed-r: {{ bleed_r_d }}px;
+    --zn-anim: {{ s.transition_ms }}ms;
+
+    --zn-h-font: {{ heading_stack }};
+    --zn-h-size: {{ s.heading_size_d }}px;
+    --zn-h-lh: {{ s.heading_line_height_d }};
+    --zn-h-ls: {{ s.heading_letter_spacing }}px;
+    --zn-h-weight: {{ s.heading_weight }};
+    --zn-h-color: {{ s.heading_color }};
+    --zn-h-align: {{ s.heading_align_d }};
+    --zn-h-mb: {{ s.heading_margin_bottom_d }}px;
+    --zn-em-color: {{ s.em_color }};
+    --zn-em-style: {{ em_style }};
+
+    --zn-card-w: {{ s.card_width_d }}px;
+    --zn-card-gap: {{ s.card_gap_d }}px;
+    --zn-card-ar: {{ ar_d }};
+    --zn-card-radius: {{ s.card_radius_d }}px;
+    --zn-card-fit: {{ s.image_fit }};
+    --zn-card-bg: {{ s.image_bg }};
+    --zn-snap: {{ s.snap_align_d }};
+    /* Con el imán centrado, este relleno permite centrar también la primera
+       y la última tarjeta. Con el imán al inicio manda el sangrado. */
+    --zn-pad-start: {% if s.snap_align_d == 'center' %}calc((100% - var(--zn-card-w)) / 2){% else %}var(--zn-bleed-l){% endif %};
+    --zn-pad-end: {% if s.snap_align_d == 'center' %}calc((100% - var(--zn-card-w)) / 2){% else %}var(--zn-bleed-r){% endif %};
+
+    --zn-n-font: {{ name_stack }};
+    --zn-n-size: {{ s.name_size_d }}px;
+    --zn-n-lh: {{ s.name_line_height }};
+    --zn-n-ls: {{ s.name_letter_spacing }}px;
+    --zn-n-weight: {{ s.name_weight }};
+    --zn-n-color: {{ s.name_color }};
+    --zn-n-align: {{ s.name_align }};
+    --zn-n-transform: {% if s.name_uppercase %}uppercase{% else %}none{% endif %};
+    --zn-n-offset: {{ s.name_offset_d }}px;
+    --zn-n-pad-x: {{ s.name_padding_x_d }}px;
+    --zn-n-shadow: {% if s.name_shadow %}0 1px {{ s.name_shadow_blur }}px {{ s.name_shadow_color }}{% else %}none{% endif %};
+
+    --zn-scrim-color: {{ s.scrim_color }};
+    --zn-scrim-h: {{ s.scrim_height }}%;
+
+    --zn-nav-mt: {{ s.nav_margin_top_d }}px;
+    --zn-nav-gap: {{ s.nav_gap_d }}px;
+    --zn-nav-justify: {{ s.nav_align_d }};
+
+    --zn-bar-h: {{ s.bar_height }}px;
+    --zn-bar-fill-h: {{ s.bar_fill_height }}px;
+    --zn-bar-track: {{ s.bar_track_color }};
+    --zn-bar-fill: {{ s.bar_fill_color }};
+    --zn-bar-radius: {{ s.bar_radius }}px;
+
+    --zn-arrow-size: {{ s.arrow_size_d }}px;
+    --zn-arrow-gap: {{ s.arrow_gap }}px;
+    --zn-arrow-icon: {{ s.arrow_icon_size_d }}px;
+    --zn-arrow-color: {{ s.arrow_color }};
+    --zn-arrow-color-hover: {{ s.arrow_color_hover }};
+    --zn-arrow-bg: {{ s.arrow_bg }};
+    --zn-arrow-bg-hover: {{ s.arrow_bg_hover }};
+    --zn-arrow-border: {{ s.arrow_border_color }};
+    --zn-arrow-border-w: {{ s.arrow_border_width }}px;
+    --zn-arrow-stroke: {{ s.arrow_stroke }};
+
+    --zn-dot-size: {{ s.dot_size }}px;
+    --zn-dot-size-active: {{ s.dot_size_active }}px;
+    --zn-dot-gap: {{ s.dot_gap }}px;
+    --zn-dot-color: {{ s.dot_color }};
+    --zn-dot-color-active: {{ s.dot_color_active }};
+  }
+
+  /* ================= Estructura ================= */
+  .zppl {
+    background-color: var(--zn-bg);
+  }
+
+  .zppl__inner {
+    display: block;
+    max-width: var(--zn-max-w);
+    margin-inline: auto;
+    padding: var(--zn-pt) var(--zn-pr) var(--zn-pb) var(--zn-pl);
+    box-sizing: border-box;
+    /* Nada de overflow:hidden aquí: recortaría el sangrado del carrusel. */
+    overflow: visible;
+  }
+
+  /* ================= Título ================= */
+  .zppl__heading {
+    margin: 0 0 var(--zn-h-mb);
+    font-family: var(--zn-h-font);
+    font-size: var(--zn-h-size);
+    font-weight: var(--zn-h-weight);
+    line-height: var(--zn-h-lh);
+    letter-spacing: var(--zn-h-ls);
+    text-align: var(--zn-h-align);
+    color: var(--zn-h-color);
+  }
+
+  .zppl__heading em,
+  .zppl__heading i {
+    font-style: var(--zn-em-style);
+    color: var(--zn-em-color);
+  }
+
+  /* ================= Carrusel ================= */
+  .zppl__track {
+    position: relative;
+    display: flex;
+    gap: var(--zn-card-gap);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    margin-left: calc(var(--zn-bleed-l) * -1);
+    margin-right: calc(var(--zn-bleed-r) * -1);
+    padding-left: var(--zn-pad-start);
+    padding-right: var(--zn-pad-end);
+    /* El imán ancla en el borde del contenido, no en el de la pantalla. */
+    scroll-padding-left: var(--zn-pad-start);
+    scroll-padding-right: var(--zn-pad-end);
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+    list-style: none;
+  }
+
+  .zppl__track::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  .zppl__card {
+    flex: 0 0 var(--zn-card-w);
+    max-width: 100%;
+    margin: 0;
+    scroll-snap-align: var(--zn-snap);
+    scroll-snap-stop: always;
+  }
+
+  .zppl__link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* ================= Imagen y nombre ================= */
+  .zppl__frame {
+    position: relative;
+    aspect-ratio: var(--zn-card-ar);
+    background-color: var(--zn-card-bg);
+    border-radius: var(--zn-card-radius);
+    overflow: hidden;
+  }
+
+  .zppl__frame picture,
+  .zppl__frame > svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .zppl__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: var(--zn-card-fit);
+    transition: transform var(--zn-anim) ease;
+  }
+
+  .zppl--zoom .zppl__link:hover .zppl__img,
+  .zppl--zoom .zppl__link:focus-visible .zppl__img {
+    transform: scale(1.03);
+  }
+
+  /* Velo para que el nombre se lea sobre fotos claras. Va detrás del nombre
+     y no intercepta el ratón. */
+  .zppl__scrim {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: var(--zn-scrim-h);
+    pointer-events: none;
+  }
+
+  .zppl--name-over_top .zppl__scrim {
+    top: 0;
+    background: linear-gradient(to bottom, var(--zn-scrim-color), transparent);
+  }
+
+  .zppl--name-over_bottom .zppl__scrim,
+  .zppl--name-over_center .zppl__scrim {
+    bottom: 0;
+    background: linear-gradient(to top, var(--zn-scrim-color), transparent);
+  }
+
+  .zppl__name {
+    margin: 0;
+    font-family: var(--zn-n-font);
+    font-size: var(--zn-n-size);
+    font-weight: var(--zn-n-weight);
+    line-height: var(--zn-n-lh);
+    letter-spacing: var(--zn-n-ls);
+    text-transform: var(--zn-n-transform);
+    text-align: var(--zn-n-align);
+    color: var(--zn-n-color);
+  }
+
+  /* Nombre encima de la foto */
+  .zppl__name--over {
+    position: absolute;
+    left: var(--zn-n-pad-x);
+    right: var(--zn-n-pad-x);
+    z-index: 2;
+    text-shadow: var(--zn-n-shadow);
+  }
+
+  .zppl--name-over_bottom .zppl__name--over {
+    bottom: var(--zn-n-offset);
+  }
+
+  .zppl--name-over_top .zppl__name--over {
+    top: var(--zn-n-offset);
+  }
+
+  .zppl--name-over_center .zppl__name--over {
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  /* Nombre debajo de la foto */
+  .zppl__name--below {
+    margin-top: var(--zn-n-offset);
+  }
+
+  /* ================= Navegación =================
+     Hermana del carrusel, nunca hija: dentro del contenedor con scroll se
+     movería con las tarjetas y se saldría de la vista. */
+  .zppl__nav {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: var(--zn-nav-justify);
+    gap: var(--zn-nav-gap);
+    margin-top: var(--zn-nav-mt);
+  }
+
+  /* ---- Barra de avance ----
+     El !important es a propósito: es un elemento fino y de bajo contraste,
+     justo lo que un tema o una app tumban sin querer con una regla genérica.
+     Se blinda el alto, el fondo y la visibilidad. */
+  .zppl-{{ section.id }} .zppl__bar {
+    position: relative !important;
+    z-index: 2 !important;
+    flex: 1 1 auto;
+    min-width: 40px;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: var(--zn-bar-h) !important;
+    background-color: var(--zn-bar-track) !important;
+    border-radius: var(--zn-bar-radius);
+    overflow: visible;
+  }
+
+  .zppl-{{ section.id }} .zppl__bar-fill {
+    position: absolute !important;
+    top: 50%;
+    left: 0;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: {{ init_pct }}%;
+    height: var(--zn-bar-fill-h) !important;
+    background-color: var(--zn-bar-fill) !important;
+    border-radius: var(--zn-bar-radius);
+    transform: translateY(-50%);
+    transition: width var(--zn-anim) linear, left var(--zn-anim) linear;
+    pointer-events: none;
+  }
+
+  /* ---- Flechas ---- */
+  .zppl__arrows {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: var(--zn-arrow-gap);
+  }
+
+  .zppl__arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--zn-arrow-size);
+    height: var(--zn-arrow-size);
+    padding: 0;
+    border: var(--zn-arrow-border-w) solid var(--zn-arrow-border);
+    border-radius: 50%;
+    background-color: var(--zn-arrow-bg);
+    color: var(--zn-arrow-color);
+    cursor: pointer;
+    transition: background-color var(--zn-anim) ease, color var(--zn-anim) ease, opacity var(--zn-anim) ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .zppl__arrow:hover {
+    background-color: var(--zn-arrow-bg-hover);
+    color: var(--zn-arrow-color-hover);
+  }
+
+  .zppl__arrow:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+
+  .zppl__arrow[disabled] {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .zppl__arrow svg {
+    width: var(--zn-arrow-icon);
+    height: var(--zn-arrow-icon);
+    display: block;
+  }
+
+  .zppl__arrow svg path {
+    stroke: currentColor;
+    stroke-width: var(--zn-arrow-stroke);
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ---- Puntos ---- */
+  .zppl__dots {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--zn-dot-gap);
+  }
+
+  .zppl__dot {
+    width: var(--zn-dot-size);
+    height: var(--zn-dot-size);
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background-color: var(--zn-dot-color);
+    cursor: pointer;
+    transition: background-color var(--zn-anim) ease, width var(--zn-anim) ease, height var(--zn-anim) ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .zppl__dot[aria-current='true'] {
+    width: var(--zn-dot-size-active);
+    height: var(--zn-dot-size-active);
+    background-color: var(--zn-dot-color-active);
+  }
+
+  .zppl__dot:focus-visible {
+    outline: 2px solid var(--zn-dot-color-active);
+    outline-offset: 3px;
+  }
+
+  /* ================= Visibilidad de los controles: PC ================= */
+  @media screen and (min-width: {{ bp }}px) {
+    .zppl-{{ section.id }} .zppl__bar    { display: {% if bar_d %}block{% else %}none{% endif %} !important; }
+    .zppl-{{ section.id }} .zppl__arrows { display: {% if arrows_d %}flex{% else %}none{% endif %} !important; }
+    .zppl-{{ section.id }} .zppl__dots   { display: {% if dots_d %}flex{% else %}none{% endif %} !important; }
+  }
+
+  /* ================= Móvil ================= */
+  @media screen and (max-width: {{ bp_max }}px) {
+    .zppl-{{ section.id }} {
+      --zn-max-w: none;
+      --zn-pt: {{ s.padding_top_m }}px;
+      --zn-pb: {{ s.padding_bottom_m }}px;
+      --zn-pl: {{ s.padding_left_m }}px;
+      --zn-pr: {{ s.padding_right_m }}px;
+      --zn-bleed-l: {{ bleed_l_m }}px;
+      --zn-bleed-r: {{ bleed_r_m }}px;
+
+      --zn-h-size: {{ s.heading_size_m }}px;
+      --zn-h-lh: {{ s.heading_line_height_m }};
+      --zn-h-align: {{ s.heading_align_m }};
+      --zn-h-mb: {{ s.heading_margin_bottom_m }}px;
+
+      --zn-card-w: {{ s.card_width_m }}%;
+      --zn-card-gap: {{ s.card_gap_m }}px;
+      --zn-card-ar: {{ ar_m }};
+      --zn-card-radius: {{ s.card_radius_m }}px;
+      --zn-snap: {{ s.snap_align_m }};
+      --zn-pad-start: {% if s.snap_align_m == 'center' %}calc((100% - var(--zn-card-w)) / 2){% else %}var(--zn-bleed-l){% endif %};
+      --zn-pad-end: {% if s.snap_align_m == 'center' %}calc((100% - var(--zn-card-w)) / 2){% else %}var(--zn-bleed-r){% endif %};
+
+      --zn-n-size: {{ s.name_size_m }}px;
+      --zn-n-offset: {{ s.name_offset_m }}px;
+      --zn-n-pad-x: {{ s.name_padding_x_m }}px;
+
+      --zn-nav-mt: {{ s.nav_margin_top_m }}px;
+      --zn-nav-gap: {{ s.nav_gap_m }}px;
+      --zn-nav-justify: {{ s.nav_align_m }};
+
+      --zn-arrow-size: {{ s.arrow_size_m }}px;
+      --zn-arrow-icon: {{ s.arrow_icon_size_m }}px;
+    }
+
+    .zppl-{{ section.id }} .zppl__bar    { display: {% if bar_m %}block{% else %}none{% endif %} !important; }
+    .zppl-{{ section.id }} .zppl__arrows { display: {% if arrows_m %}flex{% else %}none{% endif %} !important; }
+    .zppl-{{ section.id }} .zppl__dots   { display: {% if dots_m %}flex{% else %}none{% endif %} !important; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .zppl-{{ section.id }} { --zn-anim: 1ms; }
+    .zppl-{{ section.id }} .zppl__track { scroll-behavior: auto; }
+    .zppl--zoom .zppl__link:hover .zppl__img { transform: none; }
+  }
+{%- endstyle -%}
+
+<div class="{{ root_class }}">
+  <zzen-people-carousel class="zppl__inner" data-scroll-by="{{ s.scroll_by }}" data-bar-mode="{{ s.bar_mode }}">
+    {%- if s.heading != blank -%}
+      <{{ s.heading_tag }} class="zppl__heading">{{ s.heading | newline_to_br }}</{{ s.heading_tag }}>
+    {%- endif -%}
+
+    {%- comment -%} ---------- Tarjetas ---------- {%- endcomment -%}
+    <div
+      class="zppl__track"
+      data-zn-track
+      tabindex="0"
+      role="group"
+      aria-label="{{ s.carousel_label | escape }}"
+    >
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign img = block.settings.image
+          assign img_m = block.settings.image_mobile
+          if img_m == blank
+            assign img_m = img
+          endif
+          assign name = block.settings.name
+
+          if block.settings.link != blank
+            assign wrap = 'a'
+          else
+            assign wrap = 'div'
+          endif
+        -%}
+        <figure class="zppl__card" data-zn-card {{ block.shopify_attributes }}>
+          <{{ wrap }}
+            class="zppl__link"
+            {% if wrap == 'a' %}
+              href="{{ block.settings.link }}"
+            {% endif %}
+          >
+            <div class="zppl__frame">
+              {%- if img != blank -%}
+                <picture>
+                  {%- if img_m != img -%}
+                    <source
+                      media="(max-width: {{ bp_max }}px)"
+                      srcset="
+                        {{ img_m | image_url: width: 400 }} 400w,
+                        {{ img_m | image_url: width: 600 }} 600w,
+                        {{ img_m | image_url: width: 900 }} 900w
+                      "
+                      sizes="{{ s.card_width_m }}vw"
+                      width="{{ img_m.width }}"
+                      height="{{ img_m.height }}"
+                    >
+                  {%- endif -%}
+                  <img
+                    class="zppl__img"
+                    src="{{ img | image_url: width: 800 }}"
+                    srcset="
+                      {{ img | image_url: width: 400 }} 400w,
+                      {{ img | image_url: width: 600 }} 600w,
+                      {{ img | image_url: width: 800 }} 800w,
+                      {{ img | image_url: width: 1100 }} 1100w
+                    "
+                    sizes="(min-width: {{ bp }}px) {{ s.card_width_d }}px, {{ s.card_width_m }}vw"
+                    width="{{ img.width }}"
+                    height="{{ img.height }}"
+                    alt="{{ img.alt | default: name | escape }}"
+                    loading="{% if forloop.index <= 3 %}eager{% else %}lazy{% endif %}"
+                    decoding="async"
+                  >
+                </picture>
+              {%- else -%}
+                {{ 'image' | placeholder_svg_tag: 'zppl__img' }}
+              {%- endif -%}
+
+              {%- if s.show_scrim and s.name_position != 'below' and name != blank -%}
+                <span class="zppl__scrim" aria-hidden="true"></span>
+              {%- endif -%}
+
+              {%- if name != blank and s.name_position != 'below' -%}
+                <figcaption class="zppl__name zppl__name--over">{{ name }}</figcaption>
+              {%- endif -%}
+            </div>
+
+            {%- if name != blank and s.name_position == 'below' -%}
+              <figcaption class="zppl__name zppl__name--below">{{ name }}</figcaption>
+            {%- endif -%}
+          </{{ wrap }}>
+        </figure>
+      {%- endfor -%}
+    </div>
+
+    {%- comment -%}
+      ---------- Navegación ----------
+      Fuera del carrusel a propósito. Ver la nota de la cabecera.
+    {%- endcomment -%}
+    <div class="zppl__nav">
+      <div class="zppl__bar" data-zn-bar aria-hidden="true">
+        <span class="zppl__bar-fill" data-zn-fill></span>
+      </div>
+
+      <div class="zppl__dots" role="tablist" aria-label="{{ s.dots_label | escape }}">
+        {%- for block in section.blocks -%}
+          <button
+            type="button"
+            class="zppl__dot"
+            data-zn-dot
+            role="tab"
+            aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+            aria-label="{{ block.settings.name | default: forloop.index | escape }}"
+          ></button>
+        {%- endfor -%}
+      </div>
+
+      <div class="zppl__arrows">
+        <button
+          type="button"
+          class="zppl__arrow zppl__arrow--prev"
+          data-zn-prev
+          aria-label="{{ s.arrow_prev_label | escape }}"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M14.5 4.5 7.5 12l7 7.5"></path>
+          </svg>
+        </button>
+        <button
+          type="button"
+          class="zppl__arrow zppl__arrow--next"
+          data-zn-next
+          aria-label="{{ s.arrow_next_label | escape }}"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M9.5 4.5 16.5 12l-7 7.5"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </zzen-people-carousel>
+</div>
+
+<script>
+  if (!customElements.get('zzen-people-carousel')) {
+    customElements.define(
+      'zzen-people-carousel',
+      class ZzenPeopleCarousel extends HTMLElement {
+        connectedCallback() {
+          this.track = this.querySelector('[data-zn-track]');
+          this.cards = Array.from(this.querySelectorAll('[data-zn-card]'));
+          this.fill = this.querySelector('[data-zn-fill]');
+          this.dots = Array.from(this.querySelectorAll('[data-zn-dot]'));
+          this.prevBtn = this.querySelector('[data-zn-prev]');
+          this.nextBtn = this.querySelector('[data-zn-next]');
+          if (!this.track || this.cards.length === 0) return;
+
+          this.barMode = this.dataset.barMode || 'thumb';
+          this.scrollBy = this.dataset.scrollBy || 'card';
+          this.index = 0;
+
+          this.onScroll = this.onScroll.bind(this);
+          this.track.addEventListener('scroll', this.onScroll, { passive: true });
+
+          if (this.prevBtn) this.prevBtn.addEventListener('click', () => this.move(-1));
+          if (this.nextBtn) this.nextBtn.addEventListener('click', () => this.move(1));
+
+          this.dots.forEach((dot, i) => {
+            dot.addEventListener('click', () => this.goTo(i));
+          });
+
+          // El ancho del contenedor y el alto de las tarjetas cambian al girar
+          // el móvil o al redimensionar: hay que recalcular la barra.
+          if ('ResizeObserver' in window) {
+            this.ro = new ResizeObserver(() => this.update());
+            this.ro.observe(this.track);
+          } else {
+            this._onResize = () => this.update();
+            window.addEventListener('resize', this._onResize);
+          }
+
+          // Editor de temas: al seleccionar un bloque se desliza hasta él.
+          this.addEventListener('shopify:block:select', (e) => {
+            const card = e.target.closest('[data-zn-card]');
+            const i = this.cards.indexOf(card);
+            if (i > -1) this.goTo(i);
+          });
+
+          // Las imágenes cambian el ancho total al cargar.
+          this.track.querySelectorAll('img').forEach((img) => {
+            if (!img.complete) img.addEventListener('load', () => this.update(), { once: true });
+          });
+
+          this.update();
+        }
+
+        disconnectedCallback() {
+          if (this.ro) this.ro.disconnect();
+          if (this._onResize) window.removeEventListener('resize', this._onResize);
+        }
+
+        get maxScroll() {
+          return Math.max(this.track.scrollWidth - this.track.clientWidth, 0);
+        }
+
+        // El modo de anclaje se lee del CSS aplicado, así que acierta en PC y
+        // en móvil sin tener que duplicar el ajuste en JavaScript.
+        get centered() {
+          const a = getComputedStyle(this.cards[0]).scrollSnapAlign || '';
+          return a.indexOf('center') > -1;
+        }
+
+        get padStart() {
+          return parseFloat(getComputedStyle(this.track).paddingLeft) || 0;
+        }
+
+        // Distancia de una tarjeta al borde izquierdo de la primera.
+        offsetOf(i) {
+          return this.cards[i].offsetLeft - this.cards[0].offsetLeft;
+        }
+
+        // Posición de scroll que deja la tarjeta i donde toca.
+        targetFor(i) {
+          const card = this.cards[i];
+          if (this.centered) {
+            return this.offsetOf(i) + this.padStart - (this.track.clientWidth - card.offsetWidth) / 2;
+          }
+          return this.offsetOf(i);
+        }
+
+        get step() {
+          if (this.scrollBy === 'page') return this.track.clientWidth;
+          if (this.cards.length > 1) return this.offsetOf(1);
+          return this.cards[0].offsetWidth;
+        }
+
+        move(dir) {
+          // Con el imán centrado se salta de tarjeta en tarjeta para que el
+          // centrado no quede a medias.
+          if (this.centered) {
+            let next = this.index + dir;
+            next = Math.min(Math.max(next, 0), this.cards.length - 1);
+            this.goTo(next);
+            return;
+          }
+          this.track.scrollBy({ left: this.step * dir, behavior: 'smooth' });
+        }
+
+        goTo(i) {
+          if (!this.cards[i]) return;
+          this.track.scrollTo({ left: this.targetFor(i), behavior: 'smooth' });
+        }
+
+        onScroll() {
+          if (this._raf) return;
+          this._raf = requestAnimationFrame(() => {
+            this._raf = null;
+            this.update();
+          });
+        }
+
+        update() {
+          const max = this.maxScroll;
+          const pos = this.track.scrollLeft;
+          const ratio = max > 0 ? Math.min(Math.max(pos / max, 0), 1) : 0;
+
+          // Barra de avance
+          if (this.fill) {
+            if (this.barMode === 'progress') {
+              // Se llena de izquierda a derecha, de 0 a 100.
+              this.fill.style.left = '0%';
+              this.fill.style.width = Math.max(ratio * 100, 2) + '%';
+            } else {
+              // Se comporta como el pulgar de una barra de desplazamiento: su
+              // ancho es la parte visible y se desliza hacia la derecha.
+              const visible = this.track.scrollWidth > 0
+                ? this.track.clientWidth / this.track.scrollWidth
+                : 1;
+              const w = Math.min(Math.max(visible, 0.06), 1) * 100;
+              this.fill.style.width = w + '%';
+              this.fill.style.left = ratio * (100 - w) + '%';
+            }
+          }
+
+          // Tarjeta activa: la más cercana a su posición de anclaje.
+          let nearest = 0;
+          let best = Infinity;
+          for (let i = 0; i < this.cards.length; i++) {
+            const d = Math.abs(this.targetFor(i) - pos);
+            if (d < best) {
+              best = d;
+              nearest = i;
+            }
+          }
+          if (nearest !== this.index || !this._painted) {
+            this.index = nearest;
+            this._painted = true;
+            this.dots.forEach((dot, i) => {
+              dot.setAttribute('aria-current', i === nearest ? 'true' : 'false');
+            });
+          }
+
+          // Flechas: apagadas en los extremos.
+          if (this.prevBtn) this.prevBtn.disabled = pos <= 1;
+          if (this.nextBtn) this.nextBtn.disabled = pos >= max - 1;
+        }
+      }
+    );
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Carrusel de personas",
+  "tag": "section",
+  "class": "section-zppl",
+  "max_blocks": 24,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Título"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Título",
+      "info": "Enter para salto de línea. Envuelve una palabra en <em>así</em> para el acento en cursiva.",
+      "default": "¿Quiénes han <em>pasado</em> por ZZEN?"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Etiqueta HTML del título (SEO)",
+      "options": [
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "div", "label": "div (sin peso SEO)" }
+      ],
+      "default": "h2"
+    },
+
+    {
+      "type": "header",
+      "content": "Diseño general"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "mobile_breakpoint",
+      "min": 480,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "label": "Punto de cambio a móvil",
+      "default": 750
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 0,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "label": "Ancho máximo del contenido",
+      "info": "0 = ancho completo.",
+      "default": 1500
+    },
+    {
+      "type": "range",
+      "id": "transition_ms",
+      "min": 0,
+      "max": 800,
+      "step": 25,
+      "unit": "ms",
+      "label": "Duración de las transiciones",
+      "default": 200
+    },
+    {
+      "type": "range",
+      "id": "padding_top_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding superior — PC",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding inferior — PC",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_left_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding izquierdo — PC",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_right_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding derecho — PC",
+      "default": 60
+    },
+    {
+      "type": "checkbox",
+      "id": "bleed_left_d",
+      "label": "Las tarjetas llegan al borde izquierdo — PC",
+      "info": "El carrusel se sale del ancho de contenido, pero la barra y las flechas se quedan dentro.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "bleed_right_d",
+      "label": "Las tarjetas llegan al borde derecho — PC",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding_top_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding superior — Móvil",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding inferior — Móvil",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "padding_left_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding izquierdo — Móvil",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_right_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding derecho — Móvil",
+      "default": 16
+    },
+    {
+      "type": "checkbox",
+      "id": "bleed_left_m",
+      "label": "Las tarjetas llegan al borde izquierdo — Móvil",
+      "info": "Sin efecto si el anclaje del móvil está centrado.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "bleed_right_m",
+      "label": "Las tarjetas llegan al borde derecho — Móvil",
+      "default": true
+    },
+
+    {
+      "type": "header",
+      "content": "Tarjetas"
+    },
+    {
+      "type": "text",
+      "id": "carousel_label",
+      "label": "Texto accesible del carrusel",
+      "default": "Personas que han pasado por ZZEN"
+    },
+    {
+      "type": "select",
+      "id": "scroll_by",
+      "label": "Cuánto avanza cada flecha",
+      "info": "Con el anclaje centrado siempre avanza de una en una.",
+      "options": [
+        { "value": "card", "label": "Una tarjeta" },
+        { "value": "page", "label": "Una pantalla completa" }
+      ],
+      "default": "card"
+    },
+    {
+      "type": "select",
+      "id": "snap_align_d",
+      "label": "Dónde se ancla la tarjeta — PC",
+      "options": [
+        { "value": "start", "label": "Al principio (fila de retratos)" },
+        { "value": "center", "label": "Centrada (una protagonista)" }
+      ],
+      "default": "start"
+    },
+    {
+      "type": "select",
+      "id": "snap_align_m",
+      "label": "Dónde se ancla la tarjeta — Móvil",
+      "options": [
+        { "value": "center", "label": "Centrada (vecinas asomando)" },
+        { "value": "start", "label": "Al principio" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "card_width_d",
+      "min": 160,
+      "max": 700,
+      "step": 10,
+      "unit": "px",
+      "label": "Ancho de la tarjeta — PC",
+      "default": 390
+    },
+    {
+      "type": "range",
+      "id": "card_gap_d",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre tarjetas — PC",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "card_width_m",
+      "min": 40,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho de la tarjeta — Móvil",
+      "info": "Porcentaje del espacio disponible. Menos de 100 deja asomar las vecinas.",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "card_gap_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre tarjetas — Móvil",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "ratio_d",
+      "label": "Proporción de la tarjeta — PC",
+      "info": "9/16 es la del original. Shopify no permite un deslizador con la precisión necesaria, de ahí el desplegable.",
+      "options": [
+        { "value": "9 / 16", "label": "9:16 — retrato alto" },
+        { "value": "2 / 3", "label": "2:3 — retrato" },
+        { "value": "3 / 4", "label": "3:4 — retrato suave" },
+        { "value": "4 / 5", "label": "4:5 — retrato corto" },
+        { "value": "1 / 1", "label": "1:1 — cuadrada" },
+        { "value": "4 / 3", "label": "4:3 — horizontal" },
+        { "value": "16 / 9", "label": "16:9 — panorámica" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "9 / 16"
+    },
+    {
+      "type": "text",
+      "id": "ratio_custom_d",
+      "label": "Proporción personalizada — PC",
+      "info": "Formato ancho / alto, por ejemplo 5 / 7.",
+      "default": "9 / 16"
+    },
+    {
+      "type": "select",
+      "id": "ratio_m",
+      "label": "Proporción de la tarjeta — Móvil",
+      "options": [
+        { "value": "9 / 16", "label": "9:16 — retrato alto" },
+        { "value": "2 / 3", "label": "2:3 — retrato" },
+        { "value": "3 / 4", "label": "3:4 — retrato suave" },
+        { "value": "4 / 5", "label": "4:5 — retrato corto" },
+        { "value": "1 / 1", "label": "1:1 — cuadrada" },
+        { "value": "4 / 3", "label": "4:3 — horizontal" },
+        { "value": "16 / 9", "label": "16:9 — panorámica" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "9 / 16"
+    },
+    {
+      "type": "text",
+      "id": "ratio_custom_m",
+      "label": "Proporción personalizada — Móvil",
+      "default": "9 / 16"
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "Ajuste de la imagen",
+      "options": [
+        { "value": "cover", "label": "Rellenar (recorta)" },
+        { "value": "contain", "label": "Entera (sin recortar)" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "color",
+      "id": "image_bg",
+      "label": "Fondo del hueco de imagen",
+      "default": "#eeeeee"
+    },
+    {
+      "type": "range",
+      "id": "card_radius_d",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo — PC",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "card_radius_m",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo — Móvil",
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "image_hover_zoom",
+      "label": "Acercar la imagen al pasar el ratón",
+      "info": "Solo en las tarjetas que lleven enlace.",
+      "default": false
+    },
+
+    {
+      "type": "header",
+      "content": "Nombre"
+    },
+    {
+      "type": "select",
+      "id": "name_position",
+      "label": "Posición",
+      "options": [
+        { "value": "over_bottom", "label": "Sobre la foto, abajo" },
+        { "value": "over_center", "label": "Sobre la foto, centrado" },
+        { "value": "over_top", "label": "Sobre la foto, arriba" },
+        { "value": "below", "label": "Debajo de la foto" }
+      ],
+      "default": "over_bottom"
+    },
+    {
+      "type": "select",
+      "id": "name_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "thin2"
+    },
+    {
+      "type": "text",
+      "id": "name_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'thin2', serif"
+    },
+    {
+      "type": "color",
+      "id": "name_color",
+      "label": "Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "name_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "checkbox",
+      "id": "name_uppercase",
+      "label": "En mayúsculas",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "name_align",
+      "label": "Alineación",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "name_size_d",
+      "min": 12,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "name_size_m",
+      "min": 10,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "name_line_height",
+      "min": 0.9,
+      "max": 2,
+      "step": 0.1,
+      "label": "Interlineado",
+      "default": 1.1
+    },
+    {
+      "type": "range",
+      "id": "name_letter_spacing",
+      "min": -2,
+      "max": 6,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "name_offset_d",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Distancia al borde — PC",
+      "info": "Desde abajo, desde arriba o el hueco con la foto, según la posición elegida.",
+      "default": 34
+    },
+    {
+      "type": "range",
+      "id": "name_offset_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Distancia al borde — Móvil",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "name_padding_x_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen lateral del nombre — PC",
+      "info": "Evita que un nombre largo toque los bordes de la foto.",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "name_padding_x_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen lateral del nombre — Móvil",
+      "default": 12
+    },
+    {
+      "type": "checkbox",
+      "id": "name_shadow",
+      "label": "Sombra bajo el nombre",
+      "info": "Ayuda a leerlo sobre fotos claras sin oscurecer la imagen.",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "name_shadow_color",
+      "label": "Color de la sombra",
+      "default": "#00000059"
+    },
+    {
+      "type": "range",
+      "id": "name_shadow_blur",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Difuminado de la sombra",
+      "default": 6
+    },
+    {
+      "type": "checkbox",
+      "id": "show_scrim",
+      "label": "Velo degradado tras el nombre",
+      "info": "Recomendado si las fotos son claras: el nombre en blanco se lee mucho mejor.",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "scrim_color",
+      "label": "Color del velo",
+      "default": "#00000073"
+    },
+    {
+      "type": "range",
+      "id": "scrim_height",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Alto del velo",
+      "default": 45
+    },
+
+    {
+      "type": "header",
+      "content": "Navegación"
+    },
+    {
+      "type": "select",
+      "id": "nav_d",
+      "label": "Controles — PC",
+      "options": [
+        { "value": "bar_arrows", "label": "Barra + flechas" },
+        { "value": "bar_dots", "label": "Barra + puntos" },
+        { "value": "bar", "label": "Solo barra" },
+        { "value": "arrows", "label": "Solo flechas" },
+        { "value": "dots", "label": "Solo puntos" },
+        { "value": "none", "label": "Ninguno" }
+      ],
+      "default": "bar_arrows"
+    },
+    {
+      "type": "select",
+      "id": "nav_m",
+      "label": "Controles — Móvil",
+      "options": [
+        { "value": "bar", "label": "Solo barra" },
+        { "value": "dots", "label": "Solo puntos" },
+        { "value": "bar_arrows", "label": "Barra + flechas" },
+        { "value": "bar_dots", "label": "Barra + puntos" },
+        { "value": "arrows", "label": "Solo flechas" },
+        { "value": "none", "label": "Ninguno" }
+      ],
+      "default": "bar"
+    },
+    {
+      "type": "select",
+      "id": "nav_align_d",
+      "label": "Alineación de los controles — PC",
+      "options": [
+        { "value": "space-between", "label": "Separados a los extremos" },
+        { "value": "flex-start", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "flex-end", "label": "Derecha" }
+      ],
+      "default": "space-between"
+    },
+    {
+      "type": "select",
+      "id": "nav_align_m",
+      "label": "Alineación de los controles — Móvil",
+      "options": [
+        { "value": "center", "label": "Centro" },
+        { "value": "flex-start", "label": "Izquierda" },
+        { "value": "space-between", "label": "Separados a los extremos" },
+        { "value": "flex-end", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "nav_margin_top_d",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación con las tarjetas — PC",
+      "default": 52
+    },
+    {
+      "type": "range",
+      "id": "nav_margin_top_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación con las tarjetas — Móvil",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "nav_gap_d",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre barra y flechas — PC",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "nav_gap_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre controles — Móvil",
+      "default": 16
+    },
+
+    {
+      "type": "header",
+      "content": "Barra de avance"
+    },
+    {
+      "type": "select",
+      "id": "bar_mode",
+      "label": "Comportamiento",
+      "info": "«Proporcional» es lo del original: la parte marcada ocupa lo que se ve y se desliza. «Se llena» crece de 0 a 100 según avanzas.",
+      "options": [
+        { "value": "thumb", "label": "Proporcional (se desliza)" },
+        { "value": "progress", "label": "Se llena de izquierda a derecha" }
+      ],
+      "default": "thumb"
+    },
+    {
+      "type": "color",
+      "id": "bar_track_color",
+      "label": "Color de la línea de fondo",
+      "info": "Tiene que contrastar con el fondo de la sección o la barra parecerá invisible.",
+      "default": "#d4d4d4"
+    },
+    {
+      "type": "color",
+      "id": "bar_fill_color",
+      "label": "Color de la parte avanzada",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "range",
+      "id": "bar_height",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor de la línea de fondo",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "bar_fill_height",
+      "min": 1,
+      "max": 14,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor de la parte avanzada",
+      "info": "Por encima del anterior para que destaque, como en el original.",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "bar_radius",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo de los extremos",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "Flechas"
+    },
+    {
+      "type": "text",
+      "id": "arrow_prev_label",
+      "label": "Texto accesible de la flecha izquierda",
+      "default": "Anterior"
+    },
+    {
+      "type": "text",
+      "id": "arrow_next_label",
+      "label": "Texto accesible de la flecha derecha",
+      "default": "Siguiente"
+    },
+    {
+      "type": "color",
+      "id": "arrow_color",
+      "label": "Color del icono",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "arrow_color_hover",
+      "label": "Color del icono al pasar el ratón",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "arrow_bg",
+      "label": "Fondo del círculo",
+      "default": "#00000000"
+    },
+    {
+      "type": "color",
+      "id": "arrow_bg_hover",
+      "label": "Fondo del círculo al pasar el ratón",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "arrow_border_color",
+      "label": "Color del borde",
+      "default": "#c7c7c7"
+    },
+    {
+      "type": "range",
+      "id": "arrow_border_width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor del borde",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "arrow_size_d",
+      "min": 24,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Diámetro — PC",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "arrow_size_m",
+      "min": 24,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "label": "Diámetro — Móvil",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "arrow_icon_size_d",
+      "min": 8,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del icono — PC",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "arrow_icon_size_m",
+      "min": 8,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del icono — Móvil",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "arrow_stroke",
+      "min": 0.5,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Grosor del trazo",
+      "default": 1.4
+    },
+    {
+      "type": "range",
+      "id": "arrow_gap",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre las dos flechas",
+      "default": 12
+    },
+
+    {
+      "type": "header",
+      "content": "Puntos"
+    },
+    {
+      "type": "text",
+      "id": "dots_label",
+      "label": "Texto accesible del grupo de puntos",
+      "default": "Ir a la persona"
+    },
+    {
+      "type": "color",
+      "id": "dot_color",
+      "label": "Color del punto inactivo",
+      "default": "#cfcfcf"
+    },
+    {
+      "type": "color",
+      "id": "dot_color_active",
+      "label": "Color del punto activo",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "range",
+      "id": "dot_size",
+      "min": 3,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del punto inactivo",
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "dot_size_active",
+      "min": 3,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del punto activo",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "dot_gap",
+      "min": 2,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre puntos",
+      "default": 8
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía del título de sección"
+    },
+    {
+      "type": "select",
+      "id": "heading_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "thin2"
+    },
+    {
+      "type": "text",
+      "id": "heading_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'thin2', serif"
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "em_color",
+      "label": "Color del acento <em>",
+      "default": "#000000"
+    },
+    {
+      "type": "checkbox",
+      "id": "em_italic",
+      "label": "Acento <em> en cursiva",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "heading_size_d",
+      "min": 20,
+      "max": 110,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 46
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_d",
+      "min": 0.8,
+      "max": 2,
+      "step": 0.1,
+      "label": "Interlineado — PC",
+      "default": 1.1
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing",
+      "min": -3,
+      "max": 6,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "heading_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_d",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — PC",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "heading_size_m",
+      "min": 14,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_m",
+      "min": 0.8,
+      "max": 2,
+      "step": 0.1,
+      "label": "Interlineado — Móvil",
+      "default": 1.2
+    },
+    {
+      "type": "select",
+      "id": "heading_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — Móvil",
+      "default": 20
+    }
+  ],
+  "blocks": [
+    {
+      "type": "person",
+      "name": "Persona",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Foto"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Foto para móvil",
+          "info": "Opcional. Si la dejas vacía se usa la de arriba."
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Nombre",
+          "default": "Nombre Apellido"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Enlace",
+          "info": "Opcional. Si lo rellenas, la tarjeta entera se vuelve pulsable."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Carrusel de personas",
+      "blocks": [
+        { "type": "person" },
+        { "type": "person" },
+        { "type": "person" },
+        { "type": "person" },
+        { "type": "person" },
+        { "type": "person" }
+      ]
+    }
+  ]
+}
+{% endschema %}
