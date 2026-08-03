@@ -23,9 +23,10 @@
         "slide_FtFTYA": {
           "type": "slide",
           "settings": {
-            "nav_label": "Focus",
-            "heading": "Focus",
-            "text": "<p>Describe aquí la fórmula: para qué sirve, a quién va dirigida y qué la hace distinta.</p>",
+            "nav_label": "Desbloquea tu potencial",
+            "image": "shopify://shop_images/ad5ad1a6-0f33-4bd7-b4d6-6a3ec3eb5269_1.webp",
+            "heading": "<em>Desbloquea</em> tu potencial",
+            "text": "<p>Por esas noches eternas sin dormir, por esas etapas de la vida donde no avanzas, por ese sentimiento de saber que puedes más y no lo estás llevando a cabo. De toda esa incomodidad, de toda esa insatisfacción, de toda esa pérdida de potencial, nace ZZEN.</p><p>No creemos en soluciones rápidas ni en propuestas idílicas. Creemos en el trabajo constante, en la disciplina y en la toma de mejores decisiones, aunque duelan. <strong>ZZEN es un recordatorio de que la única forma de ser mejor es a través del esfuerzo.</strong></p><p>Porque el potencial no se descubre, se trabaja para desbloquearlo. Avanzar exige constancia, decisiones conscientes y herramientas que estén a la altura del esfuerzo. Y por eso estamos aquí, para acompañaros en el proceso.</p><p>ZZEN existe para empujarte y recordarte que el progreso no es cómodo, pero sí posible cuando tienes dirección y propósito.</p><p>Nosotros ponemos las herramientas. El trabajo sigue siendo tuyo.</p>",
             "heading_mobile": "ZZEN Focus",
             "bullet_1": "Productividad y motivación",
             "bullet_2": "Energía <strong>sostenida</strong>",
@@ -37,9 +38,10 @@
         "slide_NBqCK9": {
           "type": "slide",
           "settings": {
-            "nav_label": "Focus",
-            "heading": "Focus",
-            "text": "<p>Describe aquí la fórmula: para qué sirve, a quién va dirigida y qué la hace distinta.</p>",
+            "nav_label": "Producto",
+            "image": "shopify://shop_images/DSCF7316_1.webp",
+            "heading": "Un <em>sistema</em> diseñado para rendir",
+            "text": "<p>En ZZEN entendemos la suplementación como un sistema. No creamos productos independientes, sino que trabajamos con una lógica de <strong>ecosistema</strong>: cada fórmula cumple una función concreta y todas están diseñadas para encajar entre sí.</p><p>Rendir bien no es solo ser más productivo. Es saber gestionar la presión, recuperarse correctamente o tener una visión más clara. Nuestros productos están alineados de forma sinérgica con el ciclo del día a día, tanto físico como mental.<br/>Buscamos crear <strong>herramientas precisas</strong>, bien formuladas, con los mejores ingredientes y respaldadas por ciencia, que funcionen a la perfección de manera independiente, pero se potencien al combinarse.</p><p>Nuestro objetivo es <strong>democratizar la salud y el rendimiento</strong>, haciendo accesibles herramientas eficaces y conocimiento claro a través de un <strong>ecosistema de suplementación </strong>pensado para acompañar el rendimiento humano de forma completa y coherente.</p>",
             "heading_mobile": "ZZEN Focus",
             "bullet_1": "Productividad y motivación",
             "bullet_2": "Energía <strong>sostenida</strong>",
@@ -51,9 +53,10 @@
         "slide_MVBcp3": {
           "type": "slide",
           "settings": {
-            "nav_label": "Focus",
-            "heading": "Focus",
-            "text": "<p>Describe aquí la fórmula: para qué sirve, a quién va dirigida y qué la hace distinta.</p>",
+            "nav_label": "Comunidad",
+            "image": "shopify://shop_images/ad5ad1a6-0f33-4bd7-b4d6-6a3ec3eb5269_2.webp",
+            "heading": "Una <em>comunidad</em> con un mismo objetivo",
+            "text": "<p>ZZEN es una forma de pensar, de exigirse y de estar presente en lo que haces. Esa dimensión se articula a través de <strong>ZZEN Talks</strong>, el espacio donde la marca se expresa, conversa y conecta.</p><p>ZZEN Talks es un podcast y un formato de encuentros conducido por <strong>René</strong>, que actúa como host y facilitador de conversaciones profundas y útiles. Un espacio donde se reúnen perfiles diversos, desde ciencia y nutrición hasta psicología, rendimiento y desarrollo humano, con el objetivo de explorar temas como la productividad, el bienestar o el autoconocimiento.</p><p>Pero no solo eso, ZZEN celebra encuentros presenciales, como el Evento ZZEN Talks, llenando uno de los cines más grandes de Europa donde se realizaron 6 ponencias por profesionales de distintas dimensiones humanas. Esta fue una de las tantas muestras de que ZZEN se trata de una comunidad activa.</p><p>Desde ZZEN creamos el entorno, las conversaciones y las herramientas para que puedas dar tu mejor versión.</p>",
             "heading_mobile": "ZZEN Focus",
             "bullet_1": "Productividad y motivación",
             "bullet_2": "Energía <strong>sostenida</strong>",
@@ -96,7 +99,7 @@
         "padding_bottom_m": 32,
         "padding_left_m": 14,
         "padding_right_m": 14,
-        "aspect_d": "1/1",
+        "aspect_d": "natural",
         "aspect_m": "1/1",
         "image_focus": "center",
         "image_radius": 8,
