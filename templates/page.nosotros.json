@@ -11,13 +11,158 @@
   "sections": {
     "main": {
       "type": "main-page",
+      "disabled": true,
       "settings": {
         "padding_top": 28,
         "padding_bottom": 28
       }
+    },
+    "custom_product_slider_DMzwV9": {
+      "type": "custom-product-slider",
+      "blocks": {
+        "slide_FtFTYA": {
+          "type": "slide",
+          "settings": {
+            "nav_label": "Focus",
+            "heading": "Focus",
+            "text": "<p>Describe aquí la fórmula: para qué sirve, a quién va dirigida y qué la hace distinta.</p>",
+            "heading_mobile": "ZZEN Focus",
+            "bullet_1": "Productividad y motivación",
+            "bullet_2": "Energía <strong>sostenida</strong>",
+            "bullet_3": "Refuerza la <strong>memoria</strong>",
+            "bullet_4": "",
+            "bullet_5": ""
+          }
+        },
+        "slide_NBqCK9": {
+          "type": "slide",
+          "settings": {
+            "nav_label": "Focus",
+            "heading": "Focus",
+            "text": "<p>Describe aquí la fórmula: para qué sirve, a quién va dirigida y qué la hace distinta.</p>",
+            "heading_mobile": "ZZEN Focus",
+            "bullet_1": "Productividad y motivación",
+            "bullet_2": "Energía <strong>sostenida</strong>",
+            "bullet_3": "Refuerza la <strong>memoria</strong>",
+            "bullet_4": "",
+            "bullet_5": ""
+          }
+        },
+        "slide_MVBcp3": {
+          "type": "slide",
+          "settings": {
+            "nav_label": "Focus",
+            "heading": "Focus",
+            "text": "<p>Describe aquí la fórmula: para qué sirve, a quién va dirigida y qué la hace distinta.</p>",
+            "heading_mobile": "ZZEN Focus",
+            "bullet_1": "Productividad y motivación",
+            "bullet_2": "Energía <strong>sostenida</strong>",
+            "bullet_3": "Refuerza la <strong>memoria</strong>",
+            "bullet_4": "",
+            "bullet_5": ""
+          }
+        }
+      },
+      "block_order": [
+        "slide_FtFTYA",
+        "slide_NBqCK9",
+        "slide_MVBcp3"
+      ],
+      "name": "Carrusel producto",
+      "settings": {
+        "bg_color": "#000000",
+        "mobile_breakpoint": 750,
+        "content_max_width": 1400,
+        "heading_tag": "h3",
+        "mobile_content": "list",
+        "loop": true,
+        "fade_out_duration": 250,
+        "fade_duration": 400,
+        "fade_easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "fade_shift": 0,
+        "image_position_d": "left",
+        "vertical_align_d": "flex-start",
+        "media_width_d": 43,
+        "gap_d": 72,
+        "padding_top_d": 48,
+        "padding_bottom_d": 60,
+        "padding_left_d": 20,
+        "padding_right_d": 20,
+        "gap_m": 28,
+        "padding_top_m": 24,
+        "padding_bottom_m": 32,
+        "padding_left_m": 14,
+        "padding_right_m": 14,
+        "aspect_d": "1/1",
+        "aspect_m": "1/1",
+        "image_focus": "center",
+        "image_radius": 8,
+        "heading_font": "thin2",
+        "heading_font_custom": "'thin2', serif",
+        "heading_weight": "400",
+        "heading_color": "#080808",
+        "heading_size_d": 96,
+        "heading_line_height_d": 1,
+        "heading_letter_spacing_d": 0,
+        "heading_margin_bottom_d": 22,
+        "heading_align_d": "left",
+        "heading_size_m": 26,
+        "heading_line_height_m": 1.2,
+        "heading_letter_spacing_m": 0,
+        "heading_margin_bottom_m": 18,
+        "heading_align_m": "left",
+        "body_font": "helvetica",
+        "body_font_custom": "'Helvetica neue', sans-serif",
+        "body_weight": "400",
+        "body_color": "#080808",
+        "body_size_d": 17,
+        "body_line_height_d": 1.5,
+        "body_letter_spacing_d": 0,
+        "paragraph_gap_d": 26,
+        "body_align_d": "left",
+        "body_size_m": 14,
+        "body_line_height_m": 1.5,
+        "body_letter_spacing_m": 0,
+        "paragraph_gap_m": 16,
+        "body_align_m": "left",
+        "bullet_size_m": 14,
+        "bullet_line_height_m": 1.4,
+        "bullet_color": "#080808",
+        "bullet_gap_m": 16,
+        "bullet_icon_size": 13,
+        "bullet_icon_color": "#080808",
+        "bullet_icon_gap": 9,
+        "nav_style_d": "stepper",
+        "nav_style_m": "dots",
+        "show_arrows_d": true,
+        "show_arrows_m": false,
+        "nav_margin_top_d": 50,
+        "nav_margin_top_m": 28,
+        "nav_gap": 36,
+        "line_color": "#d9d9d9",
+        "dot_size_d": 14,
+        "dot_border_color": "#080808",
+        "dot_active_color": "#080808",
+        "label_size_d": 13,
+        "label_gap": 12,
+        "label_color": "#8a8a8a",
+        "label_active_color": "#080808",
+        "arrow_size": 44,
+        "arrow_gap": 12,
+        "arrow_border_color": "#d9d9d9",
+        "arrow_icon_color": "#080808",
+        "pagdot_size": 7,
+        "pagdot_gap": 8,
+        "pagdot_active_color": "#5c5c5c",
+        "pagdot_inactive_color": "#d0d0d0",
+        "aria_label": "Nuestras fórmulas",
+        "aria_prev": "Anterior",
+        "aria_next": "Siguiente"
+      }
     }
   },
   "order": [
-    "main"
+    "main",
+    "custom_product_slider_DMzwV9"
   ]
 }
