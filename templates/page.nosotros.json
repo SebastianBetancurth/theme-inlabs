@@ -313,11 +313,180 @@
         "heading_align_m": "left",
         "heading_margin_bottom_m": 24
       }
+    },
+    "custom_people_carousel_KhX8x3": {
+      "type": "custom-people-carousel",
+      "blocks": {
+        "person_aV9LRJ": {
+          "type": "person",
+          "settings": {
+            "image": "shopify://shop_images/Frame_3.webp",
+            "name": "Aurelio Rojas",
+            "link": ""
+          }
+        },
+        "person_33H3Cg": {
+          "type": "person",
+          "settings": {
+            "image": "shopify://shop_images/3_803d795e-2d5c-4904-9235-9f7389cea1d7.webp",
+            "name": "Claudia Nicolasa",
+            "link": ""
+          }
+        },
+        "person_CXkxgA": {
+          "type": "person",
+          "settings": {
+            "image": "shopify://shop_images/Frame_7_888d8277-afab-4cd7-bccb-13362fb9c49b.webp",
+            "name": "",
+            "link": ""
+          }
+        },
+        "person_dVnjGd": {
+          "type": "person",
+          "settings": {
+            "image": "shopify://shop_images/Frame_5.webp",
+            "name": "Fiona Pinar",
+            "link": ""
+          }
+        },
+        "person_UfjcDx": {
+          "type": "person",
+          "settings": {
+            "image": "shopify://shop_images/Frame_10.webp",
+            "name": "José Abellán",
+            "link": ""
+          }
+        },
+        "person_B8yArL": {
+          "type": "person",
+          "settings": {
+            "name": "Isabel",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "person_aV9LRJ",
+        "person_33H3Cg",
+        "person_CXkxgA",
+        "person_dVnjGd",
+        "person_UfjcDx",
+        "person_B8yArL"
+      ],
+      "name": "Carrusel de personas",
+      "settings": {
+        "heading": "¿Quiénes han <em>pasado</em> por ZZEN?",
+        "heading_tag": "h2",
+        "bg_color": "#ffffff",
+        "mobile_breakpoint": 750,
+        "content_max_width": 1500,
+        "transition_ms": 200,
+        "padding_top_d": 80,
+        "padding_bottom_d": 80,
+        "padding_left_d": 60,
+        "padding_right_d": 60,
+        "bleed_left_d": true,
+        "bleed_right_d": true,
+        "padding_top_m": 28,
+        "padding_bottom_m": 28,
+        "padding_left_m": 16,
+        "padding_right_m": 16,
+        "bleed_left_m": true,
+        "bleed_right_m": true,
+        "carousel_label": "Personas que han pasado por ZZEN",
+        "scroll_by": "card",
+        "snap_align_d": "start",
+        "snap_align_m": "center",
+        "card_width_d": 390,
+        "card_gap_d": 20,
+        "card_width_m": 72,
+        "card_gap_m": 16,
+        "ratio_d": "9 / 16",
+        "ratio_custom_d": "9 / 16",
+        "ratio_m": "9 / 16",
+        "ratio_custom_m": "9 / 16",
+        "image_fit": "cover",
+        "image_bg": "#eeeeee",
+        "card_radius_d": 4,
+        "card_radius_m": 4,
+        "image_hover_zoom": false,
+        "name_position": "over_bottom",
+        "name_font": "thin2",
+        "name_font_custom": "'thin2', serif",
+        "name_color": "#ffffff",
+        "name_weight": "400",
+        "name_uppercase": false,
+        "name_align": "center",
+        "name_size_d": 36,
+        "name_size_m": 24,
+        "name_line_height": 1.1,
+        "name_letter_spacing": 0,
+        "name_offset_d": 34,
+        "name_offset_m": 22,
+        "name_padding_x_d": 16,
+        "name_padding_x_m": 12,
+        "name_shadow": false,
+        "name_shadow_color": "#00000059",
+        "name_shadow_blur": 6,
+        "show_scrim": false,
+        "scrim_color": "#00000073",
+        "scrim_height": 45,
+        "nav_d": "bar_arrows",
+        "nav_m": "bar",
+        "nav_align_d": "space-between",
+        "nav_align_m": "center",
+        "nav_margin_top_d": 52,
+        "nav_margin_top_m": 24,
+        "nav_gap_d": 40,
+        "nav_gap_m": 16,
+        "bar_mode": "thumb",
+        "bar_track_color": "#d4d4d4",
+        "bar_fill_color": "#1a1a1a",
+        "bar_height": 1,
+        "bar_fill_height": 2,
+        "bar_radius": 0,
+        "arrow_prev_label": "Anterior",
+        "arrow_next_label": "Siguiente",
+        "arrow_color": "#1a1a1a",
+        "arrow_color_hover": "#ffffff",
+        "arrow_bg": "#00000000",
+        "arrow_bg_hover": "#1a1a1a",
+        "arrow_border_color": "#c7c7c7",
+        "arrow_border_width": 1,
+        "arrow_size_d": 40,
+        "arrow_size_m": 36,
+        "arrow_icon_size_d": 14,
+        "arrow_icon_size_m": 13,
+        "arrow_stroke": 1.4,
+        "arrow_gap": 12,
+        "dots_label": "Ir a la persona",
+        "dot_color": "#cfcfcf",
+        "dot_color_active": "#1a1a1a",
+        "dot_size": 5,
+        "dot_size_active": 8,
+        "dot_gap": 8,
+        "heading_font": "thin2",
+        "heading_font_custom": "'thin2', serif",
+        "heading_weight": "400",
+        "heading_color": "#000000",
+        "em_color": "#000000",
+        "em_italic": true,
+        "heading_size_d": 46,
+        "heading_line_height_d": 1.1,
+        "heading_letter_spacing": 0,
+        "heading_align_d": "left",
+        "heading_margin_bottom_d": 44,
+        "heading_size_m": 22,
+        "heading_line_height_m": 1.2,
+        "heading_align_m": "left",
+        "heading_margin_bottom_m": 20
+      }
     }
   },
   "order": [
     "main",
     "custom_product_slider_DMzwV9",
-    "custom_pillars_grid_REzXbF"
+    "custom_pillars_grid_REzXbF",
+    "custom_people_carousel_KhX8x3"
   ]
 }
