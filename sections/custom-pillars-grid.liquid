@@ -1,0 +1,1792 @@
+{%- comment -%}
+  ============================================================================
+  SECCIÓN: Pilares de marca (columnas en PC, carrusel con puntos en móvil)
+  Tema: Dawn / Online Store 2.0
+  Ruta: sections/custom-pillars-grid.liquid
+
+  PC      -> rejilla de N columnas. Cada columna: imagen, título y texto.
+  Tablet  -> la misma rejilla con menos columnas.
+  Móvil   -> una tarjeta a la vez, se desliza con el dedo y los puntos de
+             abajo marcan en qué tarjeta estás.
+
+  El marcado es uno solo. El carrusel del móvil no duplica nada: la misma
+  rejilla pasa a ser una tira que se desplaza (scroll-snap nativo), así que
+  no hay dos copias del contenido que puedan desincronizarse ni saltos de
+  maquetación al cambiar de tamaño.
+
+  Los puntos son botones reales: se puede llegar a ellos con el tabulador y
+  moverse con las flechas del teclado. En PC están ocultos porque se ve todo
+  a la vez; se pueden activar si se pone el PC también en modo carrusel.
+
+  El desplazamiento es del navegador, no de un temporizador de JavaScript:
+  se siente igual que cualquier otra tira de la tienda y no pelea con el
+  scroll vertical de la página.
+  ============================================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign bp = s.mobile_breakpoint
+  assign bp_max = bp | minus: 1
+  assign bp_t = s.tablet_breakpoint
+  assign bp_t_max = bp_t | minus: 1
+  assign n_blocks = section.blocks.size
+
+  # ------------------------------------------------------------------
+  # Pilas de fuentes. Los dos archivos propios se declaran más abajo con
+  # @font-face; las opciones "del tema" usan las variables de Dawn.
+  # ------------------------------------------------------------------
+  case s.heading_font
+    when 'thin2'
+      assign heading_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign heading_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign heading_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign heading_stack = 'var(--font-body-family)'
+    else
+      assign heading_stack = s.heading_font_custom
+  endcase
+
+  case s.title_font
+    when 'thin2'
+      assign title_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign title_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign title_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign title_stack = 'var(--font-body-family)'
+    else
+      assign title_stack = s.title_font_custom
+  endcase
+
+  case s.body_font
+    when 'thin2'
+      assign body_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign body_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign body_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign body_stack = 'var(--font-body-family)'
+    else
+      assign body_stack = s.body_font_custom
+  endcase
+
+  if s.content_max_width == 0
+    assign max_w = 'none'
+  else
+    assign max_w = s.content_max_width | append: 'px'
+  endif
+
+  if s.em_italic
+    assign em_style = 'italic'
+  else
+    assign em_style = 'normal'
+  endif
+
+  # ------------------------------------------------------------------
+  # Proporción del hueco de imagen. Se toma de la primera imagen cargada
+  # para que no queden franjas vacías. Si las fotos tienen formatos
+  # distintos conviene desactivarlo y fijar una proporción común: así
+  # todas las columnas empiezan el título a la misma altura.
+  # ------------------------------------------------------------------
+  assign first_img = blank
+  assign first_img_m = blank
+  for block in section.blocks
+    if first_img == blank and block.settings.image != blank
+      assign first_img = block.settings.image
+    endif
+    if first_img_m == blank and block.settings.image_mobile != blank
+      assign first_img_m = block.settings.image_mobile
+    endif
+  endfor
+  if first_img_m == blank
+    assign first_img_m = first_img
+  endif
+
+  assign ar_d = s.image_ratio_d
+  assign ar_m = s.image_ratio_m
+  if s.image_ratio_auto
+    if first_img != blank
+      assign ar_d = first_img.aspect_ratio
+    endif
+    if first_img_m != blank
+      assign ar_m = first_img_m.aspect_ratio
+    endif
+  endif
+
+  # Ancho aproximado de la imagen para que el navegador elija bien el archivo.
+  assign img_vw_d = 100 | divided_by: s.columns_d
+  assign img_vw_t = 100 | divided_by: s.columns_t
+
+  # Clases de comportamiento
+  assign root_class = 'zpil zpil-' | append: section.id
+  if s.layout_d == 'carousel'
+    assign root_class = root_class | append: ' zpil--car-d'
+  endif
+  if s.layout_m == 'carousel'
+    assign root_class = root_class | append: ' zpil--car-m'
+  endif
+  if s.show_dots_d and s.layout_d == 'carousel'
+    assign root_class = root_class | append: ' zpil--dots-d'
+  endif
+  if s.show_dots_m and s.layout_m == 'carousel'
+    assign root_class = root_class | append: ' zpil--dots-m'
+  endif
+  if s.image_hover_zoom
+    assign root_class = root_class | append: ' zpil--zoom'
+  endif
+-%}
+
+{%- style -%}
+  @font-face {
+    font-family: 'Helvetica neue';
+    src: url('{{ 'HelveticaNeueCyr-Light.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'thin2';
+    src: url('{{ 'lawrence-regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ================= Variables: PC ================= */
+  .zpil-{{ section.id }} {
+    --zp-bg: {{ s.bg_color }};
+    --zp-max-w: {{ max_w }};
+    --zp-pt: {{ s.padding_top_d }}px;
+    --zp-pb: {{ s.padding_bottom_d }}px;
+    --zp-pl: {{ s.padding_left_d }}px;
+    --zp-pr: {{ s.padding_right_d }}px;
+    --zp-anim: {{ s.transition_ms }}ms;
+
+    --zp-cols: {{ s.columns_d }};
+    --zp-gap: {{ s.column_gap_d }}px;
+    --zp-row-gap: {{ s.row_gap_d }}px;
+    --zp-slide-w: {{ s.slide_width_d }}%;
+
+    /* Título de la sección */
+    --zp-h-font: {{ heading_stack }};
+    --zp-h-size: {{ s.heading_size_d }}px;
+    --zp-h-lh: {{ s.heading_line_height_d }};
+    --zp-h-ls: {{ s.heading_letter_spacing }}px;
+    --zp-h-weight: {{ s.heading_weight }};
+    --zp-h-color: {{ s.heading_color }};
+    --zp-h-align: {{ s.heading_align_d }};
+    --zp-h-mb: {{ s.heading_margin_bottom_d }}px;
+    --zp-em-color: {{ s.em_color }};
+    --zp-em-style: {{ em_style }};
+
+    /* Imagen */
+    --zp-ar: {{ ar_d }};
+    --zp-img-fit: {{ s.image_fit }};
+    --zp-img-bg: {{ s.image_bg }};
+    --zp-img-r: {{ s.image_radius_d }}px;
+    --zp-img-mb: {{ s.image_margin_bottom_d }}px;
+
+    /* Título de cada tarjeta */
+    --zp-t-font: {{ title_stack }};
+    --zp-t-size: {{ s.title_size_d }}px;
+    --zp-t-lh: {{ s.title_line_height }};
+    --zp-t-ls: {{ s.title_letter_spacing }}px;
+    --zp-t-weight: {{ s.title_weight }};
+    --zp-t-color: {{ s.title_color }};
+    --zp-t-align: {{ s.title_align_d }};
+    --zp-t-transform: {% if s.title_uppercase %}uppercase{% else %}none{% endif %};
+    --zp-t-mb: {{ s.title_margin_bottom_d }}px;
+    --zp-t-minh: {{ s.title_min_height_d }}px;
+
+    /* Texto de cada tarjeta */
+    --zp-b-font: {{ body_stack }};
+    --zp-b-size: {{ s.body_size_d }}px;
+    --zp-b-lh: {{ s.body_line_height_d }};
+    --zp-b-ls: {{ s.body_letter_spacing }}px;
+    --zp-b-weight: {{ s.body_weight }};
+    --zp-b-color: {{ s.body_color }};
+    --zp-b-align: {{ s.body_align_d }};
+    --zp-b-gap: {{ s.body_paragraph_gap_d }}px;
+    --zp-b-strong-w: {{ s.body_strong_weight }};
+    --zp-b-strong-c: {{ s.body_strong_color }};
+
+    /* Puntos */
+    --zp-dot-size: {{ s.dot_size }}px;
+    --zp-dot-gap: {{ s.dot_gap }}px;
+    --zp-dot-pad: {{ s.dot_hit_padding }}px;
+    --zp-dot-bg: {{ s.dot_color }};
+    --zp-dot-bg-active: {{ s.dot_color_active }};
+    --zp-dot-scale: {{ s.dot_active_scale }};
+    --zp-dots-align: {{ s.dots_align }};
+    --zp-dots-mt: {{ s.dots_margin_top_d }}px;
+  }
+
+  /* ================= Estructura ================= */
+  .zpil {
+    background-color: var(--zp-bg);
+  }
+
+  .zpil__inner {
+    max-width: var(--zp-max-w);
+    margin-inline: auto;
+    padding: var(--zp-pt) var(--zp-pr) var(--zp-pb) var(--zp-pl);
+    box-sizing: border-box;
+  }
+
+  .zpil__heading {
+    margin: 0 0 var(--zp-h-mb);
+    font-family: var(--zp-h-font);
+    font-size: var(--zp-h-size);
+    font-weight: var(--zp-h-weight);
+    line-height: var(--zp-h-lh);
+    letter-spacing: var(--zp-h-ls);
+    text-align: var(--zp-h-align);
+    color: var(--zp-h-color);
+  }
+
+  .zpil__heading em,
+  .zpil__heading i {
+    font-style: var(--zp-em-style);
+    color: var(--zp-em-color);
+  }
+
+  /* ---- Rejilla (comportamiento por defecto en PC) ---- */
+  .zpil__track {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--zp-cols), minmax(0, 1fr));
+    column-gap: var(--zp-gap);
+    row-gap: var(--zp-row-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* ---- Tira desplazable (PC en modo carrusel) ----
+     El desplazamiento y el imán son del navegador: nada de temporizadores. */
+  .zpil--car-d .zpil__track {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    row-gap: 0;
+    /* Con tarjetas más estrechas que el hueco, este relleno las deja
+       centradas también en la primera y en la última. */
+    padding-inline: calc((100% - var(--zp-slide-w)) / 2);
+  }
+
+  .zpil--car-d .zpil__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .zpil--car-d .zpil__card {
+    flex: 0 0 var(--zp-slide-w);
+    scroll-snap-align: center;
+  }
+
+  /* ---- Tarjeta ---- */
+  .zpil__card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  a.zpil__card {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .zpil__media {
+    margin-bottom: var(--zp-img-mb);
+  }
+
+  .zpil__frame {
+    position: relative;
+    aspect-ratio: var(--zp-ar);
+    background-color: var(--zp-img-bg);
+    border-radius: var(--zp-img-r);
+    overflow: hidden;
+  }
+
+  .zpil__frame picture,
+  .zpil__frame > svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .zpil__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: var(--zp-img-fit);
+    transition: transform var(--zp-anim) ease;
+  }
+
+  .zpil--zoom a.zpil__card:hover .zpil__img,
+  .zpil--zoom a.zpil__card:focus-visible .zpil__img {
+    transform: scale(1.04);
+  }
+
+  .zpil__title {
+    margin: 0 0 var(--zp-t-mb);
+    min-height: var(--zp-t-minh);
+    font-family: var(--zp-t-font);
+    font-size: var(--zp-t-size);
+    font-weight: var(--zp-t-weight);
+    line-height: var(--zp-t-lh);
+    letter-spacing: var(--zp-t-ls);
+    text-transform: var(--zp-t-transform);
+    text-align: var(--zp-t-align);
+    color: var(--zp-t-color);
+  }
+
+  .zpil__title em,
+  .zpil__title i {
+    font-style: var(--zp-em-style);
+    color: var(--zp-em-color);
+  }
+
+  .zpil__body {
+    font-family: var(--zp-b-font);
+    font-size: var(--zp-b-size);
+    font-weight: var(--zp-b-weight);
+    line-height: var(--zp-b-lh);
+    letter-spacing: var(--zp-b-ls);
+    text-align: var(--zp-b-align);
+    color: var(--zp-b-color);
+  }
+
+  .zpil__body > * {
+    margin: 0;
+  }
+
+  .zpil__body > * + * {
+    margin-top: var(--zp-b-gap);
+  }
+
+  .zpil__body p:empty {
+    display: none;
+  }
+
+  .zpil__body strong,
+  .zpil__body b {
+    font-weight: var(--zp-b-strong-w);
+    color: var(--zp-b-strong-c);
+  }
+
+  .zpil__body a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .zpil__body ul,
+  .zpil__body ol {
+    padding-left: 1.15em;
+  }
+
+  /* ---- Puntos ---- */
+  .zpil__dots {
+    display: none;
+    align-items: center;
+    justify-content: var(--zp-dots-align);
+    gap: 0;
+    margin-top: var(--zp-dots-mt);
+  }
+
+  .zpil--dots-d .zpil__dots {
+    display: flex;
+  }
+
+  .zpil__dot {
+    display: grid;
+    place-items: center;
+    /* El relleno lateral es la mitad de la separación pedida: entre dos
+       puntos consecutivos queda exactamente esa separación, y de paso la
+       zona pulsable es más grande que el punto. */
+    padding: var(--zp-dot-pad) calc(var(--zp-dot-gap) / 2);
+    border: 0;
+    background: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .zpil__dot:focus-visible {
+    outline: 2px solid var(--zp-dot-bg-active);
+    outline-offset: -2px;
+    border-radius: 4px;
+  }
+
+  .zpil__dot-i {
+    display: block;
+    width: var(--zp-dot-size);
+    height: var(--zp-dot-size);
+    border-radius: 50%;
+    background-color: var(--zp-dot-bg);
+    transition: background-color var(--zp-anim) ease, transform var(--zp-anim) ease;
+  }
+
+  .zpil__dot[aria-current='true'] .zpil__dot-i {
+    background-color: var(--zp-dot-bg-active);
+    transform: scale(var(--zp-dot-scale));
+  }
+
+  /* ================= Tablet ================= */
+  @media screen and (max-width: {{ bp_t_max }}px) {
+    .zpil-{{ section.id }} {
+      --zp-cols: {{ s.columns_t }};
+      --zp-gap: {{ s.column_gap_t }}px;
+      --zp-pl: {{ s.padding_left_t }}px;
+      --zp-pr: {{ s.padding_right_t }}px;
+    }
+  }
+
+  /* ================= Móvil ================= */
+  @media screen and (max-width: {{ bp_max }}px) {
+    .zpil-{{ section.id }} {
+      --zp-max-w: none;
+      --zp-pt: {{ s.padding_top_m }}px;
+      --zp-pb: {{ s.padding_bottom_m }}px;
+      --zp-pl: {{ s.padding_left_m }}px;
+      --zp-pr: {{ s.padding_right_m }}px;
+
+      --zp-cols: {{ s.columns_m }};
+      --zp-gap: {{ s.column_gap_m }}px;
+      --zp-row-gap: {{ s.row_gap_m }}px;
+      --zp-slide-w: {{ s.slide_width_m }}%;
+
+      --zp-h-size: {{ s.heading_size_m }}px;
+      --zp-h-lh: {{ s.heading_line_height_m }};
+      --zp-h-align: {{ s.heading_align_m }};
+      --zp-h-mb: {{ s.heading_margin_bottom_m }}px;
+
+      --zp-ar: {{ ar_m }};
+      --zp-img-r: {{ s.image_radius_m }}px;
+      --zp-img-mb: {{ s.image_margin_bottom_m }}px;
+
+      --zp-t-size: {{ s.title_size_m }}px;
+      --zp-t-align: {{ s.title_align_m }};
+      --zp-t-mb: {{ s.title_margin_bottom_m }}px;
+      --zp-t-minh: 0px;
+
+      --zp-b-size: {{ s.body_size_m }}px;
+      --zp-b-lh: {{ s.body_line_height_m }};
+      --zp-b-align: {{ s.body_align_m }};
+      --zp-b-gap: {{ s.body_paragraph_gap_m }}px;
+
+      --zp-dots-mt: {{ s.dots_margin_top_m }}px;
+    }
+
+    /* Por defecto, apilado en una columna. */
+    .zpil-{{ section.id }} .zpil__track {
+      display: grid;
+      grid-template-columns: repeat(var(--zp-cols), minmax(0, 1fr));
+      padding-inline: 0;
+    }
+
+    /* Y en modo carrusel, tira desplazable con imán. */
+    .zpil-{{ section.id }}.zpil--car-m .zpil__track {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      row-gap: 0;
+      padding-inline: calc((100% - var(--zp-slide-w)) / 2);
+    }
+
+    .zpil-{{ section.id }}.zpil--car-m .zpil__track::-webkit-scrollbar {
+      display: none;
+    }
+
+    .zpil-{{ section.id }}.zpil--car-m .zpil__card {
+      flex: 0 0 var(--zp-slide-w);
+      scroll-snap-align: center;
+    }
+
+    .zpil-{{ section.id }} .zpil__dots {
+      display: none;
+    }
+
+    .zpil-{{ section.id }}.zpil--dots-m .zpil__dots {
+      display: flex;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .zpil-{{ section.id }} {
+      --zp-anim: 1ms;
+    }
+    .zpil-{{ section.id }} .zpil__track {
+      scroll-behavior: auto;
+    }
+    .zpil--zoom a.zpil__card:hover .zpil__img {
+      transform: none;
+    }
+  }
+{%- endstyle -%}
+
+<div class="{{ root_class }}">
+  <div class="zpil__inner">
+    {%- if s.heading != blank -%}
+      <{{ s.heading_tag }} class="zpil__heading">{{ s.heading | newline_to_br }}</{{ s.heading_tag }}>
+    {%- endif -%}
+
+    <zzen-pillars data-count="{{ n_blocks }}">
+      <div class="zpil__track" data-zp-track>
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign img = block.settings.image
+            assign img_m = block.settings.image_mobile
+            if img_m == blank
+              assign img_m = img
+            endif
+            assign alt_text = block.settings.title | strip_html | strip
+
+            if block.settings.link != blank
+              assign tag = 'a'
+            else
+              assign tag = 'div'
+            endif
+          -%}
+
+          <{{ tag }}
+            class="zpil__card"
+            {% if tag == 'a' %}
+              href="{{ block.settings.link }}"
+            {% endif %}
+            data-zp-card
+            {{ block.shopify_attributes }}
+          >
+            {%- if s.show_image -%}
+              <div class="zpil__media">
+                <div class="zpil__frame">
+                  {%- if img != blank -%}
+                    <picture>
+                      {%- if img_m != img -%}
+                        <source
+                          media="(max-width: {{ bp_max }}px)"
+                          srcset="
+                            {{ img_m | image_url: width: 400 }} 400w,
+                            {{ img_m | image_url: width: 600 }} 600w,
+                            {{ img_m | image_url: width: 900 }} 900w,
+                            {{ img_m | image_url: width: 1200 }} 1200w
+                          "
+                          sizes="{{ s.slide_width_m }}vw"
+                          width="{{ img_m.width }}"
+                          height="{{ img_m.height }}"
+                        >
+                      {%- endif -%}
+                      <img
+                        class="zpil__img"
+                        src="{{ img | image_url: width: 700 }}"
+                        srcset="
+                          {{ img | image_url: width: 300 }} 300w,
+                          {{ img | image_url: width: 500 }} 500w,
+                          {{ img | image_url: width: 700 }} 700w,
+                          {{ img | image_url: width: 900 }} 900w,
+                          {{ img | image_url: width: 1200 }} 1200w
+                        "
+                        sizes="(min-width: {{ bp_t }}px) {{ img_vw_d }}vw, (min-width: {{ bp }}px) {{ img_vw_t }}vw, {{ s.slide_width_m }}vw"
+                        width="{{ img.width }}"
+                        height="{{ img.height }}"
+                        alt="{{ img.alt | default: alt_text | escape }}"
+                        loading="{% if forloop.index <= 2 %}eager{% else %}lazy{% endif %}"
+                        decoding="async"
+                      >
+                    </picture>
+                  {%- else -%}
+                    {{ 'image' | placeholder_svg_tag: 'zpil__img' }}
+                  {%- endif -%}
+                </div>
+              </div>
+            {%- endif -%}
+
+            {%- if block.settings.title != blank -%}
+              <{{ s.title_tag }} class="zpil__title">{{ block.settings.title }}</{{ s.title_tag }}>
+            {%- endif -%}
+
+            {%- if block.settings.body != blank -%}
+              <div class="zpil__body">{{ block.settings.body }}</div>
+            {%- endif -%}
+          </{{ tag }}>
+        {%- endfor -%}
+      </div>
+
+      {%- if n_blocks > 1 -%}
+        <div class="zpil__dots" role="tablist" aria-label="{{ s.dots_label | escape }}">
+          {%- for block in section.blocks -%}
+            {%- liquid
+              assign dot_name = block.settings.title | strip_html | strip
+              if dot_name == blank
+                assign dot_name = s.dot_fallback_label | append: ' ' | append: forloop.index
+              endif
+            -%}
+            <button
+              type="button"
+              class="zpil__dot"
+              data-zp-dot
+              role="tab"
+              aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+              aria-label="{{ dot_name | escape }}"
+              tabindex="{% if forloop.first %}0{% else %}-1{% endif %}"
+            >
+              <span class="zpil__dot-i" aria-hidden="true"></span>
+            </button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </zzen-pillars>
+  </div>
+</div>
+
+<script>
+  if (!customElements.get('zzen-pillars')) {
+    customElements.define(
+      'zzen-pillars',
+      class ZzenPillars extends HTMLElement {
+        connectedCallback() {
+          this.track = this.querySelector('[data-zp-track]');
+          this.cards = Array.from(this.querySelectorAll('[data-zp-card]'));
+          this.dots = Array.from(this.querySelectorAll('[data-zp-dot]'));
+          if (!this.track || this.cards.length === 0) return;
+
+          this.index = 0;
+
+          this.dots.forEach((dot, i) => {
+            dot.addEventListener('click', () => this.scrollTo(i));
+          });
+
+          if (this.dots.length) {
+            const dotsWrap = this.dots[0].parentElement;
+            dotsWrap.addEventListener('keydown', (e) => this.onKeydown(e));
+          }
+
+          // La posición se lee del scroll real, así que el punto activo
+          // acierta igual si el cambio vino del dedo, de la rueda del ratón,
+          // de la barra de desplazamiento o de un clic en el punto.
+          this.onScroll = this.onScroll.bind(this);
+          this.track.addEventListener('scroll', this.onScroll, { passive: true });
+
+          // Editor de temas: al seleccionar un bloque, se trae esa tarjeta.
+          this.addEventListener('shopify:block:select', (e) => {
+            const card = e.target.closest('[data-zp-card]');
+            const i = this.cards.indexOf(card);
+            if (i > -1) this.scrollTo(i);
+          });
+
+          this.sync();
+        }
+
+        disconnectedCallback() {
+          if (this.track) this.track.removeEventListener('scroll', this.onScroll);
+        }
+
+        onScroll() {
+          if (this.raf) return;
+          this.raf = requestAnimationFrame(() => {
+            this.raf = null;
+            this.sync();
+          });
+        }
+
+        // Tarjeta cuyo centro queda más cerca del centro del hueco visible.
+        sync() {
+          const mid = this.track.scrollLeft + this.track.clientWidth / 2;
+          let best = 0;
+          let bestDist = Infinity;
+
+          this.cards.forEach((card, i) => {
+            const cardMid = card.offsetLeft + card.offsetWidth / 2;
+            const dist = Math.abs(cardMid - mid);
+            if (dist < bestDist) {
+              bestDist = dist;
+              best = i;
+            }
+          });
+
+          if (best === this.index && this.rendered) return;
+          this.index = best;
+          this.rendered = true;
+          this.render();
+        }
+
+        render() {
+          this.dots.forEach((dot, i) => {
+            const on = i === this.index;
+            dot.setAttribute('aria-current', on ? 'true' : 'false');
+            dot.setAttribute('tabindex', on ? '0' : '-1');
+          });
+        }
+
+        scrollTo(i, moveFocus) {
+          const card = this.cards[i];
+          if (!card) return;
+          const left = card.offsetLeft - (this.track.clientWidth - card.offsetWidth) / 2;
+          const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+          // Se mueve solo la tira, nunca la página.
+          this.track.scrollTo({ left: left, behavior: reduce ? 'auto' : 'smooth' });
+
+          this.index = i;
+          this.render();
+          if (moveFocus && this.dots[i]) this.dots[i].focus();
+        }
+
+        onKeydown(e) {
+          const step = { ArrowLeft: -1, ArrowRight: 1 }[e.key];
+          if (step) {
+            e.preventDefault();
+            let next = this.index + step;
+            if (next < 0) next = this.cards.length - 1;
+            if (next > this.cards.length - 1) next = 0;
+            this.scrollTo(next, true);
+          } else if (e.key === 'Home') {
+            e.preventDefault();
+            this.scrollTo(0, true);
+          } else if (e.key === 'End') {
+            e.preventDefault();
+            this.scrollTo(this.cards.length - 1, true);
+          }
+        }
+      }
+    );
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Pilares de marca",
+  "tag": "section",
+  "class": "section-zpillars",
+  "max_blocks": 8,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Título de la sección"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Título",
+      "info": "Déjalo vacío para no mostrarlo. Enter para salto de línea. Envuelve una palabra en <em>así</em> para el acento en cursiva."
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Etiqueta HTML del título (SEO)",
+      "options": [
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "div", "label": "div (sin peso SEO)" }
+      ],
+      "default": "h2"
+    },
+
+    {
+      "type": "header",
+      "content": "Distribución"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 0,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "label": "Ancho máximo del contenido",
+      "info": "0 = ancho completo.",
+      "default": 1500
+    },
+    {
+      "type": "range",
+      "id": "tablet_breakpoint",
+      "min": 750,
+      "max": 1400,
+      "step": 10,
+      "unit": "px",
+      "label": "Punto de cambio a tablet",
+      "info": "Por debajo de este ancho se usan las columnas de tablet.",
+      "default": 990
+    },
+    {
+      "type": "range",
+      "id": "mobile_breakpoint",
+      "min": 480,
+      "max": 1000,
+      "step": 10,
+      "unit": "px",
+      "label": "Punto de cambio a móvil",
+      "info": "Debe ser menor que el de tablet.",
+      "default": 750
+    },
+    {
+      "type": "select",
+      "id": "layout_d",
+      "label": "Comportamiento en PC",
+      "options": [
+        { "value": "grid", "label": "Todo a la vista (rejilla)" },
+        { "value": "carousel", "label": "Carrusel deslizable" }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "select",
+      "id": "layout_m",
+      "label": "Comportamiento en móvil",
+      "options": [
+        { "value": "carousel", "label": "Carrusel deslizable" },
+        { "value": "grid", "label": "Todo a la vista (apilado)" }
+      ],
+      "default": "carousel"
+    },
+    {
+      "type": "range",
+      "id": "columns_d",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "label": "Columnas — PC",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "columns_t",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "label": "Columnas — Tablet",
+      "default": 2
+    },
+    {
+      "type": "select",
+      "id": "columns_m",
+      "label": "Columnas — Móvil",
+      "info": "Solo se aplica con el móvil en modo apilado.",
+      "options": [
+        { "value": "1", "label": "1 columna" },
+        { "value": "2", "label": "2 columnas" }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "range",
+      "id": "slide_width_d",
+      "min": 20,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho de tarjeta en carrusel — PC",
+      "info": "Solo en modo carrusel. Menos de 100% deja ver la tarjeta siguiente.",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "slide_width_m",
+      "min": 55,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho de tarjeta en carrusel — Móvil",
+      "info": "100% = una tarjeta ocupa toda la pantalla.",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "column_gap_d",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre columnas — PC",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "column_gap_t",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre columnas — Tablet",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "column_gap_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre tarjetas — Móvil",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "row_gap_d",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre filas — PC",
+      "info": "Solo se nota si hay más tarjetas que columnas.",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "row_gap_m",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre filas — Móvil",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "transition_ms",
+      "min": 0,
+      "max": 1200,
+      "step": 25,
+      "unit": "ms",
+      "label": "Duración de las transiciones",
+      "default": 300
+    },
+
+    {
+      "type": "header",
+      "content": "Márgenes exteriores"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding superior — PC",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding inferior — PC",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_left_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding izquierdo — PC",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_right_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding derecho — PC",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_left_t",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding izquierdo — Tablet",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_right_t",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding derecho — Tablet",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_top_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding superior — Móvil",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding inferior — Móvil",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_left_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding izquierdo — Móvil",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding derecho — Móvil",
+      "default": 20
+    },
+
+    {
+      "type": "header",
+      "content": "Imagen"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image",
+      "label": "Mostrar imagen",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "image_ratio_auto",
+      "label": "Usar la proporción de la primera imagen",
+      "info": "Desactívalo si las fotos tienen formatos distintos: así todas las columnas empiezan el título a la misma altura.",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "image_ratio_d",
+      "min": 0.5,
+      "max": 2,
+      "step": 0.1,
+      "label": "Proporción ancho/alto — PC",
+      "info": "1 = cuadrada. Menos de 1 = vertical.",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "image_ratio_m",
+      "min": 0.5,
+      "max": 2,
+      "step": 0.1,
+      "label": "Proporción ancho/alto — Móvil",
+      "default": 1
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "Ajuste de la imagen",
+      "options": [
+        { "value": "cover", "label": "Rellenar (recorta)" },
+        { "value": "contain", "label": "Entera (sin recortar)" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "color",
+      "id": "image_bg",
+      "label": "Fondo del hueco de imagen",
+      "default": "#f2f2f2"
+    },
+    {
+      "type": "range",
+      "id": "image_radius_d",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo — PC",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "image_radius_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo — Móvil",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "image_margin_bottom_d",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Espacio bajo la imagen — PC",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "image_margin_bottom_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Espacio bajo la imagen — Móvil",
+      "default": 24
+    },
+    {
+      "type": "checkbox",
+      "id": "image_hover_zoom",
+      "label": "Acercar la imagen al pasar el ratón",
+      "info": "Solo tiene efecto en las tarjetas que llevan enlace.",
+      "default": false
+    },
+
+    {
+      "type": "header",
+      "content": "Título de cada tarjeta"
+    },
+    {
+      "type": "select",
+      "id": "title_tag",
+      "label": "Etiqueta HTML (SEO)",
+      "options": [
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "p", "label": "p (sin peso SEO)" }
+      ],
+      "default": "h3"
+    },
+    {
+      "type": "select",
+      "id": "title_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "title_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Color",
+      "default": "#000000"
+    },
+    {
+      "type": "select",
+      "id": "title_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "checkbox",
+      "id": "title_uppercase",
+      "label": "En mayúsculas",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "title_letter_spacing",
+      "min": -1,
+      "max": 6,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "title_line_height",
+      "min": 1,
+      "max": 2.2,
+      "step": 0.1,
+      "label": "Interlineado",
+      "default": 1.3
+    },
+    {
+      "type": "range",
+      "id": "title_size_d",
+      "min": 10,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "title_size_m",
+      "min": 10,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 15
+    },
+    {
+      "type": "select",
+      "id": "title_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "title_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "title_margin_bottom_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Espacio bajo el título — PC",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "title_margin_bottom_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Espacio bajo el título — Móvil",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "title_min_height_d",
+      "min": 0,
+      "max": 140,
+      "step": 2,
+      "unit": "px",
+      "label": "Alto reservado al título — PC",
+      "info": "Súbelo si algún título ocupa dos líneas y quieres que todos los textos arranquen a la misma altura. 0 = sin reserva.",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "Texto de cada tarjeta"
+    },
+    {
+      "type": "select",
+      "id": "body_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "body_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "select",
+      "id": "body_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "body_strong_weight",
+      "label": "Grosor de las negritas",
+      "options": [
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "color",
+      "id": "body_strong_color",
+      "label": "Color de las negritas",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "body_letter_spacing",
+      "min": -1,
+      "max": 4,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "body_size_d",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "body_line_height_d",
+      "min": 1,
+      "max": 2.4,
+      "step": 0.1,
+      "label": "Interlineado — PC",
+      "default": 1.6
+    },
+    {
+      "type": "select",
+      "id": "body_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "body_paragraph_gap_d",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre párrafos — PC",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "body_size_m",
+      "min": 9,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "body_line_height_m",
+      "min": 1,
+      "max": 2.4,
+      "step": 0.1,
+      "label": "Interlineado — Móvil",
+      "default": 1.6
+    },
+    {
+      "type": "select",
+      "id": "body_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "body_paragraph_gap_m",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre párrafos — Móvil",
+      "default": 16
+    },
+
+    {
+      "type": "header",
+      "content": "Puntos del carrusel"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dots_m",
+      "label": "Mostrar puntos en móvil",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dots_d",
+      "label": "Mostrar puntos en PC",
+      "info": "Solo tiene efecto si el PC está en modo carrusel.",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "dot_size",
+      "min": 4,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Diámetro del punto",
+      "default": 7
+    },
+    {
+      "type": "range",
+      "id": "dot_gap",
+      "min": 4,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre puntos",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "dot_hit_padding",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Zona pulsable alrededor del punto",
+      "info": "Espacio invisible que agranda el objetivo del dedo sin cambiar el tamaño del punto.",
+      "default": 8
+    },
+    {
+      "type": "color",
+      "id": "dot_color",
+      "label": "Color del punto inactivo",
+      "default": "#c9c9c9"
+    },
+    {
+      "type": "color",
+      "id": "dot_color_active",
+      "label": "Color del punto activo",
+      "default": "#4a4a4a"
+    },
+    {
+      "type": "range",
+      "id": "dot_active_scale",
+      "min": 1,
+      "max": 2,
+      "step": 0.1,
+      "label": "Aumento del punto activo",
+      "default": 1
+    },
+    {
+      "type": "select",
+      "id": "dots_align",
+      "label": "Alineación de los puntos",
+      "options": [
+        { "value": "flex-start", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "flex-end", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "dots_margin_top_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Espacio sobre los puntos — PC",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "dots_margin_top_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Espacio sobre los puntos — Móvil",
+      "default": 24
+    },
+    {
+      "type": "text",
+      "id": "dots_label",
+      "label": "Texto accesible del grupo de puntos",
+      "default": "Pilares de marca"
+    },
+    {
+      "type": "text",
+      "id": "dot_fallback_label",
+      "label": "Nombre de respaldo del punto",
+      "info": "Se usa como texto accesible cuando la tarjeta no tiene título. Se le añade el número.",
+      "default": "Tarjeta"
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía del título de la sección"
+    },
+    {
+      "type": "select",
+      "id": "heading_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "thin2"
+    },
+    {
+      "type": "text",
+      "id": "heading_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'thin2', serif"
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "em_color",
+      "label": "Color del acento <em>",
+      "default": "#000000"
+    },
+    {
+      "type": "checkbox",
+      "id": "em_italic",
+      "label": "Acento <em> en cursiva",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "heading_size_d",
+      "min": 20,
+      "max": 110,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_d",
+      "min": 0.8,
+      "max": 2,
+      "step": 0.1,
+      "label": "Interlineado — PC",
+      "default": 1.1
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing",
+      "min": -3,
+      "max": 6,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "heading_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_d",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Espacio bajo el título — PC",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "heading_size_m",
+      "min": 14,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_m",
+      "min": 0.8,
+      "max": 2,
+      "step": 0.1,
+      "label": "Interlineado — Móvil",
+      "default": 1.1
+    },
+    {
+      "type": "select",
+      "id": "heading_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Espacio bajo el título — Móvil",
+      "default": 24
+    }
+  ],
+  "blocks": [
+    {
+      "type": "pillar",
+      "name": "Pilar",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Imagen para móvil",
+          "info": "Opcional. Si la dejas vacía se usa la de arriba."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Título",
+          "info": "Admite <em>cursiva</em> para el acento.",
+          "default": "Ingredientes de calidad"
+        },
+        {
+          "type": "richtext",
+          "id": "body",
+          "label": "Texto",
+          "default": "<p>Explica aquí este pilar: qué garantizáis, cómo lo hacéis y por qué le importa a quien compra.</p>"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Enlace de la tarjeta",
+          "info": "Opcional. Si lo rellenas, toda la tarjeta se vuelve pulsable."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Pilares de marca",
+      "blocks": [
+        { "type": "pillar" },
+        { "type": "pillar" },
+        { "type": "pillar" },
+        { "type": "pillar" }
+      ]
+    }
+  ]
+}
+{% endschema %}
