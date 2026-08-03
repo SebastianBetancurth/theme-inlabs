@@ -418,7 +418,7 @@
         "name_uppercase": false,
         "name_align": "center",
         "name_size_d": 36,
-        "name_size_m": 24,
+        "name_size_m": 29,
         "name_line_height": 1.1,
         "name_letter_spacing": 0,
         "name_offset_d": 34,
@@ -476,7 +476,7 @@
         "heading_letter_spacing": 0,
         "heading_align_d": "left",
         "heading_margin_bottom_d": 44,
-        "heading_size_m": 22,
+        "heading_size_m": 31,
         "heading_line_height_m": 1.2,
         "heading_align_m": "left",
         "heading_margin_bottom_m": 20
