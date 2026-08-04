@@ -67,6 +67,7 @@
         "expert_RJehdM": {
           "type": "expert",
           "settings": {
+            "video": "shopify://files/videos/Suplementación basada en ciencia real ZZEN Labs (1).mp4",
             "video_url": "",
             "name": "Dra. Isabel Belaustegui",
             "role": "Medicina integrativa y nutrición",
@@ -79,6 +80,7 @@
         "expert_kJjhYR": {
           "type": "expert",
           "settings": {
+            "video": "shopify://files/videos/Suplementación basada en ciencia real ZZEN Labs.mp4",
             "video_url": "",
             "name": "Dra. Isabel Belaustegui",
             "role": "Medicina integrativa y nutrición",
@@ -145,11 +147,11 @@
         "video_muted": false,
         "video_controls": false,
         "pause_on_leave": true,
-        "scrim_style": "none",
+        "scrim_style": "solid",
         "scrim_color": "#000000",
         "scrim_opacity": 25,
         "hide_text_on_play": true,
-        "show_overlay_d": true,
+        "show_overlay_d": false,
         "show_overlay_m": false,
         "ov_layout": "split",
         "ov_align_v": "center",
@@ -163,7 +165,7 @@
         "ov_padding_x_m": 16,
         "ov_padding_y_m": 16,
         "ov_gap_m": 12,
-        "show_below_d": false,
+        "show_below_d": true,
         "show_below_m": true,
         "below_align_d": "center",
         "below_align_m": "center",
