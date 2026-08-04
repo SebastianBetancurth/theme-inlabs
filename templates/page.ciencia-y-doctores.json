@@ -32,6 +32,7 @@
       "type": "hero-v2s",
       "name": "Hero V2S",
       "settings": {
+        "image": "shopify://shop_images/Frame_1781.webp",
         "image_position_desktop": "center center",
         "image_position_mobile": "center top",
         "overlay_opacity": 15,
@@ -52,7 +53,7 @@
         "subheading_size": 25,
         "button_label": "Conoce a nuestros expertos",
         "button_link": "",
-        "button_size": 21,
+        "button_size": 18,
         "button_padding_v": 17,
         "button_padding_h": 44,
         "text_color": "#ffffff",
