@@ -1,0 +1,3055 @@
+{%- comment -%}
+  ============================================================================
+  SECCIÓN: Carrusel de vídeos de expertos
+  Tema: Dawn / Online Store 2.0
+  Ruta: sections/custom-experts-video-carousel.liquid
+
+  PC     -> título centrado arriba. Carrusel centrado: la tarjeta del medio va
+            a tamaño real y las de los lados se encogen y se atenúan. Sobre el
+            vídeo, el nombre y la especialidad a la izquierda y la cita a la
+            derecha, los dos centrados en vertical. Botón de reproducir en el
+            centro, botón de pantalla completa arriba a la derecha. Debajo del
+            vídeo, el botón de producto. Flechas redondas encima de las
+            tarjetas laterales.
+  Móvil  -> misma tarjeta central, los lados solo asoman. El texto SALE de
+            encima del vídeo y se coloca debajo, centrado: nombre,
+            especialidad, cita y botón a ancho completo. Sin flechas.
+
+  EL TEXTO SE ESCRIBE DOS VECES A PROPÓSITO.
+  Una copia va superpuesta al vídeo y otra debajo de la tarjeta. No es un
+  descuido: en PC se ve la de encima y en móvil la de debajo, y cada una se
+  enseña u oculta por separado desde el personalizador. Mover el mismo nodo
+  con CSS de una posición a otra obligaría a usar posiciones absolutas en
+  móvil y el alto de la tarjeta dejaría de crecer con el texto.
+
+  LAS FLECHAS VAN FUERA DEL CONTENEDOR QUE HACE SCROLL.
+  Si se meten dentro, se desplazan junto con las tarjetas y se salen de la
+  vista. Aquí son hermanas del carril, colocadas sobre el marco.
+
+  El carrusel usa el scroll nativo del navegador con anclaje al centro. Eso da
+  gratis el deslizamiento con inercia en móvil, el arrastre con trackpad y la
+  navegación por teclado, sin cargar ninguna librería.
+
+  Vídeo: usa el selector de vídeos de Shopify (se sube en Contenido > Archivos
+  o desde la propia tarjeta). Si prefieres YouTube o Vimeo, pega la URL en el
+  campo de abajo del bloque; el iframe se inserta solo al pulsar reproducir,
+  así no lastra la carga de la página.
+  ============================================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign bp = s.mobile_breakpoint
+  assign bp_max = bp | minus: 1
+  assign n_blocks = section.blocks.size
+
+  case s.heading_font
+    when 'thin2'
+      assign heading_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign heading_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign heading_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign heading_stack = 'var(--font-body-family)'
+    else
+      assign heading_stack = s.heading_font_custom
+  endcase
+
+  case s.body_font
+    when 'thin2'
+      assign body_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign body_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign body_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign body_stack = 'var(--font-body-family)'
+    else
+      assign body_stack = s.body_font_custom
+  endcase
+
+  if s.content_max_width == 0
+    assign max_w = 'none'
+  else
+    assign max_w = s.content_max_width | append: 'px'
+  endif
+
+  if s.em_italic
+    assign em_style = 'italic'
+  else
+    assign em_style = 'normal'
+  endif
+
+  if s.quote_italic
+    assign quote_style = 'italic'
+  else
+    assign quote_style = 'normal'
+  endif
+
+  if s.btn_uppercase
+    assign btn_transform = 'uppercase'
+  else
+    assign btn_transform = 'none'
+  endif
+
+  # ------------------------------------------------------------------
+  # Velo sobre el vídeo. Se construye aquí para no ensuciar el CSS con ifs.
+  # ------------------------------------------------------------------
+  case s.scrim_style
+    when 'solid'
+      assign scrim_bg = s.scrim_color
+    when 'bottom'
+      assign scrim_bg = 'linear-gradient(to top, ' | append: s.scrim_color | append: ' 0%, transparent 65%)'
+    when 'sides'
+      assign scrim_bg = 'linear-gradient(to right, ' | append: s.scrim_color | append: ' 0%, transparent 38%, transparent 62%, ' | append: s.scrim_color | append: ' 100%)'
+    else
+      assign scrim_bg = 'none'
+  endcase
+
+  # ------------------------------------------------------------------
+  # Qué controles se ven en cada dispositivo.
+  # ------------------------------------------------------------------
+  assign arrows_d = false
+  assign dots_d = false
+  case s.nav_d
+    when 'arrows'
+      assign arrows_d = true
+    when 'dots'
+      assign dots_d = true
+    when 'arrows_dots'
+      assign arrows_d = true
+      assign dots_d = true
+  endcase
+
+  assign arrows_m = false
+  assign dots_m = false
+  case s.nav_m
+    when 'arrows'
+      assign arrows_m = true
+    when 'dots'
+      assign dots_m = true
+    when 'arrows_dots'
+      assign arrows_m = true
+      assign dots_m = true
+  endcase
+
+  # Ancho de la tarjeta: en PC en píxeles, en móvil en vw. El relleno lateral
+  # del carril se calcula a partir de este valor para que la primera y la
+  # última tarjeta también puedan quedar centradas.
+  assign card_w_d = s.card_width_d | append: 'px'
+  assign card_w_m = s.card_width_m | append: 'vw'
+-%}
+
+{%- style -%}
+  @font-face {
+    font-family: 'Helvetica neue';
+    src: url('{{ 'HelveticaNeueCyr-Light.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'thin2';
+    src: url('{{ 'lawrence-regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ================= Variables: PC ================= */
+  .zvid-{{ section.id }} {
+    --zv-bg: {{ s.bg_color }};
+    --zv-max-w: {{ max_w }};
+    --zv-pt: {{ s.padding_top_d }}px;
+    --zv-pb: {{ s.padding_bottom_d }}px;
+    --zv-pl: {{ s.padding_left_d }}px;
+    --zv-pr: {{ s.padding_right_d }}px;
+
+    --zv-h-font: {{ heading_stack }};
+    --zv-h-size: {{ s.heading_size_d }}px;
+    --zv-h-lh: {{ s.heading_line_height_d | divided_by: 100.0 }};
+    --zv-h-ls: {{ s.heading_letter_spacing_d }}px;
+    --zv-h-weight: {{ s.heading_weight }};
+    --zv-h-color: {{ s.heading_color }};
+    --zv-h-align: {{ s.heading_align_d }};
+    --zv-h-mb: {{ s.heading_margin_bottom_d }}px;
+    --zv-em-color: {{ s.em_color }};
+    --zv-em-style: {{ em_style }};
+
+    --zv-b-font: {{ body_stack }};
+
+    --zv-card-w: {{ card_w_d }};
+    --zv-card-gap: {{ s.card_gap_d }}px;
+    --zv-scale-off: {{ s.inactive_scale_d | divided_by: 100.0 }};
+    --zv-op-off: {{ s.inactive_opacity_d | divided_by: 100.0 }};
+
+    --zv-media-ar: {{ s.media_ratio_d | divided_by: 100.0 }};
+    --zv-media-radius: {{ s.media_radius_d }}px;
+    --zv-media-bg: {{ s.media_bg }};
+    --zv-media-fit: {{ s.media_fit }};
+
+    --zv-scrim-bg: {{ scrim_bg }};
+    --zv-scrim-op: {{ s.scrim_opacity | divided_by: 100.0 }};
+
+    --zv-ov-px: {{ s.ov_padding_x_d }}px;
+    --zv-ov-py: {{ s.ov_padding_y_d }}px;
+    --zv-ov-gap: {{ s.ov_gap_d }}px;
+    --zv-ov-quote-w: {{ s.ov_quote_width_d }}%;
+
+    --zv-name-size: {{ s.name_size_d }}px;
+    --zv-name-lh: {{ s.name_line_height | divided_by: 100.0 }};
+    --zv-name-weight: {{ s.name_weight }};
+    --zv-name-mb: {{ s.name_margin_bottom_d }}px;
+    --zv-name-color-ov: {{ s.name_color_ov }};
+    --zv-name-color-bl: {{ s.name_color_below }};
+
+    --zv-role-size: {{ s.role_size_d }}px;
+    --zv-role-lh: {{ s.role_line_height | divided_by: 100.0 }};
+    --zv-role-weight: {{ s.role_weight }};
+    --zv-role-mb: {{ s.role_margin_bottom_d }}px;
+    --zv-role-color-ov: {{ s.role_color_ov }};
+    --zv-role-color-bl: {{ s.role_color_below }};
+
+    --zv-quote-size: {{ s.quote_size_d }}px;
+    --zv-quote-lh: {{ s.quote_line_height_d | divided_by: 100.0 }};
+    --zv-quote-weight: {{ s.quote_weight }};
+    --zv-quote-style: {{ quote_style }};
+    --zv-quote-color-ov: {{ s.quote_color_ov }};
+    --zv-quote-color-bl: {{ s.quote_color_below }};
+    --zv-quote-align-ov: {{ s.quote_align_ov }};
+
+    --zv-below-align: {{ s.below_align_d }};
+    --zv-below-mt: {{ s.below_margin_top_d }}px;
+    --zv-below-max-w: {{ s.below_max_width_d }}%;
+
+    --zv-play-size: {{ s.play_size_d }}px;
+    --zv-play-icon: {{ s.play_icon_size_d }}px;
+    --zv-play-bg: {{ s.play_bg }};
+    --zv-play-bg-hover: {{ s.play_bg_hover }};
+    --zv-play-color: {{ s.play_icon_color }};
+    --zv-play-color-hover: {{ s.play_icon_color_hover }};
+    --zv-play-border: {{ s.play_border_color }};
+    --zv-play-border-w: {{ s.play_border_width }}px;
+
+    --zv-fs-size: {{ s.fs_size_d }}px;
+    --zv-fs-icon: {{ s.fs_icon_size_d }}px;
+    --zv-fs-inset: {{ s.fs_inset_d }}px;
+    --zv-fs-bg: {{ s.fs_bg }};
+    --zv-fs-bg-hover: {{ s.fs_bg_hover }};
+    --zv-fs-color: {{ s.fs_color }};
+    --zv-fs-radius: {{ s.fs_radius }}px;
+
+    --zv-btn-bg: {{ s.btn_bg }};
+    --zv-btn-color: {{ s.btn_color }};
+    --zv-btn-bg-hover: {{ s.btn_bg_hover }};
+    --zv-btn-color-hover: {{ s.btn_color_hover }};
+    --zv-btn-radius: {{ s.btn_radius }}px;
+    --zv-btn-border: {{ s.btn_border_color }};
+    --zv-btn-border-w: {{ s.btn_border_width }}px;
+    --zv-btn-size: {{ s.btn_font_size_d }}px;
+    --zv-btn-weight: {{ s.btn_weight }};
+    --zv-btn-ls: {{ s.btn_letter_spacing }}px;
+    --zv-btn-tt: {{ btn_transform }};
+    --zv-btn-py: {{ s.btn_pad_y_d }}px;
+    --zv-btn-px: {{ s.btn_pad_x_d }}px;
+    --zv-btn-min-w: {{ s.btn_min_width_d }}px;
+    --zv-btn-mt: {{ s.btn_margin_top_d }}px;
+
+    --zv-arrow-size: {{ s.arrow_size_d }}px;
+    --zv-arrow-icon: {{ s.arrow_icon_size_d }}px;
+    --zv-arrow-stroke: {{ s.arrow_stroke }};
+    --zv-arrow-color: {{ s.arrow_color }};
+    --zv-arrow-color-hover: {{ s.arrow_color_hover }};
+    --zv-arrow-bg: {{ s.arrow_bg }};
+    --zv-arrow-bg-hover: {{ s.arrow_bg_hover }};
+    --zv-arrow-border: {{ s.arrow_border_color }};
+    --zv-arrow-border-w: {{ s.arrow_border_width }}px;
+    --zv-arrow-offset: {{ s.arrow_offset_d }}px;
+    --zv-arrow-top: {{ s.arrow_top_d }}%;
+
+    --zv-dot-size: {{ s.dot_size }}px;
+    --zv-dot-size-active: {{ s.dot_size_active }}px;
+    --zv-dot-gap: {{ s.dot_gap }}px;
+    --zv-dot-color: {{ s.dot_color }};
+    --zv-dot-color-active: {{ s.dot_color_active }};
+    --zv-dots-mt: {{ s.dots_margin_top_d }}px;
+
+    --zv-anim: {{ s.transition_ms }}ms;
+  }
+
+  /* ================= Estructura ================= */
+  .zvid {
+    background-color: var(--zv-bg);
+    /* El carrusel se sale a todo el ancho de la pantalla. Este recorte evita
+       que aparezca una barra de scroll horizontal en la página cuando el
+       navegador reserva sitio para la vertical. */
+    overflow-x: hidden;
+    overflow-x: clip;
+  }
+
+  .zvid__inner {
+    max-width: var(--zv-max-w);
+    margin-inline: auto;
+    padding: var(--zv-pt) var(--zv-pr) var(--zv-pb) var(--zv-pl);
+    box-sizing: border-box;
+  }
+
+  /* ================= Título ================= */
+  .zvid__heading {
+    margin: 0 0 var(--zv-h-mb);
+    font-family: var(--zv-h-font);
+    font-size: var(--zv-h-size);
+    font-weight: var(--zv-h-weight);
+    line-height: var(--zv-h-lh);
+    letter-spacing: var(--zv-h-ls);
+    text-align: var(--zv-h-align);
+    color: var(--zv-h-color);
+  }
+
+  .zvid__heading em,
+  .zvid__heading i {
+    font-style: var(--zv-em-style);
+    color: var(--zv-em-color);
+  }
+
+  /* ================= Marco del carrusel =================
+     A todo el ancho de la pantalla con el truco del margen negativo. Las
+     flechas se apoyan aquí, no dentro del carril. */
+  .zvid__viewport {
+    position: relative;
+  }
+
+  .zvid__viewport--bleed {
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+  }
+
+  /* ================= Carril =================
+     Scroll nativo con anclaje al centro. El relleno lateral vale la mitad del
+     espacio sobrante, así la primera y la última tarjeta llegan al centro. */
+  .zvid__track {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--zv-card-gap);
+    padding-inline: max(0px, calc((100% - var(--zv-card-w)) / 2));
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .zvid__track::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  /* La tarjeta entera se encoge y se atenúa cuando no es la del centro:
+     vídeo, texto y botón a la vez, igual que en el original. */
+  .zvid__card {
+    flex: 0 0 var(--zv-card-w);
+    max-width: 100%;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+    transform: scale(var(--zv-scale-off));
+    transform-origin: center center;
+    opacity: var(--zv-op-off);
+    transition: transform var(--zv-anim) ease, opacity var(--zv-anim) ease;
+  }
+
+  .zvid__card.is-active {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  .zvid__card:not(.is-active) .zvid__cta[data-zv-focus] {
+    cursor: pointer;
+  }
+
+  /* ================= Vídeo ================= */
+  .zvid__media {
+    position: relative;
+    aspect-ratio: var(--zv-media-ar);
+    background-color: var(--zv-media-bg);
+    border-radius: var(--zv-media-radius);
+    overflow: hidden;
+  }
+
+  .zvid__video,
+  .zvid__poster,
+  .zvid__iframe,
+  .zvid__media > svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: var(--zv-media-fit);
+    border: 0;
+  }
+
+  .zvid__poster {
+    z-index: 1;
+    transition: opacity var(--zv-anim) ease;
+  }
+
+  .zvid__media.is-playing .zvid__poster {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .zvid__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: var(--zv-scrim-bg);
+    opacity: var(--zv-scrim-op);
+    pointer-events: none;
+  }
+
+  /* ---- Texto encima del vídeo ---- */
+  .zvid__ov {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    gap: var(--zv-ov-gap);
+    padding: var(--zv-ov-py) var(--zv-ov-px);
+    box-sizing: border-box;
+    font-family: var(--zv-b-font);
+    pointer-events: none;
+    transition: opacity var(--zv-anim) ease;
+  }
+
+  .zvid__ov--split {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .zvid__ov--stack {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .zvid__ov--stack .zvid__ov-quote {
+    width: var(--zv-ov-quote-w);
+    max-width: 100%;
+    margin-top: var(--zv-ov-gap);
+  }
+
+  .zvid__ov--v-top { align-items: flex-start; }
+  .zvid__ov--v-center { align-items: center; }
+  .zvid__ov--v-bottom { align-items: flex-end; }
+
+  .zvid__ov--stack.zvid__ov--v-top { justify-content: flex-start; }
+  .zvid__ov--stack.zvid__ov--v-center { justify-content: center; }
+  .zvid__ov--stack.zvid__ov--v-bottom { justify-content: flex-end; }
+
+  .zvid__ov--stack.zvid__ov--h-left { align-items: flex-start; text-align: left; }
+  .zvid__ov--stack.zvid__ov--h-center { align-items: center; text-align: center; }
+  .zvid__ov--stack.zvid__ov--h-right { align-items: flex-end; text-align: right; }
+
+  .zvid__ov-id {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .zvid__ov-quote {
+    flex: 0 0 var(--zv-ov-quote-w);
+    text-align: var(--zv-quote-align-ov);
+  }
+
+  /* El texto estorba mientras el vídeo está en marcha. */
+  .zvid__media.is-playing .zvid__ov--hide-on-play,
+  .zvid__media.is-playing .zvid__scrim--hide-on-play {
+    opacity: 0;
+  }
+
+  /* ---- Nombre, especialidad y cita ---- */
+  .zvid__name {
+    margin: 0 0 var(--zv-name-mb);
+    font-family: var(--zv-b-font);
+    font-size: var(--zv-name-size);
+    font-weight: var(--zv-name-weight);
+    line-height: var(--zv-name-lh);
+  }
+
+  .zvid__role {
+    margin: 0 0 var(--zv-role-mb);
+    font-family: var(--zv-b-font);
+    font-size: var(--zv-role-size);
+    font-weight: var(--zv-role-weight);
+    line-height: var(--zv-role-lh);
+  }
+
+  .zvid__quote {
+    font-family: var(--zv-b-font);
+    font-size: var(--zv-quote-size);
+    font-weight: var(--zv-quote-weight);
+    font-style: var(--zv-quote-style);
+    line-height: var(--zv-quote-lh);
+  }
+
+  .zvid__quote > * { margin: 0; }
+  .zvid__quote > * + * { margin-top: 0.6em; }
+  .zvid__quote p:empty { display: none; }
+
+  .zvid__ov .zvid__name { color: var(--zv-name-color-ov); }
+  .zvid__ov .zvid__role { color: var(--zv-role-color-ov); }
+  .zvid__ov .zvid__quote { color: var(--zv-quote-color-ov); }
+
+  .zvid__below .zvid__name { color: var(--zv-name-color-bl); }
+  .zvid__below .zvid__role { color: var(--zv-role-color-bl); }
+  .zvid__below .zvid__quote { color: var(--zv-quote-color-bl); }
+
+  /* ---- Texto debajo de la tarjeta ---- */
+  .zvid__below {
+    margin-top: var(--zv-below-mt);
+    text-align: var(--zv-below-align);
+  }
+
+  .zvid__below-in {
+    max-width: var(--zv-below-max-w);
+    margin-inline: auto;
+  }
+
+  /* ---- Botón de reproducir ---- */
+  .zvid__play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 4;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--zv-play-size);
+    height: var(--zv-play-size);
+    padding: 0;
+    border: var(--zv-play-border-w) solid var(--zv-play-border);
+    border-radius: 50%;
+    background-color: var(--zv-play-bg);
+    color: var(--zv-play-color);
+    cursor: pointer;
+    transition: background-color var(--zv-anim) ease, color var(--zv-anim) ease, opacity var(--zv-anim) ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .zvid__play:hover {
+    background-color: var(--zv-play-bg-hover);
+    color: var(--zv-play-color-hover);
+  }
+
+  .zvid__play:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+
+  .zvid__play svg {
+    width: var(--zv-play-icon);
+    height: var(--zv-play-icon);
+    display: block;
+    fill: currentColor;
+    /* El triángulo pesa a la izquierda: se corrige a ojo. */
+    margin-left: 6%;
+  }
+
+  .zvid__media.is-playing .zvid__play {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* ---- Botón de pantalla completa ---- */
+  .zvid__fs {
+    position: absolute;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--zv-fs-size);
+    height: var(--zv-fs-size);
+    padding: 0;
+    border: 0;
+    border-radius: var(--zv-fs-radius);
+    background-color: var(--zv-fs-bg);
+    color: var(--zv-fs-color);
+    cursor: pointer;
+    transition: background-color var(--zv-anim) ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .zvid__fs:hover { background-color: var(--zv-fs-bg-hover); }
+
+  .zvid__fs:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  .zvid__fs svg {
+    width: var(--zv-fs-icon);
+    height: var(--zv-fs-icon);
+    display: block;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .zvid__fs--tr { top: var(--zv-fs-inset); right: var(--zv-fs-inset); }
+  .zvid__fs--tl { top: var(--zv-fs-inset); left: var(--zv-fs-inset); }
+  .zvid__fs--br { bottom: var(--zv-fs-inset); right: var(--zv-fs-inset); }
+  .zvid__fs--bl { bottom: var(--zv-fs-inset); left: var(--zv-fs-inset); }
+
+  /* ================= Botón de producto ================= */
+  .zvid__cta-wrap {
+    margin-top: var(--zv-btn-mt);
+    text-align: center;
+  }
+
+  .zvid__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-width: var(--zv-btn-min-w);
+    padding: var(--zv-btn-py) var(--zv-btn-px);
+    border: var(--zv-btn-border-w) solid var(--zv-btn-border);
+    border-radius: var(--zv-btn-radius);
+    background-color: var(--zv-btn-bg);
+    color: var(--zv-btn-color);
+    font-family: var(--zv-b-font);
+    font-size: var(--zv-btn-size);
+    font-weight: var(--zv-btn-weight);
+    letter-spacing: var(--zv-btn-ls);
+    text-transform: var(--zv-btn-tt);
+    text-align: center;
+    text-decoration: none;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: background-color var(--zv-anim) ease, color var(--zv-anim) ease;
+  }
+
+  .zvid__cta:hover {
+    background-color: var(--zv-btn-bg-hover);
+    color: var(--zv-btn-color-hover);
+  }
+
+  .zvid__cta:focus-visible {
+    outline: 2px solid var(--zv-btn-bg);
+    outline-offset: 3px;
+  }
+
+  /* ================= Flechas =================
+     Colgadas del marco, centradas sobre el borde de la tarjeta activa. El
+     desplazamiento las mete encima de las tarjetas laterales, como el
+     original. */
+  .zvid__arrow {
+    position: absolute;
+    top: var(--zv-arrow-top);
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--zv-arrow-size);
+    height: var(--zv-arrow-size);
+    padding: 0;
+    border: var(--zv-arrow-border-w) solid var(--zv-arrow-border);
+    border-radius: 50%;
+    background-color: var(--zv-arrow-bg);
+    color: var(--zv-arrow-color);
+    cursor: pointer;
+    transition: background-color var(--zv-anim) ease, color var(--zv-anim) ease, opacity var(--zv-anim) ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .zvid__arrow--prev {
+    left: calc(50% - (var(--zv-card-w) / 2) - var(--zv-arrow-offset));
+    transform: translate(-50%, -50%);
+  }
+
+  .zvid__arrow--next {
+    left: calc(50% + (var(--zv-card-w) / 2) + var(--zv-arrow-offset));
+    transform: translate(-50%, -50%);
+  }
+
+  .zvid__arrow:hover {
+    background-color: var(--zv-arrow-bg-hover);
+    color: var(--zv-arrow-color-hover);
+  }
+
+  .zvid__arrow:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+
+  .zvid__arrow[disabled] {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  .zvid__arrow svg {
+    width: var(--zv-arrow-icon);
+    height: var(--zv-arrow-icon);
+    display: block;
+  }
+
+  .zvid__arrow svg path {
+    stroke: currentColor;
+    stroke-width: var(--zv-arrow-stroke);
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ================= Puntos ================= */
+  .zvid__dots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--zv-dot-gap);
+    margin-top: var(--zv-dots-mt);
+  }
+
+  .zvid__dot {
+    width: var(--zv-dot-size);
+    height: var(--zv-dot-size);
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background-color: var(--zv-dot-color);
+    cursor: pointer;
+    transition: background-color var(--zv-anim) ease, width var(--zv-anim) ease, height var(--zv-anim) ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .zvid__dot[aria-current='true'] {
+    width: var(--zv-dot-size-active);
+    height: var(--zv-dot-size-active);
+    background-color: var(--zv-dot-color-active);
+  }
+
+  .zvid__dot:focus-visible {
+    outline: 2px solid var(--zv-dot-color-active);
+    outline-offset: 3px;
+  }
+
+  /* ================= Visibilidad por dispositivo: PC ================= */
+  @media screen and (min-width: {{ bp }}px) {
+    .zvid-{{ section.id }} .zvid__arrow { display: {% if arrows_d %}flex{% else %}none{% endif %} !important; }
+    .zvid-{{ section.id }} .zvid__dots  { display: {% if dots_d %}flex{% else %}none{% endif %} !important; }
+    {%- unless s.show_overlay_d -%}
+      .zvid-{{ section.id }} .zvid__ov { display: none; }
+    {%- endunless -%}
+    {%- unless s.show_below_d -%}
+      .zvid-{{ section.id }} .zvid__below { display: none; }
+    {%- endunless -%}
+    {%- if s.btn_full_d -%}
+      .zvid-{{ section.id }} .zvid__cta { width: 100%; }
+    {%- endif -%}
+  }
+
+  /* ================= Móvil ================= */
+  @media screen and (max-width: {{ bp_max }}px) {
+    .zvid-{{ section.id }} {
+      --zv-max-w: none;
+      --zv-pt: {{ s.padding_top_m }}px;
+      --zv-pb: {{ s.padding_bottom_m }}px;
+      --zv-pl: {{ s.padding_left_m }}px;
+      --zv-pr: {{ s.padding_right_m }}px;
+
+      --zv-h-size: {{ s.heading_size_m }}px;
+      --zv-h-lh: {{ s.heading_line_height_m | divided_by: 100.0 }};
+      --zv-h-align: {{ s.heading_align_m }};
+      --zv-h-mb: {{ s.heading_margin_bottom_m }}px;
+
+      --zv-card-w: {{ card_w_m }};
+      --zv-card-gap: {{ s.card_gap_m }}px;
+      --zv-scale-off: {{ s.inactive_scale_m | divided_by: 100.0 }};
+      --zv-op-off: {{ s.inactive_opacity_m | divided_by: 100.0 }};
+
+      --zv-media-ar: {{ s.media_ratio_m | divided_by: 100.0 }};
+      --zv-media-radius: {{ s.media_radius_m }}px;
+
+      --zv-ov-px: {{ s.ov_padding_x_m }}px;
+      --zv-ov-py: {{ s.ov_padding_y_m }}px;
+      --zv-ov-gap: {{ s.ov_gap_m }}px;
+      --zv-ov-quote-w: {{ s.ov_quote_width_m }}%;
+
+      --zv-name-size: {{ s.name_size_m }}px;
+      --zv-name-mb: {{ s.name_margin_bottom_m }}px;
+      --zv-role-size: {{ s.role_size_m }}px;
+      --zv-role-mb: {{ s.role_margin_bottom_m }}px;
+      --zv-quote-size: {{ s.quote_size_m }}px;
+      --zv-quote-lh: {{ s.quote_line_height_m | divided_by: 100.0 }};
+
+      --zv-below-align: {{ s.below_align_m }};
+      --zv-below-mt: {{ s.below_margin_top_m }}px;
+      --zv-below-max-w: {{ s.below_max_width_m }}%;
+
+      --zv-play-size: {{ s.play_size_m }}px;
+      --zv-play-icon: {{ s.play_icon_size_m }}px;
+
+      --zv-fs-size: {{ s.fs_size_m }}px;
+      --zv-fs-icon: {{ s.fs_icon_size_m }}px;
+      --zv-fs-inset: {{ s.fs_inset_m }}px;
+
+      --zv-btn-size: {{ s.btn_font_size_m }}px;
+      --zv-btn-py: {{ s.btn_pad_y_m }}px;
+      --zv-btn-px: {{ s.btn_pad_x_m }}px;
+      --zv-btn-mt: {{ s.btn_margin_top_m }}px;
+
+      --zv-arrow-size: {{ s.arrow_size_m }}px;
+      --zv-arrow-icon: {{ s.arrow_icon_size_m }}px;
+      --zv-arrow-offset: {{ s.arrow_offset_m }}px;
+      --zv-arrow-top: {{ s.arrow_top_m }}%;
+
+      --zv-dots-mt: {{ s.dots_margin_top_m }}px;
+    }
+
+    {%- if s.btn_full_m -%}
+      .zvid-{{ section.id }} .zvid__cta {
+        width: 100%;
+        min-width: 0;
+      }
+    {%- endif -%}
+
+    .zvid-{{ section.id }} .zvid__arrow { display: {% if arrows_m %}flex{% else %}none{% endif %} !important; }
+    .zvid-{{ section.id }} .zvid__dots  { display: {% if dots_m %}flex{% else %}none{% endif %} !important; }
+    {%- unless s.show_overlay_m -%}
+      .zvid-{{ section.id }} .zvid__ov { display: none; }
+    {%- endunless -%}
+    {%- unless s.show_below_m -%}
+      .zvid-{{ section.id }} .zvid__below { display: none; }
+    {%- endunless -%}
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .zvid-{{ section.id }} { --zv-anim: 1ms; }
+    .zvid-{{ section.id }} .zvid__track { scroll-behavior: auto; }
+  }
+{%- endstyle -%}
+
+<div class="zvid zvid-{{ section.id }}">
+  <zzen-experts-carousel
+    class="zvid__inner"
+    data-start-at="{{ s.start_at }}"
+    data-click-to-focus="{{ s.click_to_focus }}"
+    data-pause-on-leave="{{ s.pause_on_leave }}"
+  >
+    {%- if s.heading != blank -%}
+      <{{ s.heading_tag }} class="zvid__heading">{{ s.heading | newline_to_br }}</{{ s.heading_tag }}>
+    {%- endif -%}
+
+    <div class="zvid__viewport{% if s.full_bleed %} zvid__viewport--bleed{% endif %}">
+      <div
+        class="zvid__track"
+        data-zv-track
+        tabindex="0"
+        role="group"
+        aria-label="{{ s.carousel_label | escape }}"
+      >
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign b = block.settings
+            assign v = b.video
+            assign poster = b.poster
+            if poster == blank and v != blank
+              assign poster = v.preview_image
+            endif
+            if poster == blank
+              assign poster = b.image
+            endif
+          -%}
+          <article class="zvid__card" data-zv-card {{ block.shopify_attributes }}>
+            <div class="zvid__media" data-zv-media>
+              {%- comment -%} ---------- Vídeo ---------- {%- endcomment -%}
+              {%- if v != blank -%}
+                <video
+                  class="zvid__video"
+                  data-zv-video
+                  playsinline
+                  preload="none"
+                  {% if s.video_loop %}loop{% endif %}
+                  {% if s.video_muted %}muted{% endif %}
+                  {% if s.video_controls %}controls{% endif %}
+                  {% if poster != blank %}poster="{{ poster | image_url: width: 1200 }}"{% endif %}
+                >
+                  {%- for source in v.sources -%}
+                    {%- if source.format == 'mp4' -%}
+                      <source src="{{ source.url }}" type="{{ source.mime_type }}">
+                    {%- endif -%}
+                  {%- endfor -%}
+                  {%- for source in v.sources -%}
+                    {%- if source.format == 'm3u8' -%}
+                      <source src="{{ source.url }}" type="{{ source.mime_type }}">
+                    {%- endif -%}
+                  {%- endfor -%}
+                </video>
+              {%- elsif b.video_url != blank -%}
+                {%- comment -%}
+                  El iframe no se pinta hasta que se pulsa reproducir: así no
+                  se cargan tres reproductores externos en cada visita.
+                {%- endcomment -%}
+                <div
+                  class="zvid__embed"
+                  data-zv-embed
+                  data-embed-type="{{ b.video_url.type }}"
+                  data-embed-id="{{ b.video_url.id }}"
+                ></div>
+              {%- endif -%}
+
+              {%- comment -%} ---------- Cartel ---------- {%- endcomment -%}
+              {%- if poster != blank -%}
+                <img
+                  class="zvid__poster"
+                  data-zv-poster
+                  src="{{ poster | image_url: width: 1200 }}"
+                  srcset="
+                    {{ poster | image_url: width: 500 }} 500w,
+                    {{ poster | image_url: width: 800 }} 800w,
+                    {{ poster | image_url: width: 1200 }} 1200w
+                  "
+                  sizes="(min-width: {{ bp }}px) {{ s.card_width_d }}px, {{ s.card_width_m }}vw"
+                  width="{{ poster.width }}"
+                  height="{{ poster.height }}"
+                  alt="{{ poster.alt | default: b.name | escape }}"
+                  loading="{% if forloop.index <= 2 %}eager{% else %}lazy{% endif %}"
+                  decoding="async"
+                >
+              {%- elsif v == blank and b.video_url == blank -%}
+                {{ 'image' | placeholder_svg_tag: 'zvid__poster' }}
+              {%- endif -%}
+
+              {%- if s.scrim_style != 'none' -%}
+                <span class="zvid__scrim{% if s.hide_text_on_play %} zvid__scrim--hide-on-play{% endif %}"></span>
+              {%- endif -%}
+
+              {%- comment -%}
+                ---------- Texto encima del vídeo (se ve en PC) ----------
+              {%- endcomment -%}
+              {%- if b.name != blank or b.role != blank or b.quote != blank -%}
+                <div
+                  class="zvid__ov zvid__ov--{{ s.ov_layout }} zvid__ov--v-{{ s.ov_align_v }} zvid__ov--h-{{ s.ov_align_h }}{% if s.hide_text_on_play %} zvid__ov--hide-on-play{% endif %}"
+                  aria-hidden="true"
+                >
+                  <div class="zvid__ov-id">
+                    {%- if b.name != blank -%}
+                      <div class="zvid__name">{{ b.name }}</div>
+                    {%- endif -%}
+                    {%- if b.role != blank -%}
+                      <div class="zvid__role">{{ b.role }}</div>
+                    {%- endif -%}
+                  </div>
+                  {%- if b.quote != blank -%}
+                    <div class="zvid__ov-quote">
+                      <div class="zvid__quote">{{ b.quote }}</div>
+                    </div>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+
+              {%- if s.show_play -%}
+                <button
+                  type="button"
+                  class="zvid__play"
+                  data-zv-play
+                  aria-label="{{ s.play_label | escape }}{% if b.name != blank %} — {{ b.name | escape }}{% endif %}"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M8 5.5v13l11-6.5z"></path>
+                  </svg>
+                </button>
+              {%- endif -%}
+
+              {%- if s.show_fs -%}
+                <button
+                  type="button"
+                  class="zvid__fs zvid__fs--{{ s.fs_position }}"
+                  data-zv-fs
+                  aria-label="{{ s.fs_label | escape }}"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M4 9V5.5A1.5 1.5 0 0 1 5.5 4H9"></path>
+                    <path d="M15 4h3.5A1.5 1.5 0 0 1 20 5.5V9"></path>
+                    <path d="M20 15v3.5a1.5 1.5 0 0 1-1.5 1.5H15"></path>
+                    <path d="M9 20H5.5A1.5 1.5 0 0 1 4 18.5V15"></path>
+                  </svg>
+                </button>
+              {%- endif -%}
+            </div>
+
+            {%- comment -%}
+              ---------- Texto debajo de la tarjeta (se ve en móvil) ----------
+              Es la misma información que la de encima del vídeo. Ver la nota
+              de la cabecera del archivo.
+            {%- endcomment -%}
+            {%- if b.name != blank or b.role != blank or b.quote != blank -%}
+              <div class="zvid__below">
+                <div class="zvid__below-in">
+                  {%- if b.name != blank -%}
+                    <{{ s.name_tag }} class="zvid__name">{{ b.name }}</{{ s.name_tag }}>
+                  {%- endif -%}
+                  {%- if b.role != blank -%}
+                    <div class="zvid__role">{{ b.role }}</div>
+                  {%- endif -%}
+                  {%- if b.quote != blank -%}
+                    <div class="zvid__quote">{{ b.quote }}</div>
+                  {%- endif -%}
+                </div>
+              </div>
+            {%- endif -%}
+
+            {%- if b.btn_label != blank -%}
+              <div class="zvid__cta-wrap">
+                <a
+                  class="zvid__cta"
+                  href="{{ b.btn_link | default: '#' }}"
+                  {% if b.btn_new_tab %}target="_blank" rel="noopener"{% endif %}
+                >
+                  {{- b.btn_label -}}
+                </a>
+              </div>
+            {%- endif -%}
+          </article>
+        {%- endfor -%}
+      </div>
+
+      {%- comment -%}
+        ---------- Flechas ----------
+        Fuera del carril a propósito. Ver la nota de la cabecera.
+      {%- endcomment -%}
+      <button
+        type="button"
+        class="zvid__arrow zvid__arrow--prev"
+        data-zv-prev
+        aria-label="{{ s.arrow_prev_label | escape }}"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M14.5 4.5 7.5 12l7 7.5"></path>
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="zvid__arrow zvid__arrow--next"
+        data-zv-next
+        aria-label="{{ s.arrow_next_label | escape }}"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M9.5 4.5 16.5 12l-7 7.5"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="zvid__dots" role="tablist" aria-label="{{ s.dots_label | escape }}">
+      {%- for block in section.blocks -%}
+        <button
+          type="button"
+          class="zvid__dot"
+          data-zv-dot
+          role="tab"
+          aria-current="false"
+          aria-label="{{ block.settings.name | default: forloop.index | escape }}"
+        ></button>
+      {%- endfor -%}
+    </div>
+  </zzen-experts-carousel>
+</div>
+
+<script>
+  if (!customElements.get('zzen-experts-carousel')) {
+    customElements.define(
+      'zzen-experts-carousel',
+      class ZzenExpertsCarousel extends HTMLElement {
+        connectedCallback() {
+          this.track = this.querySelector('[data-zv-track]');
+          this.cards = Array.from(this.querySelectorAll('[data-zv-card]'));
+          this.dots = Array.from(this.querySelectorAll('[data-zv-dot]'));
+          this.prevBtn = this.querySelector('[data-zv-prev]');
+          this.nextBtn = this.querySelector('[data-zv-next]');
+          if (!this.track || this.cards.length === 0) return;
+
+          this.clickToFocus = this.dataset.clickToFocus === 'true';
+          this.pauseOnLeave = this.dataset.pauseOnLeave === 'true';
+          this.index = -1;
+
+          this.onScroll = this.onScroll.bind(this);
+          this.track.addEventListener('scroll', this.onScroll, { passive: true });
+
+          if (this.prevBtn) this.prevBtn.addEventListener('click', () => this.move(-1));
+          if (this.nextBtn) this.nextBtn.addEventListener('click', () => this.move(1));
+          this.dots.forEach((dot, i) => dot.addEventListener('click', () => this.goTo(i)));
+
+          this.cards.forEach((card, i) => {
+            const play = card.querySelector('[data-zv-play]');
+            const fs = card.querySelector('[data-zv-fs]');
+
+            if (play) {
+              play.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Pulsar el reproductor de una tarjeta lateral primero la
+                // trae al centro: reproducir algo que se ve a medias y
+                // atenuado no ayuda a nadie.
+                if (i !== this.index) {
+                  this.goTo(i);
+                  return;
+                }
+                this.playCard(i);
+              });
+            }
+
+            if (fs) {
+              fs.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.enterFullscreen(card);
+              });
+            }
+
+            // Tocar una tarjeta lateral la centra.
+            if (this.clickToFocus) {
+              card.addEventListener('click', (e) => {
+                if (i === this.index) return;
+                if (e.target.closest('a')) return;
+                e.preventDefault();
+                this.goTo(i);
+              });
+            }
+          });
+
+          // El alto de las tarjetas y el ancho del marco cambian al girar el
+          // móvil o al redimensionar: hay que recalcular la tarjeta activa.
+          if ('ResizeObserver' in window) {
+            this.ro = new ResizeObserver(() => this.update());
+            this.ro.observe(this.track);
+          } else {
+            this._onResize = () => this.update();
+            window.addEventListener('resize', this._onResize);
+          }
+
+          // El editor de temas: al seleccionar un bloque se centra.
+          this.addEventListener('shopify:block:select', (e) => {
+            const card = e.target.closest('[data-zv-card]');
+            const i = this.cards.indexOf(card);
+            if (i > -1) this.goTo(i);
+          });
+          this.addEventListener('shopify:block:deselect', () => this.pauseAll());
+
+          // Pausar cuando la sección se sale de la pantalla.
+          if (this.pauseOnLeave && 'IntersectionObserver' in window) {
+            this.io = new IntersectionObserver(
+              (entries) => {
+                entries.forEach((entry) => {
+                  if (!entry.isIntersecting) this.pauseAll();
+                });
+              },
+              { threshold: 0.1 }
+            );
+            this.io.observe(this);
+          }
+
+          this.start();
+        }
+
+        disconnectedCallback() {
+          if (this.ro) this.ro.disconnect();
+          if (this.io) this.io.disconnect();
+          if (this._onResize) window.removeEventListener('resize', this._onResize);
+        }
+
+        // Primera tarjeta centrada, sin animación para que no se vea el salto.
+        start() {
+          const i = this.dataset.startAt === 'middle' ? Math.floor((this.cards.length - 1) / 2) : 0;
+          this.goTo(i, 'auto');
+          // El anclaje necesita un fotograma para asentarse.
+          requestAnimationFrame(() => this.update());
+        }
+
+        get maxScroll() {
+          return Math.max(this.track.scrollWidth - this.track.clientWidth, 0);
+        }
+
+        move(dir) {
+          const next = Math.min(Math.max(this.index + dir, 0), this.cards.length - 1);
+          this.goTo(next);
+        }
+
+        goTo(i, behavior) {
+          const card = this.cards[i];
+          if (!card) return;
+          const left = card.offsetLeft - (this.track.clientWidth - card.offsetWidth) / 2;
+          this.track.scrollTo({ left: left, behavior: behavior || 'smooth' });
+        }
+
+        onScroll() {
+          if (this._raf) return;
+          this._raf = requestAnimationFrame(() => {
+            this._raf = null;
+            this.update();
+          });
+        }
+
+        update() {
+          const center = this.track.scrollLeft + this.track.clientWidth / 2;
+
+          let nearest = 0;
+          let best = Infinity;
+          this.cards.forEach((card, i) => {
+            const d = Math.abs(card.offsetLeft + card.offsetWidth / 2 - center);
+            if (d < best) {
+              best = d;
+              nearest = i;
+            }
+          });
+
+          if (nearest !== this.index) {
+            // Al cambiar de tarjeta se para el vídeo que quedaba atrás.
+            this.pauseAll();
+            this.index = nearest;
+            this.cards.forEach((card, i) => card.classList.toggle('is-active', i === nearest));
+            this.dots.forEach((dot, i) => dot.setAttribute('aria-current', i === nearest ? 'true' : 'false'));
+          }
+
+          if (this.prevBtn) this.prevBtn.disabled = nearest === 0;
+          if (this.nextBtn) this.nextBtn.disabled = nearest === this.cards.length - 1;
+        }
+
+        playCard(i) {
+          const card = this.cards[i];
+          if (!card) return;
+          const media = card.querySelector('[data-zv-media]');
+          const video = card.querySelector('[data-zv-video]');
+          const embed = card.querySelector('[data-zv-embed]');
+
+          if (video) {
+            media.classList.add('is-playing');
+            const p = video.play();
+            if (p && p.catch) {
+              // Algunos navegadores bloquean el sonido: se reintenta en silencio.
+              p.catch(() => {
+                video.muted = true;
+                video.play().catch(() => media.classList.remove('is-playing'));
+              });
+            }
+            return;
+          }
+
+          if (embed && !embed.dataset.loaded) {
+            const type = embed.dataset.embedType;
+            const id = embed.dataset.embedId;
+            const src =
+              type === 'vimeo'
+                ? 'https://player.vimeo.com/video/' + id + '?autoplay=1'
+                : 'https://www.youtube.com/embed/' + id + '?autoplay=1&rel=0';
+            const iframe = document.createElement('iframe');
+            iframe.className = 'zvid__iframe';
+            iframe.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
+            iframe.setAttribute('allowfullscreen', '');
+            iframe.setAttribute('title', embed.dataset.embedId || 'video');
+            iframe.src = src;
+            embed.appendChild(iframe);
+            embed.dataset.loaded = 'true';
+            media.classList.add('is-playing');
+          }
+        }
+
+        pauseAll() {
+          this.cards.forEach((card) => {
+            const video = card.querySelector('[data-zv-video]');
+            const media = card.querySelector('[data-zv-media]');
+            if (video && !video.paused) video.pause();
+            if (video && media) media.classList.remove('is-playing');
+          });
+        }
+
+        enterFullscreen(card) {
+          const video = card.querySelector('[data-zv-video]');
+          const media = card.querySelector('[data-zv-media]');
+          const target = video || media;
+          if (!target) return;
+
+          // iOS solo deja pantalla completa al propio elemento de vídeo.
+          if (video && video.webkitEnterFullscreen && !document.fullscreenEnabled) {
+            video.play().catch(() => {});
+            video.webkitEnterFullscreen();
+            return;
+          }
+
+          const req = target.requestFullscreen || target.webkitRequestFullscreen || target.msRequestFullscreen;
+          if (req) {
+            req.call(target);
+            if (video) {
+              media.classList.add('is-playing');
+              video.play().catch(() => {});
+            }
+          }
+        }
+      }
+    );
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Carrusel de expertos",
+  "tag": "section",
+  "class": "section-zvid",
+  "max_blocks": 12,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Título"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Título",
+      "info": "Enter para salto de línea. Envuelve una palabra en <em>así</em> para el acento.",
+      "default": "Expertos analizan lo que\nhay detrás de cada fórmula."
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Etiqueta HTML del título (SEO)",
+      "options": [
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "div", "label": "div (sin peso SEO)" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "select",
+      "id": "name_tag",
+      "label": "Etiqueta HTML del nombre del experto",
+      "options": [
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "div", "label": "div (sin peso SEO)" }
+      ],
+      "default": "h3"
+    },
+
+    {
+      "type": "header",
+      "content": "Diseño general"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "mobile_breakpoint",
+      "min": 480,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "label": "Punto de cambio a móvil",
+      "default": 750
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 0,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "label": "Ancho máximo del contenido",
+      "info": "0 = ancho completo. Afecta al título y a los puntos, no al carrusel si está a sangre.",
+      "default": 1500
+    },
+    {
+      "type": "checkbox",
+      "id": "full_bleed",
+      "label": "El carrusel ocupa todo el ancho de la pantalla",
+      "info": "Así las tarjetas laterales se cortan en los bordes, como en el original.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "transition_ms",
+      "min": 0,
+      "max": 900,
+      "step": 25,
+      "unit": "ms",
+      "label": "Duración de las transiciones",
+      "default": 300
+    },
+    {
+      "type": "range",
+      "id": "padding_top_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding superior — PC",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding inferior — PC",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_left_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding izquierdo — PC",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_right_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding derecho — PC",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_top_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding superior — Móvil",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding inferior — Móvil",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "padding_left_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding izquierdo — Móvil",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_right_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding derecho — Móvil",
+      "default": 16
+    },
+
+    {
+      "type": "header",
+      "content": "Carrusel"
+    },
+    {
+      "type": "text",
+      "id": "carousel_label",
+      "label": "Texto accesible del carrusel",
+      "default": "Opiniones de expertos"
+    },
+    {
+      "type": "select",
+      "id": "start_at",
+      "label": "Tarjeta que se ve al cargar",
+      "options": [
+        { "value": "first", "label": "La primera" },
+        { "value": "middle", "label": "La del medio" }
+      ],
+      "default": "middle"
+    },
+    {
+      "type": "checkbox",
+      "id": "click_to_focus",
+      "label": "Al tocar una tarjeta lateral se centra",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "card_width_d",
+      "min": 200,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "label": "Ancho de la tarjeta — PC",
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "card_gap_d",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre tarjetas — PC",
+      "info": "Ponlo bajo: al encogerse, las laterales ya dejan hueco por sí solas.",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "inactive_scale_d",
+      "min": 60,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Tamaño de las tarjetas laterales — PC",
+      "info": "100 % = igual que la tarjeta del centro.",
+      "default": 90
+    },
+    {
+      "type": "range",
+      "id": "inactive_opacity_d",
+      "min": 10,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Opacidad de las tarjetas laterales — PC",
+      "default": 35
+    },
+    {
+      "type": "range",
+      "id": "card_width_m",
+      "min": 50,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho de la tarjeta — Móvil",
+      "info": "Porcentaje del ancho de la pantalla. Menos de 100 deja asomar las de al lado.",
+      "default": 75
+    },
+    {
+      "type": "range",
+      "id": "card_gap_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre tarjetas — Móvil",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "inactive_scale_m",
+      "min": 60,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Tamaño de las tarjetas laterales — Móvil",
+      "default": 95
+    },
+    {
+      "type": "range",
+      "id": "inactive_opacity_m",
+      "min": 10,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Opacidad de las tarjetas laterales — Móvil",
+      "default": 45
+    },
+
+    {
+      "type": "header",
+      "content": "Vídeo"
+    },
+    {
+      "type": "range",
+      "id": "media_ratio_d",
+      "min": 40,
+      "max": 200,
+      "step": 2,
+      "unit": "%",
+      "label": "Proporción ancho/alto — PC",
+      "info": "100 % = cuadrado. Menos de 100 = vertical.",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "media_ratio_m",
+      "min": 40,
+      "max": 200,
+      "step": 2,
+      "unit": "%",
+      "label": "Proporción ancho/alto — Móvil",
+      "default": 106
+    },
+    {
+      "type": "select",
+      "id": "media_fit",
+      "label": "Ajuste del vídeo",
+      "options": [
+        { "value": "cover", "label": "Rellenar (recorta)" },
+        { "value": "contain", "label": "Entero (sin recortar)" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "color",
+      "id": "media_bg",
+      "label": "Fondo del hueco del vídeo",
+      "default": "#e8e6e1"
+    },
+    {
+      "type": "range",
+      "id": "media_radius_d",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo — PC",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "media_radius_m",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo — Móvil",
+      "default": 6
+    },
+    {
+      "type": "checkbox",
+      "id": "video_loop",
+      "label": "Repetir el vídeo al terminar",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "video_muted",
+      "label": "Reproducir sin sonido",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "video_controls",
+      "label": "Mostrar los controles del navegador",
+      "info": "Actívalo si quieres barra de tiempo y volumen sobre el vídeo.",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_leave",
+      "label": "Pausar al salir de la pantalla",
+      "default": true
+    },
+
+    {
+      "type": "header",
+      "content": "Velo sobre el vídeo"
+    },
+    {
+      "type": "select",
+      "id": "scrim_style",
+      "label": "Tipo de velo",
+      "info": "Ayuda a que el texto blanco se lea sobre vídeos claros.",
+      "options": [
+        { "value": "none", "label": "Ninguno" },
+        { "value": "solid", "label": "Uniforme" },
+        { "value": "bottom", "label": "Degradado desde abajo" },
+        { "value": "sides", "label": "Degradado en los laterales" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "color",
+      "id": "scrim_color",
+      "label": "Color del velo",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "scrim_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Opacidad del velo",
+      "default": 25
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_text_on_play",
+      "label": "Ocultar el texto y el velo mientras se reproduce",
+      "default": true
+    },
+
+    {
+      "type": "header",
+      "content": "Texto encima del vídeo"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_overlay_d",
+      "label": "Mostrar el texto encima del vídeo — PC",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_overlay_m",
+      "label": "Mostrar el texto encima del vídeo — Móvil",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "ov_layout",
+      "label": "Colocación",
+      "options": [
+        { "value": "split", "label": "Nombre a la izquierda y cita a la derecha" },
+        { "value": "stack", "label": "Todo en una columna" }
+      ],
+      "default": "split"
+    },
+    {
+      "type": "select",
+      "id": "ov_align_v",
+      "label": "Posición vertical",
+      "options": [
+        { "value": "top", "label": "Arriba" },
+        { "value": "center", "label": "Centro" },
+        { "value": "bottom", "label": "Abajo" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "ov_align_h",
+      "label": "Posición horizontal (solo en una columna)",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "quote_align_ov",
+      "label": "Alineación de la cita encima del vídeo",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "ov_quote_width_d",
+      "min": 10,
+      "max": 70,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho de la cita — PC",
+      "default": 27
+    },
+    {
+      "type": "range",
+      "id": "ov_quote_width_m",
+      "min": 20,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho de la cita — Móvil",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "ov_padding_x_d",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen interior lateral — PC",
+      "default": 45
+    },
+    {
+      "type": "range",
+      "id": "ov_padding_y_d",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen interior arriba y abajo — PC",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "ov_gap_d",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación nombre / cita — PC",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "ov_padding_x_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen interior lateral — Móvil",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "ov_padding_y_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen interior arriba y abajo — Móvil",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "ov_gap_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación nombre / cita — Móvil",
+      "default": 12
+    },
+
+    {
+      "type": "header",
+      "content": "Texto debajo del vídeo"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_below_d",
+      "label": "Mostrar el texto debajo del vídeo — PC",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_below_m",
+      "label": "Mostrar el texto debajo del vídeo — Móvil",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "below_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "below_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "center", "label": "Centro" },
+        { "value": "left", "label": "Izquierda" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "below_margin_top_d",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con el vídeo — PC",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "below_margin_top_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con el vídeo — Móvil",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "below_max_width_d",
+      "min": 40,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho máximo del texto — PC",
+      "default": 90
+    },
+    {
+      "type": "range",
+      "id": "below_max_width_m",
+      "min": 40,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho máximo del texto — Móvil",
+      "default": 95
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía del nombre"
+    },
+    {
+      "type": "select",
+      "id": "body_font",
+      "label": "Fuente de todos los textos de la tarjeta",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "body_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "select",
+      "id": "name_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "name_color_ov",
+      "label": "Color encima del vídeo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "name_color_below",
+      "label": "Color debajo del vídeo",
+      "default": "#111111"
+    },
+    {
+      "type": "range",
+      "id": "name_size_d",
+      "min": 12,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 21
+    },
+    {
+      "type": "range",
+      "id": "name_size_m",
+      "min": 10,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "name_line_height",
+      "min": 100,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado",
+      "default": 130
+    },
+    {
+      "type": "range",
+      "id": "name_margin_bottom_d",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen inferior — PC",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "name_margin_bottom_m",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen inferior — Móvil",
+      "default": 4
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía de la especialidad"
+    },
+    {
+      "type": "select",
+      "id": "role_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "role_color_ov",
+      "label": "Color encima del vídeo",
+      "default": "#ededed"
+    },
+    {
+      "type": "color",
+      "id": "role_color_below",
+      "label": "Color debajo del vídeo",
+      "default": "#8a8a8a"
+    },
+    {
+      "type": "range",
+      "id": "role_size_d",
+      "min": 9,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "role_size_m",
+      "min": 9,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "role_line_height",
+      "min": 100,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado",
+      "default": 140
+    },
+    {
+      "type": "range",
+      "id": "role_margin_bottom_d",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen inferior — PC",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "role_margin_bottom_m",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen inferior — Móvil",
+      "default": 12
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía de la cita"
+    },
+    {
+      "type": "select",
+      "id": "quote_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "checkbox",
+      "id": "quote_italic",
+      "label": "Cita en cursiva",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "quote_color_ov",
+      "label": "Color encima del vídeo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "quote_color_below",
+      "label": "Color debajo del vídeo",
+      "default": "#6f6f6f"
+    },
+    {
+      "type": "range",
+      "id": "quote_size_d",
+      "min": 9,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "quote_size_m",
+      "min": 9,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "quote_line_height_d",
+      "min": 100,
+      "max": 240,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado — PC",
+      "default": 155
+    },
+    {
+      "type": "range",
+      "id": "quote_line_height_m",
+      "min": 100,
+      "max": 240,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado — Móvil",
+      "default": 150
+    },
+
+    {
+      "type": "header",
+      "content": "Botón de reproducir"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_play",
+      "label": "Mostrar el botón de reproducir",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "play_label",
+      "label": "Texto accesible",
+      "default": "Reproducir vídeo"
+    },
+    {
+      "type": "color",
+      "id": "play_bg",
+      "label": "Fondo del círculo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "play_bg_hover",
+      "label": "Fondo al pasar el ratón",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "play_icon_color",
+      "label": "Color del triángulo",
+      "default": "#3a3a3a"
+    },
+    {
+      "type": "color",
+      "id": "play_icon_color_hover",
+      "label": "Color del triángulo al pasar el ratón",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "play_border_color",
+      "label": "Color del borde",
+      "default": "#00000000"
+    },
+    {
+      "type": "range",
+      "id": "play_border_width",
+      "min": 0,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor del borde",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "play_size_d",
+      "min": 32,
+      "max": 140,
+      "step": 2,
+      "unit": "px",
+      "label": "Diámetro — PC",
+      "default": 76
+    },
+    {
+      "type": "range",
+      "id": "play_size_m",
+      "min": 28,
+      "max": 110,
+      "step": 2,
+      "unit": "px",
+      "label": "Diámetro — Móvil",
+      "default": 54
+    },
+    {
+      "type": "range",
+      "id": "play_icon_size_d",
+      "min": 10,
+      "max": 70,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del triángulo — PC",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "play_icon_size_m",
+      "min": 10,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del triángulo — Móvil",
+      "default": 22
+    },
+
+    {
+      "type": "header",
+      "content": "Botón de pantalla completa"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_fs",
+      "label": "Mostrar el botón de pantalla completa",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "fs_label",
+      "label": "Texto accesible",
+      "default": "Ver a pantalla completa"
+    },
+    {
+      "type": "select",
+      "id": "fs_position",
+      "label": "Esquina",
+      "options": [
+        { "value": "tr", "label": "Arriba derecha" },
+        { "value": "tl", "label": "Arriba izquierda" },
+        { "value": "br", "label": "Abajo derecha" },
+        { "value": "bl", "label": "Abajo izquierda" }
+      ],
+      "default": "tr"
+    },
+    {
+      "type": "color",
+      "id": "fs_bg",
+      "label": "Fondo",
+      "default": "#1f1f1f"
+    },
+    {
+      "type": "color",
+      "id": "fs_bg_hover",
+      "label": "Fondo al pasar el ratón",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "fs_color",
+      "label": "Color del icono",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "fs_radius",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "fs_size_d",
+      "min": 20,
+      "max": 70,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 34
+    },
+    {
+      "type": "range",
+      "id": "fs_size_m",
+      "min": 18,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "fs_icon_size_d",
+      "min": 8,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del icono — PC",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "fs_icon_size_m",
+      "min": 8,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del icono — Móvil",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "fs_inset_d",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Distancia al borde — PC",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "fs_inset_m",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Distancia al borde — Móvil",
+      "default": 10
+    },
+
+    {
+      "type": "header",
+      "content": "Botón de producto"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg",
+      "label": "Fondo",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "btn_color",
+      "label": "Color del texto",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg_hover",
+      "label": "Fondo al pasar el ratón",
+      "default": "#2b2b2b"
+    },
+    {
+      "type": "color",
+      "id": "btn_color_hover",
+      "label": "Color del texto al pasar el ratón",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_border_color",
+      "label": "Color del borde",
+      "default": "#00000000"
+    },
+    {
+      "type": "range",
+      "id": "btn_border_width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor del borde",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "btn_radius",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo",
+      "default": 40
+    },
+    {
+      "type": "select",
+      "id": "btn_weight",
+      "label": "Grosor del texto",
+      "options": [
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "checkbox",
+      "id": "btn_uppercase",
+      "label": "Texto en mayúsculas",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "btn_letter_spacing",
+      "min": -1,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "btn_font_size_d",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del texto — PC",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "btn_font_size_m",
+      "min": 9,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del texto — Móvil",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "btn_pad_y_d",
+      "min": 4,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Alto interior — PC",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "btn_pad_x_d",
+      "min": 8,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Ancho interior — PC",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "btn_pad_y_m",
+      "min": 4,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Alto interior — Móvil",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "btn_pad_x_m",
+      "min": 8,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Ancho interior — Móvil",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "btn_min_width_d",
+      "min": 0,
+      "max": 400,
+      "step": 5,
+      "unit": "px",
+      "label": "Ancho mínimo — PC",
+      "default": 220
+    },
+    {
+      "type": "checkbox",
+      "id": "btn_full_d",
+      "label": "Botón a todo el ancho de la tarjeta — PC",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "btn_full_m",
+      "label": "Botón a todo el ancho de la tarjeta — Móvil",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "btn_margin_top_d",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con lo de arriba — PC",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "btn_margin_top_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con lo de arriba — Móvil",
+      "default": 16
+    },
+
+    {
+      "type": "header",
+      "content": "Navegación"
+    },
+    {
+      "type": "select",
+      "id": "nav_d",
+      "label": "Controles — PC",
+      "options": [
+        { "value": "arrows", "label": "Solo flechas" },
+        { "value": "dots", "label": "Solo puntos" },
+        { "value": "arrows_dots", "label": "Flechas + puntos" },
+        { "value": "none", "label": "Ninguno" }
+      ],
+      "default": "arrows"
+    },
+    {
+      "type": "select",
+      "id": "nav_m",
+      "label": "Controles — Móvil",
+      "options": [
+        { "value": "none", "label": "Ninguno (solo deslizar)" },
+        { "value": "dots", "label": "Solo puntos" },
+        { "value": "arrows", "label": "Solo flechas" },
+        { "value": "arrows_dots", "label": "Flechas + puntos" }
+      ],
+      "default": "none"
+    },
+
+    {
+      "type": "header",
+      "content": "Flechas"
+    },
+    {
+      "type": "text",
+      "id": "arrow_prev_label",
+      "label": "Texto accesible de la flecha izquierda",
+      "default": "Anterior"
+    },
+    {
+      "type": "text",
+      "id": "arrow_next_label",
+      "label": "Texto accesible de la flecha derecha",
+      "default": "Siguiente"
+    },
+    {
+      "type": "color",
+      "id": "arrow_color",
+      "label": "Color del icono",
+      "default": "#2b2b2b"
+    },
+    {
+      "type": "color",
+      "id": "arrow_color_hover",
+      "label": "Color del icono al pasar el ratón",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "arrow_bg",
+      "label": "Fondo del círculo",
+      "default": "#f0efec"
+    },
+    {
+      "type": "color",
+      "id": "arrow_bg_hover",
+      "label": "Fondo al pasar el ratón",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "arrow_border_color",
+      "label": "Color del borde",
+      "default": "#00000000"
+    },
+    {
+      "type": "range",
+      "id": "arrow_border_width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor del borde",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "arrow_size_d",
+      "min": 24,
+      "max": 90,
+      "step": 1,
+      "unit": "px",
+      "label": "Diámetro — PC",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "arrow_size_m",
+      "min": 24,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "label": "Diámetro — Móvil",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "arrow_icon_size_d",
+      "min": 8,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del icono — PC",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "arrow_icon_size_m",
+      "min": 8,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del icono — Móvil",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "arrow_stroke",
+      "min": 0.5,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Grosor del trazo",
+      "default": 1.8
+    },
+    {
+      "type": "range",
+      "id": "arrow_offset_d",
+      "min": -50,
+      "max": 150,
+      "step": 2,
+      "unit": "px",
+      "label": "Distancia al borde de la tarjeta — PC",
+      "info": "Valores positivos alejan la flecha hacia fuera, encima de la tarjeta lateral.",
+      "default": 110
+    },
+    {
+      "type": "range",
+      "id": "arrow_offset_m",
+      "min": -60,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Distancia al borde de la tarjeta — Móvil",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "arrow_top_d",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Altura de las flechas — PC",
+      "info": "Porcentaje desde arriba del carrusel.",
+      "default": 46
+    },
+    {
+      "type": "range",
+      "id": "arrow_top_m",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Altura de las flechas — Móvil",
+      "default": 34
+    },
+
+    {
+      "type": "header",
+      "content": "Puntos"
+    },
+    {
+      "type": "text",
+      "id": "dots_label",
+      "label": "Texto accesible del grupo de puntos",
+      "default": "Ir al experto"
+    },
+    {
+      "type": "color",
+      "id": "dot_color",
+      "label": "Color del punto inactivo",
+      "default": "#d3d3d3"
+    },
+    {
+      "type": "color",
+      "id": "dot_color_active",
+      "label": "Color del punto activo",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "dot_size",
+      "min": 3,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del punto inactivo",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "dot_size_active",
+      "min": 3,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del punto activo",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "dot_gap",
+      "min": 2,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre puntos",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "dots_margin_top_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación con el carrusel — PC",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "dots_margin_top_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación con el carrusel — Móvil",
+      "default": 20
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía del título de sección"
+    },
+    {
+      "type": "select",
+      "id": "heading_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "heading_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "em_color",
+      "label": "Color del acento <em>",
+      "default": "#111111"
+    },
+    {
+      "type": "checkbox",
+      "id": "em_italic",
+      "label": "Acento <em> en cursiva",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "heading_size_d",
+      "min": 18,
+      "max": 110,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 38
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_d",
+      "min": 80,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado — PC",
+      "default": 125
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing_d",
+      "min": -3,
+      "max": 6,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "heading_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_d",
+      "min": 0,
+      "max": 140,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — PC",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "heading_size_m",
+      "min": 14,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_m",
+      "min": 80,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado — Móvil",
+      "default": 125
+    },
+    {
+      "type": "select",
+      "id": "heading_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "center", "label": "Centro" },
+        { "value": "left", "label": "Izquierda" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — Móvil",
+      "default": 24
+    }
+  ],
+  "blocks": [
+    {
+      "type": "expert",
+      "name": "Experto",
+      "settings": [
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Vídeo",
+          "info": "Sube el vídeo a Contenido > Archivos y selecciónalo aquí."
+        },
+        {
+          "type": "video_url",
+          "id": "video_url",
+          "label": "O pega una URL de YouTube o Vimeo",
+          "accept": ["youtube", "vimeo"],
+          "info": "Solo se usa si el campo de arriba está vacío. El reproductor se carga al pulsar play.",
+          "placeholder": "https://www.youtube.com/watch?v=..."
+        },
+        {
+          "type": "image_picker",
+          "id": "poster",
+          "label": "Imagen de portada",
+          "info": "Opcional. Si la dejas vacía se usa el primer fotograma del vídeo de Shopify."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Imagen sin vídeo",
+          "info": "Por si esta tarjeta no lleva vídeo."
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Nombre",
+          "default": "Dra. Isabel Belaustegui"
+        },
+        {
+          "type": "text",
+          "id": "role",
+          "label": "Especialidad",
+          "default": "Medicina integrativa y nutrición"
+        },
+        {
+          "type": "richtext",
+          "id": "quote",
+          "label": "Cita",
+          "default": "<p>\"ZZEN ha pensado en sus usuarios. Cada fórmula responde a una necesidad real.\"</p>"
+        },
+        {
+          "type": "text",
+          "id": "btn_label",
+          "label": "Texto del botón",
+          "default": "Ver Sleep"
+        },
+        {
+          "type": "url",
+          "id": "btn_link",
+          "label": "Enlace del botón"
+        },
+        {
+          "type": "checkbox",
+          "id": "btn_new_tab",
+          "label": "Abrir en una pestaña nueva",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Carrusel de expertos",
+      "blocks": [
+        { "type": "expert" },
+        { "type": "expert" },
+        { "type": "expert" }
+      ]
+    }
+  ]
+}
+{% endschema %}
