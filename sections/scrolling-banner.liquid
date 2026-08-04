@@ -1,4 +1,11 @@
 <style>
+    @font-face {
+    font-family: 'Helvetica neue';
+    src: url('{{ 'HelveticaNeueCyr-Light.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
   .scrolling-banner-{{ section.id }} {
     background-color: {{ section.settings.background_color }};
     overflow: hidden;
@@ -37,6 +44,7 @@
     letter-spacing: {{ section.settings.letter_spacing | divided_by: 100.0 }}em;
     text-transform: {{ section.settings.text_transform }};
     font-weight: {{ section.settings.font_weight }};
+    font-family: 'Helvetica neue', sans-serif;
     white-space: nowrap;
     padding: 0 {{ section.settings.spacing_mobile }}px;
     line-height: 1.4;
