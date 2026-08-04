@@ -27,10 +27,43 @@
         "padding_top": 36,
         "padding_bottom": 36
       }
+    },
+    "hero_v2s_mHhY3E": {
+      "type": "hero-v2s",
+      "name": "Hero V2S",
+      "settings": {
+        "image_position_desktop": "center center",
+        "image_position_mobile": "center top",
+        "overlay_opacity": 15,
+        "overlay_opacity_mobile": 60,
+        "content_position_desktop": "flex-start",
+        "content_position_vertical": "center",
+        "text_align_desktop": "left",
+        "side_padding_desktop": 6,
+        "content_max_width": 62,
+        "height_desktop": 95,
+        "height_mobile": 75,
+        "rating_text": "",
+        "rating_size": 16,
+        "heading": "Suplementación basada en ciencia real",
+        "heading_size": 62,
+        "heading_size_mobile": 36,
+        "subheading": "Formulamos cada suplemento con respaldo científico, ingredientes naturales y eficacia comprobada para apoyar tu concentración, memoria y bienestar mental día tras día.",
+        "subheading_size": 25,
+        "button_label": "Conoce a nuestros expertos",
+        "button_link": "",
+        "button_size": 21,
+        "button_padding_v": 17,
+        "button_padding_h": 44,
+        "text_color": "#ffffff",
+        "button_bg": "#ffffff",
+        "button_text_color": "#000000"
+      }
     }
   },
   "order": [
     "main",
-    "form"
+    "form",
+    "hero_v2s_mHhY3E"
   ]
 }
