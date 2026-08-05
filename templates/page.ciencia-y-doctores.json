@@ -289,12 +289,156 @@
         "heading_align_m": "center",
         "heading_margin_bottom_m": 24
       }
+    },
+    "custom_quality_certificates_t6Aihc": {
+      "type": "custom-quality-certificates",
+      "blocks": {
+        "cert_i6QHWn": {
+          "type": "cert",
+          "settings": {
+            "title": "IFS",
+            "text": "<p>Asegura la calidad y seguridad en todo el proceso de producción, desde la selección de ingredientes hasta el envasado final.</p>",
+            "link": "",
+            "new_tab": false
+          }
+        },
+        "cert_mikpCm": {
+          "type": "cert",
+          "settings": {
+            "title": "GMP",
+            "text": "<p>Garantiza que cada fórmula se fabrica bajo estrictos estándares de Buenas Prácticas.</p>",
+            "link": "",
+            "new_tab": false
+          }
+        },
+        "cert_MYHpGY": {
+          "type": "cert",
+          "settings": {
+            "title": "FDA",
+            "text": "<p>Cumplimos las normativas de la Administración de Alimentos y Medicamentos de EE. UU., asegurando procesos validados y productos seguros.</p>",
+            "link": "",
+            "new_tab": false
+          }
+        },
+        "cert_zKdjTq": {
+          "type": "cert",
+          "settings": {
+            "title": "GHP",
+            "text": "<p>Certifica las buenas prácticas de manipulación en cada fase, garantizando la trazabilidad y el máximo cuidado en la producción.</p>",
+            "link": "",
+            "new_tab": false
+          }
+        }
+      },
+      "block_order": [
+        "cert_i6QHWn",
+        "cert_mikpCm",
+        "cert_MYHpGY",
+        "cert_zKdjTq"
+      ],
+      "name": "Certificados de calidad",
+      "settings": {
+        "heading": "Certificados Internacionales de Calidad",
+        "sub": "",
+        "heading_tag": "h2",
+        "title_tag": "h3",
+        "anchor_id": "",
+        "bg_color": "#080808",
+        "mobile_breakpoint": 750,
+        "content_max_width": 1500,
+        "layout_d": "side",
+        "head_width_d": 32,
+        "layout_gap_d": 60,
+        "head_valign_d": "start",
+        "transition_ms": 250,
+        "padding_top_d": 80,
+        "padding_bottom_d": 80,
+        "padding_left_d": 24,
+        "padding_right_d": 24,
+        "padding_top_m": 36,
+        "padding_bottom_m": 36,
+        "padding_left_m": 16,
+        "padding_right_m": 16,
+        "cols_d": 4,
+        "col_gap_d": 18,
+        "row_gap_d": 18,
+        "cols_m": 2,
+        "col_gap_m": 12,
+        "row_gap_m": 12,
+        "card_bg": "#171717",
+        "card_border_color": "#262626",
+        "card_border_width": 1,
+        "card_bg_hover": "#1f1f1f",
+        "card_border_color_hover": "#3a3a3a",
+        "card_hover_lift": 0,
+        "card_radius_d": 10,
+        "card_radius_m": 10,
+        "card_padding_x_d": 18,
+        "card_padding_y_d": 18,
+        "card_padding_x_m": 16,
+        "card_padding_y_m": 16,
+        "card_min_height_d": 0,
+        "card_min_height_m": 0,
+        "card_align_d": "left",
+        "card_align_m": "left",
+        "card_justify": "flex-start",
+        "image_width_d": 48,
+        "image_width_m": 40,
+        "image_margin_bottom_d": 14,
+        "image_margin_bottom_m": 12,
+        "image_radius": 0,
+        "heading_font": "helvetica",
+        "heading_font_custom": "'Helvetica neue', sans-serif",
+        "heading_weight": "400",
+        "heading_color": "#ffffff",
+        "em_color": "#ffffff",
+        "em_italic": true,
+        "heading_size_d": 46,
+        "heading_line_height_d": 115,
+        "heading_letter_spacing_d": -0.5,
+        "heading_align_d": "left",
+        "heading_max_width_d": 100,
+        "heading_margin_bottom_d": 40,
+        "heading_size_m": 26,
+        "heading_line_height_m": 120,
+        "heading_letter_spacing_m": -0.5,
+        "heading_align_m": "left",
+        "heading_max_width_m": 100,
+        "heading_margin_bottom_m": 20,
+        "sub_color": "#b9b9b9",
+        "sub_size_d": 15,
+        "sub_size_m": 14,
+        "sub_line_height": 155,
+        "sub_margin_top_d": 16,
+        "sub_margin_top_m": 12,
+        "sub_max_width_d": 100,
+        "sub_max_width_m": 100,
+        "body_font": "helvetica",
+        "body_font_custom": "'Helvetica neue', sans-serif",
+        "title_weight": "400",
+        "title_color": "#ffffff",
+        "title_uppercase": false,
+        "title_size_d": 26,
+        "title_size_m": 25,
+        "title_line_height": 120,
+        "title_letter_spacing": 0,
+        "title_margin_bottom_d": 12,
+        "title_margin_bottom_m": 10,
+        "text_weight": "400",
+        "text_color": "#e2e2e2",
+        "text_size_d": 13,
+        "text_size_m": 14,
+        "text_line_height_d": 150,
+        "text_line_height_m": 150,
+        "text_letter_spacing": 0
+      }
     }
   },
   "order": [
     "main",
     "form",
     "hero_v2s_mHhY3E",
-    "custom_experts_video_carousel_pU9Xn4"
+    "custom_experts_video_carousel_pU9Xn4",
+    "custom_quality_certificates_t6Aihc"
   ]
 }

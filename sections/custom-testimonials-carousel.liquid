@@ -1,0 +1,1982 @@
+{%- comment -%}
+  ============================================================================
+  SECCIÓN: Carrusel de testimonios
+  Tema: Dawn / Online Store 2.0
+  Ruta: sections/custom-testimonials-carousel.liquid
+
+  PC     -> título arriba a la izquierda. Debajo, tres tarjetas y media a todo
+            el ancho de la pantalla: foto arriba y panel gris con la cita, el
+            nombre y la profesión debajo. Puntos centrados al final.
+  Móvil  -> una tarjeta y la siguiente asomando por la derecha. Mismo orden
+            dentro de la tarjeta. Puntos centrados al final.
+
+  LOS PUNTOS CUENTAN PÁGINAS, NO TARJETAS.
+  En la captura de PC hay cuatro testimonios y solo dos puntos, porque se ven
+  tres de golpe: el carrusel avanza por grupos. En móvil se ve una tarjeta, así
+  que salen cuatro puntos. Es el mismo cálculo en los dos casos: se mira
+  cuántas tarjetas caben de verdad en el carril y se divide. Por eso se pintan
+  tantos puntos como bloques y el script esconde los que sobran, en vez de
+  intentar adivinar el número desde Liquid, que no sabe el ancho de la pantalla.
+
+  LAS ALTURAS SE IGUALAN SOLAS.
+  Las tarjetas son elementos flex que se estiran, y dentro de cada una el panel
+  de texto ocupa el hueco que queda. Con citas de distinta longitud las
+  tarjetas siguen midiendo lo mismo sin medir nada con JS.
+
+  EL RELLENO DEL CARRIL NECESITA scroll-padding.
+  En móvil el carril lleva un margen interior para que la tarjeta no toque el
+  borde. Sin `scroll-padding-inline`, el anclaje pegaría el borde de la tarjeta
+  al borde de la pantalla y ese margen se perdería al primer deslizamiento.
+  ============================================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign bp = s.mobile_breakpoint
+  assign bp_max = bp | minus: 1
+
+  case s.heading_font
+    when 'thin2'
+      assign heading_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign heading_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign heading_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign heading_stack = 'var(--font-body-family)'
+    else
+      assign heading_stack = s.heading_font_custom
+  endcase
+
+  case s.body_font
+    when 'thin2'
+      assign body_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign body_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign body_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign body_stack = 'var(--font-body-family)'
+    else
+      assign body_stack = s.body_font_custom
+  endcase
+
+  if s.content_max_width == 0
+    assign max_w = 'none'
+  else
+    assign max_w = s.content_max_width | append: 'px'
+  endif
+
+  if s.heading_max_width == 0
+    assign head_max_w = 'none'
+  else
+    assign head_max_w = s.heading_max_width | append: 'px'
+  endif
+
+  if s.em_italic
+    assign em_style = 'italic'
+  else
+    assign em_style = 'normal'
+  endif
+
+  if s.quote_italic
+    assign quote_style = 'italic'
+  else
+    assign quote_style = 'normal'
+  endif
+
+  # ------------------------------------------------------------------
+  # Ancho de la tarjeta en PC: se reparte el carril entre las tarjetas que se
+  # quieren ver, descontando los huecos. Así el número de tarjetas por pantalla
+  # es un ajuste y no un ancho fijo que hay que recalcular a mano.
+  # ------------------------------------------------------------------
+  assign per_view = s.cards_per_view_d
+  assign gaps_d = per_view | minus: 1 | times: s.card_gap_d
+  assign card_w_d = 'calc((100% - ' | append: gaps_d | append: 'px) / ' | append: per_view | append: ')'
+  assign card_w_m = s.card_width_m | append: 'vw'
+
+  # ------------------------------------------------------------------
+  # Relleno del título. Ver nota de cabecera: el carrusel va a sangre, así que
+  # el título lleva su propio margen lateral en vez de heredar el de la sección.
+  # ------------------------------------------------------------------
+  assign arrows_d = false
+  assign dots_d = false
+  case s.nav_d
+    when 'arrows'
+      assign arrows_d = true
+    when 'dots'
+      assign dots_d = true
+    when 'arrows_dots'
+      assign arrows_d = true
+      assign dots_d = true
+  endcase
+
+  assign arrows_m = false
+  assign dots_m = false
+  case s.nav_m
+    when 'arrows'
+      assign arrows_m = true
+    when 'dots'
+      assign dots_m = true
+    when 'arrows_dots'
+      assign arrows_m = true
+      assign dots_m = true
+  endcase
+-%}
+
+{%- style -%}
+  @font-face {
+    font-family: 'Helvetica neue';
+    src: url('{{ 'HelveticaNeueCyr-Light.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'thin2';
+    src: url('{{ 'lawrence-regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ================= Variables: PC ================= */
+  .ztes-{{ section.id }} {
+    --zt-bg: {{ s.bg_color }};
+    --zt-max-w: {{ max_w }};
+    --zt-pt: {{ s.padding_top_d }}px;
+    --zt-pb: {{ s.padding_bottom_d }}px;
+
+    --zt-h-font: {{ heading_stack }};
+    --zt-h-size: {{ s.heading_size_d }}px;
+    --zt-h-lh: {{ s.heading_line_height_d | divided_by: 100.0 }};
+    --zt-h-ls: {{ s.heading_letter_spacing_d }}px;
+    --zt-h-weight: {{ s.heading_weight }};
+    --zt-h-color: {{ s.heading_color }};
+    --zt-h-align: {{ s.heading_align_d }};
+    --zt-h-max-w: {{ head_max_w }};
+    --zt-h-px: {{ s.heading_padding_x_d }}px;
+    --zt-h-mb: {{ s.heading_margin_bottom_d }}px;
+    --zt-h-grad: linear-gradient({{ s.heading_gradient_angle }}deg, {{ s.heading_gradient_1 }} 0%, {{ s.heading_gradient_2 }} {{ s.heading_gradient_mid }}%, {{ s.heading_gradient_3 }} 100%);
+    --zt-em-color: {{ s.em_color }};
+    --zt-em-style: {{ em_style }};
+
+    --zt-b-font: {{ body_stack }};
+
+    --zt-card-w: {{ card_w_d }};
+    --zt-gap: {{ s.card_gap_d }}px;
+    --zt-track-px: {{ s.track_padding_x_d }}px;
+
+    --zt-card-bg: {{ s.card_bg }};
+    --zt-card-radius: {{ s.card_radius_d }}px;
+    --zt-card-border: {{ s.card_border_color }};
+    --zt-card-border-w: {{ s.card_border_width }}px;
+    --zt-card-align: {{ s.card_align_d }};
+    --zt-card-justify: {{ s.card_justify }};
+
+    --zt-img-ar: {{ s.image_ratio_d | divided_by: 100.0 }};
+    --zt-img-fit: {{ s.image_fit }};
+    --zt-img-pos: {{ s.image_position }};
+    --zt-img-bg: {{ s.image_bg }};
+
+    --zt-body-px: {{ s.body_padding_x_d }}px;
+    --zt-body-py: {{ s.body_padding_y_d }}px;
+
+    --zt-q-size: {{ s.quote_size_d }}px;
+    --zt-q-lh: {{ s.quote_line_height_d | divided_by: 100.0 }};
+    --zt-q-weight: {{ s.quote_weight }};
+    --zt-q-style: {{ quote_style }};
+    --zt-q-color: {{ s.quote_color }};
+
+    --zt-n-size: {{ s.name_size_d }}px;
+    --zt-n-lh: {{ s.name_line_height | divided_by: 100.0 }};
+    --zt-n-weight: {{ s.name_weight }};
+    --zt-n-color: {{ s.name_color }};
+    --zt-n-mt: {{ s.name_margin_top_d }}px;
+
+    --zt-r-size: {{ s.role_size_d }}px;
+    --zt-r-lh: {{ s.role_line_height | divided_by: 100.0 }};
+    --zt-r-weight: {{ s.role_weight }};
+    --zt-r-color: {{ s.role_color }};
+    --zt-r-mt: {{ s.role_margin_top_d }}px;
+
+    --zt-arrow-size: {{ s.arrow_size_d }}px;
+    --zt-arrow-icon: {{ s.arrow_icon_size_d }}px;
+    --zt-arrow-stroke: {{ s.arrow_stroke }};
+    --zt-arrow-color: {{ s.arrow_color }};
+    --zt-arrow-color-hover: {{ s.arrow_color_hover }};
+    --zt-arrow-bg: {{ s.arrow_bg }};
+    --zt-arrow-bg-hover: {{ s.arrow_bg_hover }};
+    --zt-arrow-border: {{ s.arrow_border_color }};
+    --zt-arrow-border-w: {{ s.arrow_border_width }}px;
+    --zt-arrow-inset: {{ s.arrow_inset_d }}px;
+    --zt-arrow-top: {{ s.arrow_top_d }}%;
+
+    --zt-dot-size: {{ s.dot_size }}px;
+    --zt-dot-size-active: {{ s.dot_size_active }}px;
+    --zt-dot-gap: {{ s.dot_gap }}px;
+    --zt-dot-color: {{ s.dot_color }};
+    --zt-dot-color-active: {{ s.dot_color_active }};
+    --zt-dots-mt: {{ s.dots_margin_top_d }}px;
+
+    --zt-anim: {{ s.transition_ms }}ms;
+  }
+
+  /* ================= Estructura ================= */
+  .ztes {
+    background-color: var(--zt-bg);
+    /* El carrusel se sale a todo el ancho: este recorte evita la barra de
+       scroll horizontal en la página. */
+    overflow-x: hidden;
+    overflow-x: clip;
+  }
+
+  .ztes__inner {
+    display: block;
+    max-width: var(--zt-max-w);
+    margin-inline: auto;
+    padding-block: var(--zt-pt) var(--zt-pb);
+    box-sizing: border-box;
+  }
+
+  /* ================= Título ================= */
+  .ztes__head {
+    max-width: var(--zt-h-max-w);
+    margin: 0 auto var(--zt-h-mb);
+    padding-inline: var(--zt-h-px);
+    box-sizing: border-box;
+  }
+
+  .ztes__heading {
+    margin: 0;
+    font-family: var(--zt-h-font);
+    font-size: var(--zt-h-size);
+    font-weight: var(--zt-h-weight);
+    line-height: var(--zt-h-lh);
+    letter-spacing: var(--zt-h-ls);
+    text-align: var(--zt-h-align);
+    color: var(--zt-h-color);
+  }
+
+  /* Relleno degradado. El color plano queda debajo como respaldo para
+     navegadores que no recorten el fondo al texto. */
+  .ztes__heading--grad {
+    background-image: var(--zt-h-grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .ztes__heading em,
+  .ztes__heading i {
+    font-style: var(--zt-em-style);
+    color: var(--zt-em-color);
+  }
+
+  .ztes__heading--grad em,
+  .ztes__heading--grad i {
+    color: inherit;
+  }
+
+  /* ================= Marco y carril ================= */
+  .ztes__viewport {
+    position: relative;
+  }
+
+  .ztes__viewport--bleed {
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+  }
+
+  .ztes__track {
+    display: flex;
+    align-items: stretch;
+    gap: var(--zt-gap);
+    padding-inline: var(--zt-track-px);
+    /* Ver nota de cabecera: sin esto el anclaje se come el relleno. */
+    scroll-padding-inline: var(--zt-track-px);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ztes__track::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  /* ================= Tarjeta ================= */
+  .ztes__card {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 var(--zt-card-w);
+    max-width: 100%;
+    box-sizing: border-box;
+    border: var(--zt-card-border-w) solid var(--zt-card-border);
+    border-radius: var(--zt-card-radius);
+    background-color: var(--zt-card-bg);
+    /* Recorta la foto al redondeo de la tarjeta. */
+    overflow: hidden;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  .ztes__media {
+    position: relative;
+    aspect-ratio: var(--zt-img-ar);
+    background-color: var(--zt-img-bg);
+    flex: 0 0 auto;
+  }
+
+  .ztes__media img,
+  .ztes__media > svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: var(--zt-img-fit);
+    object-position: var(--zt-img-pos);
+  }
+
+  /* El panel se queda el hueco que sobra: es lo que iguala las alturas. */
+  .ztes__body {
+    display: flex;
+    flex-direction: column;
+    justify-content: var(--zt-card-justify);
+    flex: 1 1 auto;
+    padding: var(--zt-body-py) var(--zt-body-px);
+    text-align: var(--zt-card-align);
+  }
+
+  .ztes__quote {
+    font-family: var(--zt-b-font);
+    font-size: var(--zt-q-size);
+    font-weight: var(--zt-q-weight);
+    font-style: var(--zt-q-style);
+    line-height: var(--zt-q-lh);
+    color: var(--zt-q-color);
+  }
+
+  .ztes__quote > * {
+    margin: 0;
+  }
+
+  .ztes__quote > * + * {
+    margin-top: 0.7em;
+  }
+
+  .ztes__quote p:empty {
+    display: none;
+  }
+
+  .ztes__name {
+    margin: var(--zt-n-mt) 0 0;
+    font-family: var(--zt-b-font);
+    font-size: var(--zt-n-size);
+    font-weight: var(--zt-n-weight);
+    line-height: var(--zt-n-lh);
+    color: var(--zt-n-color);
+  }
+
+  .ztes__role {
+    margin: var(--zt-r-mt) 0 0;
+    font-family: var(--zt-b-font);
+    font-size: var(--zt-r-size);
+    font-weight: var(--zt-r-weight);
+    line-height: var(--zt-r-lh);
+    color: var(--zt-r-color);
+  }
+
+  /* ================= Flechas ================= */
+  .ztes__arrow {
+    position: absolute;
+    top: var(--zt-arrow-top);
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--zt-arrow-size);
+    height: var(--zt-arrow-size);
+    padding: 0;
+    border: var(--zt-arrow-border-w) solid var(--zt-arrow-border);
+    border-radius: 50%;
+    background-color: var(--zt-arrow-bg);
+    color: var(--zt-arrow-color);
+    cursor: pointer;
+    transform: translateY(-50%);
+    transition: background-color var(--zt-anim) ease, color var(--zt-anim) ease,
+      opacity var(--zt-anim) ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .ztes__arrow--prev { left: var(--zt-arrow-inset); }
+  .ztes__arrow--next { right: var(--zt-arrow-inset); }
+
+  .ztes__arrow:hover {
+    background-color: var(--zt-arrow-bg-hover);
+    color: var(--zt-arrow-color-hover);
+  }
+
+  .ztes__arrow:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+
+  .ztes__arrow[disabled] {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  .ztes__arrow svg {
+    width: var(--zt-arrow-icon);
+    height: var(--zt-arrow-icon);
+    display: block;
+  }
+
+  .ztes__arrow svg path {
+    stroke: currentColor;
+    stroke-width: var(--zt-arrow-stroke);
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ================= Puntos ================= */
+  .ztes__dots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--zt-dot-gap);
+    margin-top: var(--zt-dots-mt);
+  }
+
+  .ztes__dot {
+    width: var(--zt-dot-size);
+    height: var(--zt-dot-size);
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background-color: var(--zt-dot-color);
+    cursor: pointer;
+    transition: background-color var(--zt-anim) ease, width var(--zt-anim) ease,
+      height var(--zt-anim) ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .ztes__dot[aria-current='true'] {
+    width: var(--zt-dot-size-active);
+    height: var(--zt-dot-size-active);
+    background-color: var(--zt-dot-color-active);
+  }
+
+  .ztes__dot:focus-visible {
+    outline: 2px solid var(--zt-dot-color-active);
+    outline-offset: 3px;
+  }
+
+  /* Puntos que sobran porque hay menos páginas que bloques. */
+  .ztes__dot[hidden] {
+    display: none;
+  }
+
+  /* ================= Visibilidad por dispositivo: PC ================= */
+  @media screen and (min-width: {{ bp }}px) {
+    .ztes-{{ section.id }} .ztes__arrow { display: {% if arrows_d %}flex{% else %}none{% endif %} !important; }
+    .ztes-{{ section.id }} .ztes__dots  { display: {% if dots_d %}flex{% else %}none{% endif %} !important; }
+  }
+
+  /* ================= Móvil ================= */
+  @media screen and (max-width: {{ bp_max }}px) {
+    .ztes-{{ section.id }} {
+      --zt-max-w: none;
+      --zt-pt: {{ s.padding_top_m }}px;
+      --zt-pb: {{ s.padding_bottom_m }}px;
+
+      --zt-h-size: {{ s.heading_size_m }}px;
+      --zt-h-lh: {{ s.heading_line_height_m | divided_by: 100.0 }};
+      --zt-h-ls: {{ s.heading_letter_spacing_m }}px;
+      --zt-h-align: {{ s.heading_align_m }};
+      --zt-h-max-w: none;
+      --zt-h-px: {{ s.heading_padding_x_m }}px;
+      --zt-h-mb: {{ s.heading_margin_bottom_m }}px;
+
+      --zt-card-w: {{ card_w_m }};
+      --zt-gap: {{ s.card_gap_m }}px;
+      --zt-track-px: {{ s.track_padding_x_m }}px;
+
+      --zt-card-radius: {{ s.card_radius_m }}px;
+      --zt-card-align: {{ s.card_align_m }};
+
+      --zt-img-ar: {{ s.image_ratio_m | divided_by: 100.0 }};
+
+      --zt-body-px: {{ s.body_padding_x_m }}px;
+      --zt-body-py: {{ s.body_padding_y_m }}px;
+
+      --zt-q-size: {{ s.quote_size_m }}px;
+      --zt-q-lh: {{ s.quote_line_height_m | divided_by: 100.0 }};
+
+      --zt-n-size: {{ s.name_size_m }}px;
+      --zt-n-mt: {{ s.name_margin_top_m }}px;
+
+      --zt-r-size: {{ s.role_size_m }}px;
+      --zt-r-mt: {{ s.role_margin_top_m }}px;
+
+      --zt-arrow-size: {{ s.arrow_size_m }}px;
+      --zt-arrow-icon: {{ s.arrow_icon_size_m }}px;
+      --zt-arrow-inset: {{ s.arrow_inset_m }}px;
+      --zt-arrow-top: {{ s.arrow_top_m }}%;
+
+      --zt-dots-mt: {{ s.dots_margin_top_m }}px;
+    }
+
+    .ztes-{{ section.id }} .ztes__arrow { display: {% if arrows_m %}flex{% else %}none{% endif %} !important; }
+    .ztes-{{ section.id }} .ztes__dots  { display: {% if dots_m %}flex{% else %}none{% endif %} !important; }
+  }
+
+  /* Cuando cabe todo de una vez no hay nada que navegar. La clase la pone el
+     script y gana a las reglas de arriba por especificidad. */
+  .ztes-{{ section.id }}.is-single-page .ztes__dots,
+  .ztes-{{ section.id }}.is-single-page .ztes__arrow {
+    display: none !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ztes-{{ section.id }} { --zt-anim: 1ms; }
+    .ztes-{{ section.id }} .ztes__track { scroll-behavior: auto; }
+  }
+{%- endstyle -%}
+
+<div class="ztes ztes-{{ section.id }}"{% if s.anchor_id != blank %} id="{{ s.anchor_id | handle }}"{% endif %}>
+  <zzen-testimonials
+    class="ztes__inner"
+    data-arrow-step="{{ s.arrow_step }}"
+  >
+    {%- if s.heading != blank -%}
+      <div class="ztes__head">
+        <{{ s.heading_tag }} class="ztes__heading{% if s.heading_fill == 'gradient' %} ztes__heading--grad{% endif %}">
+          {{- s.heading | newline_to_br -}}
+        </{{ s.heading_tag }}>
+      </div>
+    {%- endif -%}
+
+    <div class="ztes__viewport{% if s.full_bleed %} ztes__viewport--bleed{% endif %}">
+      <div
+        class="ztes__track"
+        data-zt-track
+        tabindex="0"
+        role="group"
+        aria-label="{{ s.carousel_label | escape }}"
+      >
+        {%- for block in section.blocks -%}
+          {%- assign b = block.settings -%}
+          <article class="ztes__card" data-zt-card {{ block.shopify_attributes }}>
+            <div class="ztes__media">
+              {%- if b.image != blank -%}
+                <img
+                  src="{{ b.image | image_url: width: 900 }}"
+                  srcset="
+                    {{ b.image | image_url: width: 400 }} 400w,
+                    {{ b.image | image_url: width: 700 }} 700w,
+                    {{ b.image | image_url: width: 900 }} 900w,
+                    {{ b.image | image_url: width: 1200 }} 1200w
+                  "
+                  sizes="(min-width: {{ bp }}px) {{ 100 | divided_by: s.cards_per_view_d }}vw, {{ s.card_width_m }}vw"
+                  width="{{ b.image.width }}"
+                  height="{{ b.image.height }}"
+                  alt="{{ b.image.alt | default: b.name | escape }}"
+                  loading="{% if forloop.index <= 3 %}eager{% else %}lazy{% endif %}"
+                  decoding="async"
+                >
+              {%- else -%}
+                {{ 'image' | placeholder_svg_tag }}
+              {%- endif -%}
+            </div>
+
+            <div class="ztes__body">
+              {%- if b.quote != blank -%}
+                <div class="ztes__quote">{{ b.quote }}</div>
+              {%- endif -%}
+              {%- if b.name != blank -%}
+                <{{ s.name_tag }} class="ztes__name">{{ b.name }}</{{ s.name_tag }}>
+              {%- endif -%}
+              {%- if b.role != blank -%}
+                <div class="ztes__role">{{ b.role }}</div>
+              {%- endif -%}
+            </div>
+          </article>
+        {%- endfor -%}
+      </div>
+
+      <button
+        type="button"
+        class="ztes__arrow ztes__arrow--prev"
+        data-zt-prev
+        aria-label="{{ s.arrow_prev_label | escape }}"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M14.5 4.5 7.5 12l7 7.5"></path>
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="ztes__arrow ztes__arrow--next"
+        data-zt-next
+        aria-label="{{ s.arrow_next_label | escape }}"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M9.5 4.5 16.5 12l-7 7.5"></path>
+        </svg>
+      </button>
+    </div>
+
+    {%- comment -%}
+      Se pinta un punto por bloque y el script esconde los que sobran. Ver la
+      nota de la cabecera del archivo.
+    {%- endcomment -%}
+    <div class="ztes__dots" role="tablist" aria-label="{{ s.dots_label | escape }}">
+      {%- for block in section.blocks -%}
+        <button
+          type="button"
+          class="ztes__dot"
+          data-zt-dot
+          role="tab"
+          aria-current="false"
+          aria-label="{{ s.dot_label_prefix | escape }} {{ forloop.index }}"
+        ></button>
+      {%- endfor -%}
+    </div>
+  </zzen-testimonials>
+</div>
+
+<script>
+  if (!customElements.get('zzen-testimonials')) {
+    customElements.define(
+      'zzen-testimonials',
+      class ZzenTestimonials extends HTMLElement {
+        connectedCallback() {
+          this.root = this.closest('.ztes') || this;
+          this.track = this.querySelector('[data-zt-track]');
+          this.cards = Array.from(this.querySelectorAll('[data-zt-card]'));
+          this.dots = Array.from(this.querySelectorAll('[data-zt-dot]'));
+          this.prevBtn = this.querySelector('[data-zt-prev]');
+          this.nextBtn = this.querySelector('[data-zt-next]');
+          if (!this.track || this.cards.length === 0) return;
+
+          this.byCard = this.dataset.arrowStep === 'card';
+          this.page = -1;
+
+          this.onScroll = this.onScroll.bind(this);
+          this.track.addEventListener('scroll', this.onScroll, { passive: true });
+
+          if (this.prevBtn) this.prevBtn.addEventListener('click', () => this.move(-1));
+          if (this.nextBtn) this.nextBtn.addEventListener('click', () => this.move(1));
+          this.dots.forEach((dot, i) => dot.addEventListener('click', () => this.goToPage(i)));
+
+          // El ancho de la tarjeta cambia al girar el móvil o al redimensionar,
+          // y con él cuántas caben: hay que recontar las páginas.
+          if ('ResizeObserver' in window) {
+            this.ro = new ResizeObserver(() => this.update());
+            this.ro.observe(this.track);
+          } else {
+            this._onResize = () => this.update();
+            window.addEventListener('resize', this._onResize);
+          }
+
+          // Editor de temas: al seleccionar un bloque se trae a la vista.
+          this.addEventListener('shopify:block:select', (e) => {
+            const card = e.target.closest('[data-zt-card]');
+            const i = this.cards.indexOf(card);
+            if (i > -1) this.goToCard(i);
+          });
+
+          this.update();
+          // Las fuentes y las imágenes cambian los altos: un repaso al final.
+          requestAnimationFrame(() => this.update());
+        }
+
+        disconnectedCallback() {
+          if (this.ro) this.ro.disconnect();
+          if (this._onResize) window.removeEventListener('resize', this._onResize);
+        }
+
+        // Cuántas tarjetas caben de verdad ahora mismo, y en cuántas páginas
+        // se reparten. Todo sale del layout, nada está escrito a mano.
+        metrics() {
+          const cs = getComputedStyle(this.track);
+          const pad = parseFloat(cs.paddingInlineStart || cs.paddingLeft) || 0;
+          const gap = parseFloat(cs.columnGap || cs.gap) || 0;
+          const cardW = this.cards[0].offsetWidth;
+          const step = cardW + gap;
+          const visible = this.track.clientWidth - pad * 2;
+          const perView = Math.max(1, Math.round((visible + gap) / step));
+          const pages = Math.ceil(this.cards.length / perView);
+          const maxScroll = Math.max(this.track.scrollWidth - this.track.clientWidth, 0);
+          return { pad: pad, perView: perView, pages: pages, maxScroll: maxScroll };
+        }
+
+        // Posición de scroll de una página. La última se topa con el final del
+        // carril, así que se recorta: si no, el punto activo se quedaría corto.
+        pageLeft(p, m) {
+          const card = this.cards[Math.min(p * m.perView, this.cards.length - 1)];
+          const left = card.offsetLeft - m.pad;
+          return Math.max(0, Math.min(left, m.maxScroll));
+        }
+
+        move(dir) {
+          const m = this.metrics();
+          if (this.byCard) {
+            const i = Math.min(Math.max(this.nearestCard(m) + dir, 0), this.cards.length - 1);
+            this.goToCard(i);
+            return;
+          }
+          this.goToPage(Math.min(Math.max(this.page + dir, 0), m.pages - 1));
+        }
+
+        goToPage(p, behavior) {
+          const m = this.metrics();
+          if (p < 0 || p > m.pages - 1) return;
+          this.track.scrollTo({ left: this.pageLeft(p, m), behavior: behavior || 'smooth' });
+        }
+
+        goToCard(i, behavior) {
+          const card = this.cards[i];
+          if (!card) return;
+          const m = this.metrics();
+          const left = Math.max(0, Math.min(card.offsetLeft - m.pad, m.maxScroll));
+          this.track.scrollTo({ left: left, behavior: behavior || 'smooth' });
+        }
+
+        nearestCard(m) {
+          const x = this.track.scrollLeft;
+          let best = 0;
+          let dist = Infinity;
+          this.cards.forEach((card, i) => {
+            const d = Math.abs(card.offsetLeft - m.pad - x);
+            if (d < dist) {
+              dist = d;
+              best = i;
+            }
+          });
+          return best;
+        }
+
+        onScroll() {
+          if (this._raf) return;
+          this._raf = requestAnimationFrame(() => {
+            this._raf = null;
+            this.update();
+          });
+        }
+
+        update() {
+          const m = this.metrics();
+
+          // Se esconden los puntos que sobran y, si todo cabe de una vez, se
+          // apaga la navegación entera.
+          this.dots.forEach((dot, i) => {
+            if (i < m.pages) dot.removeAttribute('hidden');
+            else dot.setAttribute('hidden', '');
+          });
+          this.root.classList.toggle('is-single-page', m.pages <= 1);
+
+          const x = this.track.scrollLeft;
+          let active = 0;
+          let dist = Infinity;
+          for (let p = 0; p < m.pages; p++) {
+            const d = Math.abs(this.pageLeft(p, m) - x);
+            if (d < dist) {
+              dist = d;
+              active = p;
+            }
+          }
+
+          if (active !== this.page) {
+            this.page = active;
+            this.dots.forEach((dot, i) =>
+              dot.setAttribute('aria-current', i === active ? 'true' : 'false')
+            );
+          }
+
+          if (this.prevBtn) this.prevBtn.disabled = x <= 1;
+          if (this.nextBtn) this.nextBtn.disabled = x >= m.maxScroll - 1;
+        }
+      }
+    );
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Carrusel de testimonios",
+  "tag": "section",
+  "class": "section-ztes",
+  "max_blocks": 16,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Título"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Título",
+      "info": "Enter para salto de línea. Envuelve una palabra en <em>así</em> para el acento.",
+      "default": "Testimonios"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Etiqueta HTML del título (SEO)",
+      "options": [
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "div", "label": "div (sin peso SEO)" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "select",
+      "id": "name_tag",
+      "label": "Etiqueta HTML del nombre",
+      "options": [
+        { "value": "h3", "label": "H3" },
+        { "value": "h4", "label": "H4" },
+        { "value": "div", "label": "div (sin peso SEO)" }
+      ],
+      "default": "h3"
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Ancla de la sección",
+      "info": "Opcional. Si escribes 'testimonios' podrás enlazar aquí con #testimonios."
+    },
+
+    {
+      "type": "header",
+      "content": "Diseño general"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "mobile_breakpoint",
+      "min": 480,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "label": "Punto de cambio a móvil",
+      "default": 750
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 0,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "label": "Ancho máximo del contenido",
+      "info": "0 = ancho completo. No afecta al carrusel si está a sangre.",
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "full_bleed",
+      "label": "El carrusel ocupa todo el ancho de la pantalla",
+      "info": "Así las tarjetas se cortan en los bordes, como en el original.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "transition_ms",
+      "min": 0,
+      "max": 900,
+      "step": 25,
+      "unit": "ms",
+      "label": "Duración de las transiciones",
+      "default": 250
+    },
+    {
+      "type": "range",
+      "id": "padding_top_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding superior — PC",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding inferior — PC",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_top_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding superior — Móvil",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding inferior — Móvil",
+      "default": 24
+    },
+
+    {
+      "type": "header",
+      "content": "Carrusel"
+    },
+    {
+      "type": "text",
+      "id": "carousel_label",
+      "label": "Texto accesible del carrusel",
+      "default": "Testimonios de clientes"
+    },
+    {
+      "type": "range",
+      "id": "cards_per_view_d",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "label": "Tarjetas a la vista — PC",
+      "info": "El ancho de la tarjeta se calcula solo a partir de este número.",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "card_gap_d",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre tarjetas — PC",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "track_padding_x_d",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen lateral del carril — PC",
+      "info": "0 = las tarjetas empiezan pegadas al borde de la pantalla.",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "card_width_m",
+      "min": 50,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho de la tarjeta — Móvil",
+      "info": "Porcentaje del ancho de la pantalla. Menos de 100 deja asomar la siguiente.",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "card_gap_m",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre tarjetas — Móvil",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "track_padding_x_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen lateral del carril — Móvil",
+      "default": 16
+    },
+
+    {
+      "type": "header",
+      "content": "Tarjeta"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Fondo del panel de texto",
+      "default": "#f3f2f0"
+    },
+    {
+      "type": "color",
+      "id": "card_border_color",
+      "label": "Color del borde",
+      "default": "#00000000"
+    },
+    {
+      "type": "range",
+      "id": "card_border_width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor del borde",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "card_radius_d",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo — PC",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "card_radius_m",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo — Móvil",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "body_padding_x_d",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen interior lateral del panel — PC",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "body_padding_y_d",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen interior arriba y abajo del panel — PC",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "body_padding_x_m",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen interior lateral del panel — Móvil",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "body_padding_y_m",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen interior arriba y abajo del panel — Móvil",
+      "default": 20
+    },
+    {
+      "type": "select",
+      "id": "card_align_d",
+      "label": "Alineación del texto — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "card_align_m",
+      "label": "Alineación del texto — Móvil",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "card_justify",
+      "label": "Reparto vertical del panel",
+      "info": "Con 'separado', el nombre se pega al fondo de la tarjeta aunque las citas midan distinto.",
+      "options": [
+        { "value": "flex-start", "label": "Todo arriba" },
+        { "value": "space-between", "label": "Separado (cita arriba, nombre abajo)" }
+      ],
+      "default": "flex-start"
+    },
+
+    {
+      "type": "header",
+      "content": "Foto"
+    },
+    {
+      "type": "range",
+      "id": "image_ratio_d",
+      "min": 40,
+      "max": 220,
+      "step": 2,
+      "unit": "%",
+      "label": "Proporción ancho/alto — PC",
+      "info": "100 % = cuadrada. Más de 100 = apaisada.",
+      "default": 132
+    },
+    {
+      "type": "range",
+      "id": "image_ratio_m",
+      "min": 40,
+      "max": 220,
+      "step": 2,
+      "unit": "%",
+      "label": "Proporción ancho/alto — Móvil",
+      "default": 128
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "Ajuste de la foto",
+      "options": [
+        { "value": "cover", "label": "Rellenar (recorta)" },
+        { "value": "contain", "label": "Entera (sin recortar)" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Zona visible al recortar",
+      "options": [
+        { "value": "center", "label": "Centro" },
+        { "value": "top", "label": "Arriba" },
+        { "value": "bottom", "label": "Abajo" },
+        { "value": "left", "label": "Izquierda" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "color",
+      "id": "image_bg",
+      "label": "Fondo del hueco de la foto",
+      "default": "#e8e6e1"
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía de la cita"
+    },
+    {
+      "type": "select",
+      "id": "body_font",
+      "label": "Fuente de todos los textos de la tarjeta",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "body_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "select",
+      "id": "quote_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "checkbox",
+      "id": "quote_italic",
+      "label": "Cita en cursiva",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "quote_color",
+      "label": "Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "range",
+      "id": "quote_size_d",
+      "min": 10,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "quote_size_m",
+      "min": 9,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "quote_line_height_d",
+      "min": 100,
+      "max": 240,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado — PC",
+      "default": 160
+    },
+    {
+      "type": "range",
+      "id": "quote_line_height_m",
+      "min": 100,
+      "max": 240,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado — Móvil",
+      "default": 155
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía del nombre"
+    },
+    {
+      "type": "select",
+      "id": "name_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "700"
+    },
+    {
+      "type": "color",
+      "id": "name_color",
+      "label": "Color",
+      "default": "#111111"
+    },
+    {
+      "type": "range",
+      "id": "name_size_d",
+      "min": 12,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 19
+    },
+    {
+      "type": "range",
+      "id": "name_size_m",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "name_line_height",
+      "min": 100,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado",
+      "default": 130
+    },
+    {
+      "type": "range",
+      "id": "name_margin_top_d",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con la cita — PC",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "name_margin_top_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con la cita — Móvil",
+      "default": 16
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía de la profesión"
+    },
+    {
+      "type": "select",
+      "id": "role_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "role_color",
+      "label": "Color",
+      "default": "#5a5a5a"
+    },
+    {
+      "type": "range",
+      "id": "role_size_d",
+      "min": 9,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "role_size_m",
+      "min": 9,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "role_line_height",
+      "min": 100,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado",
+      "default": 140
+    },
+    {
+      "type": "range",
+      "id": "role_margin_top_d",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con el nombre — PC",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "role_margin_top_m",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con el nombre — Móvil",
+      "default": 4
+    },
+
+    {
+      "type": "header",
+      "content": "Navegación"
+    },
+    {
+      "type": "select",
+      "id": "nav_d",
+      "label": "Controles — PC",
+      "options": [
+        { "value": "dots", "label": "Solo puntos" },
+        { "value": "arrows", "label": "Solo flechas" },
+        { "value": "arrows_dots", "label": "Flechas + puntos" },
+        { "value": "none", "label": "Ninguno" }
+      ],
+      "default": "dots"
+    },
+    {
+      "type": "select",
+      "id": "nav_m",
+      "label": "Controles — Móvil",
+      "options": [
+        { "value": "dots", "label": "Solo puntos" },
+        { "value": "none", "label": "Ninguno (solo deslizar)" },
+        { "value": "arrows", "label": "Solo flechas" },
+        { "value": "arrows_dots", "label": "Flechas + puntos" }
+      ],
+      "default": "dots"
+    },
+    {
+      "type": "select",
+      "id": "arrow_step",
+      "label": "Las flechas avanzan",
+      "options": [
+        { "value": "page", "label": "Una página (el grupo visible)" },
+        { "value": "card", "label": "Una tarjeta" }
+      ],
+      "default": "page"
+    },
+
+    {
+      "type": "header",
+      "content": "Flechas"
+    },
+    {
+      "type": "text",
+      "id": "arrow_prev_label",
+      "label": "Texto accesible de la flecha izquierda",
+      "default": "Anterior"
+    },
+    {
+      "type": "text",
+      "id": "arrow_next_label",
+      "label": "Texto accesible de la flecha derecha",
+      "default": "Siguiente"
+    },
+    {
+      "type": "color",
+      "id": "arrow_color",
+      "label": "Color del icono",
+      "default": "#2b2b2b"
+    },
+    {
+      "type": "color",
+      "id": "arrow_color_hover",
+      "label": "Color del icono al pasar el ratón",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "arrow_bg",
+      "label": "Fondo del círculo",
+      "default": "#f0efec"
+    },
+    {
+      "type": "color",
+      "id": "arrow_bg_hover",
+      "label": "Fondo al pasar el ratón",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "arrow_border_color",
+      "label": "Color del borde",
+      "default": "#00000000"
+    },
+    {
+      "type": "range",
+      "id": "arrow_border_width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor del borde",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "arrow_size_d",
+      "min": 24,
+      "max": 90,
+      "step": 1,
+      "unit": "px",
+      "label": "Diámetro — PC",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "arrow_size_m",
+      "min": 24,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "label": "Diámetro — Móvil",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "arrow_icon_size_d",
+      "min": 8,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del icono — PC",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "arrow_icon_size_m",
+      "min": 8,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del icono — Móvil",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "arrow_stroke",
+      "min": 0.5,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Grosor del trazo",
+      "default": 1.8
+    },
+    {
+      "type": "range",
+      "id": "arrow_inset_d",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Distancia al borde de la pantalla — PC",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "arrow_inset_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Distancia al borde de la pantalla — Móvil",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "arrow_top_d",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Altura de las flechas — PC",
+      "info": "Porcentaje desde arriba del carrusel.",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "arrow_top_m",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Altura de las flechas — Móvil",
+      "default": 34
+    },
+
+    {
+      "type": "header",
+      "content": "Puntos"
+    },
+    {
+      "type": "text",
+      "id": "dots_label",
+      "label": "Texto accesible del grupo de puntos",
+      "default": "Ir al testimonio"
+    },
+    {
+      "type": "text",
+      "id": "dot_label_prefix",
+      "label": "Texto accesible de cada punto",
+      "info": "Se le añade el número detrás.",
+      "default": "Página"
+    },
+    {
+      "type": "color",
+      "id": "dot_color",
+      "label": "Color del punto inactivo",
+      "default": "#d3d3d3"
+    },
+    {
+      "type": "color",
+      "id": "dot_color_active",
+      "label": "Color del punto activo",
+      "default": "#111111"
+    },
+    {
+      "type": "range",
+      "id": "dot_size",
+      "min": 3,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del punto inactivo",
+      "default": 7
+    },
+    {
+      "type": "range",
+      "id": "dot_size_active",
+      "min": 3,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del punto activo",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "dot_gap",
+      "min": 2,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre puntos",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "dots_margin_top_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación con el carrusel — PC",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "dots_margin_top_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación con el carrusel — Móvil",
+      "default": 18
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía del título de sección"
+    },
+    {
+      "type": "select",
+      "id": "heading_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "thin2"
+    },
+    {
+      "type": "text",
+      "id": "heading_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'thin2', Georgia, serif"
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "200", "label": "200" },
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "heading_fill",
+      "label": "Relleno del título",
+      "info": "El degradado necesita los tres colores de abajo.",
+      "options": [
+        { "value": "solid", "label": "Color plano" },
+        { "value": "gradient", "label": "Degradado" }
+      ],
+      "default": "solid"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color (relleno plano)",
+      "default": "#2b2b2b"
+    },
+    {
+      "type": "color",
+      "id": "heading_gradient_1",
+      "label": "Degradado: color inicial",
+      "default": "#2f2b28"
+    },
+    {
+      "type": "color",
+      "id": "heading_gradient_2",
+      "label": "Degradado: color intermedio",
+      "default": "#97754a"
+    },
+    {
+      "type": "color",
+      "id": "heading_gradient_3",
+      "label": "Degradado: color final",
+      "default": "#3c3730"
+    },
+    {
+      "type": "range",
+      "id": "heading_gradient_mid",
+      "min": 5,
+      "max": 95,
+      "step": 5,
+      "unit": "%",
+      "label": "Degradado: posición del color intermedio",
+      "default": 55
+    },
+    {
+      "type": "range",
+      "id": "heading_gradient_angle",
+      "min": 0,
+      "max": 360,
+      "step": 5,
+      "unit": "°",
+      "label": "Degradado: ángulo",
+      "default": 90
+    },
+    {
+      "type": "color",
+      "id": "em_color",
+      "label": "Color del acento <em>",
+      "default": "#97754a"
+    },
+    {
+      "type": "checkbox",
+      "id": "em_italic",
+      "label": "Acento <em> en cursiva",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "heading_max_width",
+      "min": 0,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "label": "Ancho de la caja del título — PC",
+      "info": "El título se alinea dentro de esta caja centrada. Súbelo o bájalo para moverlo a izquierda o derecha. 0 = ancho completo.",
+      "default": 1160
+    },
+    {
+      "type": "range",
+      "id": "heading_padding_x_d",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen lateral del título — PC",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "heading_padding_x_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen lateral del título — Móvil",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "heading_size_d",
+      "min": 18,
+      "max": 110,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 34
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_d",
+      "min": 80,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado — PC",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing_d",
+      "min": -3,
+      "max": 6,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Espaciado entre letras — PC",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "heading_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_d",
+      "min": 0,
+      "max": 140,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — PC",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "heading_size_m",
+      "min": 14,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_m",
+      "min": 80,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado — Móvil",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing_m",
+      "min": -3,
+      "max": 6,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Espaciado entre letras — Móvil",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "heading_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — Móvil",
+      "default": 20
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonio",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Foto"
+        },
+        {
+          "type": "richtext",
+          "id": "quote",
+          "label": "Testimonio",
+          "default": "<p>“Escribe aquí el testimonio del cliente, en sus propias palabras y con el resultado concreto que ha notado.”</p>"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Nombre",
+          "default": "Nombre y apellido"
+        },
+        {
+          "type": "text",
+          "id": "role",
+          "label": "Profesión o descripción",
+          "default": "Profesión"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Carrusel de testimonios",
+      "blocks": [
+        { "type": "testimonial" },
+        { "type": "testimonial" },
+        { "type": "testimonial" },
+        { "type": "testimonial" }
+      ]
+    }
+  ]
+}
+{% endschema %}
