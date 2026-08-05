@@ -596,6 +596,93 @@
         "heading_align_m": "left",
         "heading_margin_bottom_m": 20
       }
+    },
+    "stats_results_7iFQjU": {
+      "type": "stats-results",
+      "blocks": {
+        "stat_pREdmB": {
+          "type": "stat",
+          "settings": {
+            "number": "+25% de productividad",
+            "description": "Los usuarios muestran una mejora del 25% en productividad y desempeño cognitivo tras un mes de uso.",
+            "wide": true
+          }
+        },
+        "stat_ncTk4C": {
+          "type": "stat",
+          "settings": {
+            "number": "96%",
+            "description": "De los usuarios reportan una mejora notable en su concentración tras 2 semanas de uso.",
+            "wide": false
+          }
+        },
+        "stat_XFL73A": {
+          "type": "stat",
+          "settings": {
+            "number": "89%",
+            "description": "Profesionales experimentaron menos estrés y ansiedad en su rutina diaria.",
+            "wide": false
+          }
+        },
+        "circle_NRVLcQ": {
+          "type": "circle",
+          "settings": {
+            "number": "9/10",
+            "label": "Menos fatiga"
+          }
+        },
+        "circle_6zJWTU": {
+          "type": "circle",
+          "settings": {
+            "number": "+40'",
+            "label": "Sueño profundo"
+          }
+        }
+      },
+      "block_order": [
+        "stat_pREdmB",
+        "stat_ncTk4C",
+        "stat_XFL73A",
+        "circle_NRVLcQ",
+        "circle_6zJWTU"
+      ],
+      "name": "Resultados con contadores",
+      "settings": {
+        "heading": "Resultados de nuestras encuestas",
+        "text": "<p>Todos nuestros productos se desarrollan y evalúan siguiendo protocolos de observación real.<br/>Las cifras que ves son resultados de personas que, como tú, buscan claridad y equilibrio cada día.</p>",
+        "footnote": "*Basado en resultados reportados por usuarios reales tras un uso continuado de nuestras fórmulas.",
+        "text_left": false,
+        "bg_image": "shopify://shop_images/bg-deskto-estudios.jpg",
+        "count_duration": 1200,
+        "heading_size": 44,
+        "heading_size_mobile": 30,
+        "number_size": 48,
+        "number_size_mobile": 36,
+        "card_gap": 18,
+        "card_radius": 12,
+        "card_opacity": 35,
+        "card_blur": 8,
+        "max_width": 1500,
+        "padding_top": 96,
+        "padding_bottom": 96,
+        "padding_x": 48,
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "padding_top_mobile": 56,
+        "padding_bottom_mobile": 56,
+        "padding_x_mobile": 20,
+        "margin_top_mobile": 0,
+        "margin_bottom_mobile": 0,
+        "color_bg": "#1E2B1E",
+        "color_overlay": "#000000",
+        "overlay_opacity": 25,
+        "color_card": "#0A0F0A",
+        "color_heading": "#FFFFFF",
+        "color_text": "#FFFFFF",
+        "color_number": "#FFFFFF",
+        "color_desc": "#E8E8E8",
+        "color_circle_border": "#FFFFFF"
+      }
     }
   },
   "order": [
@@ -604,6 +691,7 @@
     "hero_v2s_mHhY3E",
     "custom_experts_video_carousel_pU9Xn4",
     "custom_quality_certificates_t6Aihc",
-    "custom_testimonials_carousel_wBnn4z"
+    "custom_testimonials_carousel_wBnn4z",
+    "stats_results_7iFQjU"
   ]
 }
