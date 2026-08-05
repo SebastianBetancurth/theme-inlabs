@@ -787,6 +787,138 @@
         "btn_margin_top_d": 28,
         "btn_margin_top_m": 22
       }
+    },
+    "custom_article_cards_Je4h8j": {
+      "type": "custom-article-cards",
+      "blocks": {
+        "card_hDcVt4": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/download_31a8869d-7a75-4e16-9501-ca158c0fc37c.webp",
+            "title": "Título del artículo",
+            "text": "Escribe aquí la entradilla del artículo. Se recorta sola si se pasa de largo.",
+            "url": "",
+            "button_label": ""
+          }
+        },
+        "card_rGK8nd": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/download_0c17a1ea-97c2-47fe-9a1b-7f72e572b83a.webp",
+            "title": "Título del artículo",
+            "text": "Escribe aquí la entradilla del artículo. Se recorta sola si se pasa de largo.",
+            "url": "",
+            "button_label": ""
+          }
+        },
+        "card_9TWfaa": {
+          "type": "card",
+          "settings": {
+            "image": "shopify://shop_images/download_70b7978b-4f13-45a9-b40f-7437c72ad988.webp",
+            "title": "Título del artículo",
+            "text": "Escribe aquí la entradilla del artículo. Se recorta sola si se pasa de largo.",
+            "url": "",
+            "button_label": ""
+          }
+        }
+      },
+      "block_order": [
+        "card_hDcVt4",
+        "card_rGK8nd",
+        "card_9TWfaa"
+      ],
+      "name": "Tarjetas de artículos",
+      "settings": {
+        "heading": "Descubre más con nuestros artículos",
+        "heading_tag": "h2",
+        "use_blog": false,
+        "blog": "",
+        "posts_count": 3,
+        "button_label": "Leer más",
+        "whole_card_link": true,
+        "excerpt_length": 170,
+        "show_excerpt_d": true,
+        "show_excerpt_m": true,
+        "columns_d": 3,
+        "columns_m": "1",
+        "gap_d": 26,
+        "gap_m": 20,
+        "card_ratio_d": 0.8,
+        "card_ratio_m": 0.8,
+        "card_radius_d": 12,
+        "card_radius_m": 12,
+        "image_fit": "cover",
+        "card_bg": "#1c1c1c",
+        "overlay_style": "solid",
+        "overlay_color": "#000000",
+        "overlay_opacity": 85,
+        "overlay_opacity_hover": 40,
+        "text_shadow": true,
+        "hover_zoom": 1.2,
+        "transition_ms": 250,
+        "card_title_tag": "h3",
+        "card_vertical_align": "center",
+        "card_text_align": "center",
+        "card_text_width_d": 88,
+        "card_text_width_m": 88,
+        "card_padding_x_d": 22,
+        "card_padding_x_m": 18,
+        "card_title_color": "#ffffff",
+        "card_title_weight": "400",
+        "card_title_size_d": 22,
+        "card_title_size_m": 20,
+        "card_title_line_height": 1.3,
+        "card_title_margin_bottom_d": 14,
+        "card_title_margin_bottom_m": 12,
+        "excerpt_color": "#f2f2f2",
+        "excerpt_size_d": 14,
+        "excerpt_size_m": 13,
+        "excerpt_line_height": 1.5,
+        "excerpt_margin_bottom_d": 26,
+        "excerpt_margin_bottom_m": 22,
+        "button_bg": "#ffffff",
+        "button_color": "#111111",
+        "button_bg_hover": "#e4e4e4",
+        "button_color_hover": "#111111",
+        "button_border_color": "rgba(0,0,0,0)",
+        "button_border_width": 0,
+        "button_weight": "400",
+        "button_size_d": 15,
+        "button_size_m": 15,
+        "button_padding_y_d": 13,
+        "button_padding_y_m": 14,
+        "button_padding_x_d": 30,
+        "button_padding_x_m": 34,
+        "button_radius": 30,
+        "bg_color": "#0d0d0d",
+        "mobile_breakpoint": 750,
+        "content_max_width": 1480,
+        "padding_top_d": 72,
+        "padding_bottom_d": 72,
+        "padding_left_d": 60,
+        "padding_right_d": 60,
+        "padding_top_m": 32,
+        "padding_bottom_m": 32,
+        "padding_left_m": 16,
+        "padding_right_m": 16,
+        "heading_font": "helvetica",
+        "heading_font_custom": "'Helvetica neue', sans-serif",
+        "body_font": "helvetica",
+        "body_font_custom": "'Helvetica neue', sans-serif",
+        "heading_weight": "400",
+        "heading_color": "#ffffff",
+        "em_color": "#ffffff",
+        "em_italic": true,
+        "heading_size_d": 34,
+        "heading_size_m": 26,
+        "heading_line_height_d": 1.2,
+        "heading_line_height_m": 1.3,
+        "heading_letter_spacing_d": 0,
+        "heading_align_d": "left",
+        "heading_align_m": "left",
+        "heading_margin_bottom_d": 34,
+        "heading_margin_bottom_m": 22
+      }
     }
   },
   "order": [
@@ -797,6 +929,7 @@
     "custom_quality_certificates_t6Aihc",
     "custom_testimonials_carousel_wBnn4z",
     "stats_results_7iFQjU",
-    "custom_cta_overflow_panel_dAX6VE"
+    "custom_cta_overflow_panel_dAX6VE",
+    "custom_article_cards_Je4h8j"
   ]
 }
