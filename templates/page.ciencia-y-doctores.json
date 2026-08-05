@@ -72,7 +72,7 @@
             "name": "Dra. Isabel Belaustegui",
             "role": "Medicina integrativa y nutrición",
             "quote": "<p>\"ZZEN ha pensado en sus usuarios. Cada fórmula responde a una necesidad real.\"</p>",
-            "btn_label": "Ver Sleep",
+            "btn_label": "Ver ZZEN",
             "btn_link": "",
             "btn_new_tab": false
           }
@@ -93,11 +93,12 @@
         "expert_idbHwc": {
           "type": "expert",
           "settings": {
+            "video": "shopify://files/videos/Suplementación basada en ciencia real ZZEN Labs (1).mp4",
             "video_url": "",
             "name": "Dra. Isabel Belaustegui",
             "role": "Medicina integrativa y nutrición",
             "quote": "<p>\"ZZEN ha pensado en sus usuarios. Cada fórmula responde a una necesidad real.\"</p>",
-            "btn_label": "Ver Sleep",
+            "btn_label": "Ver Calm",
             "btn_link": "",
             "btn_new_tab": false
           }
