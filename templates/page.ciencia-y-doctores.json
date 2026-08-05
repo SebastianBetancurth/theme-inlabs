@@ -702,7 +702,7 @@
         "art_offset_x_d": 0,
         "art_offset_x_m": 0,
         "art_offset_y_d": 0,
-        "art_offset_y_m": 0,
+        "art_offset_y_m": 75,
         "art_show_m": true,
         "clip_sides": true,
         "band_height_d": 155,
