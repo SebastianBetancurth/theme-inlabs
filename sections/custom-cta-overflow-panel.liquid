@@ -1,0 +1,1461 @@
+{%- comment -%}
+  ============================================================================
+  SECCIÓN: Panel de llamada a la acción con imagen que sobresale
+  Tema: Dawn / Online Store 2.0
+  Ruta: sections/custom-cta-overflow-panel.liquid
+
+  PC     -> franja de imagen a todo el ancho arriba. Debajo, un panel blanco
+            redondeado y centrado con el título, el texto y el botón, los tres
+            centrados. Pegada al lado derecho del panel, la foto del producto:
+            arranca abajo, pasa por encima del panel y ASOMA POR ENCIMA de su
+            borde superior, metiéndose en la franja de imagen.
+  Móvil  -> lo mismo pero el panel casi a todo el ancho, con más aire arriba
+            para que el texto no se cruce con la foto.
+
+  LA FOTO QUE SOBRESALE: TRES COSAS QUE HAY QUE HACER BIEN.
+
+  1) El panel NO puede recortarla. Lleva `overflow: visible`, así que no se
+     puede usar `overflow: hidden` para redondear nada dentro de él. Si algún
+     día hace falta recortar un hijo, se recorta ese hijo, nunca el panel.
+
+  2) La página no debe ganar barra horizontal. La sección recorta por los lados
+     con `overflow-x: clip`, NO con `overflow-x: hidden`. Con `hidden`, el
+     navegador convierte el eje vertical en `auto` y la foto que asoma por
+     arriba quedaría cortada justo por lo que la hace especial. `clip` recorta
+     un solo eje y deja el otro libre.
+
+  3) No debe estorbar al botón. La foto lleva `pointer-events: none` y el
+     bloque de texto va por encima en el orden de capas, así que se puede
+     solapar sin bloquear ni un clic.
+
+  LA FRANJA DE ARRIBA ES OPCIONAL.
+  En las capturas, el borde superior del panel coincide exactamente con el
+  final de la franja verde. Aquí la franja es un ajuste de la sección: si en tu
+  tienda esa imagen pertenece a la sección de encima, deja la imagen vacía y la
+  franja no se imprime.
+  ============================================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign bp = s.mobile_breakpoint
+  assign bp_max = bp | minus: 1
+
+  case s.heading_font
+    when 'thin2'
+      assign heading_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign heading_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign heading_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign heading_stack = 'var(--font-body-family)'
+    else
+      assign heading_stack = s.heading_font_custom
+  endcase
+
+  case s.body_font
+    when 'thin2'
+      assign body_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign body_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign body_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign body_stack = 'var(--font-body-family)'
+    else
+      assign body_stack = s.body_font_custom
+  endcase
+
+  if s.content_max_width == 0
+    assign max_w = 'none'
+  else
+    assign max_w = s.content_max_width | append: 'px'
+  endif
+
+  if s.text_max_width_d == 0
+    assign text_max_w = 'none'
+  else
+    assign text_max_w = s.text_max_width_d | append: 'px'
+  endif
+
+  if s.em_italic
+    assign em_style = 'italic'
+  else
+    assign em_style = 'normal'
+  endif
+
+  if s.btn_uppercase
+    assign btn_transform = 'uppercase'
+  else
+    assign btn_transform = 'none'
+  endif
+-%}
+
+{%- style -%}
+  @font-face {
+    font-family: 'Helvetica neue';
+    src: url('{{ 'HelveticaNeueCyr-Light.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'thin2';
+    src: url('{{ 'lawrence-regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ================= Variables: PC ================= */
+  .zcta-{{ section.id }} {
+    --za-bg: {{ s.bg_color }};
+    --za-max-w: {{ max_w }};
+    --za-pt: {{ s.padding_top_d }}px;
+    --za-pb: {{ s.padding_bottom_d }}px;
+    --za-px: {{ s.padding_x_d }}px;
+
+    --za-band-h: {{ s.band_height_d }}px;
+    --za-band-pos: {{ s.band_position }};
+    --za-band-overlay: {{ s.band_overlay_color }};
+    --za-band-overlay-op: {{ s.band_overlay_opacity | divided_by: 100.0 }};
+    --za-overlap: {{ s.panel_overlap_d }}px;
+
+    --za-panel-bg: {{ s.panel_bg }};
+    --za-panel-radius: {{ s.panel_radius_d }}px;
+    --za-panel-border: {{ s.panel_border_color }};
+    --za-panel-border-w: {{ s.panel_border_width }}px;
+    --za-panel-pt: {{ s.panel_padding_top_d }}px;
+    --za-panel-pb: {{ s.panel_padding_bottom_d }}px;
+    --za-panel-px: {{ s.panel_padding_x_d }}px;
+    --za-panel-min-h: {{ s.panel_min_height_d }}px;
+
+    --za-text-align: {{ s.text_align_d }};
+    --za-text-max-w: {{ text_max_w }};
+    --za-text-shift: {{ s.text_shift_d }}px;
+
+    --za-h-font: {{ heading_stack }};
+    --za-h-size: {{ s.heading_size_d }}px;
+    --za-h-lh: {{ s.heading_line_height_d | divided_by: 100.0 }};
+    --za-h-ls: {{ s.heading_letter_spacing_d }}px;
+    --za-h-weight: {{ s.heading_weight }};
+    --za-h-color: {{ s.heading_color }};
+    --za-em-color: {{ s.em_color }};
+    --za-em-style: {{ em_style }};
+
+    --za-b-font: {{ body_stack }};
+    --za-sub-size: {{ s.sub_size_d }}px;
+    --za-sub-lh: {{ s.sub_line_height_d | divided_by: 100.0 }};
+    --za-sub-weight: {{ s.sub_weight }};
+    --za-sub-color: {{ s.sub_color }};
+    --za-sub-mt: {{ s.sub_margin_top_d }}px;
+    --za-sub-gap: {{ s.sub_paragraph_gap }}px;
+
+    --za-btn-bg: {{ s.btn_bg }};
+    --za-btn-color: {{ s.btn_color }};
+    --za-btn-bg-hover: {{ s.btn_bg_hover }};
+    --za-btn-color-hover: {{ s.btn_color_hover }};
+    --za-btn-border: {{ s.btn_border_color }};
+    --za-btn-border-w: {{ s.btn_border_width }}px;
+    --za-btn-radius: {{ s.btn_radius }}px;
+    --za-btn-size: {{ s.btn_font_size_d }}px;
+    --za-btn-weight: {{ s.btn_weight }};
+    --za-btn-ls: {{ s.btn_letter_spacing }}px;
+    --za-btn-tt: {{ btn_transform }};
+    --za-btn-py: {{ s.btn_padding_y_d }}px;
+    --za-btn-px: {{ s.btn_padding_x_d }}px;
+    --za-btn-min-w: {{ s.btn_min_width_d }}px;
+    --za-btn-mt: {{ s.btn_margin_top_d }}px;
+
+    --za-art-h: {{ s.art_height_d }}px;
+    --za-art-x: {{ s.art_offset_x_d }}px;
+    --za-art-y: {{ s.art_offset_y_d }}px;
+
+    --za-anim: {{ s.transition_ms }}ms;
+  }
+
+  /* ================= Estructura ================= */
+  .zcta {
+    position: relative;
+    background-color: var(--za-bg);
+  }
+
+  /* Ver nota 2 de la cabecera: `clip` y no `hidden`, para recortar solo los
+     lados y dejar que la foto asome por arriba. */
+  .zcta--clip {
+    overflow-x: clip;
+    overflow-y: visible;
+  }
+
+  /* ---- Franja de imagen superior ---- */
+  .zcta__band {
+    position: relative;
+    z-index: 0;
+    height: var(--za-band-h);
+    overflow: hidden;
+  }
+
+  .zcta__band img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: var(--za-band-pos);
+  }
+
+  .zcta__band-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: var(--za-band-overlay);
+    opacity: var(--za-band-overlay-op);
+    pointer-events: none;
+  }
+
+  .zcta__inner {
+    position: relative;
+    z-index: 1;
+    max-width: var(--za-max-w);
+    margin-inline: auto;
+    /* Un solapamiento negativo sube el panel dentro de la franja. */
+    margin-top: calc(var(--za-overlap) * -1);
+    padding: var(--za-pt) var(--za-px) var(--za-pb);
+    box-sizing: border-box;
+  }
+
+  /* ---- Panel ----
+     `overflow: visible` es lo que deja salir la foto. Ver nota 1. */
+  .zcta__panel {
+    position: relative;
+    overflow: visible;
+    box-sizing: border-box;
+    min-height: var(--za-panel-min-h);
+    padding: var(--za-panel-pt) var(--za-panel-px) var(--za-panel-pb);
+    border: var(--za-panel-border-w) solid var(--za-panel-border);
+    border-radius: var(--za-panel-radius);
+    background-color: var(--za-panel-bg);
+  }
+
+  /* ---- Foto que sobresale ----
+     Anclada abajo y a un lado. La altura manda y el ancho la sigue, así que
+     con una altura mayor que la del panel, la foto asoma por arriba. */
+  .zcta__art {
+    position: absolute;
+    bottom: var(--za-art-y);
+    right: var(--za-art-x);
+    z-index: 2;
+    height: var(--za-art-h);
+    width: auto;
+    /* Los temas suelen limitar las imágenes al ancho del padre y eso
+       aplastaría la foto: aquí manda la altura. */
+    max-width: none;
+    display: block;
+    /* Ver nota 3: no debe robar clics al botón. */
+    pointer-events: none;
+  }
+
+  .zcta__panel--art-left .zcta__art {
+    right: auto;
+    left: var(--za-art-x);
+  }
+
+  /* ---- Texto ----
+     Por encima de la foto en el orden de capas: si algún día se cruzan, gana
+     el texto. */
+  .zcta__content {
+    position: relative;
+    z-index: 3;
+    max-width: var(--za-text-max-w);
+    margin-inline: auto;
+    transform: translateX(var(--za-text-shift));
+    text-align: var(--za-text-align);
+  }
+
+  .zcta__heading {
+    margin: 0;
+    font-family: var(--za-h-font);
+    font-size: var(--za-h-size);
+    font-weight: var(--za-h-weight);
+    line-height: var(--za-h-lh);
+    letter-spacing: var(--za-h-ls);
+    color: var(--za-h-color);
+  }
+
+  .zcta__heading em,
+  .zcta__heading i {
+    font-style: var(--za-em-style);
+    color: var(--za-em-color);
+  }
+
+  .zcta__sub {
+    margin: var(--za-sub-mt) 0 0;
+    font-family: var(--za-b-font);
+    font-size: var(--za-sub-size);
+    font-weight: var(--za-sub-weight);
+    line-height: var(--za-sub-lh);
+    color: var(--za-sub-color);
+  }
+
+  .zcta__sub > * {
+    margin: 0;
+  }
+
+  /* Con la separación a 0, un Enter en el editor se ve como un salto de línea
+     y no como un párrafo aparte. */
+  .zcta__sub > * + * {
+    margin-top: var(--za-sub-gap);
+  }
+
+  .zcta__sub p:empty {
+    display: none;
+  }
+
+  .zcta__sub a {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  /* ---- Botón ---- */
+  .zcta__btn-wrap {
+    margin-top: var(--za-btn-mt);
+  }
+
+  .zcta__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-width: var(--za-btn-min-w);
+    padding: var(--za-btn-py) var(--za-btn-px);
+    border: var(--za-btn-border-w) solid var(--za-btn-border);
+    border-radius: var(--za-btn-radius);
+    background-color: var(--za-btn-bg);
+    color: var(--za-btn-color);
+    font-family: var(--za-b-font);
+    font-size: var(--za-btn-size);
+    font-weight: var(--za-btn-weight);
+    letter-spacing: var(--za-btn-ls);
+    text-transform: var(--za-btn-tt);
+    text-align: center;
+    text-decoration: none;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: background-color var(--za-anim) ease, color var(--za-anim) ease;
+  }
+
+  .zcta__btn:hover {
+    background-color: var(--za-btn-bg-hover);
+    color: var(--za-btn-color-hover);
+  }
+
+  .zcta__btn:focus-visible {
+    outline: 2px solid var(--za-btn-bg);
+    outline-offset: 3px;
+  }
+
+  /* ================= PC ================= */
+  @media screen and (min-width: {{ bp }}px) {
+    {%- if s.btn_full_d -%}
+      .zcta-{{ section.id }} .zcta__btn { width: 100%; }
+    {%- endif -%}
+  }
+
+  /* ================= Móvil ================= */
+  @media screen and (max-width: {{ bp_max }}px) {
+    .zcta-{{ section.id }} {
+      --za-max-w: none;
+      --za-pt: {{ s.padding_top_m }}px;
+      --za-pb: {{ s.padding_bottom_m }}px;
+      --za-px: {{ s.padding_x_m }}px;
+
+      --za-band-h: {{ s.band_height_m }}px;
+      --za-overlap: {{ s.panel_overlap_m }}px;
+
+      --za-panel-radius: {{ s.panel_radius_m }}px;
+      --za-panel-pt: {{ s.panel_padding_top_m }}px;
+      --za-panel-pb: {{ s.panel_padding_bottom_m }}px;
+      --za-panel-px: {{ s.panel_padding_x_m }}px;
+      --za-panel-min-h: {{ s.panel_min_height_m }}px;
+
+      --za-text-align: {{ s.text_align_m }};
+      --za-text-max-w: {% if s.text_max_width_m == 0 %}none{% else %}{{ s.text_max_width_m }}px{% endif %};
+      --za-text-shift: {{ s.text_shift_m }}px;
+
+      --za-h-size: {{ s.heading_size_m }}px;
+      --za-h-lh: {{ s.heading_line_height_m | divided_by: 100.0 }};
+      --za-h-ls: {{ s.heading_letter_spacing_m }}px;
+
+      --za-sub-size: {{ s.sub_size_m }}px;
+      --za-sub-lh: {{ s.sub_line_height_m | divided_by: 100.0 }};
+      --za-sub-mt: {{ s.sub_margin_top_m }}px;
+
+      --za-btn-size: {{ s.btn_font_size_m }}px;
+      --za-btn-py: {{ s.btn_padding_y_m }}px;
+      --za-btn-px: {{ s.btn_padding_x_m }}px;
+      --za-btn-min-w: {{ s.btn_min_width_m }}px;
+      --za-btn-mt: {{ s.btn_margin_top_m }}px;
+
+      --za-art-h: {{ s.art_height_m }}px;
+      --za-art-x: {{ s.art_offset_x_m }}px;
+      --za-art-y: {{ s.art_offset_y_m }}px;
+    }
+
+    {%- if s.btn_full_m -%}
+      .zcta-{{ section.id }} .zcta__btn {
+        width: 100%;
+        min-width: 0;
+      }
+    {%- endif -%}
+
+    {%- unless s.art_show_m -%}
+      .zcta-{{ section.id }} .zcta__art { display: none; }
+    {%- endunless -%}
+  }
+{%- endstyle -%}
+
+<div
+  class="zcta zcta-{{ section.id }}{% if s.clip_sides %} zcta--clip{% endif %}"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handle }}"{% endif %}
+>
+  {%- if s.band_image != blank -%}
+    <div class="zcta__band">
+      <img
+        src="{{ s.band_image | image_url: width: 2400 }}"
+        srcset="
+          {{ s.band_image | image_url: width: 800 }} 800w,
+          {{ s.band_image | image_url: width: 1400 }} 1400w,
+          {{ s.band_image | image_url: width: 2000 }} 2000w,
+          {{ s.band_image | image_url: width: 2400 }} 2400w
+        "
+        sizes="100vw"
+        width="{{ s.band_image.width }}"
+        height="{{ s.band_image.height }}"
+        alt="{{ s.band_image.alt | escape }}"
+        loading="lazy"
+        decoding="async"
+      >
+      {%- if s.band_overlay_opacity > 0 -%}
+        <span class="zcta__band-overlay"></span>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  <div class="zcta__inner">
+    <div class="zcta__panel{% if s.art_side == 'left' %} zcta__panel--art-left{% endif %}">
+      <div class="zcta__content">
+        {%- if s.heading != blank -%}
+          <{{ s.heading_tag }} class="zcta__heading">{{ s.heading | newline_to_br }}</{{ s.heading_tag }}>
+        {%- endif -%}
+
+        {%- if s.sub != blank -%}
+          <div class="zcta__sub">{{ s.sub }}</div>
+        {%- endif -%}
+
+        {%- if s.btn_label != blank -%}
+          <div class="zcta__btn-wrap">
+            <a
+              class="zcta__btn"
+              href="{{ s.btn_link | default: '#' }}"
+              {% if s.btn_new_tab %}target="_blank" rel="noopener"{% endif %}
+            >
+              {{- s.btn_label -}}
+            </a>
+          </div>
+        {%- endif -%}
+      </div>
+
+      {%- comment -%}
+        La foto va DESPUÉS del texto en el HTML y encima del panel por posición
+        absoluta. Ver las tres notas de la cabecera.
+      {%- endcomment -%}
+      {%- if s.art_image != blank -%}
+        <img
+          class="zcta__art"
+          src="{{ s.art_image | image_url: width: 1200 }}"
+          srcset="
+            {{ s.art_image | image_url: width: 400 }} 400w,
+            {{ s.art_image | image_url: width: 800 }} 800w,
+            {{ s.art_image | image_url: width: 1200 }} 1200w
+          "
+          sizes="(min-width: {{ bp }}px) {{ s.art_height_d }}px, {{ s.art_height_m }}px"
+          width="{{ s.art_image.width }}"
+          height="{{ s.art_image.height }}"
+          alt="{{ s.art_image.alt | escape }}"
+          loading="lazy"
+          decoding="async"
+        >
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "CTA con imagen saliente",
+  "tag": "section",
+  "class": "section-zcta",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Textos"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Título",
+      "info": "Enter para salto de línea. Envuelve una palabra en <em>así</em> para el acento.",
+      "default": "Alinea tu propósito"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Etiqueta HTML del título (SEO)",
+      "options": [
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "div", "label": "div (sin peso SEO)" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "richtext",
+      "id": "sub",
+      "label": "Texto",
+      "info": "Con la separación entre párrafos a 0, cada Enter se ve como un salto de línea.",
+      "default": "<p>Únete a los miles de usuarios que están aprovechando al máximo cada día.</p>"
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Texto del botón",
+      "default": "Descubre Modo ZZEN"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Enlace del botón"
+    },
+    {
+      "type": "checkbox",
+      "id": "btn_new_tab",
+      "label": "Abrir en una pestaña nueva",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Ancla de la sección",
+      "info": "Opcional. Si escribes 'modo-zzen' podrás enlazar aquí con #modo-zzen."
+    },
+
+    {
+      "type": "header",
+      "content": "Foto que sobresale"
+    },
+    {
+      "type": "image_picker",
+      "id": "art_image",
+      "label": "Foto",
+      "info": "Usa un PNG o WEBP con fondo transparente. Manda la altura: el ancho se ajusta solo."
+    },
+    {
+      "type": "select",
+      "id": "art_side",
+      "label": "Lado",
+      "options": [
+        { "value": "right", "label": "Derecha" },
+        { "value": "left", "label": "Izquierda" }
+      ],
+      "default": "right"
+    },
+    {
+      "type": "range",
+      "id": "art_height_d",
+      "min": 100,
+      "max": 600,
+      "step": 5,
+      "unit": "px",
+      "label": "Altura — PC",
+      "info": "Ponla mayor que el alto del panel: la diferencia es lo que asoma por arriba.",
+      "default": 385
+    },
+    {
+      "type": "range",
+      "id": "art_height_m",
+      "min": 80,
+      "max": 580,
+      "step": 5,
+      "unit": "px",
+      "label": "Altura — Móvil",
+      "default": 360
+    },
+    {
+      "type": "range",
+      "id": "art_offset_x_d",
+      "min": -250,
+      "max": 250,
+      "step": 5,
+      "unit": "px",
+      "label": "Distancia al lado del panel — PC",
+      "info": "Negativo = la foto se sale del panel hacia fuera.",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "art_offset_x_m",
+      "min": -200,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Distancia al lado del panel — Móvil",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "art_offset_y_d",
+      "min": -250,
+      "max": 250,
+      "step": 5,
+      "unit": "px",
+      "label": "Distancia al fondo del panel — PC",
+      "info": "0 = la foto acaba justo en el borde de abajo. Negativo = se hunde por debajo.",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "art_offset_y_m",
+      "min": -200,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Distancia al fondo del panel — Móvil",
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "art_show_m",
+      "label": "Mostrar la foto en móvil",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "clip_sides",
+      "label": "Recortar lo que se salga por los lados",
+      "info": "Déjalo activado: evita que aparezca barra de scroll horizontal en la página. No afecta a lo que asoma por arriba.",
+      "default": true
+    },
+
+    {
+      "type": "header",
+      "content": "Franja de imagen superior"
+    },
+    {
+      "type": "image_picker",
+      "id": "band_image",
+      "label": "Imagen de la franja",
+      "info": "Opcional. Si esa imagen ya viene de la sección de arriba, deja esto vacío."
+    },
+    {
+      "type": "range",
+      "id": "band_height_d",
+      "min": 0,
+      "max": 500,
+      "step": 5,
+      "unit": "px",
+      "label": "Altura de la franja — PC",
+      "default": 155
+    },
+    {
+      "type": "range",
+      "id": "band_height_m",
+      "min": 0,
+      "max": 400,
+      "step": 5,
+      "unit": "px",
+      "label": "Altura de la franja — Móvil",
+      "default": 145
+    },
+    {
+      "type": "select",
+      "id": "band_position",
+      "label": "Zona visible de la imagen",
+      "options": [
+        { "value": "center", "label": "Centro" },
+        { "value": "top", "label": "Arriba" },
+        { "value": "bottom", "label": "Abajo" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "color",
+      "id": "band_overlay_color",
+      "label": "Color del velo sobre la franja",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "band_overlay_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Opacidad del velo",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "panel_overlap_d",
+      "min": 0,
+      "max": 300,
+      "step": 5,
+      "unit": "px",
+      "label": "El panel se mete en la franja — PC",
+      "info": "0 = el panel empieza justo donde acaba la franja, como en el original.",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "panel_overlap_m",
+      "min": 0,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "El panel se mete en la franja — Móvil",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "Panel"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo de la sección",
+      "default": "#0a0a0a"
+    },
+    {
+      "type": "color",
+      "id": "panel_bg",
+      "label": "Fondo del panel",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "panel_border_color",
+      "label": "Color del borde del panel",
+      "default": "#00000000"
+    },
+    {
+      "type": "range",
+      "id": "panel_border_width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor del borde del panel",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "panel_radius_d",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo — PC",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "panel_radius_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo — Móvil",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 0,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "label": "Ancho máximo del panel — PC",
+      "info": "0 = ancho completo.",
+      "default": 1360
+    },
+    {
+      "type": "range",
+      "id": "panel_padding_top_d",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen interior superior — PC",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "panel_padding_bottom_d",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen interior inferior — PC",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "panel_padding_x_d",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen interior lateral — PC",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "panel_min_height_d",
+      "min": 0,
+      "max": 500,
+      "step": 5,
+      "unit": "px",
+      "label": "Alto mínimo del panel — PC",
+      "info": "0 = el que pida el contenido.",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "panel_padding_top_m",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen interior superior — Móvil",
+      "info": "En el original es grande: es lo que deja sitio a la foto sin cruzarse con el texto.",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "panel_padding_bottom_m",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen interior inferior — Móvil",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "panel_padding_x_m",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen interior lateral — Móvil",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "panel_min_height_m",
+      "min": 0,
+      "max": 500,
+      "step": 5,
+      "unit": "px",
+      "label": "Alto mínimo del panel — Móvil",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "Espaciado de la sección"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding superior — PC",
+      "info": "Espacio entre la franja y el panel.",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding inferior — PC",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "padding_x_d",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding lateral — PC",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_top_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding superior — Móvil",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding inferior — Móvil",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_x_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Padding lateral — Móvil",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "mobile_breakpoint",
+      "min": 480,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "label": "Punto de cambio a móvil",
+      "default": 750
+    },
+    {
+      "type": "range",
+      "id": "transition_ms",
+      "min": 0,
+      "max": 900,
+      "step": 25,
+      "unit": "ms",
+      "label": "Duración de las transiciones",
+      "default": 250
+    },
+
+    {
+      "type": "header",
+      "content": "Colocación del texto"
+    },
+    {
+      "type": "select",
+      "id": "text_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "center", "label": "Centro" },
+        { "value": "left", "label": "Izquierda" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "center", "label": "Centro" },
+        { "value": "left", "label": "Izquierda" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "text_max_width_d",
+      "min": 0,
+      "max": 1000,
+      "step": 10,
+      "unit": "px",
+      "label": "Ancho máximo del texto — PC",
+      "info": "0 = todo el panel. Bájalo para controlar dónde parten las líneas.",
+      "default": 560
+    },
+    {
+      "type": "range",
+      "id": "text_max_width_m",
+      "min": 0,
+      "max": 800,
+      "step": 10,
+      "unit": "px",
+      "label": "Ancho máximo del texto — Móvil",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "text_shift_d",
+      "min": -250,
+      "max": 250,
+      "step": 5,
+      "unit": "px",
+      "label": "Desplazar el texto en horizontal — PC",
+      "info": "Útil para descentrarlo un poco y compensar el peso visual de la foto.",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "text_shift_m",
+      "min": -200,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Desplazar el texto en horizontal — Móvil",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía del título"
+    },
+    {
+      "type": "select",
+      "id": "heading_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "heading_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "200", "label": "200" },
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color",
+      "default": "#1f1f1f"
+    },
+    {
+      "type": "color",
+      "id": "em_color",
+      "label": "Color del acento <em>",
+      "default": "#1f1f1f"
+    },
+    {
+      "type": "checkbox",
+      "id": "em_italic",
+      "label": "Acento <em> en cursiva",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "heading_size_d",
+      "min": 18,
+      "max": 110,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_d",
+      "min": 80,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado — PC",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing_d",
+      "min": -3,
+      "max": 6,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Espaciado entre letras — PC",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "heading_size_m",
+      "min": 14,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_m",
+      "min": 80,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado — Móvil",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing_m",
+      "min": -3,
+      "max": 6,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Espaciado entre letras — Móvil",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía del texto"
+    },
+    {
+      "type": "select",
+      "id": "body_font",
+      "label": "Fuente del texto y del botón",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "body_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "select",
+      "id": "sub_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "sub_color",
+      "label": "Color",
+      "default": "#3a3a3a"
+    },
+    {
+      "type": "range",
+      "id": "sub_size_d",
+      "min": 10,
+      "max": 34,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "sub_size_m",
+      "min": 9,
+      "max": 26,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "sub_line_height_d",
+      "min": 100,
+      "max": 240,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado — PC",
+      "default": 150
+    },
+    {
+      "type": "range",
+      "id": "sub_line_height_m",
+      "min": 100,
+      "max": 240,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado — Móvil",
+      "default": 150
+    },
+    {
+      "type": "range",
+      "id": "sub_margin_top_d",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con el título — PC",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "sub_margin_top_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con el título — Móvil",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "sub_paragraph_gap",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre párrafos",
+      "info": "0 = cada Enter se ve como un salto de línea.",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "Botón"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg",
+      "label": "Fondo",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "btn_color",
+      "label": "Color del texto",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg_hover",
+      "label": "Fondo al pasar el ratón",
+      "default": "#2b2b2b"
+    },
+    {
+      "type": "color",
+      "id": "btn_color_hover",
+      "label": "Color del texto al pasar el ratón",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_border_color",
+      "label": "Color del borde",
+      "default": "#00000000"
+    },
+    {
+      "type": "range",
+      "id": "btn_border_width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor del borde",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "btn_radius",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo",
+      "default": 40
+    },
+    {
+      "type": "select",
+      "id": "btn_weight",
+      "label": "Grosor del texto",
+      "options": [
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "500"
+    },
+    {
+      "type": "checkbox",
+      "id": "btn_uppercase",
+      "label": "Texto en mayúsculas",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "btn_letter_spacing",
+      "min": -1,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "btn_font_size_d",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del texto — PC",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "btn_font_size_m",
+      "min": 9,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño del texto — Móvil",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "btn_padding_y_d",
+      "min": 4,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Alto interior — PC",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "btn_padding_x_d",
+      "min": 8,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Ancho interior — PC",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "btn_padding_y_m",
+      "min": 4,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Alto interior — Móvil",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "btn_padding_x_m",
+      "min": 8,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Ancho interior — Móvil",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "btn_min_width_d",
+      "min": 0,
+      "max": 500,
+      "step": 5,
+      "unit": "px",
+      "label": "Ancho mínimo — PC",
+      "default": 300
+    },
+    {
+      "type": "range",
+      "id": "btn_min_width_m",
+      "min": 0,
+      "max": 400,
+      "step": 5,
+      "unit": "px",
+      "label": "Ancho mínimo — Móvil",
+      "default": 255
+    },
+    {
+      "type": "checkbox",
+      "id": "btn_full_d",
+      "label": "Botón a todo el ancho — PC",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "btn_full_m",
+      "label": "Botón a todo el ancho — Móvil",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "btn_margin_top_d",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con el texto — PC",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "btn_margin_top_m",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con el texto — Móvil",
+      "default": 22
+    }
+  ],
+  "presets": [
+    {
+      "name": "CTA con imagen saliente"
+    }
+  ]
+}
+{% endschema %}
