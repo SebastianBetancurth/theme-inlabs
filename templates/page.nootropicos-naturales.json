@@ -1344,6 +1344,87 @@
         "image_margin_d": 32,
         "image_margin_m": 24
       }
+    },
+    "custom_cta_button_4iUzUh": {
+      "type": "custom-cta-button",
+      "blocks": {
+        "button_gzHJLg": {
+          "type": "button",
+          "settings": {
+            "text": "Conocer los nootrópicos de ZZEN Labs",
+            "link": "#",
+            "new_tab": false,
+            "custom_colors": false,
+            "bg": "#ffffff",
+            "bg_hover": "#f2f2f2",
+            "color": "#000000",
+            "color_hover": "#000000",
+            "border_color": "#000000"
+          }
+        }
+      },
+      "block_order": [
+        "button_gzHJLg"
+      ],
+      "name": "Botón CTA",
+      "settings": {
+        "anchor_id": "",
+        "missing_link_note": "",
+        "bg_color": "#ffffff",
+        "mobile_breakpoint": 750,
+        "content_max_width": 780,
+        "align_d": "center",
+        "align_m": "center",
+        "stack_m": true,
+        "full_width_m": false,
+        "button_gap_d": 16,
+        "button_gap_m": 12,
+        "padding_x_d": 24,
+        "padding_x_m": 18,
+        "padding_top_d": 56,
+        "padding_bottom_d": 56,
+        "padding_top_m": 36,
+        "padding_bottom_m": 36,
+        "pill_shape": true,
+        "radius_d": 8,
+        "radius_m": 8,
+        "button_padding_x_d": 58,
+        "button_padding_y_d": 13,
+        "button_padding_x_m": 32,
+        "button_padding_y_m": 12,
+        "button_min_width_d": 0,
+        "button_min_width_m": 0,
+        "button_font": "helvetica",
+        "button_font_custom": "'Helvetica neue', sans-serif",
+        "button_weight": "400",
+        "button_transform": "none",
+        "underline": "always",
+        "underline_width": 1,
+        "underline_offset": 3,
+        "button_size_d": 15,
+        "button_size_m": 14,
+        "button_line_height": 130,
+        "button_letter_spacing_d": 0,
+        "button_letter_spacing_m": 0,
+        "button_bg": "#000000",
+        "button_bg_hover": "#2b2b2b",
+        "button_color": "#ffffff",
+        "button_color_hover": "#ffffff",
+        "button_border_color": "#00000000",
+        "button_border_color_hover": "#00000000",
+        "button_border_width": 0,
+        "shadow_color": "#00000000",
+        "shadow_x": 0,
+        "shadow_y": 6,
+        "shadow_blur": 18,
+        "hover_lift": 0,
+        "transition_ms": 200,
+        "icon_style": "none",
+        "icon_size_d": 16,
+        "icon_size_m": 15,
+        "icon_gap": 8,
+        "icon_stroke": 1.6
+      }
     }
   },
   "order": [
@@ -1358,6 +1439,7 @@
     "custom_body_text_7XJjaD",
     "custom_body_text_XGV3Ek",
     "custom_body_text_zqh9tU",
-    "custom_body_text_XkA43t"
+    "custom_body_text_XkA43t",
+    "custom_cta_button_4iUzUh"
   ]
 }
