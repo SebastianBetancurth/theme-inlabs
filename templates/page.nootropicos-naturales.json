@@ -1425,6 +1425,32 @@
         "icon_gap": 8,
         "icon_stroke": 1.6
       }
+    },
+    "prod_slider_apby3W": {
+      "type": "prod-slider",
+      "name": "Slider de productos",
+      "settings": {
+        "title": "Modo ZZEN",
+        "collection": "frontpage",
+        "products_limit": 8,
+        "image_ratio": "1 / 1",
+        "image_fit": "cover",
+        "button_text": "Añadir",
+        "soon_badge_text": "Próximamente...",
+        "soon_button_text": "Próximamente...",
+        "title_size": 58,
+        "title_size_mobile": 32,
+        "name_size": 18,
+        "name_size_mobile": 16,
+        "benefit_size": 16,
+        "benefit_size_mobile": 15,
+        "atc_size": 16,
+        "atc_size_mobile": 15,
+        "badge_size": 13,
+        "bg_color": "#f6f5f3",
+        "padding_top": 60,
+        "padding_bottom": 60
+      }
     }
   },
   "order": [
@@ -1440,6 +1466,7 @@
     "custom_body_text_XGV3Ek",
     "custom_body_text_zqh9tU",
     "custom_body_text_XkA43t",
-    "custom_cta_button_4iUzUh"
+    "custom_cta_button_4iUzUh",
+    "prod_slider_apby3W"
   ]
 }
