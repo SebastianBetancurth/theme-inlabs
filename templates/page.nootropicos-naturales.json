@@ -200,7 +200,7 @@
         "levels": "h2h3",
         "content_selector": "[data-toc-content]",
         "exclude_selector": "",
-        "min_items": 3,
+        "min_items": 4,
         "empty_note": "Este artículo aún no tiene suficientes encabezados H2 o H3. La tabla no se mostrará en la tienda.",
         "scroll_offset": 100,
         "scroll_offset_m": 80,
