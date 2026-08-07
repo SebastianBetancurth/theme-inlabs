@@ -42,7 +42,7 @@
         "published_HYb6Fb": {
           "type": "published",
           "settings": {
-            "label": "Publicado: 15 May 2026",
+            "label": "Publicado: 10 Abr 2026",
             "value": "",
             "new_line": false
           }
@@ -50,7 +50,7 @@
         "updated_3JDwh7": {
           "type": "updated",
           "settings": {
-            "label": "Actualizado: 07 Jul 2026",
+            "label": "Actualizado: 09 Jul 2026",
             "value": "",
             "new_line": true
           }
@@ -91,7 +91,7 @@
         "show_image_m": true,
         "show_crumbs_m": true,
         "show_crumbs": true,
-        "crumb_home": "Inicio / Noticias / Los nootrópicos naturales más efectivos para optimizar tu rendimiento mental",
+        "crumb_home": "Inicio / Noticias / Cómo optimizar tu salud: la guía definitiva para transformar tu bienestar",
         "crumb_separator": "",
         "crumb_aria_label": "",
         "crumb_truncate": false,
@@ -114,7 +114,7 @@
         "crumb_row_gap": 4,
         "crumb_margin_bottom_d": 44,
         "crumb_margin_bottom_m": 22,
-        "heading_text": "Los nootrópicos naturales más efectivos para optimizar tu rendimiento mental",
+        "heading_text": "Cómo optimizar tu salud: la guía definitiva para transformar tu bienestar",
         "heading_tag": "h1",
         "heading_font": "thin2",
         "heading_font_custom": "'thin2', Georgia, serif",
@@ -163,8 +163,8 @@
         "updated_format_filter": true,
         "reading_wpm": 200,
         "reading_unit": "min",
-        "reading_override": 0,
-        "image": "shopify://shop_images/01-Es_2520e06d-96cf-49d7-a953-a119bd83bcc9.webp",
+        "reading_override": 12,
+        "image": "shopify://shop_images/Mobile_bb29883d-bf7e-4a21-962f-b773aca571d5.webp",
         "image_ratio_d": 152,
         "image_ratio_m": 156,
         "image_fit": "cover",
@@ -311,7 +311,7 @@
         "text_PteBAR": {
           "type": "text",
           "settings": {
-            "text": "<p>El rendimiento cognitivo nunca ha sido tan crucial como en la actualidad. Entre las exigencias laborales, académicas y personales, nuestro cerebro necesita funcionar al máximo nivel durante jornadas cada vez más intensas. Afortunadamente, la naturaleza nos ofrece soluciones extraordinarias a través de los<strong> nootrópicos naturales </strong>más efectivos, sustancias que pueden potenciar tu memoria, concentración y claridad mental sin los efectos secundarios de los estimulantes sintéticos.</p>"
+            "text": "<p>Optimizar tu salud no es cuestión de suerte ni de genética privilegiada. Es el resultado de decisiones conscientes, hábitos bien construidos y conocimiento aplicado con consistencia. Y lo mejor: está completamente bajo tu control.<br/>La mayoría de personas entiende que \"deberían\" cuidarse más. Pero entre saber qué hacer y hacerlo realmente hay un abismo. Este artículo te da el mapa completo para cruzar ese abismo, con estrategias probadas y un sistema que funciona incluso cuando la motivación falla.</p>"
           }
         }
       },
@@ -434,14 +434,14 @@
         "heading_prNztt": {
           "type": "heading",
           "settings": {
-            "text": "Qué son los nootrópicos naturales y cómo transforman tu cerebro",
+            "text": "Qué significa realmente optimizar tu salud",
             "level": "h2"
           }
         },
         "text_XW9xNf": {
           "type": "text",
           "settings": {
-            "text": "<p>Los <strong>nootrópicos naturales</strong> son compuestos de origen vegetal, mineral o amino que mejoran las funciones cognitivas de manera progresiva y sostenible. A diferencia de los estimulantes tradicionales, estos potenciadores cerebrales trabajan optimizando procesos fundamentales como la circulación sanguínea cerebral, la síntesis de neurotransmisores y la protección neuronal.</p><p>Su mecanismo de acción es fascinante. Mientras algunos aumentan el flujo de oxígeno y nutrientes hacia las neuronas, otros regulan la producción de acetilcolina, dopamina y GABA, los mensajeros químicos responsables de la memoria, el enfoque y el estado de ánimo. Esta aproximación integral explica por qué un <strong>nootrópico natural más potente</strong> puede generar mejoras sostenidas sin crear dependencia.</p>"
+            "text": "<p>Optimizar tu salud va mucho más allá de \"no estar enfermo\". Es maximizar tu energía, tu claridad mental, tu capacidad física y tu bienestar emocional para vivir la mejor versión posible de tu vida cada día.</p><p>La Organización Mundial de la Salud define salud como \"un estado de completo bienestar físico, mental y social, y no solamente la ausencia de afecciones o enfermedades.\" Pero incluso esta definición se queda corta.</p><p>Optimizar tu salud significa:</p><ul><li><strong>Tener energía sostenida durante todo el día</strong>, sin necesitar cinco cafés para funcionar o sufrir el bajón de las tres de la tarde que te deja arrastrándote hasta la cama.</li><li><strong>Mantener la concentración cuando la necesitas</strong>, sin esa niebla mental que convierte tareas simples en maratones mentales agotadores.</li><li><strong>Dormir profundamente y despertar descansado</strong>, no dando vueltas durante horas antes de conseguir dormirte o despertándote a las 3 de la madrugada con la mente acelerada.</li><li><strong>Gestionar el estrés sin que te consuma</strong>, siendo capaz de mantener la calma bajo presión en lugar de vivir constantemente al borde del colapso nervioso.</li><li><strong>Moverte sin dolor ni limitaciones</strong>, subir escaleras sin quedarte sin aire, jugar con tus hijos sin que te duela todo al día siguiente.</li><li><strong>Mantener un estado de ánimo estable</strong>, sin esos cambios bruscos que te hacen pasar de la euforia a la irritabilidad en cuestión de minutos.</li></ul><p>No se trata de alcanzar la perfección. Se trata de funcionar a un nivel donde la vida es más fácil, más disfrutable y más productiva porque tu cuerpo y tu mente están trabajando a tu favor, no en tu contra.</p>"
           }
         }
       },
@@ -565,20 +565,27 @@
         "heading_j3VkKT": {
           "type": "heading",
           "settings": {
-            "text": "Los nootrópicos naturales más potentes respaldados por la ciencia",
+            "text": "Los 4 pilares fundamentales de la salud óptima",
             "level": "h2"
           }
         },
         "text_Va9A6t": {
           "type": "text",
           "settings": {
-            "text": "<h3>Bacopa monnieri, el potenciador de memoria milenario</h3><p>La <strong>Bacopa monnieri</strong> destaca como uno de los nootrópicos más estudiados científicamente. Esta planta ayurvédica contiene bacósidos, compuestos que favorecen la regeneración neuronal y mejoran la comunicación sináptica.</p><p>Los estudios demuestran que la Bacopa puede:</p><ul><li>Incrementar la retención de información en un 25% tras 12 semanas de uso</li><li>Mejorar la velocidad de procesamiento mental</li><li>Reducir los niveles de cortisol, combatiendo el estrés oxidativo</li><li>Potenciar la formación de nuevas conexiones neuronales<br/></li></ul><h3>Ginkgo biloba, el optimizador de circulación cerebral</h3><p>El <strong>Ginkgo biloba</strong> ha demostrado ser excepcional para mejorar el flujo sanguíneo cerebral. Sus flavonoides y terpenoides actúan como vasodilatadores naturales, aumentando la llegada de oxígeno y glucosa al cerebro.</p><p>Sus beneficios incluyen:</p><ul><li>Mejora significativa en tareas de memoria de trabajo</li><li>Reducción de la fatiga mental en adultos mayores</li><li>Protección contra el daño oxidativo neuronal</li><li>Aumento de la concentración sostenida</li></ul><h3>Rhodiola rosea, el adaptógeno para el estrés mental</h3><p>Esta planta nórdica es un <strong>adaptógeno excepcional</strong> que ayuda al cerebro a gestionar mejor las situaciones de alta demanda cognitiva. La Rhodiola optimiza la resistencia mental sin sobreestimular el sistema nervioso.</p>"
+            "text": "<p>Hay cuatro áreas que determinan el 80% de tu salud. Domina estas y todo lo demás se vuelve más fácil. Ignóralas y ningún suplemento, ninguna dieta milagro y ningún hack de productividad te salvará.</p>"
+          }
+        },
+        "text_fMX46E": {
+          "type": "text",
+          "settings": {
+            "text": "<h3>Pilar 1: Nutrición inteligente para tu cuerpo y mente</h3><p>Tu cerebro consume el 20% de la energía total de tu cuerpo a pesar de representar solo el 2% de tu peso. Cada pensamiento, cada decisión, cada momento de concentración requiere combustible de calidad.</p>"
           }
         }
       },
       "block_order": [
         "heading_j3VkKT",
-        "text_Va9A6t"
+        "text_Va9A6t",
+        "text_fMX46E"
       ],
       "name": "Títulos y texto",
       "settings": {
@@ -696,14 +703,14 @@
         "heading_BPXeEk": {
           "type": "heading",
           "settings": {
-            "text": "Combinaciones sinérgicas que multiplican los beneficios La fórmula concentración perfecta",
+            "text": "Los principios no negociables de la nutrición óptima",
             "level": "h2"
           }
         },
         "text_wChfcz": {
           "type": "text",
           "settings": {
-            "text": "<p>La combinación de <strong>L-teanina con cafeína natural</strong> representa una de las sinergias más estudiadas. Mientras la cafeína estimula la alerta mental, la L-teanina presente en el té verde suaviza los efectos secundarios como el nerviosismo, creando un estado de <strong>concentración relajada</strong>.</p><p>Esta combinación ofrece:</p><ul><li>Energía mental sostenida sin picos ni caídas</li><li>Reducción de la ansiedad asociada a la cafeína</li><li>Mejora en la calidad de la atención selectiva</li><li>Mayor resistencia a la fatiga cognitiva</li></ul><h3>El dúo memoria y aprendizaje</h3><p>La sinergia entre <strong>Bacopa monnieri y Ginkgo biloba</strong> potencia tanto la formación como la recuperación de recuerdos. Mientras la Bacopa optimiza los procesos de consolidación mnésica, el Ginkgo asegura que las neuronas reciban los recursos necesarios para funcionar óptimamente.</p>"
+            "text": "<p><strong>Prioriza proteínas de calidad en cada comida</strong>. Las proteínas proporcionan los aminoácidos que tu cuerpo necesita para construir neurotransmisores, hormonas y tejidos. Apunta a 1.6-2g de proteína por kilo de peso corporal si eres activo, 1.2-1.6g si eres sedentario.</p><p><strong>Grasas saludables para tu cerebro</strong>. Tu cerebro es 60% grasa. Las membranas de cada neurona necesitan grasas de calidad para funcionar correctamente. Los omega-3 (DHA y EPA) son especialmente críticos.</p><p><strong>Carbohidratos complejos en cantidades moderadas</strong>. No necesitas eliminar los carbohidratos. Necesitas elegir los correctos. Los carbohidratos complejos proporcionan glucosa de forma sostenida, evitando los picos de insulina que te dejan exhausto.</p><p><strong>Micronutrientes que marcan la diferencia</strong>. Las vitaminas y minerales son cofactores en miles de reacciones bioquímicas. Sin ellos, tu cuerpo simplemente no puede funcionar óptimamente.</p><p><strong>El error que comete el 90% de la gente</strong>, es desayunar solo carbohidratos (tostadas, cereales, bollería). Esto dispara tu glucosa, genera un pico de insulina y te deja exhausto a media mañana. Resultado: necesitas café tras café para funcionar.</p>"
           }
         }
       },
@@ -821,20 +828,101 @@
         "image_margin_m": 24
       }
     },
+    "custom_cta_button_LdWrw9": {
+      "type": "custom-cta-button",
+      "blocks": {
+        "button_Ddqp9T": {
+          "type": "button",
+          "settings": {
+            "text": "Conocer los nootrópicos de ZZEN Focus",
+            "link": "#",
+            "new_tab": false,
+            "custom_colors": false,
+            "bg": "#ffffff",
+            "bg_hover": "#f2f2f2",
+            "color": "#000000",
+            "color_hover": "#000000",
+            "border_color": "#000000"
+          }
+        }
+      },
+      "block_order": [
+        "button_Ddqp9T"
+      ],
+      "name": "Botón CTA",
+      "settings": {
+        "anchor_id": "",
+        "missing_link_note": "",
+        "bg_color": "#ffffff",
+        "mobile_breakpoint": 750,
+        "content_max_width": 780,
+        "align_d": "center",
+        "align_m": "center",
+        "stack_m": true,
+        "full_width_m": false,
+        "button_gap_d": 16,
+        "button_gap_m": 12,
+        "padding_x_d": 24,
+        "padding_x_m": 18,
+        "padding_top_d": 56,
+        "padding_bottom_d": 56,
+        "padding_top_m": 36,
+        "padding_bottom_m": 36,
+        "pill_shape": true,
+        "radius_d": 8,
+        "radius_m": 8,
+        "button_padding_x_d": 58,
+        "button_padding_y_d": 13,
+        "button_padding_x_m": 32,
+        "button_padding_y_m": 12,
+        "button_min_width_d": 0,
+        "button_min_width_m": 0,
+        "button_font": "helvetica",
+        "button_font_custom": "'Helvetica neue', sans-serif",
+        "button_weight": "400",
+        "button_transform": "none",
+        "underline": "always",
+        "underline_width": 1,
+        "underline_offset": 3,
+        "button_size_d": 15,
+        "button_size_m": 14,
+        "button_line_height": 130,
+        "button_letter_spacing_d": 0,
+        "button_letter_spacing_m": 0,
+        "button_bg": "#000000",
+        "button_bg_hover": "#2b2b2b",
+        "button_color": "#ffffff",
+        "button_color_hover": "#ffffff",
+        "button_border_color": "rgba(0,0,0,0)",
+        "button_border_color_hover": "rgba(0,0,0,0)",
+        "button_border_width": 0,
+        "shadow_color": "rgba(0,0,0,0)",
+        "shadow_x": 0,
+        "shadow_y": 6,
+        "shadow_blur": 18,
+        "hover_lift": 0,
+        "transition_ms": 200,
+        "icon_style": "none",
+        "icon_size_d": 16,
+        "icon_size_m": 15,
+        "icon_gap": 8,
+        "icon_stroke": 1.6
+      }
+    },
     "custom_body_text_7XJjaD": {
       "type": "custom-body-text",
       "blocks": {
         "heading_QCXUCq": {
           "type": "heading",
           "settings": {
-            "text": "Alimentos que contienen nootrópicos naturales potentes",
+            "text": "Pilar 2: Movimiento funcional que genera resultados",
             "level": "h2"
           }
         },
         "text_gEqhaz": {
           "type": "text",
           "settings": {
-            "text": "<p>Tu cocina puede convertirse en una farmacia natural si sabes qué buscar. Estos alimentos concentran compuestos nootrópicos en cantidades significativas:</p><h3>Fuentes alimentarias de alta potencia</h3><ul><li><strong>Huevos</strong>: Ricos en colina, precursor de la acetilcolina</li><li><strong>Pescados grasos</strong>: Aportan DHA y EPA para la salud neuronal</li><li><strong>Nueces y almendras</strong>: Contienen vitamina E y ácidos grasos esenciales</li><li><strong>Arándanos</strong>: Concentran antocianinas protectoras</li><li><strong>Chocolate negro (85% cacao)</strong>: Rico en flavonoides y teobromina</li><li><strong>Té verde matcha</strong>: La forma más concentrada de L-teanina</li><li><strong>Cúrcuma</strong>: Su curcumina protege contra la neurodegeneración</li></ul><h3>Superalimentos nootrópicos emergentes</h3><p>Los <strong>hongos funcionales</strong> como el Melena de León contienen compuestos únicos que estimulan la producción del factor de crecimiento nervioso. Estas setas comestibles pueden favorecer la regeneración neuronal y mejorar la plasticidad cerebral.</p>"
+            "text": "<p>El ejercicio no es opcional para la salud óptima. No es negociable. Tu cuerpo está diseñado para moverse, y cuando no lo hace, se deteriora progresivamente.</p><p>Pero aquí está lo interesante: no necesitas pasar dos horas diarias en el gimnasio. Necesitas movimiento inteligente que genere resultados específicos.</p><h3>La fórmula de movimiento óptimo</h3><p><strong>Fuerza (2-3 veces por semana, 45-60 minutos)</strong></p><p>El entrenamiento de fuerza no es solo para ganar músculo. Es para mantener la densidad ósea, mejorar la sensibilidad a la insulina, aumentar el metabolismo basal y proteger las articulaciones.</p><p><strong>Cardio de baja intensidad (casi diario, 20-40 minutos)</strong></p><p>Caminar es probablemente el ejercicio más infravalorado del mundo. Mejora la salud cardiovascular, reduce el estrés, facilita la digestión y no genera el cortisol excesivo del cardio intenso.</p><p><strong>Cardio de alta intensidad (1-2 veces por semana, 15-20 minutos)</strong></p><p>HIIT (intervalos de alta intensidad) mejora dramáticamente la capacidad cardiovascular, la sensibilidad a la insulina y la composición corporal. Pero más no es mejor. El exceso genera estrés crónico.</p><p><strong>Movilidad y flexibilidad (diaria, 10-15 minutos)</strong></p><p>Estiramientos, yoga suave o trabajo de movilidad mantienen tus articulaciones sanas y previenen lesiones. Especialmente importante si pasas horas sentado.</p><p>Lo más importante es la consistencia. Es mucho mejor entrenar 30 minutos cuatro veces por semana durante un año que machacarte dos horas diarias durante dos semanas y abandonar.</p>"
           }
         }
       },
@@ -952,20 +1040,101 @@
         "image_margin_m": 24
       }
     },
+    "custom_cta_button_NgbGHh": {
+      "type": "custom-cta-button",
+      "blocks": {
+        "button_3ttnRq": {
+          "type": "button",
+          "settings": {
+            "text": "Conocer los nootrópicos de ZZEN Focus",
+            "link": "#",
+            "new_tab": false,
+            "custom_colors": false,
+            "bg": "#ffffff",
+            "bg_hover": "#f2f2f2",
+            "color": "#000000",
+            "color_hover": "#000000",
+            "border_color": "#000000"
+          }
+        }
+      },
+      "block_order": [
+        "button_3ttnRq"
+      ],
+      "name": "Botón CTA",
+      "settings": {
+        "anchor_id": "",
+        "missing_link_note": "",
+        "bg_color": "#ffffff",
+        "mobile_breakpoint": 750,
+        "content_max_width": 780,
+        "align_d": "center",
+        "align_m": "center",
+        "stack_m": true,
+        "full_width_m": false,
+        "button_gap_d": 16,
+        "button_gap_m": 12,
+        "padding_x_d": 24,
+        "padding_x_m": 18,
+        "padding_top_d": 56,
+        "padding_bottom_d": 56,
+        "padding_top_m": 36,
+        "padding_bottom_m": 36,
+        "pill_shape": true,
+        "radius_d": 8,
+        "radius_m": 8,
+        "button_padding_x_d": 58,
+        "button_padding_y_d": 13,
+        "button_padding_x_m": 32,
+        "button_padding_y_m": 12,
+        "button_min_width_d": 0,
+        "button_min_width_m": 0,
+        "button_font": "helvetica",
+        "button_font_custom": "'Helvetica neue', sans-serif",
+        "button_weight": "400",
+        "button_transform": "none",
+        "underline": "always",
+        "underline_width": 1,
+        "underline_offset": 3,
+        "button_size_d": 15,
+        "button_size_m": 14,
+        "button_line_height": 130,
+        "button_letter_spacing_d": 0,
+        "button_letter_spacing_m": 0,
+        "button_bg": "#000000",
+        "button_bg_hover": "#2b2b2b",
+        "button_color": "#ffffff",
+        "button_color_hover": "#ffffff",
+        "button_border_color": "rgba(0,0,0,0)",
+        "button_border_color_hover": "rgba(0,0,0,0)",
+        "button_border_width": 0,
+        "shadow_color": "rgba(0,0,0,0)",
+        "shadow_x": 0,
+        "shadow_y": 6,
+        "shadow_blur": 18,
+        "hover_lift": 0,
+        "transition_ms": 200,
+        "icon_style": "none",
+        "icon_size_d": 16,
+        "icon_size_m": 15,
+        "icon_gap": 8,
+        "icon_stroke": 1.6
+      }
+    },
     "custom_body_text_XGV3Ek": {
       "type": "custom-body-text",
       "blocks": {
         "heading_ryeNWg": {
           "type": "heading",
           "settings": {
-            "text": "Cómo optimizar el uso de nootrópicos naturales para máximos resultados",
+            "text": "Pilar 3: Sueño reparador como base del rendimiento",
             "level": "h2"
           }
         },
         "text_N4PiNA": {
           "type": "text",
           "settings": {
-            "text": "<h3>Protocolo de implementación gradual</h3><p>Para obtener los mejores resultados con cualquier <strong>nootrópico natural más potente</strong>, la clave está en la progresión sistemática:</p><ul><li>Comienza con un solo compuesto durante 2-4 semanas</li><li>Documenta los cambios en concentración, memoria y estado de ánimo</li><li>Ajusta la dosis según tu respuesta individual</li><li>Considera combinaciones solo después de evaluar efectos individuales</li></ul><h3>Factores que potencian la efectividad</h3><p>El estilo de vida amplifica o limita los beneficios de los nootrópicos naturales. El sueño de calidad, la hidratación adecuada y el ejercicio regular crean el entorno óptimo para que estos compuestos funcionen eficientemente.</p><p>La <strong>sincronización circadiana</strong> también importa. Los nootrópicos estimulantes funcionan mejor por la mañana, mientras que los adaptógenos pueden tomarse en cualquier momento del día.</p>"
+            "text": "<p>Puedes hacer todo lo demás perfectamente, pero si duermes mal, tu salud será subóptima. El sueño no es tiempo perdido. Es cuando tu cuerpo se repara, tu cerebro consolida memorias y tus sistemas se resetean.</p><h3>Por qué el sueño es un no negociable</h3><p>Durante el sueño profundo:</p><ul><li>Se elimina la beta-amiloide del cerebro (proteína asociada al Alzheimer)</li><li>Se consolidan las memorias y el aprendizaje del día</li><li>Se reparan los tejidos musculares</li><li>Se producen la mayoría de las hormonas de crecimiento</li><li>Se regula el metabolismo y el apetito (leptina y grelina)</li><li>Se fortalece el sistema inmunológico</li></ul><p>Una sola noche de mal sueño reduce tu función cognitiva equivalente a estar legalmente ebrio. Dormir menos de 6 horas regularmente aumenta el riesgo de obesidad, diabetes, enfermedades cardiovasculares y demencia.</p><h3>El protocolo de sueño óptimo</h3><p><strong>Horario consistente (7 días a la semana): </strong>Acuéstate y levántate a la misma hora cada día, incluyendo fines de semana. Tu ritmo circadiano funciona con regularidad, no con flexibilidad.</p><p><strong>Temperatura de la habitación (16-19°C): </strong>Tu temperatura corporal debe descender para iniciar el sueño. Una habitación fresca facilita este proceso.</p><p><strong>Oscuridad total: </strong>Incluso la luz tenue afecta la producción de melatonina. Usa cortinas opacas o antifaz si es necesario.</p><p><strong>Sin pantallas 1-2 horas antes de dormir: </strong>La luz azul suprime la melatonina. Lee un libro físico, escucha un podcast, medita. Pero aléjate de teléfono, tablet y ordenador.</p><p><strong>Rutina de desactivación (30-60 minutos antes): </strong>Tu cerebro necesita tiempo para cambiar del modo activo al modo descanso. Crea una rutina relajante: ducha caliente, lectura, estiramientos suaves, respiración profunda.</p><p><strong>Suplementación natural si es necesario: </strong>El magnesio puede ayudar, pero no es una mágica. Primero optimiza el comportamiento, luego considera <a href=\"https://zzenlabs.com/\"><span style=\"text-decoration:underline\"><strong>suplementos naturales</strong></span></a>.</p><p><a href=\"https://zzenlabs.com/products/zzen-sleep\"><strong>ZZEN Sleep</strong></a> combina bisglicinato de magnesio, melatonina, L-triptófano, GABA y extractos naturales de valeriana para ayudarte a conciliar el sueño más rápido y disfrutar de un descanso profundo y reparador.</p><p><a href=\"https://zzenlabs.com/products/zzen-sleep-magnesio-y-melatonina\">ZZEN SLEEP | Triptófano y GabaPrueba ahora ZZEN Sleep</a></p><h2>Pilar 4: Gestión del estrés y salud mental</h2><p>El estrés crónico es probablemente el asesino silencioso más subestimado del siglo XXI. No te mata directamente. Te erosiona poco a poco: sueño fragmentado, digestión comprometida, sistema inmune debilitado, función cognitiva reducida.</p><h3>El problema del estrés moderno</h3><p>Nuestros cuerpos están diseñados para manejar estrés agudo (escapar de un depredador) y luego recuperarse. No están diseñados para el estrés crónico de bajo grado: emails constantes, presión laboral, preocupación financiera, tráfico, noticias alarmantes 24/7.</p><p>Este estrés mantenido eleva el cortisol crónicamente. El cortisol alto sostenido:</p><ul><li>Suprime el sistema inmune</li><li>Interfiere con la formación de memoria</li><li>Promueve acumulación de grasa abdominal</li><li>Reduce la sensibilidad a la insulina</li><li>Aumenta inflamación sistémica</li><li>Deteriora la calidad del sueño</li></ul><h3>Estrategias probadas de gestión del estrés</h3><p><strong>Meditación o mindfulness (10-20 minutos diarios): </strong>No necesitas convertirte en monje budista. Simplemente siéntate, cierra los ojos y enfócate en tu respiración. Cuando tu mente divague (lo hará), vuelve suavemente a la respiración. Repite.</p><p><strong>Respiración diafragmática (3-5 minutos, varias veces al día): </strong>Inhala profundamente durante 4 segundos, mantén 4 segundos, exhala 6 segundos, mantén 2 segundos. Repite 5-10 ciclos. Esto activa el sistema nervioso parasimpático (descanso y digestión) y desactiva el simpático (lucha o huida).</p><p><strong>Tiempo en naturaleza (mínimo 120 minutos semanales): </strong>La investigación muestra que pasar dos horas semanales en espacios verdes reduce significativamente cortisol, presión arterial y marcadores de inflamación.</p><p><strong>Conexiones sociales de calidad: </strong>Las relaciones profundas son uno de los predictores más fuertes de longevidad y bienestar. Pero calidad sobre cantidad. Una cena tranquila con un amigo cercano vale más que cien likes en Instagram.</p><p><strong>Límites digitales estrictos: </strong>Desactiva notificaciones innecesarias. Establece horarios sin teléfono. Usa modo avión por las noches. Tu cerebro necesita descanso del bombardeo constante de información.</p><p>Suplementos nootrópicos como <a href=\"https://zzenlabs.com/products/zzen-calm-ashwagandha\"><strong>ZZEN Calm</strong></a>, que contiene Ashwagandha KSM-66®, el extracto de ashwagandha más estudiado científicamente, junto con azafrán y melissa, pueden ayudarte a reducir el estrés, mejorar tu estado de ánimo y recuperar el equilibrio mental.</p><p><a href=\"https://zzenlabs.com/products/zzen-calm-ashwagandha\">ZZEN CALM | Ashwagandha KSM-66Prueba ahora ZZEN Calm</a></p><h2>La matriz de optimización: evalúa tu situación actual</h2><p>Antes de optimizar, necesitas saber dónde estás. Esta matriz te puede ayudar a detectar tus áreas más débiles para priorizarlas.</p>"
           }
         }
       },
@@ -1083,20 +1252,101 @@
         "image_margin_m": 24
       }
     },
+    "custom_cta_button_hXEb3J": {
+      "type": "custom-cta-button",
+      "blocks": {
+        "button_7UHLNQ": {
+          "type": "button",
+          "settings": {
+            "text": "Conocer los nootrópicos de ZZEN Focus",
+            "link": "#",
+            "new_tab": false,
+            "custom_colors": false,
+            "bg": "#ffffff",
+            "bg_hover": "#f2f2f2",
+            "color": "#000000",
+            "color_hover": "#000000",
+            "border_color": "#000000"
+          }
+        }
+      },
+      "block_order": [
+        "button_7UHLNQ"
+      ],
+      "name": "Botón CTA",
+      "settings": {
+        "anchor_id": "",
+        "missing_link_note": "",
+        "bg_color": "#ffffff",
+        "mobile_breakpoint": 750,
+        "content_max_width": 780,
+        "align_d": "center",
+        "align_m": "center",
+        "stack_m": true,
+        "full_width_m": false,
+        "button_gap_d": 16,
+        "button_gap_m": 12,
+        "padding_x_d": 24,
+        "padding_x_m": 18,
+        "padding_top_d": 56,
+        "padding_bottom_d": 56,
+        "padding_top_m": 36,
+        "padding_bottom_m": 36,
+        "pill_shape": true,
+        "radius_d": 8,
+        "radius_m": 8,
+        "button_padding_x_d": 58,
+        "button_padding_y_d": 13,
+        "button_padding_x_m": 32,
+        "button_padding_y_m": 12,
+        "button_min_width_d": 0,
+        "button_min_width_m": 0,
+        "button_font": "helvetica",
+        "button_font_custom": "'Helvetica neue', sans-serif",
+        "button_weight": "400",
+        "button_transform": "none",
+        "underline": "always",
+        "underline_width": 1,
+        "underline_offset": 3,
+        "button_size_d": 15,
+        "button_size_m": 14,
+        "button_line_height": 130,
+        "button_letter_spacing_d": 0,
+        "button_letter_spacing_m": 0,
+        "button_bg": "#000000",
+        "button_bg_hover": "#2b2b2b",
+        "button_color": "#ffffff",
+        "button_color_hover": "#ffffff",
+        "button_border_color": "rgba(0,0,0,0)",
+        "button_border_color_hover": "rgba(0,0,0,0)",
+        "button_border_width": 0,
+        "shadow_color": "rgba(0,0,0,0)",
+        "shadow_x": 0,
+        "shadow_y": 6,
+        "shadow_blur": 18,
+        "hover_lift": 0,
+        "transition_ms": 200,
+        "icon_style": "none",
+        "icon_size_d": 16,
+        "icon_size_m": 15,
+        "icon_gap": 8,
+        "icon_stroke": 1.6
+      }
+    },
     "custom_body_text_zqh9tU": {
       "type": "custom-body-text",
       "blocks": {
         "heading_czcFzn": {
           "type": "heading",
           "settings": {
-            "text": "Consideraciones de seguridad y uso responsable",
+            "text": "Errores comunes que sabotean la optimización de tu salud",
             "level": "h2"
           }
         },
         "text_ARydgx": {
           "type": "text",
           "settings": {
-            "text": "<p>1. Aunque los nootrópicos naturales tienen un perfil de seguridad superior a los sintéticos, requieren uso consciente. Algunas personas pueden experimentar efectos leves como molestias digestivas iniciales o cambios en los patrones de sueño.<br/><br/><strong>Contraindicaciones importantes</strong></p><p>- Personas con trastornos de coagulación deben evitar el Ginkgo biloba<br/>- Quienes toman medicación psiquiátrica necesitan supervisión médica<br/>- Durante el embarazo y lactancia, consulta siempre con un profesional<br/>- Los hipertensos deben monitorizar su respuesta a nootrópicos estimulantes</p>"
+            "text": "<p>Saber qué hacer es importante. Saber qué NO hacer es igual de crítico.<br/><br/><strong>Error 1: Intentar cambiar todo a la vez</strong></p><p>La fuerza de voluntad es un recurso limitado. Intentar cambiar tu dieta, empezar a hacer ejercicio, meditar, dormir mejor y leer más, todo simultáneamente, es la receta perfecta para el fracaso en dos semanas.</p><p><strong>¿Qué te recomendamos en ZZEN Labs?</strong> Implementa un hábito cada semana. Consolídalo durante 7-14 días antes de añadir el siguiente.</p><h3><strong>Error 2: Buscar la perfección</strong></h3><p>\"Si no puedo entrenar una hora, no entreno.\" \"Si no puedo comer perfectamente, como lo que sea.\" Este pensamiento todo-o-nada destruye el progreso.</p><p><strong>¿Qué te recomendamos en ZZEN Labs? </strong>20 minutos de ejercicio son infinitamente mejor que cero. Una comida decente es mejor que comida basura. El progreso no requiere perfección.</p><h3><strong>Error 3: No dar tiempo suficiente</strong></h3><p>Esperas ver resultados en una semana. Tu cuerpo necesita tiempo para adaptarse. Los cambios metabólicos, hormonales y neurológicos requieren semanas o meses.</p><p><strong>¿Qué te recomendamos en ZZEN Labs?</strong> Comprométete a 90 días antes de evaluar. Los primeros 30 días estableces hábitos. Los siguientes 60 ves resultados reales.</p><h3><strong>Error 4: Ignorar el descanso</strong></h3><p>Más ejercicio, más trabajo, más productividad. Ningún descanso. El cuerpo se adapta durante el descanso, no durante el estrés.</p><p><strong>¿Qué te recomendamos en ZZEN Labs?</strong> Planifica días de descanso activo (caminar suave, yoga). Toma una semana de deload (reducir intensidad) cada 6-8 semanas de entrenamiento.</p><h3><strong>Error 5: Confiar solo en la motivación</strong></h3><p>La motivación fluctúa. Los sistemas permanecen. Cuando la motivación falla (y fallará), necesitas sistemas que te mantengan en marcha.</p><p><strong>¿Qué te recomendamos en ZZEN Labs?</strong> Crea disparadores automáticos. \"Después de X, haré Y.\" Después de despertar, bebo agua. Después de trabajar, camino. Los hábitos no requieren motivación.</p><h2>Conclusión</h2><p>En definitiva, optimizar tu salud no es una meta puntual, sino un proceso continuo basado en decisiones inteligentes y sostenibles en el tiempo. No necesitas hacerlo todo perfecto ni cambiar tu vida de un día para otro. Necesitas entender qué te está limitando, actuar con intención y construir sistemas que te permitan avanzar incluso cuando la motivación no acompaña.</p><p>Cuando alineas nutrición, movimiento, descanso y gestión del estrés, tu cuerpo deja de ser un obstáculo y se convierte en tu mayor aliado. Es ahí donde realmente notas la diferencia: más energía, mayor claridad mental, mejor estado de ánimo y una sensación de control sobre tu propio bienestar.</p><p>A partir de aquí, el siguiente paso es simple: empieza. Identifica tu punto más débil, céntrate en mejorarlo y deja que el efecto acumulativo haga el resto. Porque la salud óptima no es un destino reservado a unos pocos, sino el resultado de pequeñas decisiones bien ejecutadas, repetidas cada día.</p>"
           }
         }
       },
@@ -1214,144 +1464,13 @@
         "image_margin_m": 24
       }
     },
-    "custom_body_text_XkA43t": {
-      "type": "custom-body-text",
-      "blocks": {
-        "heading_rTc9DG": {
-          "type": "heading",
-          "settings": {
-            "text": "El futuro de la optimización cognitiva natural",
-            "level": "h2"
-          }
-        },
-        "text_iWn3PR": {
-          "type": "text",
-          "settings": {
-            "text": "<p>La investigación en nootrópicos naturales avanza constantemente. Estudios emergentes exploran nuevos extractos vegetales, combinaciones innovadoras y métodos de potenciación de la biodisponibilidad. Este campo promete soluciones cada vez más específicas y efectivas para diferentes aspectos del rendimiento mental.</p><p>La <strong>personalización</strong> representa la siguiente frontera. En lugar de fórmulas genéricas, el futuro apunta hacia protocolos individualizados basados en perfiles genéticos, biomarcadores y objetivos cognitivos específicos.</p><p>Los nootrópicos naturales no son una solución mágica, pero sí representan herramientas valiosas para quienes buscan optimizar su potencial mental de manera sostenible. La clave está en combinar estos potenciadores naturales con hábitos de vida saludables y expectativas realistas sobre sus efectos graduales pero significativos.</p>"
-          }
-        }
-      },
-      "block_order": [
-        "heading_rTc9DG",
-        "text_iWn3PR"
-      ],
-      "name": "Títulos y texto",
-      "settings": {
-        "source": "blocks",
-        "empty_note": "",
-        "anchor_id": "contenido",
-        "bg_color": "#ffffff",
-        "mobile_breakpoint": 750,
-        "content_max_width": 780,
-        "padding_x_d": 24,
-        "padding_x_m": 18,
-        "padding_top_d": 24,
-        "padding_bottom_d": 24,
-        "padding_top_m": 16,
-        "padding_bottom_m": 16,
-        "body_font": "helvetica",
-        "body_font_custom": "'Helvetica neue', sans-serif",
-        "body_weight": "500",
-        "body_align_d": "justify",
-        "body_align_m": "justify",
-        "hyphenate": false,
-        "body_fill": "solid",
-        "body_color": "#000000",
-        "body_grad_1": "#3a5670",
-        "body_grad_2": "#6b6355",
-        "body_grad_3": "#8a7550",
-        "body_grad_mid": 50,
-        "body_grad_angle": 90,
-        "body_size_d": 16,
-        "body_size_m": 15,
-        "body_line_height_d": 180,
-        "body_line_height_m": 150,
-        "body_letter_spacing_d": 0,
-        "body_letter_spacing_m": 0,
-        "paragraph_gap_d": 28,
-        "paragraph_gap_m": 20,
-        "strong_color": "#111111",
-        "strong_weight": "700",
-        "em_color": "#3c4650",
-        "link_color": "#96794a",
-        "link_hover_color": "#6f5c3c",
-        "link_underline": "always",
-        "h2_font": "thin2",
-        "h2_font_custom": "'thin2', Georgia, serif",
-        "h2_weight": "400",
-        "h2_fill": "gradient",
-        "h2_color": "#000000",
-        "h2_grad_1": "#1e3b31",
-        "h2_grad_2": "#000000",
-        "h2_grad_3": "#2b2b2b",
-        "h2_grad_mid": 55,
-        "h2_grad_angle": 90,
-        "h2_align_d": "left",
-        "h2_align_m": "left",
-        "h2_size_d": 42,
-        "h2_size_m": 23,
-        "h2_line_height_d": 120,
-        "h2_line_height_m": 122,
-        "h2_letter_spacing_d": 0,
-        "h2_letter_spacing_m": 0,
-        "h2_margin_top_d": 64,
-        "h2_margin_top_m": 40,
-        "h2_margin_bottom_d": 18,
-        "h2_margin_bottom_m": 14,
-        "h3_font": "thin2",
-        "h3_font_custom": "'thin2', Georgia, serif",
-        "h3_weight": "400",
-        "h3_fill": "solid",
-        "h3_color": "#22303a",
-        "h3_grad_1": "#25405a",
-        "h3_grad_2": "#7f8a7a",
-        "h3_grad_3": "#3a3a3a",
-        "h3_grad_mid": 55,
-        "h3_grad_angle": 90,
-        "h3_align_d": "left",
-        "h3_align_m": "left",
-        "h3_size_d": 22,
-        "h3_size_m": 18,
-        "h3_line_height_d": 130,
-        "h3_line_height_m": 130,
-        "h3_letter_spacing_d": 0,
-        "h3_letter_spacing_m": 0,
-        "h3_margin_top_d": 40,
-        "h3_margin_top_m": 28,
-        "h3_margin_bottom_d": 14,
-        "h3_margin_bottom_m": 10,
-        "list_marker_color": "#96794a",
-        "list_indent_d": 22,
-        "list_indent_m": 18,
-        "list_item_gap_d": 8,
-        "list_item_gap_m": 6,
-        "list_margin_top_d": 20,
-        "list_margin_top_m": 16,
-        "list_margin_bottom_d": 8,
-        "list_margin_bottom_m": 6,
-        "quote_color": "#4a4a4a",
-        "quote_border_color": "#96794a",
-        "quote_border_width": 3,
-        "quote_padding_d": 20,
-        "quote_padding_m": 14,
-        "quote_margin_d": 32,
-        "quote_margin_m": 24,
-        "hr_color": "#e5e3de",
-        "hr_thickness": 1,
-        "hr_margin_d": 40,
-        "hr_margin_m": 28,
-        "image_radius": 8,
-        "image_margin_d": 32,
-        "image_margin_m": 24
-      }
-    },
-    "custom_cta_button_4iUzUh": {
+    "custom_cta_button_EqPAVV": {
       "type": "custom-cta-button",
       "blocks": {
-        "button_gzHJLg": {
+        "button_pwtzXr": {
           "type": "button",
           "settings": {
-            "text": "Conocer los nootrópicos de ZZEN Labs",
+            "text": "Conocer los nootrópicos de ZZEN Focus",
             "link": "#",
             "new_tab": false,
             "custom_colors": false,
@@ -1364,7 +1483,7 @@
         }
       },
       "block_order": [
-        "button_gzHJLg"
+        "button_pwtzXr"
       ],
       "name": "Botón CTA",
       "settings": {
@@ -1410,10 +1529,10 @@
         "button_bg_hover": "#2b2b2b",
         "button_color": "#ffffff",
         "button_color_hover": "#ffffff",
-        "button_border_color": "#00000000",
-        "button_border_color_hover": "#00000000",
+        "button_border_color": "rgba(0,0,0,0)",
+        "button_border_color_hover": "rgba(0,0,0,0)",
         "button_border_width": 0,
-        "shadow_color": "#00000000",
+        "shadow_color": "rgba(0,0,0,0)",
         "shadow_x": 0,
         "shadow_y": 6,
         "shadow_blur": 18,
@@ -1447,7 +1566,7 @@
         "atc_size": 16,
         "atc_size_mobile": 15,
         "badge_size": 13,
-        "bg_color": "#FFFFFF",
+        "bg_color": "#ffffff",
         "padding_top": 60,
         "padding_bottom": 60
       }
@@ -1462,11 +1581,13 @@
     "custom_body_text_JrAfek",
     "custom_body_text_EkgD7V",
     "custom_body_text_V9hPTX",
+    "custom_cta_button_LdWrw9",
     "custom_body_text_7XJjaD",
+    "custom_cta_button_NgbGHh",
     "custom_body_text_XGV3Ek",
+    "custom_cta_button_hXEb3J",
     "custom_body_text_zqh9tU",
-    "custom_body_text_XkA43t",
-    "custom_cta_button_4iUzUh",
+    "custom_cta_button_EqPAVV",
     "prod_slider_apby3W"
   ]
 }
