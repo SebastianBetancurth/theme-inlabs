@@ -58,7 +58,7 @@
         "reading_time_ANCbrx": {
           "type": "reading_time",
           "settings": {
-            "label": "Lectura: 4min",
+            "label": "Lectura:",
             "new_line": false
           }
         }
