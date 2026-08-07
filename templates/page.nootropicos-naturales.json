@@ -193,19 +193,6 @@
     },
     "custom_table_of_contens_qErgpE": {
       "type": "custom-table-of-contens",
-      "blocks": {
-        "link_ptPRhw": {
-          "type": "link",
-          "settings": {
-            "text": "1. Qué son los nootrópicos naturales y cómo transforman tu cerebro",
-            "anchor": "que-son-los-nootropicos",
-            "level": "1"
-          }
-        }
-      },
-      "block_order": [
-        "link_ptPRhw"
-      ],
       "name": "Tabla de contenido",
       "settings": {
         "anchor_id": "",
