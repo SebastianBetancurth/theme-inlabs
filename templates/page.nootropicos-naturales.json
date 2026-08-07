@@ -310,7 +310,7 @@
       "name": "Títulos y texto",
       "settings": {
         "source": "article",
-        "empty_note": "El rendimiento cognitivo nunca ha sido tan crucial como en la actualidad. Entre las exigencias laborales, académicas y personales, nuestro cerebro necesita funcionar al máximo nivel durante jornadas cada vez más intensas. Afortunadamente, la naturaleza nos ofrece soluciones extraordinarias a través de los nootrópicos naturales más efectivos, sustancias que pueden potenciar tu memoria, concentración y claridad mental sin los efectos secundarios de los estimulantes sintéticos.",
+        "empty_note": "El rendimiento cognitivo nunca ha sido tan crucial como en la actualidad. Entre las exigencias laborales, académicas y personales, nuestro cerebro necesita funcionar al máximo nivel durante jornadas cada vez más intensas. Afortunadamente, la naturaleza nos ofrece soluciones extraordinarias a través de los <strong>nootrópicos naturales </strong>más efectivos, sustancias que pueden potenciar tu memoria, concentración y claridad mental sin los efectos secundarios de los estimulantes sintéticos.",
         "anchor_id": "contenido",
         "bg_color": "#ffffff",
         "mobile_breakpoint": 750,
@@ -323,7 +323,7 @@
         "padding_bottom_m": 16,
         "body_font": "helvetica",
         "body_font_custom": "'Helvetica neue', sans-serif",
-        "body_weight": "400",
+        "body_weight": "500",
         "body_align_d": "justify",
         "body_align_m": "justify",
         "hyphenate": false,
