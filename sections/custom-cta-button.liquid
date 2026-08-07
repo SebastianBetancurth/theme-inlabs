@@ -1,0 +1,978 @@
+{%- comment -%}
+  ============================================================================
+  SECCIÓN: Botón de llamada a la acción
+  Tema: Dawn / Online Store 2.0
+  Ruta: sections/custom-cta-button.liquid
+
+  Píldora negra centrada, con el texto en blanco Y SUBRAYADO. Ese subrayado es
+  el detalle que distingue este botón de cualquier botón por defecto: la mayoría
+  de temas lo quitan expresamente. Aquí se mantiene y es un ajuste, no algo
+  fijo.
+
+  LA FORMA DE PÍLDORA NO ES UN RADIO GRANDE «A OJO».
+  Con una casilla se aplica un radio enorme, que CSS recorta solo hasta la
+  mitad de la altura. Así el botón sigue siendo una píldora perfecta aunque
+  cambie el tamaño de letra o el relleno, sin tener que recalcular el radio
+  cada vez. Si se prefiere una esquina concreta, se desmarca y se usa el
+  deslizador.
+
+  EL BOTÓN SE ESTIRA POR EL RELLENO, NO POR UN ANCHO FIJO.
+  Se mide desde el texto hacia fuera. Un ancho fijo obligaría a revisarlo cada
+  vez que se cambia el texto o el idioma; con relleno, la traducción más larga
+  sigue cabiendo. El ancho mínimo está disponible por si se quieren dos botones
+  del mismo tamaño con textos distintos.
+
+  SIN ENLACE NO SE PINTA UN ENLACE.
+  Un <a> sin destino es un botón que no lleva a ninguna parte y que el teclado
+  y los lectores de pantalla anuncian como pulsable. Si el bloque no tiene
+  destino, sale como texto normal, y dentro del editor se avisa para que no
+  pase inadvertido antes de publicar.
+  ============================================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign bp = s.mobile_breakpoint
+  assign bp_max = bp | minus: 1
+
+  case s.button_font
+    when 'thin2'
+      assign btn_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign btn_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign btn_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign btn_stack = 'var(--font-body-family)'
+    else
+      assign btn_stack = s.button_font_custom
+  endcase
+
+  if s.content_max_width == 0
+    assign max_w = 'none'
+  else
+    assign max_w = s.content_max_width | append: 'px'
+  endif
+
+  # Ver nota de cabecera: el navegador recorta el radio a la mitad de la
+  # altura, así que un número enorme siempre da la píldora exacta.
+  if s.pill_shape
+    assign radius_d = '999px'
+    assign radius_m = '999px'
+  else
+    assign radius_d = s.radius_d | append: 'px'
+    assign radius_m = s.radius_m | append: 'px'
+  endif
+
+  case s.underline
+    when 'always'
+      assign deco = 'underline'
+      assign deco_hover = 'underline'
+    when 'hover'
+      assign deco = 'none'
+      assign deco_hover = 'underline'
+    when 'hover_off'
+      assign deco = 'underline'
+      assign deco_hover = 'none'
+    else
+      assign deco = 'none'
+      assign deco_hover = 'none'
+  endcase
+-%}
+
+{%- style -%}
+  @font-face {
+    font-family: 'Helvetica neue';
+    src: url('{{ 'HelveticaNeueCyr-Light.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'thin2';
+    src: url('{{ 'lawrence-regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ================= Variables: PC ================= */
+  .zcta-{{ section.id }} {
+    --zcta-bg: {{ s.bg_color }};
+    --zcta-max-w: {{ max_w }};
+    --zcta-px: {{ s.padding_x_d }}px;
+    --zcta-pt: {{ s.padding_top_d }}px;
+    --zcta-pb: {{ s.padding_bottom_d }}px;
+    --zcta-align: {{ s.align_d }};
+    --zcta-gap: {{ s.button_gap_d }}px;
+
+    --zcta-font: {{ btn_stack }};
+    --zcta-size: {{ s.button_size_d }}px;
+    --zcta-lh: {{ s.button_line_height | divided_by: 100.0 }};
+    --zcta-weight: {{ s.button_weight }};
+    --zcta-ls: {{ s.button_letter_spacing_d }}px;
+    --zcta-transform: {{ s.button_transform }};
+    --zcta-deco: {{ deco }};
+    --zcta-deco-hover: {{ deco_hover }};
+    --zcta-deco-offset: {{ s.underline_offset }}px;
+    --zcta-deco-width: {{ s.underline_width }}px;
+
+    --zcta-btn-bg: {{ s.button_bg }};
+    --zcta-btn-bg-hover: {{ s.button_bg_hover }};
+    --zcta-btn-color: {{ s.button_color }};
+    --zcta-btn-color-hover: {{ s.button_color_hover }};
+    --zcta-btn-border: {{ s.button_border_color }};
+    --zcta-btn-border-hover: {{ s.button_border_color_hover }};
+    --zcta-btn-border-w: {{ s.button_border_width }}px;
+
+    --zcta-radius: {{ radius_d }};
+    --zcta-pad-x: {{ s.button_padding_x_d }}px;
+    --zcta-pad-y: {{ s.button_padding_y_d }}px;
+    --zcta-min-w: {{ s.button_min_width_d }}px;
+
+    --zcta-shadow: {{ s.shadow_x }}px {{ s.shadow_y }}px {{ s.shadow_blur }}px {{ s.shadow_color }};
+    --zcta-lift: {{ s.hover_lift }}px;
+    --zcta-anim: {{ s.transition_ms }}ms;
+
+    --zcta-icon-size: {{ s.icon_size_d }}px;
+    --zcta-icon-gap: {{ s.icon_gap }}px;
+    --zcta-icon-stroke: {{ s.icon_stroke }};
+  }
+
+  /* ================= Estructura ================= */
+  .zcta {
+    background-color: var(--zcta-bg);
+  }
+
+  .zcta__inner {
+    max-width: var(--zcta-max-w);
+    margin-inline: auto;
+    padding: var(--zcta-pt) var(--zcta-px) var(--zcta-pb);
+    box-sizing: border-box;
+  }
+
+  .zcta__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: var(--zcta-align);
+    gap: var(--zcta-gap);
+  }
+
+  /* ================= Botón ================= */
+  .zcta__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--zcta-icon-gap);
+    box-sizing: border-box;
+    /* Ver nota de cabecera: mide desde el texto hacia fuera. */
+    padding: var(--zcta-pad-y) var(--zcta-pad-x);
+    min-width: var(--zcta-min-w);
+    border: var(--zcta-btn-border-w) solid var(--zcta-btn-border);
+    border-radius: var(--zcta-radius);
+    background-color: var(--zcta-btn-bg);
+    box-shadow: var(--zcta-shadow);
+    font-family: var(--zcta-font);
+    font-size: var(--zcta-size);
+    font-weight: var(--zcta-weight);
+    line-height: var(--zcta-lh);
+    letter-spacing: var(--zcta-ls);
+    text-transform: var(--zcta-transform);
+    color: var(--zcta-btn-color);
+    text-decoration: var(--zcta-deco);
+    text-decoration-thickness: var(--zcta-deco-width);
+    text-underline-offset: var(--zcta-deco-offset);
+    cursor: pointer;
+    transition: background-color var(--zcta-anim) ease, color var(--zcta-anim) ease,
+      border-color var(--zcta-anim) ease, transform var(--zcta-anim) ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .zcta__btn:hover {
+    background-color: var(--zcta-btn-bg-hover);
+    color: var(--zcta-btn-color-hover);
+    border-color: var(--zcta-btn-border-hover);
+    text-decoration: var(--zcta-deco-hover);
+    transform: translateY(calc(var(--zcta-lift) * -1));
+  }
+
+  .zcta__btn:focus-visible {
+    outline: 2px solid var(--zcta-btn-bg);
+    outline-offset: 3px;
+  }
+
+  /* Sin destino no es pulsable, así que tampoco reacciona al ratón. */
+  .zcta__btn--static {
+    cursor: default;
+  }
+
+  .zcta__btn--static:hover {
+    background-color: var(--zcta-btn-bg);
+    color: var(--zcta-btn-color);
+    border-color: var(--zcta-btn-border);
+    transform: none;
+  }
+
+  .zcta__icon {
+    flex: 0 0 auto;
+    width: var(--zcta-icon-size);
+    height: var(--zcta-icon-size);
+    display: block;
+  }
+
+  .zcta__icon path {
+    stroke: currentColor;
+    stroke-width: var(--zcta-icon-stroke);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+  }
+
+  .zcta__note {
+    margin: 10px 0 0;
+    font-family: var(--zcta-font);
+    font-size: 13px;
+    line-height: 1.4;
+    color: #b04a3a;
+    text-align: var(--zcta-align);
+  }
+
+  /* ================= Móvil ================= */
+  @media screen and (max-width: {{ bp_max }}px) {
+    .zcta-{{ section.id }} {
+      --zcta-max-w: none;
+      --zcta-px: {{ s.padding_x_m }}px;
+      --zcta-pt: {{ s.padding_top_m }}px;
+      --zcta-pb: {{ s.padding_bottom_m }}px;
+      --zcta-align: {{ s.align_m }};
+      --zcta-gap: {{ s.button_gap_m }}px;
+
+      --zcta-size: {{ s.button_size_m }}px;
+      --zcta-ls: {{ s.button_letter_spacing_m }}px;
+
+      --zcta-radius: {{ radius_m }};
+      --zcta-pad-x: {{ s.button_padding_x_m }}px;
+      --zcta-pad-y: {{ s.button_padding_y_m }}px;
+      --zcta-min-w: {{ s.button_min_width_m }}px;
+
+      --zcta-icon-size: {{ s.icon_size_m }}px;
+    }
+
+    {%- if s.stack_m %}
+      .zcta-{{ section.id }} .zcta__row {
+        flex-direction: column;
+        align-items: {% if s.align_m == 'flex-start' %}flex-start{% elsif s.align_m == 'flex-end' %}flex-end{% else %}center{% endif %};
+      }
+    {%- endif %}
+
+    {%- if s.full_width_m %}
+      .zcta-{{ section.id }} .zcta__row { flex-direction: column; align-items: stretch; }
+      .zcta-{{ section.id }} .zcta__btn { width: 100%; }
+    {%- endif %}
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .zcta-{{ section.id }} .zcta__btn { transition: none; }
+    .zcta-{{ section.id }} .zcta__btn:hover { transform: none; }
+  }
+{%- endstyle -%}
+
+<div class="zcta zcta-{{ section.id }}"{% if s.anchor_id != blank %} id="{{ s.anchor_id | handle }}"{% endif %}>
+  <div class="zcta__inner">
+    <div class="zcta__row">
+      {%- for block in section.blocks -%}
+        {%- assign b = block.settings -%}
+        {%- if b.text != blank -%}
+          {%- capture btn_style -%}
+            {%- if b.custom_colors -%}
+              --zcta-btn-bg: {{ b.bg }}; --zcta-btn-bg-hover: {{ b.bg_hover }}; --zcta-btn-color: {{ b.color }}; --zcta-btn-color-hover: {{ b.color_hover }}; --zcta-btn-border: {{ b.border_color }};
+            {%- endif -%}
+          {%- endcapture -%}
+
+          {%- if b.link != blank -%}
+            <a
+              class="zcta__btn"
+              href="{{ b.link }}"
+              {% if b.new_tab %}target="_blank" rel="noopener"{% endif %}
+              {% if btn_style != blank %}style="{{ btn_style | strip }}"{% endif %}
+              {{ block.shopify_attributes }}
+            >
+              <span>{{ b.text }}</span>
+              {%- if s.icon_style != 'none' -%}
+                <svg class="zcta__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                  {%- if s.icon_style == 'arrow' -%}
+                    <path d="M3.5 10h13M11 4.5l5.5 5.5L11 15.5"></path>
+                  {%- else -%}
+                    <path d="M7.5 4.5 13 10l-5.5 5.5"></path>
+                  {%- endif -%}
+                </svg>
+              {%- endif -%}
+            </a>
+          {%- else -%}
+            <span
+              class="zcta__btn zcta__btn--static"
+              {% if btn_style != blank %}style="{{ btn_style | strip }}"{% endif %}
+              {{ block.shopify_attributes }}
+            >{{ b.text }}</span>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+
+    {%- if request.design_mode -%}
+      {%- assign missing = 0 -%}
+      {%- for block in section.blocks -%}
+        {%- if block.settings.text != blank and block.settings.link == blank -%}
+          {%- assign missing = missing | plus: 1 -%}
+        {%- endif -%}
+      {%- endfor -%}
+      {%- if missing > 0 -%}
+        <p class="zcta__note">{{ s.missing_link_note }}</p>
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Botón CTA",
+  "tag": "section",
+  "class": "section-zcta",
+  "max_blocks": 4,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Añade un bloque por cada botón. El texto y el destino se ponen dentro de cada bloque; el aspecto se decide aquí y vale para todos."
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Ancla de la sección",
+      "info": "Opcional. Si escribes 'cta' podrás enlazar aquí con #cta."
+    },
+    {
+      "type": "text",
+      "id": "missing_link_note",
+      "label": "Aviso en el editor si falta el destino",
+      "default": "Hay un botón sin destino: se está mostrando como texto y no se podrá pulsar. Añádele un enlace antes de publicar."
+    },
+
+    {
+      "type": "header",
+      "content": "Diseño general"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo de la sección",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "mobile_breakpoint",
+      "min": 480,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "label": "Punto de cambio a móvil",
+      "default": 750
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 0,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "label": "Ancho máximo del contenido",
+      "info": "Ponlo igual que en el resto de secciones del artículo.",
+      "default": 780
+    },
+    {
+      "type": "select",
+      "id": "align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "flex-start", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "flex-end", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "flex-start", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "flex-end", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "checkbox",
+      "id": "stack_m",
+      "label": "Apilar los botones en móvil",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width_m",
+      "label": "Botones a todo el ancho en móvil",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "button_gap_d",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre botones — PC",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "button_gap_m",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre botones — Móvil",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding_x_d",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen lateral — PC",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_x_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen lateral — Móvil",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "padding_top_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Aire por encima — PC",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Aire por debajo — PC",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_top_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Aire por encima — Móvil",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Aire por debajo — Móvil",
+      "default": 36
+    },
+
+    {
+      "type": "header",
+      "content": "Forma y tamaño del botón"
+    },
+    {
+      "type": "checkbox",
+      "id": "pill_shape",
+      "label": "Forma de píldora (totalmente redondeado)",
+      "info": "Se mantiene perfecta aunque cambies el tamaño de letra o el relleno. Desmárcala para elegir una esquina concreta.",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "radius_d",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo — PC",
+      "info": "Solo se usa si la casilla de píldora está desmarcada.",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "radius_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo — Móvil",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "button_padding_x_d",
+      "min": 20,
+      "max": 120,
+      "step": 1,
+      "unit": "px",
+      "label": "Relleno lateral — PC",
+      "default": 58
+    },
+    {
+      "type": "range",
+      "id": "button_padding_y_d",
+      "min": 4,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Relleno arriba y abajo — PC",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "button_padding_x_m",
+      "min": 8,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Relleno lateral — Móvil",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "button_padding_y_m",
+      "min": 4,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Relleno arriba y abajo — Móvil",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "button_min_width_d",
+      "min": 0,
+      "max": 500,
+      "step": 5,
+      "unit": "px",
+      "label": "Ancho mínimo — PC",
+      "info": "0 = el botón se ajusta al texto. Súbelo para igualar dos botones con textos distintos.",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "button_min_width_m",
+      "min": 0,
+      "max": 400,
+      "step": 5,
+      "unit": "px",
+      "label": "Ancho mínimo — Móvil",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "Texto del botón"
+    },
+    {
+      "type": "select",
+      "id": "button_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "button_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "select",
+      "id": "button_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "button_transform",
+      "label": "Mayúsculas",
+      "options": [
+        { "value": "none", "label": "Como se escriba" },
+        { "value": "uppercase", "label": "TODO EN MAYÚSCULAS" },
+        { "value": "capitalize", "label": "Inicial De Cada Palabra" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "select",
+      "id": "underline",
+      "label": "Subrayado",
+      "info": "'Siempre' es lo del original: es lo que distingue este botón de uno cualquiera.",
+      "options": [
+        { "value": "always", "label": "Siempre" },
+        { "value": "hover", "label": "Solo al pasar el ratón" },
+        { "value": "hover_off", "label": "Se quita al pasar el ratón" },
+        { "value": "none", "label": "Nunca" }
+      ],
+      "default": "always"
+    },
+    {
+      "type": "range",
+      "id": "underline_width",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor del subrayado",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "underline_offset",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación del subrayado",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "button_size_d",
+      "min": 10,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "button_size_m",
+      "min": 10,
+      "max": 26,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "button_line_height",
+      "min": 100,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado",
+      "default": 130
+    },
+    {
+      "type": "range",
+      "id": "button_letter_spacing_d",
+      "min": -2,
+      "max": 6,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras — PC",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "button_letter_spacing_m",
+      "min": -2,
+      "max": 6,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras — Móvil",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "Colores"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Fondo",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_hover",
+      "label": "Fondo al pasar el ratón",
+      "default": "#2b2b2b"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Color del texto",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_color_hover",
+      "label": "Color del texto al pasar el ratón",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color",
+      "label": "Color del borde",
+      "default": "#00000000"
+    },
+    {
+      "type": "color",
+      "id": "button_border_color_hover",
+      "label": "Color del borde al pasar el ratón",
+      "default": "#00000000"
+    },
+    {
+      "type": "range",
+      "id": "button_border_width",
+      "min": 0,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor del borde",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "Sombra y movimiento"
+    },
+    {
+      "type": "color",
+      "id": "shadow_color",
+      "label": "Color de la sombra",
+      "info": "Transparente = sin sombra.",
+      "default": "#00000000"
+    },
+    {
+      "type": "range",
+      "id": "shadow_x",
+      "min": -40,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Sombra: desplazamiento horizontal",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "shadow_y",
+      "min": -40,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Sombra: desplazamiento vertical",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "shadow_blur",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Sombra: difuminado",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "hover_lift",
+      "min": 0,
+      "max": 8,
+      "step": 1,
+      "unit": "px",
+      "label": "Cuánto sube al pasar el ratón",
+      "info": "0 = se queda quieto, como en el original.",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "transition_ms",
+      "min": 0,
+      "max": 900,
+      "step": 25,
+      "unit": "ms",
+      "label": "Duración de las transiciones",
+      "default": 200
+    },
+
+    {
+      "type": "header",
+      "content": "Icono"
+    },
+    {
+      "type": "select",
+      "id": "icon_style",
+      "label": "Icono a la derecha del texto",
+      "options": [
+        { "value": "none", "label": "Ninguno" },
+        { "value": "arrow", "label": "Flecha" },
+        { "value": "chevron", "label": "Punta de flecha" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "icon_size_d",
+      "min": 8,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "icon_size_m",
+      "min": 8,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "icon_gap",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con el texto",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "icon_stroke",
+      "min": 0.5,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Grosor del trazo",
+      "default": 1.6
+    }
+  ],
+  "blocks": [
+    {
+      "type": "button",
+      "name": "Botón",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Texto",
+          "default": "Conocer los nootrópicos de ZZEN Labs"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Destino"
+        },
+        {
+          "type": "checkbox",
+          "id": "new_tab",
+          "label": "Abrir en una pestaña nueva",
+          "default": false
+        },
+        {
+          "type": "header",
+          "content": "Colores propios de este botón"
+        },
+        {
+          "type": "checkbox",
+          "id": "custom_colors",
+          "label": "Usar colores distintos en este botón",
+          "info": "Útil para poner un segundo botón secundario junto al principal.",
+          "default": false
+        },
+        {
+          "type": "color",
+          "id": "bg",
+          "label": "Fondo",
+          "default": "#ffffff"
+        },
+        {
+          "type": "color",
+          "id": "bg_hover",
+          "label": "Fondo al pasar el ratón",
+          "default": "#f2f2f2"
+        },
+        {
+          "type": "color",
+          "id": "color",
+          "label": "Color del texto",
+          "default": "#000000"
+        },
+        {
+          "type": "color",
+          "id": "color_hover",
+          "label": "Color del texto al pasar el ratón",
+          "default": "#000000"
+        },
+        {
+          "type": "color",
+          "id": "border_color",
+          "label": "Color del borde",
+          "default": "#000000"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Botón CTA",
+      "blocks": [{ "type": "button" }]
+    }
+  ]
+}
+{% endschema %}
