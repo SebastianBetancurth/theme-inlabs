@@ -649,14 +649,25 @@
           this.build();
         }
 
-        content() {
+        // Devuelve TODOS los contenedores de contenido de la página, no solo
+        // el primero. El artículo puede estar repartido en varias secciones de
+        // texto (una con la entradilla, otra con cada apartado), y quedarse con
+        // la primera dejaría fuera casi todos los títulos.
+        contents() {
           const list = (this.dataset.contentSelector || '').split(',').map((x) => x.trim()).filter(Boolean);
+          const found = [];
           for (const sel of list) {
-            let el = null;
-            try { el = document.querySelector(sel); } catch (e) { el = null; }
-            if (el) return el;
+            try {
+              document.querySelectorAll(sel).forEach((el) => found.push(el));
+            } catch (e) {
+              /* selector inválido: se ignora */
+            }
           }
-          return null;
+          // Sin repetidos, y sin contenedores que vivan dentro de otro ya
+          // recogido: si no, sus títulos se listarían dos veces.
+          return found
+            .filter((el, i) => found.indexOf(el) === i)
+            .filter((el) => !found.some((other) => other !== el && other.contains(el)));
         }
 
         // Texto -> identificador. Se quitan tildes con NFD para que «Bacopa
@@ -672,11 +683,22 @@
         }
 
         build() {
-          const content = this.content();
-          if (!content) return this.fail('No se ha encontrado el contenido del artículo. Revisa el selector en los ajustes de la sección.');
+          const containers = this.contents();
+          if (containers.length === 0) return this.fail('No se ha encontrado el contenido del artículo. Revisa el selector en los ajustes de la sección.');
 
           const exclude = (this.dataset.excludeSelector || '').trim();
-          let nodes = Array.from(content.querySelectorAll(this.dataset.levels));
+          let nodes = [];
+          containers.forEach((c) => {
+            c.querySelectorAll(this.dataset.levels).forEach((h) => nodes.push(h));
+          });
+
+          // Varios contenedores llegan en el orden en que se encontraron, no
+          // en el que se leen. Se ordenan por su posición real en la página
+          // para que el índice siga el hilo del artículo.
+          nodes.sort((a, b) =>
+            a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1
+          );
+
           nodes = nodes.filter((h) => {
             if (h.textContent.trim() === '') return false;
             if (h.closest('.ztoc')) return false;
@@ -862,7 +884,7 @@
       "type": "text",
       "id": "content_selector",
       "label": "Dónde buscar los encabezados",
-      "info": "Selectores CSS separados por comas. Se usa el primero que exista. Si tu tema no es Dawn, añade aquí la clase de tu contenedor de contenido.",
+      "info": "Selectores CSS separados por comas. Se recogen los títulos de TODOS los contenedores que coincidan, en el orden en que aparecen en la página. Deja [data-toc-content] si usas la sección «Títulos y texto».",
       "default": ".article-template__content, .article-template .rte, .article__content, main .rte"
     },
     {
