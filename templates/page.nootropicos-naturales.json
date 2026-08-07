@@ -198,7 +198,7 @@
           "type": "link",
           "settings": {
             "text": "1. Qué son los nootrópicos naturales y cómo transforman tu cerebro",
-            "anchor": "apartado-1",
+            "anchor": "que-son-los-nootropicos",
             "level": "1"
           }
         }
@@ -450,10 +450,17 @@
             "text": "Qué son los nootrópicos naturales y cómo transforman tu cerebro",
             "level": "h2"
           }
+        },
+        "text_XW9xNf": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Los <strong>nootrópicos naturales</strong> son compuestos de origen vegetal, mineral o amino que mejoran las funciones cognitivas de manera progresiva y sostenible. A diferencia de los estimulantes tradicionales, estos potenciadores cerebrales trabajan optimizando procesos fundamentales como la circulación sanguínea cerebral, la síntesis de neurotransmisores y la protección neuronal.</p><p>Su mecanismo de acción es fascinante. Mientras algunos aumentan el flujo de oxígeno y nutrientes hacia las neuronas, otros regulan la producción de acetilcolina, dopamina y GABA, los mensajeros químicos responsables de la memoria, el enfoque y el estado de ánimo. Esta aproximación integral explica por qué un <strong>nootrópico natural más potente</strong> puede generar mejoras sostenidas sin crear dependencia.</p>"
+          }
         }
       },
       "block_order": [
-        "heading_prNztt"
+        "heading_prNztt",
+        "text_XW9xNf"
       ],
       "name": "Títulos y texto",
       "settings": {
