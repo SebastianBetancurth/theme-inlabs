@@ -164,6 +164,7 @@
         "reading_wpm": 200,
         "reading_unit": "min",
         "reading_override": 0,
+        "image": "shopify://shop_images/01-Es_2520e06d-96cf-49d7-a953-a119bd83bcc9.webp",
         "image_ratio_d": 152,
         "image_ratio_m": 156,
         "image_fit": "cover",
