@@ -1,0 +1,2039 @@
+{%- comment -%}
+  ============================================================================
+  SECCIÓN: Cabecera de artículo (ruta + título + meta + foto)
+  Tema: Dawn / Online Store 2.0
+  Ruta: sections/custom-article-header.liquid
+
+  PC     -> ruta de navegación arriba, a todo el ancho de la caja. Debajo, dos
+            columnas: a la izquierda el título grande y los datos del artículo,
+            a la derecha la foto destacada con las esquinas redondeadas. Una
+            línea fina cierra el bloque.
+  Móvil  -> todo apilado: ruta (que salta a dos líneas), título, datos y foto a
+            todo el ancho. Misma línea al final.
+
+  LA FOTO NO SE COLOCA CON MÁRGENES.
+  En la captura de PC la foto queda más baja que el título y su centro coincide
+  con el centro de la columna de texto (título + datos). Eso no es un margen
+  superior: es `align-items: center` en la rejilla. Si se ajustara a mano, al
+  cambiar el número de líneas del título habría que recalcularlo. Con la
+  rejilla se recoloca solo.
+
+  LOS DATOS SON BLOQUES, Y EL SALTO DE LÍNEA TAMBIÉN ES UN AJUSTE.
+  En la captura hay dos filas: «Por / Publicado» y «Actualizado / Lectura». No
+  son dos contenedores fijos: cada dato es un bloque del editor con su propia
+  casilla «empezar en una línea nueva». El bucle abre una fila nueva cuando
+  encuentra esa casilla marcada, así que se pueden añadir, quitar y reordenar
+  datos, y decidir dónde rompe la línea, sin tocar el código.
+  Se agrupa en filas de verdad (un div por fila) en vez de usar un elemento
+  invisible que fuerce el salto dentro de un solo flex: con el elemento
+  invisible la separación entre filas se contaría dos veces y el ajuste de
+  «separación entre filas» dejaría de significar lo que dice.
+
+  «ACTUALIZADO» NO EXISTE EN SHOPIFY.
+  El objeto `article` no expone una fecha de última edición fiable, así que se
+  lee de un metacampo cuyo espacio de nombres y clave se configuran abajo
+  (por defecto `custom.updated_at`). Si está vacío se cae a `article.updated_at`
+  y, en último caso, a la fecha de publicación, de modo que el dato nunca sale
+  en blanco.
+
+  «LECTURA: 4 MIN» SE CALCULA, NO SE ESCRIBE.
+  Se cuentan las palabras del cuerpo del artículo y se dividen entre las
+  palabras por minuto que se indiquen. Es una estimación: Liquid cuenta sobre
+  el HTML limpio, no sobre el texto ya maquetado. Hay un ajuste para forzar el
+  número a mano cuando interese.
+
+  EL TÍTULO SALE DEL ARTÍCULO SOLO.
+  El campo de texto de arriba está vacío a propósito: si se deja así se usa
+  `article.title`, de modo que la sección sirve para todos los artículos del
+  blog. Solo se rellena para forzar un título distinto o para partirlo en
+  líneas concretas con Enter.
+  ============================================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign bp = s.mobile_breakpoint
+  assign bp_max = bp | minus: 1
+
+  # ------------------------------------------------------------------
+  # Fuentes. Mismas cinco opciones en los tres selectores para que se puedan
+  # mezclar sin salir del sistema del tema.
+  # ------------------------------------------------------------------
+  case s.heading_font
+    when 'thin2'
+      assign heading_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign heading_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign heading_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign heading_stack = 'var(--font-body-family)'
+    else
+      assign heading_stack = s.heading_font_custom
+  endcase
+
+  case s.crumb_font
+    when 'thin2'
+      assign crumb_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign crumb_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign crumb_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign crumb_stack = 'var(--font-body-family)'
+    else
+      assign crumb_stack = s.crumb_font_custom
+  endcase
+
+  case s.meta_font
+    when 'thin2'
+      assign meta_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign meta_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign meta_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign meta_stack = 'var(--font-body-family)'
+    else
+      assign meta_stack = s.meta_font_custom
+  endcase
+
+  # ------------------------------------------------------------------
+  # Anchos
+  # ------------------------------------------------------------------
+  if s.content_max_width == 0
+    assign max_w = 'none'
+  else
+    assign max_w = s.content_max_width | append: 'px'
+  endif
+
+  if s.heading_max_width == 0
+    assign head_max_w = 'none'
+  else
+    assign head_max_w = s.heading_max_width | append: 'px'
+  endif
+
+  # ------------------------------------------------------------------
+  # Rejilla de PC. Las dos columnas se reparten en fracciones a partir de un
+  # solo ajuste, así que mover el reparto no descuadra el hueco entre ellas.
+  # ------------------------------------------------------------------
+  assign text_col = s.text_col_width
+  assign media_col = 100 | minus: text_col
+  assign cols_d = text_col | append: 'fr ' | append: media_col | append: 'fr'
+
+  if s.layout_reverse
+    assign text_order = 2
+    assign media_order = 1
+  else
+    assign text_order = 1
+    assign media_order = 2
+  endif
+
+  if s.media_position_m == 'above'
+    assign media_order_m = 0
+  else
+    assign media_order_m = 3
+  endif
+
+  case s.image_align
+    when 'left'
+      assign img_margin = '0 auto 0 0'
+    when 'right'
+      assign img_margin = '0 0 0 auto'
+    else
+      assign img_margin = '0 auto'
+  endcase
+
+  if s.em_italic
+    assign em_style = 'italic'
+  else
+    assign em_style = 'normal'
+  endif
+
+  assign crumb_sep = s.crumb_separator | replace: '"', '' | strip
+
+  # ------------------------------------------------------------------
+  # Formato de fecha. Solo patrones strftime: los nombres de formato de
+  # Shopify («abbreviated_date») necesitan otra sintaxis de filtro y no se
+  # pueden intercambiar con estos en la misma variable.
+  # ------------------------------------------------------------------
+  case s.date_format
+    when 'd_mon_y'
+      assign date_fmt = '%-d %b %Y'
+    when 'dd_mon_y'
+      assign date_fmt = '%d %b %Y'
+    when 'dd_mm_yyyy'
+      assign date_fmt = '%d/%m/%Y'
+    when 'd_month_y'
+      assign date_fmt = '%-d de %B de %Y'
+    when 'month_d_y'
+      assign date_fmt = '%B %-d, %Y'
+    else
+      assign date_fmt = s.date_format_custom
+  endcase
+
+  # ------------------------------------------------------------------
+  # Título: campo manual, si no el del artículo, si no el de la página. El
+  # tercer respaldo es lo que permite ver la sección en el editor cuando se
+  # coloca fuera de una plantilla de artículo.
+  # ------------------------------------------------------------------
+  if s.heading_text != blank
+    assign heading_html = s.heading_text | newline_to_br
+  elsif article.title != blank
+    assign heading_html = article.title
+  else
+    assign heading_html = page_title
+  endif
+  assign heading_plain = heading_html | strip_html | strip
+
+  # ------------------------------------------------------------------
+  # Foto: la elegida a mano gana a la destacada del artículo.
+  # ------------------------------------------------------------------
+  if s.image != blank
+    assign hero_img = s.image
+  else
+    assign hero_img = article.image
+  endif
+
+  # ------------------------------------------------------------------
+  # Autor
+  # ------------------------------------------------------------------
+  assign meta_author = s.author_override | default: article.author
+
+  # ------------------------------------------------------------------
+  # Fecha de actualización. Ver nota de cabecera.
+  # ------------------------------------------------------------------
+  assign updated_val = ''
+  if s.updated_namespace != blank and s.updated_key != blank
+    assign updated_mf = article.metafields[s.updated_namespace][s.updated_key]
+    if updated_mf.value != blank
+      assign updated_val = updated_mf.value
+      assign updated_from_mf = true
+    endif
+  endif
+  if updated_val == ''
+    assign updated_val = article.updated_at
+    assign updated_from_mf = false
+  endif
+  if updated_val == blank
+    assign updated_val = article.published_at
+    assign updated_from_mf = false
+  endif
+
+  # ------------------------------------------------------------------
+  # Tiempo de lectura. Ver nota de cabecera.
+  # ------------------------------------------------------------------
+  if s.reading_override > 0
+    assign read_min = s.reading_override
+  else
+    assign body_plain = article.content | strip_html | strip
+    assign word_count = body_plain | split: ' ' | size
+    if word_count > 0
+      assign read_min = word_count | times: 1.0 | divided_by: s.reading_wpm | ceil
+    else
+      assign read_min = 1
+    endif
+  endif
+  if read_min < 1
+    assign read_min = 1
+  endif
+
+  # ------------------------------------------------------------------
+  # `sizes` de la foto. Con caja de ancho fijo se puede dar el ancho real en
+  # píxeles, que es mucho más preciso para el navegador que un porcentaje de
+  # pantalla; sin ella se cae al porcentaje.
+  # ------------------------------------------------------------------
+  if s.content_max_width == 0
+    assign img_sizes_d = media_col | append: 'vw'
+  else
+    assign inner_w = s.content_max_width | minus: s.col_gap_d | minus: s.padding_x_d | minus: s.padding_x_d
+    assign media_px = inner_w | times: media_col | divided_by: 100 | times: s.image_max_width | divided_by: 100
+    assign img_sizes_d = media_px | append: 'px'
+  endif
+-%}
+
+{%- style -%}
+  @font-face {
+    font-family: 'Helvetica neue';
+    src: url('{{ 'HelveticaNeueCyr-Light.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'thin2';
+    src: url('{{ 'lawrence-regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ================= Variables: PC ================= */
+  .zah-{{ section.id }} {
+    --zah-bg: {{ s.bg_color }};
+    --zah-max-w: {{ max_w }};
+    --zah-px: {{ s.padding_x_d }}px;
+    --zah-pt: {{ s.padding_top_d }}px;
+    --zah-pb: {{ s.padding_bottom_d }}px;
+
+    --zah-cols: {{ cols_d }};
+    --zah-col-gap: {{ s.col_gap_d }}px;
+    --zah-row-gap: {{ s.row_gap_d }}px;
+    --zah-align: {{ s.align_items }};
+    --zah-text-order: {{ text_order }};
+    --zah-media-order: {{ media_order }};
+
+    /* ---- Ruta de navegación ---- */
+    --zah-cr-font: {{ crumb_stack }};
+    --zah-cr-size: {{ s.crumb_size_d }}px;
+    --zah-cr-lh: {{ s.crumb_line_height | divided_by: 100.0 }};
+    --zah-cr-ls: {{ s.crumb_letter_spacing_d }}px;
+    --zah-cr-weight: {{ s.crumb_weight }};
+    --zah-cr-color: {{ s.crumb_color }};
+    --zah-cr-color-hover: {{ s.crumb_color_hover }};
+    --zah-cr-current: {{ s.crumb_current_color }};
+    --zah-cr-sep-color: {{ s.crumb_sep_color }};
+    --zah-cr-sep: "{{ crumb_sep }}";
+    --zah-cr-gap: {{ s.crumb_gap_d }}px;
+    --zah-cr-row-gap: {{ s.crumb_row_gap }}px;
+    --zah-cr-mb: {{ s.crumb_margin_bottom_d }}px;
+
+    /* ---- Título ---- */
+    --zah-h-font: {{ heading_stack }};
+    --zah-h-size: {{ s.heading_size_d }}px;
+    --zah-h-lh: {{ s.heading_line_height_d | divided_by: 100.0 }};
+    --zah-h-ls: {{ s.heading_letter_spacing_d }}px;
+    --zah-h-weight: {{ s.heading_weight }};
+    --zah-h-color: {{ s.heading_color }};
+    --zah-h-align: {{ s.heading_align_d }};
+    --zah-h-max-w: {{ head_max_w }};
+    --zah-h-grad: linear-gradient({{ s.heading_gradient_angle }}deg, {{ s.heading_gradient_1 }} 0%, {{ s.heading_gradient_2 }} {{ s.heading_gradient_mid }}%, {{ s.heading_gradient_3 }} 100%);
+    --zah-em-color: {{ s.em_color }};
+    --zah-em-style: {{ em_style }};
+
+    /* ---- Datos del artículo ---- */
+    --zah-m-font: {{ meta_stack }};
+    --zah-m-size: {{ s.meta_size_d }}px;
+    --zah-m-lh: {{ s.meta_line_height | divided_by: 100.0 }};
+    --zah-m-ls: {{ s.meta_letter_spacing }}px;
+    --zah-m-transform: {{ s.meta_transform }};
+    --zah-m-label-color: {{ s.meta_label_color }};
+    --zah-m-label-weight: {{ s.meta_label_weight }};
+    --zah-m-value-color: {{ s.meta_value_color }};
+    --zah-m-value-weight: {{ s.meta_value_weight }};
+    --zah-m-pair-gap: {{ s.meta_pair_gap }}px;
+    --zah-m-col-gap: {{ s.meta_col_gap_d }}px;
+    --zah-m-row-gap: {{ s.meta_row_gap_d }}px;
+    --zah-m-mt: {{ s.meta_margin_top_d }}px;
+
+    /* ---- Foto ---- */
+    --zah-img-ar: {{ s.image_ratio_d | divided_by: 100.0 }};
+    --zah-img-fit: {{ s.image_fit }};
+    --zah-img-pos: {{ s.image_position }};
+    --zah-img-bg: {{ s.image_bg }};
+    --zah-img-radius: {{ s.image_radius_d }}px;
+    --zah-img-border: {{ s.image_border_color }};
+    --zah-img-border-w: {{ s.image_border_width }}px;
+    --zah-img-shadow: {{ s.image_shadow_x }}px {{ s.image_shadow_y }}px {{ s.image_shadow_blur }}px {{ s.image_shadow_color }};
+    --zah-img-max-w: {{ s.image_max_width }}%;
+    --zah-img-margin: {{ img_margin }};
+
+    /* ---- Línea inferior ---- */
+    --zah-div-color: {{ s.divider_color }};
+    --zah-div-h: {{ s.divider_thickness }}px;
+    --zah-div-w: {{ s.divider_width }}%;
+    --zah-div-mt: {{ s.divider_margin_top_d }}px;
+    --zah-div-mb: {{ s.divider_margin_bottom_d }}px;
+  }
+
+  /* ================= Estructura ================= */
+  .zah {
+    background-color: var(--zah-bg);
+  }
+
+  .zah__inner {
+    max-width: var(--zah-max-w);
+    margin-inline: auto;
+    padding: var(--zah-pt) var(--zah-px) var(--zah-pb);
+    box-sizing: border-box;
+  }
+
+  /* ================= Ruta de navegación ================= */
+  .zah__crumbs {
+    margin-bottom: var(--zah-cr-mb);
+  }
+
+  .zah__crumbs-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--zah-cr-row-gap) var(--zah-cr-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--zah-cr-font);
+    font-size: var(--zah-cr-size);
+    font-weight: var(--zah-cr-weight);
+    line-height: var(--zah-cr-lh);
+    letter-spacing: var(--zah-cr-ls);
+  }
+
+  .zah__crumbs-list li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--zah-cr-current);
+  }
+
+  /* El separador se pinta con el propio elemento, no como un <li> aparte: así
+     no cuenta como paso de la ruta para los lectores de pantalla. */
+  .zah__crumbs-list li + li::before {
+    content: var(--zah-cr-sep);
+    margin-right: var(--zah-cr-gap);
+    color: var(--zah-cr-sep-color);
+  }
+
+  .zah__crumbs-list a {
+    color: var(--zah-cr-color);
+    text-decoration: var(--zah-cr-deco, none);
+    text-underline-offset: 0.2em;
+    transition: color 200ms ease;
+  }
+
+  .zah__crumbs-list a:hover {
+    color: var(--zah-cr-color-hover);
+    text-decoration: var(--zah-cr-deco-hover, none);
+  }
+
+  .zah__crumbs-list a:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  /* El último paso puede ser muy largo: recortarlo es opcional porque en la
+     referencia se deja partir en dos líneas. */
+  .zah__crumbs--truncate li:last-child {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ================= Rejilla ================= */
+  .zah__grid {
+    display: grid;
+    grid-template-columns: var(--zah-cols);
+    column-gap: var(--zah-col-gap);
+    row-gap: var(--zah-row-gap);
+    /* Ver nota de cabecera: esto es lo que centra la foto frente al texto. */
+    align-items: var(--zah-align);
+  }
+
+  .zah__text {
+    order: var(--zah-text-order);
+    min-width: 0;
+  }
+
+  .zah__media {
+    order: var(--zah-media-order);
+    min-width: 0;
+  }
+
+  /* ================= Título ================= */
+  .zah__heading {
+    max-width: var(--zah-h-max-w);
+    margin: 0;
+    font-family: var(--zah-h-font);
+    font-size: var(--zah-h-size);
+    font-weight: var(--zah-h-weight);
+    line-height: var(--zah-h-lh);
+    letter-spacing: var(--zah-h-ls);
+    text-align: var(--zah-h-align);
+    color: var(--zah-h-color);
+    text-wrap: balance;
+  }
+
+  /* Relleno degradado. El color plano queda debajo como respaldo para
+     navegadores que no recorten el fondo al texto. */
+  .zah__heading--grad {
+    background-image: var(--zah-h-grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .zah__heading em,
+  .zah__heading i {
+    font-style: var(--zah-em-style);
+    color: var(--zah-em-color);
+  }
+
+  .zah__heading--grad em,
+  .zah__heading--grad i {
+    color: inherit;
+  }
+
+  /* ================= Datos del artículo ================= */
+  .zah__meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--zah-m-row-gap);
+    margin-top: var(--zah-m-mt);
+    font-family: var(--zah-m-font);
+    font-size: var(--zah-m-size);
+    line-height: var(--zah-m-lh);
+    letter-spacing: var(--zah-m-ls);
+    text-transform: var(--zah-m-transform);
+  }
+
+  .zah__meta:empty {
+    display: none;
+  }
+
+  .zah__meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--zah-m-row-gap) var(--zah-m-col-gap);
+  }
+
+  /* Una fila puede quedarse vacía si se dejan en blanco los datos que
+     contiene: sin esto seguiría ocupando su hueco de separación. */
+  .zah__meta-row:empty {
+    display: none;
+  }
+
+  .zah__meta-item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--zah-m-pair-gap);
+  }
+
+  .zah__meta-label {
+    color: var(--zah-m-label-color);
+    font-weight: var(--zah-m-label-weight);
+  }
+
+  .zah__meta-value {
+    color: var(--zah-m-value-color);
+    font-weight: var(--zah-m-value-weight);
+  }
+
+  /* ================= Foto ================= */
+  .zah__figure {
+    margin: 0;
+  }
+
+  .zah__img {
+    position: relative;
+    width: var(--zah-img-max-w);
+    margin: var(--zah-img-margin);
+    aspect-ratio: var(--zah-img-ar);
+    background-color: var(--zah-img-bg);
+    border: var(--zah-img-border-w) solid var(--zah-img-border);
+    border-radius: var(--zah-img-radius);
+    box-shadow: var(--zah-img-shadow);
+    /* Recorta la foto al redondeo del marco. */
+    overflow: hidden;
+  }
+
+  .zah__img img,
+  .zah__img > svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: var(--zah-img-fit);
+    object-position: var(--zah-img-pos);
+  }
+
+  /* ================= Línea inferior ================= */
+  .zah__divider {
+    width: var(--zah-div-w);
+    height: var(--zah-div-h);
+    margin: var(--zah-div-mt) 0 var(--zah-div-mb);
+    border: 0;
+    background-color: var(--zah-div-color);
+  }
+
+  /* ================= Móvil ================= */
+  @media screen and (max-width: {{ bp_max }}px) {
+    .zah-{{ section.id }} {
+      --zah-max-w: none;
+      --zah-px: {{ s.padding_x_m }}px;
+      --zah-pt: {{ s.padding_top_m }}px;
+      --zah-pb: {{ s.padding_bottom_m }}px;
+
+      --zah-cols: 1fr;
+      --zah-col-gap: 0px;
+      --zah-row-gap: {{ s.row_gap_m }}px;
+      --zah-align: stretch;
+      --zah-text-order: 1;
+      --zah-media-order: {{ media_order_m }};
+
+      --zah-cr-size: {{ s.crumb_size_m }}px;
+      --zah-cr-ls: {{ s.crumb_letter_spacing_m }}px;
+      --zah-cr-gap: {{ s.crumb_gap_m }}px;
+      --zah-cr-mb: {{ s.crumb_margin_bottom_m }}px;
+
+      --zah-h-size: {{ s.heading_size_m }}px;
+      --zah-h-lh: {{ s.heading_line_height_m | divided_by: 100.0 }};
+      --zah-h-ls: {{ s.heading_letter_spacing_m }}px;
+      --zah-h-align: {{ s.heading_align_m }};
+      --zah-h-max-w: none;
+
+      --zah-m-size: {{ s.meta_size_m }}px;
+      --zah-m-col-gap: {{ s.meta_col_gap_m }}px;
+      --zah-m-row-gap: {{ s.meta_row_gap_m }}px;
+      --zah-m-mt: {{ s.meta_margin_top_m }}px;
+
+      --zah-img-ar: {{ s.image_ratio_m | divided_by: 100.0 }};
+      --zah-img-radius: {{ s.image_radius_m }}px;
+      --zah-img-max-w: {{ s.image_max_width_m }}%;
+
+      --zah-div-mt: {{ s.divider_margin_top_m }}px;
+      --zah-div-mb: {{ s.divider_margin_bottom_m }}px;
+    }
+
+    {%- unless s.show_crumbs_m %}
+      .zah-{{ section.id }} .zah__crumbs { display: none; }
+    {%- endunless %}
+
+    {%- unless s.show_image_m %}
+      .zah-{{ section.id }} .zah__media { display: none; }
+      .zah-{{ section.id }} .zah__grid { row-gap: 0; }
+    {%- endunless %}
+  }
+
+  {%- if s.crumb_underline == 'always' %}
+    .zah-{{ section.id }} { --zah-cr-deco: underline; --zah-cr-deco-hover: underline; }
+  {%- elsif s.crumb_underline == 'hover' %}
+    .zah-{{ section.id }} { --zah-cr-deco: none; --zah-cr-deco-hover: underline; }
+  {%- endif %}
+
+  @media (prefers-reduced-motion: reduce) {
+    .zah-{{ section.id }} .zah__crumbs-list a { transition: none; }
+  }
+{%- endstyle -%}
+
+<div class="zah zah-{{ section.id }}"{% if s.anchor_id != blank %} id="{{ s.anchor_id | handle }}"{% endif %}>
+  <div class="zah__inner">
+    {%- if s.show_crumbs -%}
+      <nav class="zah__crumbs{% if s.crumb_truncate %} zah__crumbs--truncate{% endif %}" aria-label="{{ s.crumb_aria_label | escape }}">
+        <ol class="zah__crumbs-list">
+          <li><a href="{{ routes.root_url }}">{{ s.crumb_home }}</a></li>
+          {%- case request.page_type -%}
+            {%- when 'article' -%}
+              <li><a href="{{ blog.url }}">{{ blog.title }}</a></li>
+              <li aria-current="page">{{ article.title }}</li>
+            {%- when 'blog' -%}
+              <li aria-current="page">{{ blog.title }}</li>
+            {%- when 'product' -%}
+              {%- if collection.url != blank -%}
+                <li><a href="{{ collection.url }}">{{ collection.title }}</a></li>
+              {%- endif -%}
+              <li aria-current="page">{{ product.title }}</li>
+            {%- when 'collection' -%}
+              <li aria-current="page">{{ collection.title | default: page_title }}</li>
+            {%- when 'page' -%}
+              <li aria-current="page">{{ page.title }}</li>
+            {%- else -%}
+              <li aria-current="page">{{ page_title }}</li>
+          {%- endcase -%}
+        </ol>
+      </nav>
+    {%- endif -%}
+
+    <div class="zah__grid">
+      <div class="zah__text">
+        {%- if heading_html != blank -%}
+          <{{ s.heading_tag }} class="zah__heading{% if s.heading_fill == 'gradient' %} zah__heading--grad{% endif %}">
+            {{- heading_html -}}
+          </{{ s.heading_tag }}>
+        {%- endif -%}
+
+        {%- if section.blocks.size > 0 -%}
+          {%- assign rendered = 0 -%}
+          <div class="zah__meta">
+            {%- comment -%}
+              Ver nota de cabecera: la fila se cierra y se abre dentro del
+              bucle, así que el salto de línea es un ajuste por bloque.
+            {%- endcomment -%}
+            {%- capture meta_rows -%}
+              {%- for block in section.blocks -%}
+                {%- liquid
+                  assign b = block.settings
+                  assign val = ''
+
+                  case block.type
+                    when 'author'
+                      assign val = b.value | default: meta_author
+                    when 'published'
+                      if b.value != blank
+                        assign val = b.value
+                      elsif article.published_at != blank
+                        assign val = article.published_at | date: date_fmt
+                      endif
+                    when 'updated'
+                      if b.value != blank
+                        assign val = b.value
+                      elsif updated_val != blank
+                        if updated_from_mf and s.updated_format_filter == false
+                          assign val = updated_val
+                        else
+                          assign val = updated_val | date: date_fmt
+                        endif
+                      endif
+                    when 'reading_time'
+                      assign val = read_min | append: ' ' | append: s.reading_unit
+                    when 'text'
+                      assign val = b.value
+                  endcase
+                -%}
+                {%- if b.label != blank or val != blank -%}
+                  {%- if b.new_line and rendered > 0 -%}</div><div class="zah__meta-row">{%- endif -%}
+                  <div class="zah__meta-item" {{ block.shopify_attributes }}>
+                    {%- if b.label != blank -%}<span class="zah__meta-label">{{ b.label }}</span>{%- endif -%}
+                    {%- if val != blank -%}<span class="zah__meta-value">{{ val }}</span>{%- endif -%}
+                  </div>
+                  {%- assign rendered = rendered | plus: 1 -%}
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endcapture -%}
+            {%- if rendered > 0 -%}<div class="zah__meta-row">{{- meta_rows -}}</div>{%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      <div class="zah__media">
+        <figure class="zah__figure">
+          <div class="zah__img">
+            {%- if hero_img != blank -%}
+              <img
+                src="{{ hero_img | image_url: width: 1200 }}"
+                srcset="
+                  {{ hero_img | image_url: width: 400 }} 400w,
+                  {{ hero_img | image_url: width: 600 }} 600w,
+                  {{ hero_img | image_url: width: 900 }} 900w,
+                  {{ hero_img | image_url: width: 1200 }} 1200w,
+                  {{ hero_img | image_url: width: 1600 }} 1600w
+                "
+                sizes="(min-width: {{ bp }}px) {{ img_sizes_d }}, {{ s.image_max_width_m }}vw"
+                width="{{ hero_img.width }}"
+                height="{{ hero_img.height }}"
+                alt="{{ hero_img.alt | default: heading_plain | escape }}"
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
+              >
+            {%- else -%}
+              {{ 'image' | placeholder_svg_tag }}
+            {%- endif -%}
+          </div>
+        </figure>
+      </div>
+    </div>
+
+    {%- if s.show_divider -%}
+      <hr class="zah__divider">
+    {%- endif -%}
+  </div>
+</div>
+
+{%- comment -%}
+  Datos estructurados de la ruta. Dawn no los genera, y son los que hacen que
+  Google pinte «Inicio › Noticias › ...» debajo del resultado en vez de la URL.
+{%- endcomment -%}
+{%- if s.show_crumbs and s.crumb_schema -%}
+  {%- capture crumb_items -%}
+    {"@type":"ListItem","position":1,"name":{{ s.crumb_home | json }},"item":{{ shop.url | append: routes.root_url | json }}}
+    {%- case request.page_type -%}
+      {%- when 'article' -%}
+        ,{"@type":"ListItem","position":2,"name":{{ blog.title | json }},"item":{{ shop.url | append: blog.url | json }}}
+        ,{"@type":"ListItem","position":3,"name":{{ article.title | json }},"item":{{ shop.url | append: article.url | json }}}
+      {%- when 'blog' -%}
+        ,{"@type":"ListItem","position":2,"name":{{ blog.title | json }},"item":{{ shop.url | append: blog.url | json }}}
+      {%- when 'product' -%}
+        ,{"@type":"ListItem","position":2,"name":{{ product.title | json }},"item":{{ shop.url | append: product.url | json }}}
+      {%- when 'collection' -%}
+        ,{"@type":"ListItem","position":2,"name":{{ collection.title | json }},"item":{{ shop.url | append: collection.url | json }}}
+      {%- when 'page' -%}
+        ,{"@type":"ListItem","position":2,"name":{{ page.title | json }},"item":{{ shop.url | append: page.url | json }}}
+    {%- endcase -%}
+  {%- endcapture -%}
+  <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{{ crumb_items }}]}
+  </script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Cabecera de artículo",
+  "tag": "section",
+  "class": "section-zah",
+  "max_blocks": 8,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Deja el título vacío para que use automáticamente el del artículo. La foto también sale de la imagen destacada si no eliges otra."
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Ancla de la sección",
+      "info": "Opcional. Si escribes 'cabecera' podrás enlazar aquí con #cabecera."
+    },
+
+    {
+      "type": "header",
+      "content": "Diseño general"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "mobile_breakpoint",
+      "min": 480,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "label": "Punto de cambio a móvil",
+      "default": 750
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 0,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "label": "Ancho máximo del contenido",
+      "info": "0 = ancho completo. Este es el ajuste que decide dónde empiezan el título y la ruta.",
+      "default": 780
+    },
+    {
+      "type": "range",
+      "id": "padding_x_d",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen lateral — PC",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_x_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen lateral — Móvil",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "padding_top_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding superior — PC",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding inferior — PC",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "padding_top_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding superior — Móvil",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding inferior — Móvil",
+      "default": 8
+    },
+
+    {
+      "type": "header",
+      "content": "Distribución — PC"
+    },
+    {
+      "type": "range",
+      "id": "text_col_width",
+      "min": 20,
+      "max": 80,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho de la columna de texto",
+      "info": "El resto se lo lleva la foto. 50 = mitad y mitad, como en el original.",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "col_gap_d",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación entre texto y foto",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "row_gap_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación si las columnas se apilan",
+      "default": 32
+    },
+    {
+      "type": "select",
+      "id": "align_items",
+      "label": "Alineación vertical de las dos columnas",
+      "info": "'Centrado' es lo del original: la foto se centra frente al bloque de título y datos.",
+      "options": [
+        { "value": "start", "label": "Arriba" },
+        { "value": "center", "label": "Centrado" },
+        { "value": "end", "label": "Abajo" },
+        { "value": "stretch", "label": "Estirar" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "checkbox",
+      "id": "layout_reverse",
+      "label": "Invertir columnas (foto a la izquierda)",
+      "default": false
+    },
+
+    {
+      "type": "header",
+      "content": "Distribución — Móvil"
+    },
+    {
+      "type": "select",
+      "id": "media_position_m",
+      "label": "Posición de la foto",
+      "options": [
+        { "value": "above", "label": "Encima del título" },
+        { "value": "below", "label": "Debajo de los datos" }
+      ],
+      "default": "below"
+    },
+    {
+      "type": "range",
+      "id": "row_gap_m",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre texto y foto",
+      "default": 26
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image_m",
+      "label": "Mostrar la foto en móvil",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_crumbs_m",
+      "label": "Mostrar la ruta de navegación en móvil",
+      "default": true
+    },
+
+    {
+      "type": "header",
+      "content": "Ruta de navegación"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_crumbs",
+      "label": "Mostrar la ruta",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "crumb_home",
+      "label": "Texto del primer paso",
+      "default": "Inicio"
+    },
+    {
+      "type": "text",
+      "id": "crumb_separator",
+      "label": "Separador",
+      "default": "/"
+    },
+    {
+      "type": "text",
+      "id": "crumb_aria_label",
+      "label": "Texto accesible de la ruta",
+      "default": "Ruta de navegación"
+    },
+    {
+      "type": "checkbox",
+      "id": "crumb_truncate",
+      "label": "Recortar el último paso con puntos suspensivos",
+      "info": "Desactivado deja que el título del artículo salte a varias líneas, como en el original.",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "crumb_schema",
+      "label": "Añadir datos estructurados de la ruta (SEO)",
+      "info": "Ayuda a que Google muestre la ruta en los resultados de búsqueda.",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "crumb_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "crumb_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "select",
+      "id": "crumb_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "crumb_underline",
+      "label": "Subrayado de los enlaces",
+      "options": [
+        { "value": "none", "label": "Nunca" },
+        { "value": "hover", "label": "Solo al pasar el ratón" },
+        { "value": "always", "label": "Siempre" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "color",
+      "id": "crumb_color",
+      "label": "Color de los enlaces",
+      "default": "#9d8763"
+    },
+    {
+      "type": "color",
+      "id": "crumb_color_hover",
+      "label": "Color de los enlaces al pasar el ratón",
+      "default": "#6f5c3c"
+    },
+    {
+      "type": "color",
+      "id": "crumb_current_color",
+      "label": "Color del paso actual",
+      "default": "#7d7d7d"
+    },
+    {
+      "type": "color",
+      "id": "crumb_sep_color",
+      "label": "Color del separador",
+      "default": "#c9c2b5"
+    },
+    {
+      "type": "range",
+      "id": "crumb_size_d",
+      "min": 9,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "crumb_size_m",
+      "min": 9,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "crumb_line_height",
+      "min": 100,
+      "max": 220,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado",
+      "default": 150
+    },
+    {
+      "type": "range",
+      "id": "crumb_letter_spacing_d",
+      "min": -2,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras — PC",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "crumb_letter_spacing_m",
+      "min": -2,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras — Móvil",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "crumb_gap_d",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre pasos — PC",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "crumb_gap_m",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre pasos — Móvil",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "crumb_row_gap",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación si la ruta salta de línea",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "crumb_margin_bottom_d",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación con el título — PC",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "crumb_margin_bottom_m",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con el título — Móvil",
+      "default": 22
+    },
+
+    {
+      "type": "header",
+      "content": "Título"
+    },
+    {
+      "type": "textarea",
+      "id": "heading_text",
+      "label": "Título",
+      "info": "Vacío = usa el título del artículo. Enter para salto de línea. Envuelve una palabra en <em>así</em> para el acento."
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Etiqueta HTML (SEO)",
+      "info": "En una plantilla de artículo debe ser H1, y solo puede haber uno en la página.",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "div", "label": "div (sin peso SEO)" }
+      ],
+      "default": "h1"
+    },
+    {
+      "type": "select",
+      "id": "heading_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "thin2"
+    },
+    {
+      "type": "text",
+      "id": "heading_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'thin2', Georgia, serif"
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "200", "label": "200" },
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "heading_fill",
+      "label": "Relleno del título",
+      "info": "El degradado necesita los tres colores de abajo.",
+      "options": [
+        { "value": "solid", "label": "Color plano" },
+        { "value": "gradient", "label": "Degradado" }
+      ],
+      "default": "gradient"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color (relleno plano)",
+      "default": "#1f1f1f"
+    },
+    {
+      "type": "color",
+      "id": "heading_gradient_1",
+      "label": "Degradado: color inicial",
+      "default": "#1e3b31"
+    },
+    {
+      "type": "color",
+      "id": "heading_gradient_2",
+      "label": "Degradado: color intermedio",
+      "default": "#96794a"
+    },
+    {
+      "type": "color",
+      "id": "heading_gradient_3",
+      "label": "Degradado: color final",
+      "default": "#2b2b2b"
+    },
+    {
+      "type": "range",
+      "id": "heading_gradient_mid",
+      "min": 5,
+      "max": 95,
+      "step": 5,
+      "unit": "%",
+      "label": "Degradado: posición del color intermedio",
+      "default": 55
+    },
+    {
+      "type": "range",
+      "id": "heading_gradient_angle",
+      "min": 0,
+      "max": 360,
+      "step": 5,
+      "unit": "°",
+      "label": "Degradado: ángulo",
+      "default": 90
+    },
+    {
+      "type": "color",
+      "id": "em_color",
+      "label": "Color del acento <em>",
+      "default": "#96794a"
+    },
+    {
+      "type": "checkbox",
+      "id": "em_italic",
+      "label": "Acento <em> en cursiva",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "heading_max_width",
+      "min": 0,
+      "max": 1200,
+      "step": 20,
+      "unit": "px",
+      "label": "Ancho máximo del título — PC",
+      "info": "0 = todo el ancho de su columna. Bájalo para forzar dónde parten las líneas.",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "heading_size_d",
+      "min": 18,
+      "max": 110,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_d",
+      "min": 80,
+      "max": 200,
+      "step": 2,
+      "unit": "%",
+      "label": "Interlineado — PC",
+      "default": 112
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing_d",
+      "min": -3,
+      "max": 6,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras — PC",
+      "default": -0.5
+    },
+    {
+      "type": "select",
+      "id": "heading_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_m",
+      "min": 14,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_m",
+      "min": 80,
+      "max": 200,
+      "step": 2,
+      "unit": "%",
+      "label": "Interlineado — Móvil",
+      "default": 118
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing_m",
+      "min": -3,
+      "max": 6,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras — Móvil",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "heading_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+
+    {
+      "type": "header",
+      "content": "Datos del artículo: estilo"
+    },
+    {
+      "type": "paragraph",
+      "content": "Los datos (autor, fechas, lectura) se añaden y ordenan como bloques, más abajo en el panel."
+    },
+    {
+      "type": "select",
+      "id": "meta_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "meta_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "select",
+      "id": "meta_transform",
+      "label": "Mayúsculas",
+      "options": [
+        { "value": "none", "label": "Como se escriba" },
+        { "value": "uppercase", "label": "TODO EN MAYÚSCULAS" },
+        { "value": "capitalize", "label": "Inicial De Cada Palabra" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "color",
+      "id": "meta_label_color",
+      "label": "Color de la etiqueta ('Por:', 'Publicado:')",
+      "default": "#9d8763"
+    },
+    {
+      "type": "select",
+      "id": "meta_label_weight",
+      "label": "Grosor de la etiqueta",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "meta_value_color",
+      "label": "Color del valor ('René ZZ', '15 May 2026')",
+      "default": "#5a5a5a"
+    },
+    {
+      "type": "select",
+      "id": "meta_value_weight",
+      "label": "Grosor del valor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "range",
+      "id": "meta_pair_gap",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre etiqueta y valor",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "meta_size_d",
+      "min": 9,
+      "max": 26,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "meta_size_m",
+      "min": 9,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "meta_line_height",
+      "min": 100,
+      "max": 220,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado",
+      "default": 150
+    },
+    {
+      "type": "range",
+      "id": "meta_letter_spacing",
+      "min": -2,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "meta_col_gap_d",
+      "min": 0,
+      "max": 90,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre datos de una fila — PC",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "meta_col_gap_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre datos de una fila — Móvil",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "meta_row_gap_d",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre filas — PC",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "meta_row_gap_m",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre filas — Móvil",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "meta_margin_top_d",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación con el título — PC",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "meta_margin_top_m",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con el título — Móvil",
+      "default": 18
+    },
+
+    {
+      "type": "header",
+      "content": "Fechas y tiempo de lectura"
+    },
+    {
+      "type": "select",
+      "id": "date_format",
+      "label": "Formato de fecha",
+      "options": [
+        { "value": "d_mon_y", "label": "5 May 2026" },
+        { "value": "dd_mon_y", "label": "05 May 2026" },
+        { "value": "dd_mm_yyyy", "label": "05/05/2026" },
+        { "value": "d_month_y", "label": "5 de mayo de 2026" },
+        { "value": "month_d_y", "label": "May 5, 2026" },
+        { "value": "custom", "label": "Personalizado (abajo)" }
+      ],
+      "default": "dd_mon_y"
+    },
+    {
+      "type": "text",
+      "id": "date_format_custom",
+      "label": "Formato personalizado",
+      "info": "Código strftime. Ejemplo: %d %b %Y",
+      "default": "%d %b %Y"
+    },
+    {
+      "type": "text",
+      "id": "author_override",
+      "label": "Forzar autor",
+      "info": "Vacío = usa el autor del artículo."
+    },
+    {
+      "type": "text",
+      "id": "updated_namespace",
+      "label": "Metacampo de 'Actualizado': espacio de nombres",
+      "info": "Shopify no guarda una fecha de última edición visible, así que se lee de aquí. Si está vacío se usa la fecha de publicación.",
+      "default": "custom"
+    },
+    {
+      "type": "text",
+      "id": "updated_key",
+      "label": "Metacampo de 'Actualizado': clave",
+      "default": "updated_at"
+    },
+    {
+      "type": "checkbox",
+      "id": "updated_format_filter",
+      "label": "Dar formato a la fecha del metacampo",
+      "info": "Desactívalo solo si el metacampo ya guarda el texto escrito a mano (por ejemplo 'julio 2026').",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "reading_wpm",
+      "min": 100,
+      "max": 400,
+      "step": 10,
+      "unit": "ppm",
+      "label": "Palabras por minuto",
+      "info": "Se usa para calcular el tiempo de lectura a partir del cuerpo del artículo.",
+      "default": 200
+    },
+    {
+      "type": "text",
+      "id": "reading_unit",
+      "label": "Unidad del tiempo de lectura",
+      "default": "min"
+    },
+    {
+      "type": "range",
+      "id": "reading_override",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "min",
+      "label": "Forzar tiempo de lectura",
+      "info": "0 = calcularlo automáticamente.",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "Foto"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Foto",
+      "info": "Vacío = usa la imagen destacada del artículo."
+    },
+    {
+      "type": "range",
+      "id": "image_ratio_d",
+      "min": 40,
+      "max": 260,
+      "step": 4,
+      "unit": "%",
+      "label": "Proporción ancho/alto — PC",
+      "info": "100 % = cuadrada. Más de 100 = apaisada.",
+      "default": 152
+    },
+    {
+      "type": "range",
+      "id": "image_ratio_m",
+      "min": 40,
+      "max": 260,
+      "step": 4,
+      "unit": "%",
+      "label": "Proporción ancho/alto — Móvil",
+      "default": 156
+    },
+    {
+      "type": "select",
+      "id": "image_fit",
+      "label": "Ajuste de la foto",
+      "options": [
+        { "value": "cover", "label": "Rellenar (recorta)" },
+        { "value": "contain", "label": "Entera (sin recortar)" }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Zona visible al recortar",
+      "options": [
+        { "value": "center", "label": "Centro" },
+        { "value": "top", "label": "Arriba" },
+        { "value": "bottom", "label": "Abajo" },
+        { "value": "left", "label": "Izquierda" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "color",
+      "id": "image_bg",
+      "label": "Fondo del hueco de la foto",
+      "default": "#e8e6e1"
+    },
+    {
+      "type": "range",
+      "id": "image_radius_d",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo — PC",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "image_radius_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo — Móvil",
+      "default": 8
+    },
+    {
+      "type": "color",
+      "id": "image_border_color",
+      "label": "Color del borde",
+      "default": "#00000000"
+    },
+    {
+      "type": "range",
+      "id": "image_border_width",
+      "min": 0,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor del borde",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "image_shadow_color",
+      "label": "Color de la sombra",
+      "info": "Transparente = sin sombra.",
+      "default": "#00000000"
+    },
+    {
+      "type": "range",
+      "id": "image_shadow_x",
+      "min": -40,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Sombra: desplazamiento horizontal",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "image_shadow_y",
+      "min": -40,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Sombra: desplazamiento vertical",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "image_shadow_blur",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Sombra: difuminado",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "image_max_width",
+      "min": 40,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho de la foto en su columna — PC",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "image_max_width_m",
+      "min": 40,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho de la foto — Móvil",
+      "default": 100
+    },
+    {
+      "type": "select",
+      "id": "image_align",
+      "label": "Alineación de la foto si no ocupa todo el ancho",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+
+    {
+      "type": "header",
+      "content": "Línea inferior"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_divider",
+      "label": "Mostrar la línea",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Color",
+      "default": "#e5e3de"
+    },
+    {
+      "type": "range",
+      "id": "divider_thickness",
+      "min": 1,
+      "max": 8,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "divider_width",
+      "min": 10,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "divider_margin_top_d",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación superior — PC",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "divider_margin_bottom_d",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación inferior — PC",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "divider_margin_top_m",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación superior — Móvil",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "divider_margin_bottom_m",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación inferior — Móvil",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "author",
+      "name": "Autor",
+      "limit": 2,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Etiqueta",
+          "default": "Por:"
+        },
+        {
+          "type": "text",
+          "id": "value",
+          "label": "Forzar valor",
+          "info": "Vacío = el autor del artículo."
+        },
+        {
+          "type": "checkbox",
+          "id": "new_line",
+          "label": "Empezar en una línea nueva",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "published",
+      "name": "Fecha de publicación",
+      "limit": 2,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Etiqueta",
+          "default": "Publicado:"
+        },
+        {
+          "type": "text",
+          "id": "value",
+          "label": "Forzar valor",
+          "info": "Vacío = la fecha de publicación del artículo."
+        },
+        {
+          "type": "checkbox",
+          "id": "new_line",
+          "label": "Empezar en una línea nueva",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "updated",
+      "name": "Fecha de actualización",
+      "limit": 2,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Etiqueta",
+          "default": "Actualizado:"
+        },
+        {
+          "type": "text",
+          "id": "value",
+          "label": "Forzar valor",
+          "info": "Vacío = el metacampo configurado en los ajustes de la sección."
+        },
+        {
+          "type": "checkbox",
+          "id": "new_line",
+          "label": "Empezar en una línea nueva",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "reading_time",
+      "name": "Tiempo de lectura",
+      "limit": 2,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Etiqueta",
+          "default": "Lectura:"
+        },
+        {
+          "type": "checkbox",
+          "id": "new_line",
+          "label": "Empezar en una línea nueva",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Dato libre",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Etiqueta",
+          "default": "Categoría:"
+        },
+        {
+          "type": "text",
+          "id": "value",
+          "label": "Valor",
+          "default": "Nootrópicos"
+        },
+        {
+          "type": "checkbox",
+          "id": "new_line",
+          "label": "Empezar en una línea nueva",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cabecera de artículo",
+      "blocks": [
+        { "type": "author" },
+        { "type": "published" },
+        { "type": "updated", "settings": { "new_line": true } },
+        { "type": "reading_time" }
+      ]
+    }
+  ]
+}
+{% endschema %}
