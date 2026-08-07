@@ -1,0 +1,1585 @@
+{%- comment -%}
+  ============================================================================
+  SECCIÓN: Títulos y texto (cuerpo del artículo)
+  Tema: Dawn / Online Store 2.0
+  Ruta: sections/custom-body-text.liquid
+
+  PC     -> caja centrada y estrecha. Párrafos justificados, títulos de
+            apartado en serif grande con relleno degradado y mucho aire por
+            encima. La negrita destaca en color plano.
+  Móvil  -> lo mismo, más estrecho y más pequeño. Sigue justificado.
+
+  EL TEXTO VA JUSTIFICADO, Y ESO TIENE UN PEAJE.
+  En las capturas los espacios entre palabras están claramente estirados: es
+  `text-align: justify`. Se clona tal cual, pero conviene saber que en móvil,
+  con líneas de siete u ocho palabras, la justificación abre huecos enormes
+  («ríos» blancos). El arreglo es partir palabras con guion, que aquí es un
+  ajuste aparte porque cambia el aspecto del original. La última línea nunca
+  se estira: `text-align-last` la deja alineada a la izquierda, que es como se
+  comporta el texto de la referencia.
+
+  EL DEGRADADO ES DEL PÁRRAFO, NO DE CADA PALABRA.
+  Cada línea empieza fría y termina cálida. Eso no se consigue coloreando
+  palabras: es un degradado horizontal recortado sobre todo el bloque de
+  texto, así que cada línea recorre la misma rampa de color. Por eso el efecto
+  se mantiene aunque cambie el texto o el ancho de la pantalla.
+
+  LA NEGRITA NECESITA RESCATARSE DEL DEGRADADO.
+  Al recortar el fondo sobre el texto, el relleno se hereda: la negrita saldría
+  también degradada y se perdería como recurso de énfasis. Se le devuelve un
+  color plano con `-webkit-text-fill-color`, que es la única propiedad capaz de
+  ganarle al recorte. Lo mismo con los enlaces.
+
+  SIRVE PARA EL ARTÍCULO Y PARA MONTAR A MANO.
+  Por defecto imprime el contenido del artículo escrito en el editor de blog,
+  que es de donde sale el original. En modo manual se construye con bloques de
+  título y párrafo, para páginas que no son artículos. El CSS es el mismo en
+  los dos casos porque apunta a las etiquetas (h2, h3, p, strong), no a clases
+  propias: así el texto pegado desde el editor de blog se ve exactamente igual
+  que el escrito a mano.
+
+  MARCADO PARA LA TABLA DE CONTENIDO.
+  El contenedor lleva `data-toc-content`. En la sección de tabla de contenido,
+  pon ese mismo selector en «Dónde buscar los encabezados» y el índice se
+  construirá con estos títulos.
+  ============================================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign bp = s.mobile_breakpoint
+  assign bp_max = bp | minus: 1
+
+  case s.body_font
+    when 'thin2'
+      assign body_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign body_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign body_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign body_stack = 'var(--font-body-family)'
+    else
+      assign body_stack = s.body_font_custom
+  endcase
+
+  case s.h2_font
+    when 'thin2'
+      assign h2_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign h2_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign h2_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign h2_stack = 'var(--font-body-family)'
+    else
+      assign h2_stack = s.h2_font_custom
+  endcase
+
+  case s.h3_font
+    when 'thin2'
+      assign h3_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign h3_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign h3_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign h3_stack = 'var(--font-body-family)'
+    else
+      assign h3_stack = s.h3_font_custom
+  endcase
+
+  if s.content_max_width == 0
+    assign max_w = 'none'
+  else
+    assign max_w = s.content_max_width | append: 'px'
+  endif
+
+  # Ver nota de cabecera: al justificar, la última línea no se estira.
+  if s.body_align_d == 'justify'
+    assign align_last_d = 'left'
+  else
+    assign align_last_d = 'auto'
+  endif
+
+  if s.body_align_m == 'justify'
+    assign align_last_m = 'left'
+  else
+    assign align_last_m = 'auto'
+  endif
+
+  if s.hyphenate
+    assign hyphens = 'auto'
+  else
+    assign hyphens = 'manual'
+  endif
+-%}
+
+{%- style -%}
+  @font-face {
+    font-family: 'Helvetica neue';
+    src: url('{{ 'HelveticaNeueCyr-Light.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'thin2';
+    src: url('{{ 'lawrence-regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ================= Variables: PC ================= */
+  .zbt-{{ section.id }} {
+    --zbt-bg: {{ s.bg_color }};
+    --zbt-max-w: {{ max_w }};
+    --zbt-px: {{ s.padding_x_d }}px;
+    --zbt-pt: {{ s.padding_top_d }}px;
+    --zbt-pb: {{ s.padding_bottom_d }}px;
+
+    /* ---- Párrafos ---- */
+    --zbt-b-font: {{ body_stack }};
+    --zbt-b-size: {{ s.body_size_d }}px;
+    --zbt-b-lh: {{ s.body_line_height_d | divided_by: 100.0 }};
+    --zbt-b-ls: {{ s.body_letter_spacing_d }}px;
+    --zbt-b-weight: {{ s.body_weight }};
+    --zbt-b-color: {{ s.body_color }};
+    --zbt-b-align: {{ s.body_align_d }};
+    --zbt-b-align-last: {{ align_last_d }};
+    --zbt-b-hyphens: {{ hyphens }};
+    --zbt-b-grad: linear-gradient({{ s.body_grad_angle }}deg, {{ s.body_grad_1 }} 0%, {{ s.body_grad_2 }} {{ s.body_grad_mid }}%, {{ s.body_grad_3 }} 100%);
+    --zbt-p-gap: {{ s.paragraph_gap_d }}px;
+
+    /* ---- Negrita y cursiva ---- */
+    --zbt-strong-color: {{ s.strong_color }};
+    --zbt-strong-weight: {{ s.strong_weight }};
+    --zbt-em-color: {{ s.em_color }};
+
+    /* ---- Títulos de apartado (H2) ---- */
+    --zbt-h2-font: {{ h2_stack }};
+    --zbt-h2-size: {{ s.h2_size_d }}px;
+    --zbt-h2-lh: {{ s.h2_line_height_d | divided_by: 100.0 }};
+    --zbt-h2-ls: {{ s.h2_letter_spacing_d }}px;
+    --zbt-h2-weight: {{ s.h2_weight }};
+    --zbt-h2-color: {{ s.h2_color }};
+    --zbt-h2-align: {{ s.h2_align_d }};
+    --zbt-h2-grad: linear-gradient({{ s.h2_grad_angle }}deg, {{ s.h2_grad_1 }} 0%, {{ s.h2_grad_2 }} {{ s.h2_grad_mid }}%, {{ s.h2_grad_3 }} 100%);
+    --zbt-h2-mt: {{ s.h2_margin_top_d }}px;
+    --zbt-h2-mb: {{ s.h2_margin_bottom_d }}px;
+
+    /* ---- Subtítulos (H3 y H4) ---- */
+    --zbt-h3-font: {{ h3_stack }};
+    --zbt-h3-size: {{ s.h3_size_d }}px;
+    --zbt-h3-lh: {{ s.h3_line_height_d | divided_by: 100.0 }};
+    --zbt-h3-ls: {{ s.h3_letter_spacing_d }}px;
+    --zbt-h3-weight: {{ s.h3_weight }};
+    --zbt-h3-color: {{ s.h3_color }};
+    --zbt-h3-align: {{ s.h3_align_d }};
+    --zbt-h3-grad: linear-gradient({{ s.h3_grad_angle }}deg, {{ s.h3_grad_1 }} 0%, {{ s.h3_grad_2 }} {{ s.h3_grad_mid }}%, {{ s.h3_grad_3 }} 100%);
+    --zbt-h3-mt: {{ s.h3_margin_top_d }}px;
+    --zbt-h3-mb: {{ s.h3_margin_bottom_d }}px;
+
+    /* ---- Listas ---- */
+    --zbt-li-indent: {{ s.list_indent_d }}px;
+    --zbt-li-gap: {{ s.list_item_gap_d }}px;
+    --zbt-li-marker: {{ s.list_marker_color }};
+    --zbt-li-mt: {{ s.list_margin_top_d }}px;
+    --zbt-li-mb: {{ s.list_margin_bottom_d }}px;
+
+    /* ---- Enlaces ---- */
+    --zbt-a-color: {{ s.link_color }};
+    --zbt-a-hover: {{ s.link_hover_color }};
+
+    /* ---- Citas ---- */
+    --zbt-q-border: {{ s.quote_border_color }};
+    --zbt-q-border-w: {{ s.quote_border_width }}px;
+    --zbt-q-color: {{ s.quote_color }};
+    --zbt-q-pad: {{ s.quote_padding_d }}px;
+    --zbt-q-my: {{ s.quote_margin_d }}px;
+
+    /* ---- Imágenes dentro del texto ---- */
+    --zbt-img-radius: {{ s.image_radius }}px;
+    --zbt-img-my: {{ s.image_margin_d }}px;
+
+    /* ---- Separador ---- */
+    --zbt-hr-color: {{ s.hr_color }};
+    --zbt-hr-h: {{ s.hr_thickness }}px;
+    --zbt-hr-my: {{ s.hr_margin_d }}px;
+  }
+
+  /* ================= Estructura ================= */
+  .zbt {
+    background-color: var(--zbt-bg);
+  }
+
+  .zbt__inner {
+    max-width: var(--zbt-max-w);
+    margin-inline: auto;
+    padding: var(--zbt-pt) var(--zbt-px) var(--zbt-pb);
+    box-sizing: border-box;
+  }
+
+  /* El primer y el último elemento no arrastran su margen fuera de la caja:
+     si no, el padding de la sección dejaría de significar lo que dice. */
+  .zbt__rte > *:first-child { margin-top: 0; }
+  .zbt__rte > *:last-child { margin-bottom: 0; }
+
+  /* ================= Párrafos ================= */
+  .zbt__rte p {
+    margin: var(--zbt-p-gap) 0 0;
+    font-family: var(--zbt-b-font);
+    font-size: var(--zbt-b-size);
+    font-weight: var(--zbt-b-weight);
+    line-height: var(--zbt-b-lh);
+    letter-spacing: var(--zbt-b-ls);
+    color: var(--zbt-b-color);
+    text-align: var(--zbt-b-align);
+    /* Ver nota de cabecera: la última línea no se estira. */
+    text-align-last: var(--zbt-b-align-last);
+    hyphens: var(--zbt-b-hyphens);
+    -webkit-hyphens: var(--zbt-b-hyphens);
+  }
+
+  .zbt__rte p:empty { display: none; }
+
+  /* Relleno degradado del cuerpo. Ver nota de cabecera. */
+  .zbt__rte--grad p,
+  .zbt__rte--grad li {
+    background-image: var(--zbt-b-grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  /* ================= Negrita, cursiva y enlaces ================= */
+  .zbt__rte strong,
+  .zbt__rte b {
+    font-weight: var(--zbt-strong-weight);
+    color: var(--zbt-strong-color);
+    /* Única propiedad que le gana al recorte del degradado heredado. */
+    -webkit-text-fill-color: var(--zbt-strong-color);
+  }
+
+  .zbt__rte em,
+  .zbt__rte i {
+    color: var(--zbt-em-color);
+    -webkit-text-fill-color: var(--zbt-em-color);
+  }
+
+  .zbt__rte a {
+    color: var(--zbt-a-color);
+    -webkit-text-fill-color: var(--zbt-a-color);
+    text-decoration: var(--zbt-a-deco, underline);
+    text-underline-offset: 0.18em;
+    transition: color 200ms ease;
+  }
+
+  .zbt__rte a:hover {
+    color: var(--zbt-a-hover);
+    -webkit-text-fill-color: var(--zbt-a-hover);
+    text-decoration: var(--zbt-a-deco-hover, underline);
+  }
+
+  .zbt__rte a:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  /* ================= Títulos ================= */
+  .zbt__rte h2 {
+    margin: var(--zbt-h2-mt) 0 var(--zbt-h2-mb);
+    font-family: var(--zbt-h2-font);
+    font-size: var(--zbt-h2-size);
+    font-weight: var(--zbt-h2-weight);
+    line-height: var(--zbt-h2-lh);
+    letter-spacing: var(--zbt-h2-ls);
+    text-align: var(--zbt-h2-align);
+    color: var(--zbt-h2-color);
+    /* El título de apartado nunca se justifica aunque el cuerpo sí. */
+    text-align-last: auto;
+  }
+
+  .zbt__rte h3,
+  .zbt__rte h4 {
+    margin: var(--zbt-h3-mt) 0 var(--zbt-h3-mb);
+    font-family: var(--zbt-h3-font);
+    font-size: var(--zbt-h3-size);
+    font-weight: var(--zbt-h3-weight);
+    line-height: var(--zbt-h3-lh);
+    letter-spacing: var(--zbt-h3-ls);
+    text-align: var(--zbt-h3-align);
+    color: var(--zbt-h3-color);
+    text-align-last: auto;
+  }
+
+  .zbt__rte--h2grad h2 {
+    background-image: var(--zbt-h2-grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  .zbt__rte--h3grad h3,
+  .zbt__rte--h3grad h4 {
+    background-image: var(--zbt-h3-grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  /* ================= Listas ================= */
+  .zbt__rte ul,
+  .zbt__rte ol {
+    margin: var(--zbt-li-mt) 0 var(--zbt-li-mb);
+    padding-left: var(--zbt-li-indent);
+  }
+
+  .zbt__rte li {
+    margin: 0;
+    font-family: var(--zbt-b-font);
+    font-size: var(--zbt-b-size);
+    font-weight: var(--zbt-b-weight);
+    line-height: var(--zbt-b-lh);
+    letter-spacing: var(--zbt-b-ls);
+    color: var(--zbt-b-color);
+  }
+
+  .zbt__rte li + li { margin-top: var(--zbt-li-gap); }
+
+  /* El punto de la lista se pinta aparte para que no lo arrastre el
+     degradado del texto y quede invisible. */
+  .zbt__rte li::marker {
+    color: var(--zbt-li-marker);
+  }
+
+  /* ================= Citas, separadores e imágenes ================= */
+  .zbt__rte blockquote {
+    margin: var(--zbt-q-my) 0;
+    padding-left: var(--zbt-q-pad);
+    border-left: var(--zbt-q-border-w) solid var(--zbt-q-border);
+    color: var(--zbt-q-color);
+  }
+
+  .zbt__rte blockquote p {
+    color: var(--zbt-q-color);
+    -webkit-text-fill-color: var(--zbt-q-color);
+    background-image: none;
+  }
+
+  .zbt__rte hr {
+    height: var(--zbt-hr-h);
+    margin: var(--zbt-hr-my) 0;
+    border: 0;
+    background-color: var(--zbt-hr-color);
+  }
+
+  .zbt__rte img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: var(--zbt-img-my) auto;
+    border-radius: var(--zbt-img-radius);
+  }
+
+  .zbt__rte table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--zbt-p-gap) 0 0;
+    font-family: var(--zbt-b-font);
+    font-size: var(--zbt-b-size);
+    color: var(--zbt-b-color);
+  }
+
+  .zbt__rte th,
+  .zbt__rte td {
+    padding: 8px 10px;
+    border: 1px solid var(--zbt-hr-color);
+    text-align: left;
+  }
+
+  .zbt__spacer {
+    height: var(--zbt-spacer-h, 0px);
+  }
+
+  /* ================= Móvil ================= */
+  @media screen and (max-width: {{ bp_max }}px) {
+    .zbt-{{ section.id }} {
+      --zbt-max-w: none;
+      --zbt-px: {{ s.padding_x_m }}px;
+      --zbt-pt: {{ s.padding_top_m }}px;
+      --zbt-pb: {{ s.padding_bottom_m }}px;
+
+      --zbt-b-size: {{ s.body_size_m }}px;
+      --zbt-b-lh: {{ s.body_line_height_m | divided_by: 100.0 }};
+      --zbt-b-ls: {{ s.body_letter_spacing_m }}px;
+      --zbt-b-align: {{ s.body_align_m }};
+      --zbt-b-align-last: {{ align_last_m }};
+      --zbt-p-gap: {{ s.paragraph_gap_m }}px;
+
+      --zbt-h2-size: {{ s.h2_size_m }}px;
+      --zbt-h2-lh: {{ s.h2_line_height_m | divided_by: 100.0 }};
+      --zbt-h2-ls: {{ s.h2_letter_spacing_m }}px;
+      --zbt-h2-align: {{ s.h2_align_m }};
+      --zbt-h2-mt: {{ s.h2_margin_top_m }}px;
+      --zbt-h2-mb: {{ s.h2_margin_bottom_m }}px;
+
+      --zbt-h3-size: {{ s.h3_size_m }}px;
+      --zbt-h3-lh: {{ s.h3_line_height_m | divided_by: 100.0 }};
+      --zbt-h3-ls: {{ s.h3_letter_spacing_m }}px;
+      --zbt-h3-align: {{ s.h3_align_m }};
+      --zbt-h3-mt: {{ s.h3_margin_top_m }}px;
+      --zbt-h3-mb: {{ s.h3_margin_bottom_m }}px;
+
+      --zbt-li-indent: {{ s.list_indent_m }}px;
+      --zbt-li-gap: {{ s.list_item_gap_m }}px;
+      --zbt-li-mt: {{ s.list_margin_top_m }}px;
+      --zbt-li-mb: {{ s.list_margin_bottom_m }}px;
+
+      --zbt-q-pad: {{ s.quote_padding_m }}px;
+      --zbt-q-my: {{ s.quote_margin_m }}px;
+      --zbt-img-my: {{ s.image_margin_m }}px;
+      --zbt-hr-my: {{ s.hr_margin_m }}px;
+    }
+  }
+
+  {%- if s.link_underline == 'none' %}
+    .zbt-{{ section.id }} { --zbt-a-deco: none; --zbt-a-deco-hover: none; }
+  {%- elsif s.link_underline == 'hover' %}
+    .zbt-{{ section.id }} { --zbt-a-deco: none; --zbt-a-deco-hover: underline; }
+  {%- endif %}
+
+  @media (prefers-reduced-motion: reduce) {
+    .zbt-{{ section.id }} .zbt__rte a { transition: none; }
+  }
+{%- endstyle -%}
+
+<div class="zbt zbt-{{ section.id }}"{% if s.anchor_id != blank %} id="{{ s.anchor_id | handle }}"{% endif %}>
+  <div class="zbt__inner">
+    <div
+      class="zbt__rte{% if s.body_fill == 'gradient' %} zbt__rte--grad{% endif %}{% if s.h2_fill == 'gradient' %} zbt__rte--h2grad{% endif %}{% if s.h3_fill == 'gradient' %} zbt__rte--h3grad{% endif %}"
+      data-toc-content
+      lang="{{ request.locale.iso_code }}"
+    >
+      {%- if s.source == 'article' -%}
+        {%- if article.content != blank -%}
+          {{ article.content }}
+        {%- elsif request.design_mode -%}
+          <p>{{ s.empty_note }}</p>
+        {%- endif -%}
+      {%- else -%}
+        {%- for block in section.blocks -%}
+          {%- assign b = block.settings -%}
+          {%- case block.type -%}
+            {%- when 'heading' -%}
+              {%- if b.text != blank -%}
+                <{{ b.level }} {{ block.shopify_attributes }}>{{ b.text }}</{{ b.level }}>
+              {%- endif -%}
+            {%- when 'text' -%}
+              {%- if b.text != blank -%}
+                <div {{ block.shopify_attributes }}>{{ b.text }}</div>
+              {%- endif -%}
+            {%- when 'spacer' -%}
+              <div class="zbt__spacer" style="--zbt-spacer-h: {{ b.height_d }}px;" {{ block.shopify_attributes }}></div>
+          {%- endcase -%}
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Títulos y texto",
+  "tag": "section",
+  "class": "section-zbt",
+  "max_blocks": 50,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Por defecto imprime el contenido del artículo escrito en el editor de blog. Cambia el origen para montarlo a mano con bloques."
+    },
+    {
+      "type": "select",
+      "id": "source",
+      "label": "De dónde sale el contenido",
+      "options": [
+        { "value": "article", "label": "Contenido del artículo" },
+        { "value": "blocks", "label": "Bloques manuales" }
+      ],
+      "default": "article"
+    },
+    {
+      "type": "text",
+      "id": "empty_note",
+      "label": "Aviso en el editor si el artículo está vacío",
+      "default": "Aquí se imprimirá el contenido del artículo. Escríbelo en Blog → Artículo."
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Ancla de la sección",
+      "info": "Opcional. Si escribes 'contenido' podrás enlazar aquí con #contenido."
+    },
+
+    {
+      "type": "header",
+      "content": "Diseño general"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "mobile_breakpoint",
+      "min": 480,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "label": "Punto de cambio a móvil",
+      "default": 750
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 0,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "label": "Ancho máximo del contenido",
+      "info": "Ponlo igual que en la cabecera y en la tabla de contenido para que todo quede alineado.",
+      "default": 780
+    },
+    {
+      "type": "range",
+      "id": "padding_x_d",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen lateral — PC",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_x_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen lateral — Móvil",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "padding_top_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding superior — PC",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding inferior — PC",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_top_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding superior — Móvil",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding inferior — Móvil",
+      "default": 16
+    },
+
+    {
+      "type": "header",
+      "content": "Párrafos"
+    },
+    {
+      "type": "select",
+      "id": "body_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "body_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "select",
+      "id": "body_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "body_align_d",
+      "label": "Alineación — PC",
+      "info": "'Justificado' es lo del original.",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "justify", "label": "Justificado" },
+        { "value": "center", "label": "Centro" }
+      ],
+      "default": "justify"
+    },
+    {
+      "type": "select",
+      "id": "body_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "justify", "label": "Justificado" },
+        { "value": "center", "label": "Centro" }
+      ],
+      "default": "justify"
+    },
+    {
+      "type": "checkbox",
+      "id": "hyphenate",
+      "label": "Partir palabras con guion",
+      "info": "Recomendado si justificas en móvil: evita los huecos enormes entre palabras. Cambia ligeramente el aspecto del original.",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "body_fill",
+      "label": "Relleno del texto",
+      "info": "El degradado tiñe cada línea de frío a cálido, como en el original.",
+      "options": [
+        { "value": "solid", "label": "Color plano" },
+        { "value": "gradient", "label": "Degradado" }
+      ],
+      "default": "gradient"
+    },
+    {
+      "type": "color",
+      "id": "body_color",
+      "label": "Color (relleno plano)",
+      "default": "#3c4650"
+    },
+    {
+      "type": "color",
+      "id": "body_grad_1",
+      "label": "Degradado: color inicial",
+      "default": "#3a5670"
+    },
+    {
+      "type": "color",
+      "id": "body_grad_2",
+      "label": "Degradado: color intermedio",
+      "default": "#6b6355"
+    },
+    {
+      "type": "color",
+      "id": "body_grad_3",
+      "label": "Degradado: color final",
+      "default": "#8a7550"
+    },
+    {
+      "type": "range",
+      "id": "body_grad_mid",
+      "min": 5,
+      "max": 95,
+      "step": 5,
+      "unit": "%",
+      "label": "Degradado: posición del color intermedio",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "body_grad_angle",
+      "min": 0,
+      "max": 360,
+      "step": 5,
+      "unit": "°",
+      "label": "Degradado: ángulo",
+      "default": 90
+    },
+    {
+      "type": "range",
+      "id": "body_size_d",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "body_size_m",
+      "min": 10,
+      "max": 26,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "body_line_height_d",
+      "min": 100,
+      "max": 240,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado — PC",
+      "default": 180
+    },
+    {
+      "type": "range",
+      "id": "body_line_height_m",
+      "min": 100,
+      "max": 240,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado — Móvil",
+      "default": 150
+    },
+    {
+      "type": "range",
+      "id": "body_letter_spacing_d",
+      "min": -2,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras — PC",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "body_letter_spacing_m",
+      "min": -2,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras — Móvil",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "paragraph_gap_d",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre párrafos — PC",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "paragraph_gap_m",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre párrafos — Móvil",
+      "default": 20
+    },
+
+    {
+      "type": "header",
+      "content": "Negrita, cursiva y enlaces"
+    },
+    {
+      "type": "color",
+      "id": "strong_color",
+      "label": "Color de la negrita",
+      "info": "Va en color plano aunque el texto lleve degradado, para que el énfasis se note.",
+      "default": "#111111"
+    },
+    {
+      "type": "select",
+      "id": "strong_weight",
+      "label": "Grosor de la negrita",
+      "options": [
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" },
+        { "value": "800", "label": "800" }
+      ],
+      "default": "700"
+    },
+    {
+      "type": "color",
+      "id": "em_color",
+      "label": "Color de la cursiva",
+      "default": "#3c4650"
+    },
+    {
+      "type": "color",
+      "id": "link_color",
+      "label": "Color de los enlaces",
+      "default": "#96794a"
+    },
+    {
+      "type": "color",
+      "id": "link_hover_color",
+      "label": "Color de los enlaces al pasar el ratón",
+      "default": "#6f5c3c"
+    },
+    {
+      "type": "select",
+      "id": "link_underline",
+      "label": "Subrayado de los enlaces",
+      "options": [
+        { "value": "always", "label": "Siempre" },
+        { "value": "hover", "label": "Solo al pasar el ratón" },
+        { "value": "none", "label": "Nunca" }
+      ],
+      "default": "always"
+    },
+
+    {
+      "type": "header",
+      "content": "Títulos de apartado (H2)"
+    },
+    {
+      "type": "select",
+      "id": "h2_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "thin2"
+    },
+    {
+      "type": "text",
+      "id": "h2_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'thin2', Georgia, serif"
+    },
+    {
+      "type": "select",
+      "id": "h2_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "200", "label": "200" },
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "h2_fill",
+      "label": "Relleno del texto",
+      "options": [
+        { "value": "solid", "label": "Color plano" },
+        { "value": "gradient", "label": "Degradado" }
+      ],
+      "default": "gradient"
+    },
+    {
+      "type": "color",
+      "id": "h2_color",
+      "label": "Color (relleno plano)",
+      "default": "#1f1f1f"
+    },
+    {
+      "type": "color",
+      "id": "h2_grad_1",
+      "label": "Degradado: color inicial",
+      "default": "#1e3b31"
+    },
+    {
+      "type": "color",
+      "id": "h2_grad_2",
+      "label": "Degradado: color intermedio",
+      "default": "#96794a"
+    },
+    {
+      "type": "color",
+      "id": "h2_grad_3",
+      "label": "Degradado: color final",
+      "default": "#2b2b2b"
+    },
+    {
+      "type": "range",
+      "id": "h2_grad_mid",
+      "min": 5,
+      "max": 95,
+      "step": 5,
+      "unit": "%",
+      "label": "Degradado: posición del color intermedio",
+      "default": 55
+    },
+    {
+      "type": "range",
+      "id": "h2_grad_angle",
+      "min": 0,
+      "max": 360,
+      "step": 5,
+      "unit": "°",
+      "label": "Degradado: ángulo",
+      "default": 90
+    },
+    {
+      "type": "select",
+      "id": "h2_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "h2_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "h2_size_d",
+      "min": 14,
+      "max": 70,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "h2_size_m",
+      "min": 12,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "h2_line_height_d",
+      "min": 80,
+      "max": 200,
+      "step": 2,
+      "unit": "%",
+      "label": "Interlineado — PC",
+      "default": 120
+    },
+    {
+      "type": "range",
+      "id": "h2_line_height_m",
+      "min": 80,
+      "max": 200,
+      "step": 2,
+      "unit": "%",
+      "label": "Interlineado — Móvil",
+      "default": 122
+    },
+    {
+      "type": "range",
+      "id": "h2_letter_spacing_d",
+      "min": -3,
+      "max": 6,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras — PC",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "h2_letter_spacing_m",
+      "min": -3,
+      "max": 6,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras — Móvil",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "h2_margin_top_d",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "label": "Aire por encima — PC",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "h2_margin_top_m",
+      "min": 0,
+      "max": 140,
+      "step": 2,
+      "unit": "px",
+      "label": "Aire por encima — Móvil",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "h2_margin_bottom_d",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con el texto — PC",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "h2_margin_bottom_m",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con el texto — Móvil",
+      "default": 14
+    },
+
+    {
+      "type": "header",
+      "content": "Subtítulos (H3 y H4)"
+    },
+    {
+      "type": "select",
+      "id": "h3_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "thin2"
+    },
+    {
+      "type": "text",
+      "id": "h3_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'thin2', Georgia, serif"
+    },
+    {
+      "type": "select",
+      "id": "h3_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "h3_fill",
+      "label": "Relleno del texto",
+      "options": [
+        { "value": "solid", "label": "Color plano" },
+        { "value": "gradient", "label": "Degradado" }
+      ],
+      "default": "solid"
+    },
+    {
+      "type": "color",
+      "id": "h3_color",
+      "label": "Color (relleno plano)",
+      "default": "#22303a"
+    },
+    {
+      "type": "color",
+      "id": "h3_grad_1",
+      "label": "Degradado: color inicial",
+      "default": "#25405a"
+    },
+    {
+      "type": "color",
+      "id": "h3_grad_2",
+      "label": "Degradado: color intermedio",
+      "default": "#7f8a7a"
+    },
+    {
+      "type": "color",
+      "id": "h3_grad_3",
+      "label": "Degradado: color final",
+      "default": "#3a3a3a"
+    },
+    {
+      "type": "range",
+      "id": "h3_grad_mid",
+      "min": 5,
+      "max": 95,
+      "step": 5,
+      "unit": "%",
+      "label": "Degradado: posición del color intermedio",
+      "default": 55
+    },
+    {
+      "type": "range",
+      "id": "h3_grad_angle",
+      "min": 0,
+      "max": 360,
+      "step": 5,
+      "unit": "°",
+      "label": "Degradado: ángulo",
+      "default": 90
+    },
+    {
+      "type": "select",
+      "id": "h3_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "h3_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "h3_size_d",
+      "min": 12,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "h3_size_m",
+      "min": 10,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "h3_line_height_d",
+      "min": 80,
+      "max": 200,
+      "step": 2,
+      "unit": "%",
+      "label": "Interlineado — PC",
+      "default": 130
+    },
+    {
+      "type": "range",
+      "id": "h3_line_height_m",
+      "min": 80,
+      "max": 200,
+      "step": 2,
+      "unit": "%",
+      "label": "Interlineado — Móvil",
+      "default": 130
+    },
+    {
+      "type": "range",
+      "id": "h3_letter_spacing_d",
+      "min": -3,
+      "max": 6,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras — PC",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "h3_letter_spacing_m",
+      "min": -3,
+      "max": 6,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras — Móvil",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "h3_margin_top_d",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Aire por encima — PC",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "h3_margin_top_m",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Aire por encima — Móvil",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "h3_margin_bottom_d",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con el texto — PC",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "h3_margin_bottom_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con el texto — Móvil",
+      "default": 10
+    },
+
+    {
+      "type": "header",
+      "content": "Listas"
+    },
+    {
+      "type": "color",
+      "id": "list_marker_color",
+      "label": "Color del punto o el número",
+      "default": "#96794a"
+    },
+    {
+      "type": "range",
+      "id": "list_indent_d",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Sangría — PC",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "list_indent_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Sangría — Móvil",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "list_item_gap_d",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre puntos — PC",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "list_item_gap_m",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre puntos — Móvil",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "list_margin_top_d",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Aire por encima — PC",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "list_margin_top_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Aire por encima — Móvil",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "list_margin_bottom_d",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Aire por debajo — PC",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "list_margin_bottom_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Aire por debajo — Móvil",
+      "default": 6
+    },
+
+    {
+      "type": "header",
+      "content": "Citas, líneas e imágenes"
+    },
+    {
+      "type": "color",
+      "id": "quote_color",
+      "label": "Color del texto de la cita",
+      "default": "#4a4a4a"
+    },
+    {
+      "type": "color",
+      "id": "quote_border_color",
+      "label": "Color de la barra lateral",
+      "default": "#96794a"
+    },
+    {
+      "type": "range",
+      "id": "quote_border_width",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor de la barra lateral",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "quote_padding_d",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Sangría de la cita — PC",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "quote_padding_m",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Sangría de la cita — Móvil",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "quote_margin_d",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Aire alrededor de la cita — PC",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "quote_margin_m",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Aire alrededor de la cita — Móvil",
+      "default": 24
+    },
+    {
+      "type": "color",
+      "id": "hr_color",
+      "label": "Color de las líneas separadoras",
+      "default": "#e5e3de"
+    },
+    {
+      "type": "range",
+      "id": "hr_thickness",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor de las líneas separadoras",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "hr_margin_d",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Aire alrededor de las líneas — PC",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "hr_margin_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Aire alrededor de las líneas — Móvil",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "image_radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo de las imágenes del texto",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "image_margin_d",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Aire alrededor de las imágenes — PC",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "image_margin_m",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Aire alrededor de las imágenes — Móvil",
+      "default": 24
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Título",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Texto",
+          "default": "Qué son los nootrópicos naturales"
+        },
+        {
+          "type": "select",
+          "id": "level",
+          "label": "Nivel",
+          "info": "Los H2 son los que salen numerados en la tabla de contenido.",
+          "options": [
+            { "value": "h2", "label": "Título de apartado (H2)" },
+            { "value": "h3", "label": "Subtítulo (H3)" },
+            { "value": "h4", "label": "Sub-subtítulo (H4)" }
+          ],
+          "default": "h2"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Párrafo",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto",
+          "default": "<p>Escribe aquí el texto. Puedes usar <strong>negrita</strong> y enlaces.</p>"
+        }
+      ]
+    },
+    {
+      "type": "spacer",
+      "name": "Espacio en blanco",
+      "settings": [
+        {
+          "type": "range",
+          "id": "height_d",
+          "min": 0,
+          "max": 200,
+          "step": 2,
+          "unit": "px",
+          "label": "Altura",
+          "default": 40
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Títulos y texto"
+    }
+  ]
+}
+{% endschema %}
