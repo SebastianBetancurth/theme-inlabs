@@ -600,6 +600,13 @@
           this.onScroll = this.onScroll.bind(this);
           this.list.addEventListener('click', this.onClick);
 
+          // En el editor de temas, tocar la sección de texto la vuelve a
+          // pintar sin recargar la página: los títulos cambian pero la tabla
+          // se quedaría con la lista vieja. Se reconstruye al vuelo para que
+          // lo que se ve en el editor sea lo que habrá en la tienda.
+          this.onSectionLoad = () => this.init();
+          document.addEventListener('shopify:section:load', this.onSectionLoad);
+
           // En móvil el plegado por defecto puede ser distinto al de PC, y eso
           // no se puede decidir desde Liquid porque no conoce el ancho.
           if (this.isMobile() && this.details) {
@@ -618,6 +625,7 @@
 
         disconnectedCallback() {
           window.removeEventListener('scroll', this.onScroll);
+          document.removeEventListener('shopify:section:load', this.onSectionLoad);
           if (this.list) this.list.removeEventListener('click', this.onClick);
         }
 
@@ -736,6 +744,11 @@
         }
 
         watch() {
+          // Reconstruir no debe dejar el oyente anterior colgado: si no, cada
+          // recarga del editor añadiría uno más y todos seguirían apuntando a
+          // enlaces que ya no existen.
+          window.removeEventListener('scroll', this.onScroll);
+          this._active = -2;
           if (this.dataset.active !== 'true' || !this.targets || this.targets.length === 0) return;
           this.links = Array.from(this.list.querySelectorAll('[data-ztoc-link]'));
           window.addEventListener('scroll', this.onScroll, { passive: true });
