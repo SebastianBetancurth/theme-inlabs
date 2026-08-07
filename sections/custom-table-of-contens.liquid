@@ -1,0 +1,1874 @@
+{%- comment -%}
+  ============================================================================
+  SECCIÓN: Tabla de contenido
+  Tema: Dawn / Online Store 2.0
+  Ruta: sections/custom-table-of-contents.liquid
+
+  Caja con borde y esquinas redondeadas. Cerrada solo enseña el título y un
+  «+». Abierta lista los apartados del artículo: los de primer nivel numerados
+  y los de segundo sin numerar. Al pulsar cualquiera se baja hasta ese punto
+  del artículo.
+
+  LA LISTA NO SE ESCRIBE, SE LEE DEL ARTÍCULO.
+  El cuerpo de un artículo es un bloque de HTML guardado en un solo campo:
+  Liquid puede imprimirlo, pero no recorrer sus encabezados. Por eso la lista
+  se construye en el navegador leyendo los H2 y H3 reales del contenido. La
+  ventaja de hacerlo así no es solo que se pueda: es que los enlaces y sus
+  destinos salen de la misma pasada, así que nunca apuntan a un apartado que
+  se renombró o se borró. Escribir la lista a mano en el editor obligaría a
+  repasarla cada vez que se toca el artículo. Aun así queda el modo manual
+  para páginas que no son artículos.
+
+  LOS DESTINOS NECESITAN UN ID, Y CASI NUNCA LO TIENEN.
+  El editor de Shopify no pone identificadores a los encabezados. El script se
+  los inventa a partir del texto, quitando tildes y símbolos, y añade un
+  sufijo numérico si el mismo título aparece dos veces. Si un encabezado ya
+  trae un id puesto a mano, se respeta.
+
+  EL DESPLAZAMIENTO SE CORRIGE CON scroll-margin-top, NO CON MATEMÁTICAS.
+  Con una cabecera fija, saltar a un ancla deja el título tapado. En vez de
+  calcular posiciones a mano en cada clic, se le pone `scroll-margin-top` a
+  cada encabezado de destino: el navegador ya frena a la altura correcta, y
+  sigue funcionando si se llega desde un enlace externo con la almohadilla.
+
+  SE USA <details>, ASÍ QUE ABRE Y CIERRA SIN JAVASCRIPT.
+  El plegado es nativo: funciona con teclado, con lector de pantalla y aunque
+  falle el script. El script solo rellena la lista.
+
+  LA SECCIÓN SE OCULTA SOLA SI NO HAY NADA QUE LISTAR.
+  Un artículo corto sin apartados dejaría una caja vacía. Fuera del editor la
+  sección no se pinta; dentro del editor sí, con un aviso, para que no parezca
+  que la sección se ha roto.
+  ============================================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign bp = s.mobile_breakpoint
+  assign bp_max = bp | minus: 1
+
+  case s.title_font
+    when 'thin2'
+      assign title_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign title_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign title_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign title_stack = 'var(--font-body-family)'
+    else
+      assign title_stack = s.title_font_custom
+  endcase
+
+  case s.l1_font
+    when 'thin2'
+      assign l1_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign l1_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign l1_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign l1_stack = 'var(--font-body-family)'
+    else
+      assign l1_stack = s.l1_font_custom
+  endcase
+
+  case s.l2_font
+    when 'thin2'
+      assign l2_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign l2_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign l2_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign l2_stack = 'var(--font-body-family)'
+    else
+      assign l2_stack = s.l2_font_custom
+  endcase
+
+  if s.content_max_width == 0
+    assign max_w = 'none'
+  else
+    assign max_w = s.content_max_width | append: 'px'
+  endif
+
+  if s.box_max_width == 0
+    assign box_max_w = 'none'
+  else
+    assign box_max_w = s.box_max_width | append: 'px'
+  endif
+
+  case s.levels
+    when 'h2'
+      assign level_sel = 'h2'
+    when 'h2h3h4'
+      assign level_sel = 'h2, h3, h4'
+    else
+      assign level_sel = 'h2, h3'
+  endcase
+
+  assign num_suffix = s.number_suffix | replace: '"', ''
+  assign num_sep = s.number_separator | replace: '"', ''
+
+  # La caja se esconde de entrada solo cuando la lista se genera sola y no
+  # estamos en el editor. Ver nota de cabecera.
+  assign hide_until_ready = false
+  if s.source == 'auto' and request.design_mode == false
+    assign hide_until_ready = true
+  endif
+-%}
+
+{%- style -%}
+  @font-face {
+    font-family: 'Helvetica neue';
+    src: url('{{ 'HelveticaNeueCyr-Light.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'thin2';
+    src: url('{{ 'lawrence-regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ================= Variables: PC ================= */
+  .ztoc-{{ section.id }} {
+    --ztoc-bg: {{ s.bg_color }};
+    --ztoc-max-w: {{ max_w }};
+    --ztoc-px: {{ s.padding_x_d }}px;
+    --ztoc-pt: {{ s.padding_top_d }}px;
+    --ztoc-pb: {{ s.padding_bottom_d }}px;
+
+    --ztoc-anim: {{ s.transition_ms }}ms;
+
+    /* ---- Caja ---- */
+    --ztoc-box-bg: {{ s.box_bg }};
+    --ztoc-box-border: {{ s.box_border_color }};
+    --ztoc-box-border-w: {{ s.box_border_width }}px;
+    --ztoc-box-radius: {{ s.box_radius_d }}px;
+    --ztoc-box-px: {{ s.box_padding_x_d }}px;
+    --ztoc-box-py: {{ s.box_padding_y_d }}px;
+    --ztoc-box-max-w: {{ box_max_w }};
+    --ztoc-box-shadow: {{ s.box_shadow_x }}px {{ s.box_shadow_y }}px {{ s.box_shadow_blur }}px {{ s.box_shadow_color }};
+
+    /* ---- Título de la caja ---- */
+    --ztoc-t-font: {{ title_stack }};
+    --ztoc-t-size: {{ s.title_size_d }}px;
+    --ztoc-t-weight: {{ s.title_weight }};
+    --ztoc-t-color: {{ s.title_color }};
+    --ztoc-t-ls: {{ s.title_letter_spacing }}px;
+    --ztoc-t-transform: {{ s.title_transform }};
+    --ztoc-t-mb: {{ s.title_margin_bottom_d }}px;
+
+    /* ---- Icono ---- */
+    --ztoc-i-size: {{ s.icon_size_d }}px;
+    --ztoc-i-stroke: {{ s.icon_stroke }};
+    --ztoc-i-color: {{ s.icon_color }};
+
+    /* ---- Numeración ---- */
+    --ztoc-num-color: {{ s.number_color }};
+    --ztoc-num-weight: {{ s.number_weight }};
+    --ztoc-num-gap: {{ s.number_gap }}px;
+    --ztoc-num-suffix: "{{ num_suffix }}";
+    --ztoc-num-sep: "{{ num_sep }}";
+
+    /* ---- Nivel 1 ---- */
+    --ztoc-l1-font: {{ l1_stack }};
+    --ztoc-l1-size: {{ s.l1_size_d }}px;
+    --ztoc-l1-lh: {{ s.l1_line_height | divided_by: 100.0 }};
+    --ztoc-l1-weight: {{ s.l1_weight }};
+    --ztoc-l1-ls: {{ s.l1_letter_spacing }}px;
+    --ztoc-l1-color: {{ s.l1_color }};
+    --ztoc-l1-hover: {{ s.l1_hover_color }};
+    --ztoc-l1-grad: linear-gradient({{ s.l1_grad_angle }}deg, {{ s.l1_grad_1 }} 0%, {{ s.l1_grad_2 }} {{ s.l1_grad_mid }}%, {{ s.l1_grad_3 }} 100%);
+    --ztoc-l1-gap: {{ s.l1_gap_d }}px;
+    --ztoc-l1-indent: {{ s.l1_indent_d }}px;
+
+    /* ---- Nivel 2 y 3 ---- */
+    --ztoc-l2-font: {{ l2_stack }};
+    --ztoc-l2-size: {{ s.l2_size_d }}px;
+    --ztoc-l2-lh: {{ s.l2_line_height | divided_by: 100.0 }};
+    --ztoc-l2-weight: {{ s.l2_weight }};
+    --ztoc-l2-ls: {{ s.l2_letter_spacing }}px;
+    --ztoc-l2-color: {{ s.l2_color }};
+    --ztoc-l2-hover: {{ s.l2_hover_color }};
+    --ztoc-l2-grad: linear-gradient({{ s.l2_grad_angle }}deg, {{ s.l2_grad_1 }} 0%, {{ s.l2_grad_2 }} {{ s.l2_grad_mid }}%, {{ s.l2_grad_3 }} 100%);
+    --ztoc-l2-gap: {{ s.l2_gap_d }}px;
+    --ztoc-l2-indent: {{ s.l2_indent_d }}px;
+    --ztoc-l3-indent: {{ s.l3_indent_d }}px;
+
+    /* ---- Estado activo ---- */
+    --ztoc-active-color: {{ s.active_color }};
+    --ztoc-active-weight: {{ s.active_weight }};
+
+    /* ---- Separadores ---- */
+    --ztoc-sep-color: {{ s.item_divider_color }};
+    --ztoc-sep-w: {{ s.item_divider_width }}px;
+  }
+
+  /* ================= Estructura ================= */
+  .ztoc {
+    background-color: var(--ztoc-bg);
+  }
+
+  /* Ver nota de cabecera: sin encabezados no se pinta nada. El script quita
+     esta clase en cuanto consigue construir la lista. */
+  .ztoc.is-empty {
+    display: none;
+  }
+
+  .ztoc__inner {
+    max-width: var(--ztoc-max-w);
+    margin-inline: auto;
+    padding: var(--ztoc-pt) var(--ztoc-px) var(--ztoc-pb);
+    box-sizing: border-box;
+  }
+
+  .ztoc__box {
+    display: block;
+    max-width: var(--ztoc-box-max-w);
+    margin-inline: auto;
+    border: var(--ztoc-box-border-w) solid var(--ztoc-box-border);
+    border-radius: var(--ztoc-box-radius);
+    background-color: var(--ztoc-box-bg);
+    box-shadow: var(--ztoc-box-shadow);
+  }
+
+  /* ================= Cabecera plegable ================= */
+  .ztoc__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: var(--ztoc-box-py) var(--ztoc-box-px);
+    cursor: pointer;
+    list-style: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* El triángulo nativo se quita en los dos motores. */
+  .ztoc__summary::-webkit-details-marker { display: none; }
+  .ztoc__summary::marker { content: ''; }
+
+  .ztoc__summary:focus-visible {
+    outline: 2px solid var(--ztoc-t-color);
+    outline-offset: 3px;
+    border-radius: var(--ztoc-box-radius);
+  }
+
+  .ztoc__title {
+    font-family: var(--ztoc-t-font);
+    font-size: var(--ztoc-t-size);
+    font-weight: var(--ztoc-t-weight);
+    letter-spacing: var(--ztoc-t-ls);
+    text-transform: var(--ztoc-t-transform);
+    color: var(--ztoc-t-color);
+    line-height: 1.3;
+  }
+
+  .ztoc__icon {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--ztoc-i-size);
+    height: var(--ztoc-i-size);
+    color: var(--ztoc-i-color);
+  }
+
+  .ztoc__icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    transition: transform var(--ztoc-anim) ease;
+  }
+
+  .ztoc__icon svg path {
+    stroke: currentColor;
+    stroke-width: var(--ztoc-i-stroke);
+    stroke-linecap: round;
+    fill: none;
+  }
+
+  /* El «+» se convierte en «−» plegando la barra vertical, así el cambio se
+     puede animar en vez de intercambiar dos iconos de golpe. */
+  .ztoc__icon-bar {
+    transform-origin: center;
+    transition: transform var(--ztoc-anim) ease, opacity var(--ztoc-anim) ease;
+  }
+
+  .ztoc__details[open] .ztoc__icon-bar {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+
+  .ztoc__details[open] .ztoc__icon--chevron svg {
+    transform: rotate(180deg);
+  }
+
+  /* ================= Panel ================= */
+  .ztoc__panel {
+    padding: 0 var(--ztoc-box-px) var(--ztoc-box-py);
+    margin-top: calc(var(--ztoc-t-mb) - var(--ztoc-box-py));
+  }
+
+  @keyframes ztoc-reveal {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .ztoc__details[open] .ztoc__panel {
+    animation: ztoc-reveal var(--ztoc-anim) ease;
+  }
+
+  .ztoc__list {
+    /* Los contadores viven en la lista aunque sea plana: un `counter-reset`
+       alcanza también a los hermanos siguientes, así que el nivel 2 se
+       reinicia en cada apartado sin necesidad de anidar listas. */
+    counter-reset: ztoc1 ztoc2;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ztoc__item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--ztoc-num-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ztoc__item + .ztoc__item {
+    border-top: var(--ztoc-sep-w) solid var(--ztoc-sep-color);
+  }
+
+  .ztoc__item--1 {
+    counter-increment: ztoc1;
+    counter-reset: ztoc2;
+    padding-left: var(--ztoc-l1-indent);
+  }
+
+  .ztoc__item--2 {
+    counter-increment: ztoc2;
+    padding-left: var(--ztoc-l2-indent);
+  }
+
+  .ztoc__item--3 {
+    padding-left: calc(var(--ztoc-l2-indent) + var(--ztoc-l3-indent));
+  }
+
+  .ztoc__item + .ztoc__item.ztoc__item--1 { margin-top: var(--ztoc-l1-gap); }
+  .ztoc__item + .ztoc__item.ztoc__item--2,
+  .ztoc__item + .ztoc__item.ztoc__item--3 { margin-top: var(--ztoc-l2-gap); }
+
+  /* El número es un marcador, no texto del enlace: queda fuera del área
+     pulsable y no lo lee el lector de pantalla como parte del título. */
+  .ztoc__item::before {
+    flex: 0 0 auto;
+    color: var(--ztoc-num-color);
+    font-weight: var(--ztoc-num-weight);
+  }
+
+  .ztoc__item--1::before {
+    font-family: var(--ztoc-l1-font);
+    font-size: var(--ztoc-l1-size);
+    line-height: var(--ztoc-l1-lh);
+  }
+
+  .ztoc__item--2::before,
+  .ztoc__item--3::before {
+    font-family: var(--ztoc-l2-font);
+    font-size: var(--ztoc-l2-size);
+    line-height: var(--ztoc-l2-lh);
+  }
+
+  .ztoc__link {
+    display: inline;
+    text-decoration: var(--ztoc-deco, none);
+    text-underline-offset: 0.18em;
+    transition: color var(--ztoc-anim) ease;
+  }
+
+  .ztoc__link:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  .ztoc__item--1 .ztoc__link {
+    font-family: var(--ztoc-l1-font);
+    font-size: var(--ztoc-l1-size);
+    font-weight: var(--ztoc-l1-weight);
+    line-height: var(--ztoc-l1-lh);
+    letter-spacing: var(--ztoc-l1-ls);
+    color: var(--ztoc-l1-color);
+  }
+
+  .ztoc__item--2 .ztoc__link,
+  .ztoc__item--3 .ztoc__link {
+    font-family: var(--ztoc-l2-font);
+    font-size: var(--ztoc-l2-size);
+    font-weight: var(--ztoc-l2-weight);
+    line-height: var(--ztoc-l2-lh);
+    letter-spacing: var(--ztoc-l2-ls);
+    color: var(--ztoc-l2-color);
+  }
+
+  .ztoc__item--1 .ztoc__link:hover { color: var(--ztoc-l1-hover); }
+  .ztoc__item--2 .ztoc__link:hover,
+  .ztoc__item--3 .ztoc__link:hover { color: var(--ztoc-l2-hover); }
+
+  .ztoc__link:hover { text-decoration: var(--ztoc-deco-hover, none); }
+
+  /* Relleno degradado. Se apaga en hover y en el apartado activo porque un
+     texto recortado sobre un degradado no puede cambiar de color. */
+  .ztoc__link--grad {
+    background-image: var(--ztoc-grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  .ztoc__item--1 .ztoc__link--grad { --ztoc-grad: var(--ztoc-l1-grad); }
+  .ztoc__item--2 .ztoc__link--grad,
+  .ztoc__item--3 .ztoc__link--grad { --ztoc-grad: var(--ztoc-l2-grad); }
+
+  .ztoc__link--grad:hover {
+    background-image: none;
+    -webkit-text-fill-color: currentColor;
+  }
+
+  .ztoc__item.is-active .ztoc__link {
+    color: var(--ztoc-active-color);
+    font-weight: var(--ztoc-active-weight);
+  }
+
+  .ztoc__item.is-active .ztoc__link--grad {
+    background-image: none;
+    -webkit-text-fill-color: var(--ztoc-active-color);
+  }
+
+  .ztoc__note {
+    margin: 0;
+    font-family: var(--ztoc-l2-font);
+    font-size: var(--ztoc-l2-size);
+    line-height: 1.5;
+    color: var(--ztoc-l2-color);
+    opacity: 0.75;
+  }
+
+  /* ================= Móvil ================= */
+  @media screen and (max-width: {{ bp_max }}px) {
+    .ztoc-{{ section.id }} {
+      --ztoc-max-w: none;
+      --ztoc-px: {{ s.padding_x_m }}px;
+      --ztoc-pt: {{ s.padding_top_m }}px;
+      --ztoc-pb: {{ s.padding_bottom_m }}px;
+
+      --ztoc-box-radius: {{ s.box_radius_m }}px;
+      --ztoc-box-px: {{ s.box_padding_x_m }}px;
+      --ztoc-box-py: {{ s.box_padding_y_m }}px;
+      --ztoc-box-max-w: none;
+
+      --ztoc-t-size: {{ s.title_size_m }}px;
+      --ztoc-t-mb: {{ s.title_margin_bottom_m }}px;
+
+      --ztoc-i-size: {{ s.icon_size_m }}px;
+
+      --ztoc-l1-size: {{ s.l1_size_m }}px;
+      --ztoc-l1-gap: {{ s.l1_gap_m }}px;
+      --ztoc-l1-indent: {{ s.l1_indent_m }}px;
+
+      --ztoc-l2-size: {{ s.l2_size_m }}px;
+      --ztoc-l2-gap: {{ s.l2_gap_m }}px;
+      --ztoc-l2-indent: {{ s.l2_indent_m }}px;
+      --ztoc-l3-indent: {{ s.l3_indent_m }}px;
+    }
+  }
+
+  {%- if s.link_underline == 'always' %}
+    .ztoc-{{ section.id }} { --ztoc-deco: underline; --ztoc-deco-hover: underline; }
+  {%- elsif s.link_underline == 'hover' %}
+    .ztoc-{{ section.id }} { --ztoc-deco: none; --ztoc-deco-hover: underline; }
+  {%- endif %}
+
+  {%- if s.number_style == 'level1' %}
+    .ztoc-{{ section.id }} .ztoc__item--1::before { content: counter(ztoc1) var(--ztoc-num-suffix); }
+  {%- elsif s.number_style == 'all' %}
+    .ztoc-{{ section.id }} .ztoc__item--1::before { content: counter(ztoc1) var(--ztoc-num-suffix); }
+    .ztoc-{{ section.id }} .ztoc__item--2::before { content: counter(ztoc1) var(--ztoc-num-sep) counter(ztoc2) var(--ztoc-num-suffix); }
+  {%- endif %}
+
+  {%- unless s.item_divider %}
+    .ztoc-{{ section.id }} .ztoc__item + .ztoc__item { border-top: 0; }
+  {%- else %}
+    .ztoc-{{ section.id }} .ztoc__item + .ztoc__item { padding-top: {{ s.item_divider_padding }}px; }
+  {%- endunless %}
+
+  @media (prefers-reduced-motion: reduce) {
+    .ztoc-{{ section.id }} { --ztoc-anim: 1ms; }
+    .ztoc-{{ section.id }} .ztoc__details[open] .ztoc__panel { animation: none; }
+  }
+{%- endstyle -%}
+
+<div
+  class="ztoc ztoc-{{ section.id }}{% if hide_until_ready %} is-empty{% endif %}"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handle }}"{% endif %}
+>
+  <div class="ztoc__inner">
+    <ztoc-widget
+      class="ztoc__box"
+      data-source="{{ s.source }}"
+      data-content-selector="{{ s.content_selector | escape }}"
+      data-exclude-selector="{{ s.exclude_selector | escape }}"
+      data-levels="{{ level_sel }}"
+      data-min-items="{{ s.min_items }}"
+      data-offset="{{ s.scroll_offset }}"
+      data-offset-mobile="{{ s.scroll_offset_m }}"
+      data-breakpoint="{{ bp_max }}"
+      data-smooth="{{ s.smooth_scroll }}"
+      data-hash="{{ s.update_hash }}"
+      data-close-mobile="{{ s.close_on_click_m }}"
+      data-active="{{ s.active_highlight }}"
+      data-open-mobile="{{ s.open_default_m }}"
+      data-empty-note="{{ s.empty_note | escape }}"
+    >
+      <details class="ztoc__details" data-ztoc-details{% if s.open_default_d %} open{% endif %}>
+        <summary class="ztoc__summary">
+          <span class="ztoc__title">{{ s.title }}</span>
+          {%- if s.icon_style != 'none' -%}
+            <span class="ztoc__icon{% if s.icon_style == 'chevron' %} ztoc__icon--chevron{% endif %}" aria-hidden="true">
+              {%- if s.icon_style == 'chevron' -%}
+                <svg viewBox="0 0 20 20" focusable="false">
+                  <path d="M4.5 7.5 10 13l5.5-5.5"></path>
+                </svg>
+              {%- else -%}
+                <svg viewBox="0 0 20 20" focusable="false">
+                  <path d="M3 10h14"></path>
+                  <path class="ztoc__icon-bar" d="M10 3v14"></path>
+                </svg>
+              {%- endif -%}
+            </span>
+          {%- endif -%}
+        </summary>
+
+        <div class="ztoc__panel">
+          <ol class="ztoc__list" data-ztoc-list>
+            {%- if s.source == 'manual' -%}
+              {%- for block in section.blocks -%}
+                {%- assign b = block.settings -%}
+                {%- if b.text != blank -%}
+                  {%- liquid
+                    assign target = b.anchor | strip
+                    unless target contains '/' or target contains '#'
+                      assign target = '#' | append: target
+                    endunless
+                  -%}
+                  <li class="ztoc__item ztoc__item--{{ b.level }}" {{ block.shopify_attributes }}>
+                    <a class="ztoc__link{% if b.level == '1' and s.l1_fill == 'gradient' %} ztoc__link--grad{% endif %}{% if b.level != '1' and s.l2_fill == 'gradient' %} ztoc__link--grad{% endif %}" href="{{ target }}" data-ztoc-link>{{ b.text }}</a>
+                  </li>
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endif -%}
+          </ol>
+        </div>
+      </details>
+    </ztoc-widget>
+  </div>
+</div>
+
+<script>
+  if (!customElements.get('ztoc-widget')) {
+    customElements.define(
+      'ztoc-widget',
+      class ZtocWidget extends HTMLElement {
+        connectedCallback() {
+          this.root = this.closest('.ztoc');
+          this.list = this.querySelector('[data-ztoc-list]');
+          this.details = this.querySelector('[data-ztoc-details]');
+          if (!this.list) return;
+
+          this.l1Grad = {{ s.l1_fill | json }} === 'gradient';
+          this.l2Grad = {{ s.l2_fill | json }} === 'gradient';
+
+          this.onClick = this.onClick.bind(this);
+          this.onScroll = this.onScroll.bind(this);
+          this.list.addEventListener('click', this.onClick);
+
+          // En móvil el plegado por defecto puede ser distinto al de PC, y eso
+          // no se puede decidir desde Liquid porque no conoce el ancho.
+          if (this.isMobile() && this.details) {
+            this.details.open = this.dataset.openMobile === 'true';
+          }
+
+          // El script vive en una sección que va por encima del contenido del
+          // artículo, así que al ejecutarse todavía no existe lo que hay que
+          // leer: hay que esperar a que el documento esté completo.
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.init(), { once: true });
+          } else {
+            this.init();
+          }
+        }
+
+        disconnectedCallback() {
+          window.removeEventListener('scroll', this.onScroll);
+          if (this.list) this.list.removeEventListener('click', this.onClick);
+        }
+
+        isMobile() {
+          return window.matchMedia('(max-width: ' + this.dataset.breakpoint + 'px)').matches;
+        }
+
+        offset() {
+          return parseInt(this.isMobile() ? this.dataset.offsetMobile : this.dataset.offset, 10) || 0;
+        }
+
+        init() {
+          if (this.dataset.source === 'manual') {
+            this.targets = Array.from(this.list.querySelectorAll('[data-ztoc-link]'))
+              .map((a) => document.getElementById(decodeURIComponent((a.hash || '').slice(1))))
+              .filter(Boolean);
+            this.targets.forEach((el) => { el.style.scrollMarginTop = this.offset() + 'px'; });
+            this.watch();
+            return;
+          }
+          this.build();
+        }
+
+        content() {
+          const list = (this.dataset.contentSelector || '').split(',').map((x) => x.trim()).filter(Boolean);
+          for (const sel of list) {
+            let el = null;
+            try { el = document.querySelector(sel); } catch (e) { el = null; }
+            if (el) return el;
+          }
+          return null;
+        }
+
+        // Texto -> identificador. Se quitan tildes con NFD para que «Bacopa
+        // monnieri» y «Bacopá monnieri» no acaben en el mismo id vacío.
+        slug(text) {
+          return text
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '')
+            .slice(0, 60);
+        }
+
+        build() {
+          const content = this.content();
+          if (!content) return this.fail('No se ha encontrado el contenido del artículo. Revisa el selector en los ajustes de la sección.');
+
+          const exclude = (this.dataset.excludeSelector || '').trim();
+          let nodes = Array.from(content.querySelectorAll(this.dataset.levels));
+          nodes = nodes.filter((h) => {
+            if (h.textContent.trim() === '') return false;
+            if (h.closest('.ztoc')) return false;
+            if (h.hasAttribute('data-toc-ignore')) return false;
+            if (exclude) { try { if (h.matches(exclude) || h.closest(exclude)) return false; } catch (e) {} }
+            return true;
+          });
+
+          const min = parseInt(this.dataset.minItems, 10) || 1;
+          if (nodes.length < min) return this.fail(this.dataset.emptyNote);
+
+          const used = new Set(Array.from(document.querySelectorAll('[id]')).map((el) => el.id));
+          const off = this.offset();
+          const frag = document.createDocumentFragment();
+          this.targets = [];
+
+          nodes.forEach((h) => {
+            if (!h.id) {
+              const base = this.slug(h.textContent) || 'apartado';
+              let id = base;
+              let n = 2;
+              while (used.has(id)) { id = base + '-' + n; n += 1; }
+              h.id = id;
+            }
+            used.add(h.id);
+            // Ver nota de cabecera: así frena el propio navegador.
+            h.style.scrollMarginTop = off + 'px';
+
+            const level = Math.max(1, Math.min(3, parseInt(h.tagName.slice(1), 10) - 1));
+            const grad = level === 1 ? this.l1Grad : this.l2Grad;
+
+            const li = document.createElement('li');
+            li.className = 'ztoc__item ztoc__item--' + level;
+
+            const a = document.createElement('a');
+            a.className = 'ztoc__link' + (grad ? ' ztoc__link--grad' : '');
+            a.href = '#' + h.id;
+            a.textContent = h.textContent.trim();
+            a.setAttribute('data-ztoc-link', '');
+
+            li.appendChild(a);
+            frag.appendChild(li);
+            this.targets.push(h);
+          });
+
+          this.list.innerHTML = '';
+          this.list.appendChild(frag);
+          if (this.root) this.root.classList.remove('is-empty');
+          this.watch();
+        }
+
+        fail(message) {
+          // Fuera del editor no se enseña una caja vacía; dentro se explica
+          // por qué está vacía en lugar de desaparecer sin avisar.
+          if (!document.documentElement.classList.contains('shopify-design-mode') && !window.Shopify?.designMode) {
+            if (this.root) this.root.classList.add('is-empty');
+            return;
+          }
+          this.list.innerHTML = '';
+          const note = document.createElement('li');
+          note.className = 'ztoc__note';
+          note.textContent = message;
+          this.list.appendChild(note);
+          if (this.root) this.root.classList.remove('is-empty');
+        }
+
+        watch() {
+          if (this.dataset.active !== 'true' || !this.targets || this.targets.length === 0) return;
+          this.links = Array.from(this.list.querySelectorAll('[data-ztoc-link]'));
+          window.addEventListener('scroll', this.onScroll, { passive: true });
+          this.onScroll();
+        }
+
+        onScroll() {
+          if (this._raf) return;
+          this._raf = requestAnimationFrame(() => {
+            this._raf = null;
+            this.mark();
+          });
+        }
+
+        // El apartado activo es el último cuyo título ya ha pasado por encima
+        // de la línea de lectura. Se recorre al revés para parar en cuanto se
+        // encuentra, en vez de comparar distancias con todos.
+        mark() {
+          const line = this.offset() + 8;
+          let active = -1;
+          for (let i = this.targets.length - 1; i >= 0; i--) {
+            if (this.targets[i].getBoundingClientRect().top <= line) { active = i; break; }
+          }
+          if (active === this._active) return;
+          this._active = active;
+          this.links.forEach((a, i) => {
+            a.parentElement.classList.toggle('is-active', i === active);
+          });
+        }
+
+        onClick(event) {
+          const link = event.target.closest('[data-ztoc-link]');
+          if (!link || !link.hash) return;
+          const target = document.getElementById(decodeURIComponent(link.hash.slice(1)));
+          if (!target) return;
+
+          event.preventDefault();
+
+          const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          const smooth = this.dataset.smooth === 'true' && !reduce;
+          target.style.scrollMarginTop = this.offset() + 'px';
+          target.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
+
+          // El foco viaja con el desplazamiento: si no, quien navega con
+          // teclado seguiría en la lista y el siguiente tabulador lo devolvería
+          // al principio del documento.
+          target.setAttribute('tabindex', '-1');
+          target.focus({ preventScroll: true });
+
+          if (this.dataset.hash === 'true' && history.replaceState) {
+            history.replaceState(null, '', link.hash);
+          }
+
+          if (this.dataset.closeMobile === 'true' && this.isMobile() && this.details) {
+            this.details.open = false;
+          }
+        }
+      }
+    );
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Tabla de contenido",
+  "tag": "section",
+  "class": "section-ztoc",
+  "max_blocks": 30,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "La lista se construye sola con los encabezados del artículo. Colócala encima del contenido y no toques nada más."
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Ancla de la sección",
+      "info": "Opcional. Si escribes 'indice' podrás enlazar aquí con #indice."
+    },
+
+    {
+      "type": "header",
+      "content": "Contenido y comportamiento"
+    },
+    {
+      "type": "select",
+      "id": "source",
+      "label": "De dónde sale la lista",
+      "options": [
+        { "value": "auto", "label": "Automática (encabezados del artículo)" },
+        { "value": "manual", "label": "Manual (bloques de abajo)" }
+      ],
+      "default": "auto"
+    },
+    {
+      "type": "select",
+      "id": "levels",
+      "label": "Niveles que se listan",
+      "info": "H2 son los apartados grandes; H3 los subapartados.",
+      "options": [
+        { "value": "h2", "label": "Solo H2" },
+        { "value": "h2h3", "label": "H2 y H3" },
+        { "value": "h2h3h4", "label": "H2, H3 y H4" }
+      ],
+      "default": "h2h3"
+    },
+    {
+      "type": "text",
+      "id": "content_selector",
+      "label": "Dónde buscar los encabezados",
+      "info": "Selectores CSS separados por comas. Se usa el primero que exista. Si tu tema no es Dawn, añade aquí la clase de tu contenedor de contenido.",
+      "default": ".article-template__content, .article-template .rte, .article__content, main .rte"
+    },
+    {
+      "type": "text",
+      "id": "exclude_selector",
+      "label": "Encabezados que NO se listan",
+      "info": "Opcional. Selector CSS. También puedes añadir data-toc-ignore a un encabezado concreto."
+    },
+    {
+      "type": "range",
+      "id": "min_items",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "label": "Mínimo de apartados para mostrar la tabla",
+      "info": "Por debajo de esta cifra la sección no se pinta.",
+      "default": 2
+    },
+    {
+      "type": "text",
+      "id": "empty_note",
+      "label": "Aviso en el editor cuando no hay apartados",
+      "default": "Este artículo aún no tiene suficientes encabezados H2 o H3. La tabla no se mostrará en la tienda."
+    },
+    {
+      "type": "range",
+      "id": "scroll_offset",
+      "min": 0,
+      "max": 300,
+      "step": 4,
+      "unit": "px",
+      "label": "Margen al bajar a un apartado — PC",
+      "info": "Sube este número hasta que el título no quede tapado por la cabecera fija.",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "scroll_offset_m",
+      "min": 0,
+      "max": 300,
+      "step": 4,
+      "unit": "px",
+      "label": "Margen al bajar a un apartado — Móvil",
+      "default": 80
+    },
+    {
+      "type": "checkbox",
+      "id": "smooth_scroll",
+      "label": "Bajar con desplazamiento suave",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "update_hash",
+      "label": "Añadir el apartado a la dirección del navegador",
+      "info": "Permite copiar el enlace directo a un apartado concreto.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "active_highlight",
+      "label": "Resaltar el apartado que se está leyendo",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "open_default_d",
+      "label": "Empezar abierta — PC",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "open_default_m",
+      "label": "Empezar abierta — Móvil",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "close_on_click_m",
+      "label": "Cerrarla al pulsar un apartado — Móvil",
+      "default": true
+    },
+
+    {
+      "type": "header",
+      "content": "Diseño general"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo de la sección",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "mobile_breakpoint",
+      "min": 480,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "label": "Punto de cambio a móvil",
+      "default": 750
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 0,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "label": "Ancho máximo del contenido",
+      "info": "Ponlo igual que en la cabecera del artículo para que todo quede alineado.",
+      "default": 780
+    },
+    {
+      "type": "range",
+      "id": "padding_x_d",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen lateral — PC",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_x_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen lateral — Móvil",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "padding_top_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding superior — PC",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding inferior — PC",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_top_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding superior — Móvil",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding inferior — Móvil",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "transition_ms",
+      "min": 0,
+      "max": 900,
+      "step": 25,
+      "unit": "ms",
+      "label": "Duración de las transiciones",
+      "default": 200
+    },
+
+    {
+      "type": "header",
+      "content": "Caja"
+    },
+    {
+      "type": "color",
+      "id": "box_bg",
+      "label": "Color de fondo",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "box_border_color",
+      "label": "Color del borde",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "range",
+      "id": "box_border_width",
+      "min": 0,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor del borde",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "box_radius_d",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo — PC",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "box_radius_m",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo — Móvil",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "box_padding_x_d",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen interior lateral — PC",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "box_padding_y_d",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen interior arriba y abajo — PC",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "box_padding_x_m",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen interior lateral — Móvil",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "box_padding_y_m",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen interior arriba y abajo — Móvil",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "box_max_width",
+      "min": 0,
+      "max": 1200,
+      "step": 20,
+      "unit": "px",
+      "label": "Ancho máximo de la caja — PC",
+      "info": "0 = todo el ancho del contenido.",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "box_shadow_color",
+      "label": "Color de la sombra",
+      "info": "Transparente = sin sombra.",
+      "default": "#00000000"
+    },
+    {
+      "type": "range",
+      "id": "box_shadow_x",
+      "min": -40,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Sombra: desplazamiento horizontal",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "box_shadow_y",
+      "min": -40,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Sombra: desplazamiento vertical",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "box_shadow_blur",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Sombra: difuminado",
+      "default": 20
+    },
+
+    {
+      "type": "header",
+      "content": "Título de la caja"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título",
+      "default": "Tabla de contenido"
+    },
+    {
+      "type": "select",
+      "id": "title_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "thin2"
+    },
+    {
+      "type": "text",
+      "id": "title_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'thin2', Georgia, serif"
+    },
+    {
+      "type": "select",
+      "id": "title_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "select",
+      "id": "title_transform",
+      "label": "Mayúsculas",
+      "options": [
+        { "value": "none", "label": "Como se escriba" },
+        { "value": "uppercase", "label": "TODO EN MAYÚSCULAS" },
+        { "value": "capitalize", "label": "Inicial De Cada Palabra" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "title_size_d",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "title_size_m",
+      "min": 10,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "title_letter_spacing",
+      "min": -2,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "title_margin_bottom_d",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con la lista — PC",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "title_margin_bottom_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con la lista — Móvil",
+      "default": 20
+    },
+
+    {
+      "type": "header",
+      "content": "Icono de abrir y cerrar"
+    },
+    {
+      "type": "select",
+      "id": "icon_style",
+      "label": "Icono",
+      "options": [
+        { "value": "plus", "label": "Más y menos (+ / −)" },
+        { "value": "chevron", "label": "Flecha" },
+        { "value": "none", "label": "Ninguno" }
+      ],
+      "default": "plus"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "range",
+      "id": "icon_size_d",
+      "min": 8,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "icon_size_m",
+      "min": 8,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "icon_stroke",
+      "min": 0.5,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Grosor del trazo",
+      "default": 1.4
+    },
+
+    {
+      "type": "header",
+      "content": "Numeración"
+    },
+    {
+      "type": "select",
+      "id": "number_style",
+      "label": "Numerar",
+      "options": [
+        { "value": "none", "label": "Sin numerar" },
+        { "value": "level1", "label": "Solo los apartados grandes (1, 2, 3)" },
+        { "value": "all", "label": "Todos (1, 1.1, 1.2)" }
+      ],
+      "default": "level1"
+    },
+    {
+      "type": "text",
+      "id": "number_suffix",
+      "label": "Signo después del número",
+      "default": "."
+    },
+    {
+      "type": "text",
+      "id": "number_separator",
+      "label": "Separador de niveles",
+      "info": "Solo se usa con la numeración 1.1",
+      "default": "."
+    },
+    {
+      "type": "color",
+      "id": "number_color",
+      "label": "Color del número",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "select",
+      "id": "number_weight",
+      "label": "Grosor del número",
+      "options": [
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "500"
+    },
+    {
+      "type": "range",
+      "id": "number_gap",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación entre el número y el texto",
+      "default": 6
+    },
+
+    {
+      "type": "header",
+      "content": "Apartados grandes (H2)"
+    },
+    {
+      "type": "select",
+      "id": "l1_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "thin2"
+    },
+    {
+      "type": "text",
+      "id": "l1_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'thin2', Georgia, serif"
+    },
+    {
+      "type": "select",
+      "id": "l1_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "l1_fill",
+      "label": "Relleno del texto",
+      "options": [
+        { "value": "solid", "label": "Color plano" },
+        { "value": "gradient", "label": "Degradado" }
+      ],
+      "default": "gradient"
+    },
+    {
+      "type": "color",
+      "id": "l1_color",
+      "label": "Color (relleno plano)",
+      "default": "#1f3b31"
+    },
+    {
+      "type": "color",
+      "id": "l1_hover_color",
+      "label": "Color al pasar el ratón",
+      "default": "#96794a"
+    },
+    {
+      "type": "color",
+      "id": "l1_grad_1",
+      "label": "Degradado: color inicial",
+      "default": "#1e3b31"
+    },
+    {
+      "type": "color",
+      "id": "l1_grad_2",
+      "label": "Degradado: color intermedio",
+      "default": "#96794a"
+    },
+    {
+      "type": "color",
+      "id": "l1_grad_3",
+      "label": "Degradado: color final",
+      "default": "#2b2b2b"
+    },
+    {
+      "type": "range",
+      "id": "l1_grad_mid",
+      "min": 5,
+      "max": 95,
+      "step": 5,
+      "unit": "%",
+      "label": "Degradado: posición del color intermedio",
+      "default": 55
+    },
+    {
+      "type": "range",
+      "id": "l1_grad_angle",
+      "min": 0,
+      "max": 360,
+      "step": 5,
+      "unit": "°",
+      "label": "Degradado: ángulo",
+      "default": 90
+    },
+    {
+      "type": "range",
+      "id": "l1_size_d",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "l1_size_m",
+      "min": 10,
+      "max": 26,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "l1_line_height",
+      "min": 100,
+      "max": 220,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado",
+      "default": 140
+    },
+    {
+      "type": "range",
+      "id": "l1_letter_spacing",
+      "min": -2,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "l1_gap_d",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con el apartado anterior — PC",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "l1_gap_m",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con el apartado anterior — Móvil",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "l1_indent_d",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Sangría — PC",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "l1_indent_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Sangría — Móvil",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "Subapartados (H3 y H4)"
+    },
+    {
+      "type": "select",
+      "id": "l2_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "l2_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "select",
+      "id": "l2_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "l2_fill",
+      "label": "Relleno del texto",
+      "options": [
+        { "value": "solid", "label": "Color plano" },
+        { "value": "gradient", "label": "Degradado" }
+      ],
+      "default": "solid"
+    },
+    {
+      "type": "color",
+      "id": "l2_color",
+      "label": "Color (relleno plano)",
+      "default": "#33414d"
+    },
+    {
+      "type": "color",
+      "id": "l2_hover_color",
+      "label": "Color al pasar el ratón",
+      "default": "#96794a"
+    },
+    {
+      "type": "color",
+      "id": "l2_grad_1",
+      "label": "Degradado: color inicial",
+      "default": "#25405a"
+    },
+    {
+      "type": "color",
+      "id": "l2_grad_2",
+      "label": "Degradado: color intermedio",
+      "default": "#7f8a7a"
+    },
+    {
+      "type": "color",
+      "id": "l2_grad_3",
+      "label": "Degradado: color final",
+      "default": "#3a3a3a"
+    },
+    {
+      "type": "range",
+      "id": "l2_grad_mid",
+      "min": 5,
+      "max": 95,
+      "step": 5,
+      "unit": "%",
+      "label": "Degradado: posición del color intermedio",
+      "default": 55
+    },
+    {
+      "type": "range",
+      "id": "l2_grad_angle",
+      "min": 0,
+      "max": 360,
+      "step": 5,
+      "unit": "°",
+      "label": "Degradado: ángulo",
+      "default": 90
+    },
+    {
+      "type": "range",
+      "id": "l2_size_d",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "l2_size_m",
+      "min": 10,
+      "max": 26,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "l2_line_height",
+      "min": 100,
+      "max": 220,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado",
+      "default": 140
+    },
+    {
+      "type": "range",
+      "id": "l2_letter_spacing",
+      "min": -2,
+      "max": 4,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "l2_gap_d",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con el apartado anterior — PC",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "l2_gap_m",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación con el apartado anterior — Móvil",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "l2_indent_d",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Sangría — PC",
+      "info": "0 = alineados con los apartados grandes, como en el original.",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "l2_indent_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Sangría — Móvil",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "l3_indent_d",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Sangría extra del tercer nivel (H4) — PC",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "l3_indent_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Sangría extra del tercer nivel (H4) — Móvil",
+      "default": 12
+    },
+
+    {
+      "type": "header",
+      "content": "Enlaces y apartado activo"
+    },
+    {
+      "type": "select",
+      "id": "link_underline",
+      "label": "Subrayado",
+      "options": [
+        { "value": "none", "label": "Nunca" },
+        { "value": "hover", "label": "Solo al pasar el ratón" },
+        { "value": "always", "label": "Siempre" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "color",
+      "id": "active_color",
+      "label": "Color del apartado que se está leyendo",
+      "default": "#96794a"
+    },
+    {
+      "type": "select",
+      "id": "active_weight",
+      "label": "Grosor del apartado que se está leyendo",
+      "options": [
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "500"
+    },
+
+    {
+      "type": "header",
+      "content": "Separadores entre apartados"
+    },
+    {
+      "type": "checkbox",
+      "id": "item_divider",
+      "label": "Mostrar una línea entre apartados",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "item_divider_color",
+      "label": "Color de la línea",
+      "default": "#ececec"
+    },
+    {
+      "type": "range",
+      "id": "item_divider_width",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor de la línea",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "item_divider_padding",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Espacio entre la línea y el texto",
+      "default": 12
+    }
+  ],
+  "blocks": [
+    {
+      "type": "link",
+      "name": "Apartado (modo manual)",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Texto",
+          "default": "Nombre del apartado"
+        },
+        {
+          "type": "text",
+          "id": "anchor",
+          "label": "Destino",
+          "info": "El id del encabezado (por ejemplo 'que-son-los-nootropicos') o una dirección completa.",
+          "default": "apartado-1"
+        },
+        {
+          "type": "select",
+          "id": "level",
+          "label": "Nivel",
+          "options": [
+            { "value": "1", "label": "Apartado grande" },
+            { "value": "2", "label": "Subapartado" },
+            { "value": "3", "label": "Tercer nivel" }
+          ],
+          "default": "1"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Tabla de contenido"
+    }
+  ]
+}
+{% endschema %}
