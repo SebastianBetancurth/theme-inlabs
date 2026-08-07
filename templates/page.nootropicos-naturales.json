@@ -1447,7 +1447,7 @@
         "atc_size": 16,
         "atc_size_mobile": 15,
         "badge_size": 13,
-        "bg_color": "#f6f5f3",
+        "bg_color": "#FFFFFF",
         "padding_top": 60,
         "padding_bottom": 60
       }
