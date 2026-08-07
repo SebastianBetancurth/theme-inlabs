@@ -200,7 +200,7 @@
         "levels": "h2h3",
         "content_selector": "[data-toc-content]",
         "exclude_selector": "",
-        "min_items": 2,
+        "min_items": 4,
         "empty_note": "Este artículo aún no tiene suficientes encabezados H2 o H3. La tabla no se mostrará en la tienda.",
         "scroll_offset": 100,
         "scroll_offset_m": 80,
@@ -559,26 +559,26 @@
         "image_margin_m": 24
       }
     },
-    "custom_body_text_V9hPTX": {
+    "custom_body_text_EkgD7V": {
       "type": "custom-body-text",
       "blocks": {
-        "heading_BPXeEk": {
+        "heading_j3VkKT": {
           "type": "heading",
           "settings": {
             "text": "Los nootrópicos naturales más potentes respaldados por la ciencia",
             "level": "h2"
           }
         },
-        "text_wChfcz": {
+        "text_Va9A6t": {
           "type": "text",
           "settings": {
-            "text": "<p>La <strong>Bacopa monnieri</strong> destaca como uno de los nootrópicos más estudiados científicamente. Esta planta ayurvédica contiene bacósidos, compuestos que favorecen la regeneración neuronal y mejoran la comunicación sináptica.</p><p>Los estudios demuestran que la Bacopa puede:</p><ul><li>Incrementar la retención de información en un 25% tras 12 semanas de uso</li><li>Mejorar la velocidad de procesamiento mental</li><li>Reducir los niveles de cortisol, combatiendo el estrés oxidativo</li><li>Potenciar la formación de nuevas conexiones neuronales</li></ul>"
+            "text": "<h3>Bacopa monnieri, el potenciador de memoria milenario</h3><p>La <strong>Bacopa monnieri</strong> destaca como uno de los nootrópicos más estudiados científicamente. Esta planta ayurvédica contiene bacósidos, compuestos que favorecen la regeneración neuronal y mejoran la comunicación sináptica.</p><p>Los estudios demuestran que la Bacopa puede:</p><ul><li>Incrementar la retención de información en un 25% tras 12 semanas de uso</li><li>Mejorar la velocidad de procesamiento mental</li><li>Reducir los niveles de cortisol, combatiendo el estrés oxidativo</li><li>Potenciar la formación de nuevas conexiones neuronales<br/></li></ul><h3>Ginkgo biloba, el optimizador de circulación cerebral</h3><p>El <strong>Ginkgo biloba</strong> ha demostrado ser excepcional para mejorar el flujo sanguíneo cerebral. Sus flavonoides y terpenoides actúan como vasodilatadores naturales, aumentando la llegada de oxígeno y glucosa al cerebro.</p><p>Sus beneficios incluyen:</p><ul><li>Mejora significativa en tareas de memoria de trabajo</li><li>Reducción de la fatiga mental en adultos mayores</li><li>Protección contra el daño oxidativo neuronal</li><li>Aumento de la concentración sostenida</li></ul><h3>Rhodiola rosea, el adaptógeno para el estrés mental</h3><p>Esta planta nórdica es un <strong>adaptógeno excepcional</strong> que ayuda al cerebro a gestionar mejor las situaciones de alta demanda cognitiva. La Rhodiola optimiza la resistencia mental sin sobreestimular el sistema nervioso.</p>"
           }
         }
       },
       "block_order": [
-        "heading_BPXeEk",
-        "text_wChfcz"
+        "heading_j3VkKT",
+        "text_Va9A6t"
       ],
       "name": "Títulos y texto",
       "settings": {
@@ -690,26 +690,26 @@
         "image_margin_m": 24
       }
     },
-    "custom_body_text_EkgD7V": {
+    "custom_body_text_V9hPTX": {
       "type": "custom-body-text",
       "blocks": {
-        "heading_j3VkKT": {
+        "heading_BPXeEk": {
           "type": "heading",
           "settings": {
-            "text": "Los nootrópicos naturales más potentes respaldados por la ciencia",
+            "text": "Combinaciones sinérgicas que multiplican los beneficiosLa fórmula concentración perfecta",
             "level": "h2"
           }
         },
-        "text_Va9A6t": {
+        "text_wChfcz": {
           "type": "text",
           "settings": {
-            "text": "<h3>Bacopa monnieri, el potenciador de memoria milenario</h3><p>La <strong>Bacopa monnieri</strong> destaca como uno de los nootrópicos más estudiados científicamente. Esta planta ayurvédica contiene bacósidos, compuestos que favorecen la regeneración neuronal y mejoran la comunicación sináptica.</p><p>Los estudios demuestran que la Bacopa puede:</p><ul><li>Incrementar la retención de información en un 25% tras 12 semanas de uso</li><li>Mejorar la velocidad de procesamiento mental</li><li>Reducir los niveles de cortisol, combatiendo el estrés oxidativo</li><li>Potenciar la formación de nuevas conexiones neuronales<br/></li></ul><h3>Ginkgo biloba, el optimizador de circulación cerebral</h3><p>El <strong>Ginkgo biloba</strong> ha demostrado ser excepcional para mejorar el flujo sanguíneo cerebral. Sus flavonoides y terpenoides actúan como vasodilatadores naturales, aumentando la llegada de oxígeno y glucosa al cerebro.</p><p>Sus beneficios incluyen:</p><ul><li>Mejora significativa en tareas de memoria de trabajo</li><li>Reducción de la fatiga mental en adultos mayores</li><li>Protección contra el daño oxidativo neuronal</li><li>Aumento de la concentración sostenida</li></ul><h3>Rhodiola rosea, el adaptógeno para el estrés mental</h3><p>Esta planta nórdica es un <strong>adaptógeno excepcional</strong> que ayuda al cerebro a gestionar mejor las situaciones de alta demanda cognitiva. La Rhodiola optimiza la resistencia mental sin sobreestimular el sistema nervioso.</p>"
+            "text": "<p>La combinación de <strong>L-teanina con cafeína natural</strong> representa una de las sinergias más estudiadas. Mientras la cafeína estimula la alerta mental, la L-teanina presente en el té verde suaviza los efectos secundarios como el nerviosismo, creando un estado de <strong>concentración relajada</strong>.</p><p>Esta combinación ofrece:</p><ul><li>Energía mental sostenida sin picos ni caídas</li><li>Reducción de la ansiedad asociada a la cafeína</li><li>Mejora en la calidad de la atención selectiva</li><li>Mayor resistencia a la fatiga cognitiva</li></ul><h3>El dúo memoria y aprendizaje</h3><p>La sinergia entre <strong>Bacopa monnieri y Ginkgo biloba</strong> potencia tanto la formación como la recuperación de recuerdos. Mientras la Bacopa optimiza los procesos de consolidación mnésica, el Ginkgo asegura que las neuronas reciban los recursos necesarios para funcionar óptimamente.</p>"
           }
         }
       },
       "block_order": [
-        "heading_j3VkKT",
-        "text_Va9A6t"
+        "heading_BPXeEk",
+        "text_wChfcz"
       ],
       "name": "Títulos y texto",
       "settings": {
@@ -1459,8 +1459,8 @@
     "custom_table_of_contens_qErgpE",
     "custom_body_text_nVcz6t",
     "custom_body_text_JrAfek",
-    "custom_body_text_V9hPTX",
     "custom_body_text_EkgD7V",
+    "custom_body_text_V9hPTX",
     "custom_quality_certificates_t6Aihc",
     "custom_testimonials_carousel_wBnn4z",
     "stats_results_7iFQjU",
