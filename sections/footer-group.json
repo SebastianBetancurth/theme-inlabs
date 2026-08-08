@@ -32,7 +32,7 @@
           "type": "text",
           "settings": {
             "heading": "Pruébanos",
-            "text": "<p><a href=\"https://zzenlabs.com/products/zzen-nootropic\" title=\"ZZEN FOCUS | Nootrópico Natural\">ZZEN Focus</a></p><p><a href=\"https://zzenlabs.com/products/zzen-sleep\" title=\"ZZEN SLEEP | Magnesio y Melatonina\">ZZEN Sleep</a></p><p><a href=\"https://zzenlabs.com/products/zzen-calm-ashwagandha\" title=\"ZZEN CALM | Ashwagandha\">ZZEN Calm</a></p><p><a href=\"https://zzenlabs.com/products/modo-zzen\" title=\"Modo ZZEN\">MODO ZZEN</a></p>"
+            "text": "<p><a href=\"#\" title=\"#\">ZZEN Focus</a></p><p><a href=\"#\" title=\"#\">ZZEN Sleep</a></p><p><a href=\"#\" title=\"#\">ZZEN Calm</a></p><p><a href=\"#\" title=\"#\">MODO ZZEN</a></p>"
           }
         }
       },
