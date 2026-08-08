@@ -17,503 +17,312 @@
         "padding_bottom": 28
       }
     },
-    "custom_product_slider_DMzwV9": {
-      "type": "custom-product-slider",
+    "faqs_accordion_BGKitc": {
+      "type": "faqs-accordion",
       "blocks": {
-        "slide_FtFTYA": {
-          "type": "slide",
+        "faq_EXE3HE": {
+          "type": "faq",
           "settings": {
-            "nav_label": "Desbloquea tu potencial",
-            "image": "shopify://shop_images/ad5ad1a6-0f33-4bd7-b4d6-6a3ec3eb5269_1.webp",
-            "heading": "<em>Desbloquea</em> tu potencial",
-            "text": "<p>Por esas noches eternas sin dormir, por esas etapas de la vida donde no avanzas, por ese sentimiento de saber que puedes más y no lo estás llevando a cabo. De toda esa incomodidad, de toda esa insatisfacción, de toda esa pérdida de potencial, nace ZZEN.</p><p>No creemos en soluciones rápidas ni en propuestas idílicas. Creemos en el trabajo constante, en la disciplina y en la toma de mejores decisiones, aunque duelan. <strong>ZZEN es un recordatorio de que la única forma de ser mejor es a través del esfuerzo.</strong></p><p>Porque el potencial no se descubre, se trabaja para desbloquearlo. Avanzar exige constancia, decisiones conscientes y herramientas que estén a la altura del esfuerzo. Y por eso estamos aquí, para acompañaros en el proceso.</p><p>ZZEN existe para empujarte y recordarte que el progreso no es cómodo, pero sí posible cuando tienes dirección y propósito.</p><p>Nosotros ponemos las herramientas. El trabajo sigue siendo tuyo.</p>",
-            "heading_mobile": "ZZEN Focus",
-            "bullet_1": "Productividad y motivación",
-            "bullet_2": "Energía <strong>sostenida</strong>",
-            "bullet_3": "Refuerza la <strong>memoria</strong>",
-            "bullet_4": "",
-            "bullet_5": ""
+            "question": "¿Cuánto tiempo necesito tomar ZZEN Focus / Calm / Sleep para notar efectos reales?",
+            "answer": "<p>Aunque cada organismo es diferente, la mayoría de nuestros usuarios perciben sensaciones iniciales como una <strong>mayor claridad mental, una calma activa o una mejor predisposición al descanso</strong> desde los primeros días de uso. Sin embargo, las fórmulas de ZZEN están diseñadas para apoyar los procesos naturales del cuerpo de forma <strong>progresiva y sostenible</strong>, por lo que los beneficios más estables suelen aparecer tras las primeras semanas de consumo regular.</p><p>Durante el <strong>primer mes</strong>, notarás cómo tu energía y concentración se estabilizan, ayudándote a ser más productivo sin los picos y valles de los estimulantes comunes. Al alcanzar el <strong>tercer mes</strong>, la constancia permite que los ingredientes alcancen su máxima eficacia, fortaleciendo tu <strong>resiliencia mental y equilibrio emocional</strong> a largo plazo. Recuerda que la constancia es la clave para que estos resultados no sean algo pasajero, sino tu <strong>nueva base de rendimiento diario.</strong></p>"
           }
         },
-        "slide_NBqCK9": {
-          "type": "slide",
+        "faq_tDbPjM": {
+          "type": "faq",
           "settings": {
-            "nav_label": "Producto",
-            "image": "shopify://shop_images/DSCF7316_1.webp",
-            "heading": "Un <em>sistema</em> diseñado para rendir",
-            "text": "<p>En ZZEN entendemos la suplementación como un sistema. No creamos productos independientes, sino que trabajamos con una lógica de <strong>ecosistema</strong>: cada fórmula cumple una función concreta y todas están diseñadas para encajar entre sí.</p><p>Rendir bien no es solo ser más productivo. Es saber gestionar la presión, recuperarse correctamente o tener una visión más clara. Nuestros productos están alineados de forma sinérgica con el ciclo del día a día, tanto físico como mental.<br/>Buscamos crear <strong>herramientas precisas</strong>, bien formuladas, con los mejores ingredientes y respaldadas por ciencia, que funcionen a la perfección de manera independiente, pero se potencien al combinarse.</p><p>Nuestro objetivo es <strong>democratizar la salud y el rendimiento</strong>, haciendo accesibles herramientas eficaces y conocimiento claro a través de un <strong>ecosistema de suplementación </strong>pensado para acompañar el rendimiento humano de forma completa y coherente.</p>",
-            "heading_mobile": "ZZEN Focus",
-            "bullet_1": "Productividad y motivación",
-            "bullet_2": "Energía <strong>sostenida</strong>",
-            "bullet_3": "Refuerza la <strong>memoria</strong>",
-            "bullet_4": "",
-            "bullet_5": ""
+            "question": "¿Qué resultados puedo esperar y en cuánto tiempo?",
+            "answer": "<p>Con ZZEN experimentarás una evolución clara hacia tu mejor versión. Desde los <strong>primeros días</strong>, notarás una mejora nítida en tu energía y concentración, permitiéndote ser más productivo sin el agotamiento habitual al final de la jornada.</p><p>Al alcanzar el <strong>primer mes</strong>, el sistema consolida tu resiliencia mental y equilibra tu respuesta ante el estrés. Tras <strong>tres meses de uso constante</strong>, los beneficios se vuelven estructurales: la fórmula actúa profundamente apoyando la memoria y la salud cognitiva a largo plazo. Este enfoque está diseñado para que construyas un <strong>rendimiento mental sostenible</strong> y afrontes cualquier desafío con total confianza.</p>"
           }
         },
-        "slide_MVBcp3": {
-          "type": "slide",
+        "faq_jtb3tK": {
+          "type": "faq",
           "settings": {
-            "nav_label": "Comunidad",
-            "image": "shopify://shop_images/ad5ad1a6-0f33-4bd7-b4d6-6a3ec3eb5269_2.webp",
-            "heading": "Una <em>comunidad</em> con un mismo objetivo",
-            "text": "<p>ZZEN es una forma de pensar, de exigirse y de estar presente en lo que haces. Esa dimensión se articula a través de <strong>ZZEN Talks</strong>, el espacio donde la marca se expresa, conversa y conecta.</p><p>ZZEN Talks es un podcast y un formato de encuentros conducido por <strong>René</strong>, que actúa como host y facilitador de conversaciones profundas y útiles. Un espacio donde se reúnen perfiles diversos, desde ciencia y nutrición hasta psicología, rendimiento y desarrollo humano, con el objetivo de explorar temas como la productividad, el bienestar o el autoconocimiento.</p><p>Pero no solo eso, ZZEN celebra encuentros presenciales, como el Evento ZZEN Talks, llenando uno de los cines más grandes de Europa donde se realizaron 6 ponencias por profesionales de distintas dimensiones humanas. Esta fue una de las tantas muestras de que ZZEN se trata de una comunidad activa.</p><p>Desde ZZEN creamos el entorno, las conversaciones y las herramientas para que puedas dar tu mejor versión.</p>",
-            "heading_mobile": "ZZEN Focus",
-            "bullet_1": "Productividad y motivación",
-            "bullet_2": "Energía <strong>sostenida</strong>",
-            "bullet_3": "Refuerza la <strong>memoria</strong>",
-            "bullet_4": "",
-            "bullet_5": ""
+            "question": "¿Qué pasa si un día no lo tomo? ¿Pierde eficacia?",
+            "answer": "<p>No te preocupes, saltarte una toma no genera riesgo ni efecto rebote, ya que ZZEN es 100% natural y libre de dependencia. Sin embargo, la disciplina es lo que marca la diferencia para conseguir un cambio real.</p><p>Nuestras fórmulas requieren que tu organismo se adapte de forma progresiva. Para alcanzar el máximo rendimiento, es fundamental mantener el hábito de dos cápsulas diarias de cada producto. Esta constancia construye la infraestructura necesaria para que tu enfoque, calma y descanso se conviertan en tu nueva normalidad.</p>"
+          }
+        },
+        "faq_gPg3G4": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Es mejor tomarlo con comida o en ayunas?",
+            "answer": "<p>En general, ZZEN puede tomarse tanto con comida como en ayunas. No obstante, para una mejor tolerancia digestiva, especialmente en personas sensibles, recomendamos tomar 2 cápsulas junto a una comida ligera. De este modo se favorece la absorción y se minimiza cualquier posible molestia estomacal.</p>"
+          }
+        },
+        "faq_QF4hqq": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Existen efectos secundarios?",
+            "answer": "<p>Las fórmulas de ZZEN están desarrolladas con ingredientes naturales de alta calidad y en dosis seguras, basadas en la evidencia científica. Sin embargo, como ocurre con cualquier suplemento alimenticio, cada organismo puede reaccionar de manera diferente.<br/><br/>En casos puntuales, pueden aparecer molestias leves, especialmente si existen sensibilidades individuales.<br/></p><p>Si tienes dudas, estás embarazada, en periodo de lactancia o padeces alguna condición médica previa, te recomendamos consultar con un profesional de la salud antes de incorporar ZZEN a tu rutina diaria.</p>"
+          }
+        },
+        "faq_DRWzjC": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Puedo tomar ZZEN Sleep solo algunos días o debe ser diario?",
+            "answer": "<p>Para que ZZEN Sleep potencie tu descanso, debes incorporarlo como parte de tu rutina nocturna para favorecer un descanso más regular. Si lo tomas de forma intermitente, los resultados no van a ser tan notables. </p>"
+          }
+        },
+        "faq_pHqCxi": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Puedo dejar de tomarlo de golpe o hay que hacerlo progresivamente?",
+            "answer": "<p>No tendrás efecto rebote ni dependencia, pero el éxito de ZZEN reside en su <strong>efecto acumulativo</strong>. Si dejas de tomar tus <strong>dos cápsulas diarias</strong>, tu cuerpo iniciará un retorno gradual a su estado anterior, perdiendo la nitidez y la calma que habías consolidado. Mantener el hábito es la única forma de asegurar que tu <strong>rendimiento optimizado </strong>sea tu nueva normalidad y no vuelvas a sentir el cansancio o el ruido mental de antes.</p>"
+          }
+        },
+        "faq_MbDBtX": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Puedo combinar diferentes productos de ZZEN Labs?",
+            "answer": "<p>Sí. Todas las fórmulas de ZZEN están pensadas para utilizarse de manera conjunta.</p><p>Han sido diseñadas para trabajar en sinergia, apoyando diferentes áreas del bienestar —como el estrés, la concentración, el descanso o la energía— sin solapamientos ni excesos.</p><p>Esto te permite personalizar tu rutina de suplementación según tus necesidades, combinando productos de forma segura y efectiva para lograr un cuidado integral y sostenible de tu mente y cuerpo.</p>"
+          }
+        },
+        "faq_LzU3wE": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Puedo tomar ZZEN Focus con café u otros estimulantes?",
+            "answer": "<p>Sí, pero te recomendamos ajustar la cantidad de cafeína total diaria para evitar sobreestimulación. ZZEN FOCUS ya incluye cafeína natural combinada con L-teanina para un efecto más equilibrado que el café solo.</p>"
+          }
+        },
+        "faq_wBhaCy": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Las dosis son adecuadas?",
+            "answer": "<p>Nuestro laboratorio y equipo de formulación han seleccionado dosis óptimas basadas en la evidencia científica más reciente, buscando el máximo efecto sin alterar los ritmos naturales de tu organismo. </p><p>Utilizamos extractos estandarizados de alta calidad, en concentraciones eficaces pero equilibradas, para ofrecer resultados reales sin sobrecargar tu cuerpo.</p><p>Para activar su máximo potencial, es fundamental tomar dos cápsulas diarias de cada producto. Gracias a su efecto acumulativo, los beneficios se vuelven más profundos y estables con el tiempo, permitiendo que la fórmula trabaje en sinergia con tu cuerpo para lograr resultados constantes y sostenibles a largo plazo.</p>"
+          }
+        },
+        "faq_jEzx38": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Qué significa que un ingrediente esté estandarizado?",
+            "answer": "<p>Un ingrediente estandarizado garantiza una concentración concreta y constante de sus principios activos. Esto significa que cada cápsula aporta siempre la misma cantidad de compuestos activos, asegurando eficacia, seguridad y consistencia entre lotes, algo fundamental en suplementos basados en evidencia científica.</p>"
+          }
+        },
+        "faq_FnPEe6": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Los ingredientes están respaldados por estudios científicos?",
+            "answer": "<p>Sí. Los ingredientes utilizados en las fórmulas de ZZEN han sido seleccionados en base a estudios científicos publicados, que avalan su uso, seguridad y beneficios dentro de las dosis empleadas. Nuestro enfoque prioriza ingredientes con respaldo científico real, evitando modas o claims sin fundamento.</p><p>KSM-66® es un extracto de ashwagandha de espectro completo, obtenido únicamente de la raíz y estandarizado para preservar su perfil natural. Se diferencia de otras ashwagandhas por su amplio respaldo científico, su proceso de extracción patentado y su enfoque en eficacia y tolerancia a largo plazo.</p><p>Porque cada fórmula está diseñada con un objetivo específico. ZZEN Calm se centra en la gestión del estrés y el equilibrio emocional durante el día, utilizando ingredientes adaptógenos y extractos botánicos. ZZEN Sleep, en cambio, incorpora magnesio por su papel clave en la relajación muscular y la calidad del descanso nocturno. De este modo se evitan solapamientos innecesarios y se optimiza la función de cada producto.</p>"
+          }
+        },
+        "faq_jnrY8H": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Qué diferencia hay entre ashwagandha KSM-66 y otras ashwagandhas?",
+            "answer": "<p>KSM-66® es un extracto de ashwagandha de espectro completo, obtenido únicamente de la raíz y estandarizado para preservar su perfil natural. Se diferencia de otras ashwagandhas por su amplio respaldo científico, su proceso de extracción patentado y su enfoque en eficacia y tolerancia a largo plazo.</p><p>Porque cada fórmula está diseñada con un objetivo específico. ZZEN Calm se centra en la gestión del estrés y el equilibrio emocional durante el día, utilizando ingredientes adaptógenos y extractos botánicos. ZZEN Sleep, en cambio, incorpora magnesio por su papel clave en la relajación muscular y la calidad del descanso nocturno. De este modo se evitan solapamientos innecesarios y se optimiza la función de cada producto.</p>"
+          }
+        },
+        "faq_mykmgi": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Por qué ZZEN Calm no lleva magnesio para el estrés pero ZZEN Sleep sí?",
+            "answer": "<p>Porque cada fórmula está diseñada con un objetivo específico. ZZEN Calm se centra en la gestión del estrés y el equilibrio emocional durante el día, utilizando ingredientes adaptógenos y extractos botánicos. ZZEN Sleep, en cambio, incorpora magnesio por su papel clave en la relajación muscular y la calidad del descanso nocturno. De este modo se evitan solapamientos innecesarios y se optimiza la función de cada producto.</p>"
+          }
+        },
+        "faq_A3xVzY": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Cuántos días dura un bote?",
+            "answer": "<p>Cada bote de ZZEN contiene 60 cápsulas, lo que te ofrece un suministro completo para 30 días de uso.</p><p>Para obtener el máximo beneficio, es fundamental mantener el hábito de tomar dos cápsulas al día de cada producto, todos los días.</p><p>Esta pauta es necesaria para activar el efecto acumulativo de sus ingredientes. Al ser constante con estas dos cápsulas diarias, permites que los efectos se potencien y se vuelvan más profundos y estables con el paso del tiempo.</p>"
+          }
+        },
+        "faq_nzUay6": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Es apto para personas veganas?",
+            "answer": "<p>Sí. Las cápsulas de ZZEN son de origen vegetal y las fórmulas no contienen azúcares añadidos. Aun así, si tienes alguna intolerancia específica, te recomendamos revisar el listado de ingredientes o consultar con un profesional antes de su consumo.</p>"
+          }
+        },
+        "faq_4NWri9": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Para quién está recomendado?",
+            "answer": "<p>Este suplemento está diseñado para personas que buscan un crecimiento integral en su vida, tanto a nivel personal como profesional. Es ideal para profesionales, estudiantes y cualquier individuo que enfrenta altos niveles de estrés y desea mejorar su rendimiento mental, físico y emocional.</p><p>Sí, ZZEN es adecuado para la mayoría de las dietas, ya que está formulado con ingredientes 100% naturales y viene en cápsulas vegetales sin azúcar. Sin embargo, si tienes alguna restricción alimentaria específica, te recomendamos revisar la lista completa de ingredientes o consultar con un nutricionista antes de tomarlo.</p><p>Si estás embarazada, lactando o bajo tratamiento médico, te recomendamos consultar previamente con tu profesional de la salud. Aunque son suplementos naturales, cada caso es diferente y la seguridad es lo primero.</p><p>¡Por supuesto! Nuestras fórmulas están diseñadas para adaptarse a ti. Si tienes turnos rotativos, solo necesitas <strong>ajustar la toma de las dos cápsulas diarias a tu propio ritmo</strong> de actividad y descanso.</p><p>Lo ideal es tomar <strong>las dos cápsulas juntas</strong> siempre en el mismo momento de tu jornada personal. Al adaptar la dosis a tu horario de vida, permites que el <strong>efecto acumulativo</strong> siga trabajando para optimizar tu rendimiento y recuperación, sin importar lo que diga el reloj.</p><p>ZZEN no está recomendado para personas menores de 18 años, mujeres embarazadas o en periodo de lactancia, ni para aquellas con condiciones médicas específicas o que estén tomando medicamentos sin consultar previamente con un profesional de la salud.</p><p>Nuestros productos están formulados para personas adultas mayores de 18 años. En caso de querer que lo consuma un menor, os recomendamos consultarlo antes con vuestro médico o pediatra para que pueda daros una valoración más personalizada.</p><p>Nuestro laboratorio, español, cuenta con certificaciones internacionales de máximo prestigio, entre ellas:</p><ul><li>IFS Food V7 (International Featured Standards).</li><li>GMP (Good Manufacturing Practices) específicas para suplementos alimenticios.</li><li>Certificación NSF para productos de alta calidad.</li><li>Registro en la FDA (Administración de Alimentos y Medicamentos de EE.UU.).</li><li>Certificación Halal.</li><li>Registro en autoridades sanitarias de Arabia Saudí (SFDA), Emiratos Árabes Unidos (UAE Ministry of Health) y Kurdistán (Medical Control Agency).</li></ul><p>Guarda el producto en un lugar fresco y seco, protegido de la luz directa y de la humedad.</p><p>Asegúrate de cerrar bien el envase tras cada uso y mantenerlo fuera del alcance de los niños.</p><p>Sí. ZZEN puede tomarse durante el ayuno intermitente, ya que no contiene azúcares ni calorías significativas. No obstante, algunas personas prefieren tomarlo durante la ventana de alimentación para una mejor tolerancia digestiva.</p><p>Todos nuestros suplementos se fabrican en España, en instalaciones certificadas con estándares internacionales de calidad y seguridad alimentaria.</p><p>No. Ninguna de las fórmulas de ZZEN contiene fármacos ni ingredientes que generen dependencia física o psicológica.</p>"
+          }
+        },
+        "faq_dEAbE6": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Puedo tomar ZZEN Labs si sigo una dieta específica?",
+            "answer": "<p>Sí, ZZEN es adecuado para la mayoría de las dietas, ya que está formulado con ingredientes 100% naturales y viene en cápsulas vegetales sin azúcar. Sin embargo, si tienes alguna restricción alimentaria específica, te recomendamos revisar la lista completa de ingredientes o consultar con un nutricionista antes de tomarlo.</p><p>Si estás embarazada, lactando o bajo tratamiento médico, te recomendamos consultar previamente con tu profesional de la salud. Aunque son suplementos naturales, cada caso es diferente y la seguridad es lo primero.</p><p>¡Por supuesto! Nuestras fórmulas están diseñadas para adaptarse a ti. Si tienes turnos rotativos, solo necesitas <strong>ajustar la toma de las dos cápsulas diarias a tu propio ritmo</strong> de actividad y descanso.</p><p>Lo ideal es tomar <strong>las dos cápsulas juntas</strong> siempre en el mismo momento de tu jornada personal. Al adaptar la dosis a tu horario de vida, permites que el <strong>efecto acumulativo</strong> siga trabajando para optimizar tu rendimiento y recuperación, sin importar lo que diga el reloj.</p><p>ZZEN no está recomendado para personas menores de 18 años, mujeres embarazadas o en periodo de lactancia, ni para aquellas con condiciones médicas específicas o que estén tomando medicamentos sin consultar previamente con un profesional de la salud.</p><p>Nuestros productos están formulados para personas adultas mayores de 18 años. En caso de querer que lo consuma un menor, os recomendamos consultarlo antes con vuestro médico o pediatra para que pueda daros una valoración más personalizada.</p><p>Nuestro laboratorio, español, cuenta con certificaciones internacionales de máximo prestigio, entre ellas:</p><ul><li>IFS Food V7 (International Featured Standards).</li><li>GMP (Good Manufacturing Practices) específicas para suplementos alimenticios.</li><li>Certificación NSF para productos de alta calidad.</li><li>Registro en la FDA (Administración de Alimentos y Medicamentos de EE.UU.).</li><li>Certificación Halal.</li><li>Registro en autoridades sanitarias de Arabia Saudí (SFDA), Emiratos Árabes Unidos (UAE Ministry of Health) y Kurdistán (Medical Control Agency).</li></ul><p>Guarda el producto en un lugar fresco y seco, protegido de la luz directa y de la humedad.</p><p>Asegúrate de cerrar bien el envase tras cada uso y mantenerlo fuera del alcance de los niños.</p><p>Sí. ZZEN puede tomarse durante el ayuno intermitente, ya que no contiene azúcares ni calorías significativas. No obstante, algunas personas prefieren tomarlo durante la ventana de alimentación para una mejor tolerancia digestiva.</p><p>Todos nuestros suplementos se fabrican en España, en instalaciones certificadas con estándares internacionales de calidad y seguridad alimentaria.</p><p>No. Ninguna de las fórmulas de ZZEN contiene fármacos ni ingredientes que generen dependencia física o psicológica.</p><p>Si estás embarazada, lactando o bajo tratamiento médico, te recomendamos consultar previamente con tu profesional de la salud. Aunque son suplementos naturales, cada caso es diferente y la seguridad es lo primero.</p><p>¡Por supuesto! Nuestras fórmulas están diseñadas para adaptarse a ti. Si tienes turnos rotativos, solo necesitas <strong>ajustar la toma de las dos cápsulas diarias a tu propio ritmo</strong> de actividad y descanso.</p><p>Lo ideal es tomar <strong>las dos cápsulas juntas</strong> siempre en el mismo momento de tu jornada personal. Al adaptar la dosis a tu horario de vida, permites que el <strong>efecto acumulativo</strong> siga trabajando para optimizar tu rendimiento y recuperación, sin importar lo que diga el reloj.</p><p>ZZEN no está recomendado para personas menores de 18 años, mujeres embarazadas o en periodo de lactancia, ni para aquellas con condiciones médicas específicas o que estén tomando medicamentos sin consultar previamente con un profesional de la salud.</p><p>Nuestros productos están formulados para personas adultas mayores de 18 años. En caso de querer que lo consuma un menor, os recomendamos consultarlo antes con vuestro médico o pediatra para que pueda daros una valoración más personalizada.</p><p>Nuestro laboratorio, español, cuenta con certificaciones internacionales de máximo prestigio, entre ellas:</p><ul><li>IFS Food V7 (International Featured Standards).</li><li>GMP (Good Manufacturing Practices) específicas para suplementos alimenticios.</li><li>Certificación NSF para productos de alta calidad.</li><li>Registro en la FDA (Administración de Alimentos y Medicamentos de EE.UU.).</li><li>Certificación Halal.</li><li>Registro en autoridades sanitarias de Arabia Saudí (SFDA), Emiratos Árabes Unidos (UAE Ministry of Health) y Kurdistán (Medical Control Agency).</li></ul><p>Guarda el producto en un lugar fresco y seco, protegido de la luz directa y de la humedad.</p><p>Asegúrate de cerrar bien el envase tras cada uso y mantenerlo fuera del alcance de los niños.</p><p>Sí. ZZEN puede tomarse durante el ayuno intermitente, ya que no contiene azúcares ni calorías significativas. No obstante, algunas personas prefieren tomarlo durante la ventana de alimentación para una mejor tolerancia digestiva.</p><p>Todos nuestros suplementos se fabrican en España, en instalaciones certificadas con estándares internacionales de calidad y seguridad alimentaria.</p><p>No. Ninguna de las fórmulas de ZZEN contiene fármacos ni ingredientes que generen dependencia física o psicológica.</p><p>¡Por supuesto! Nuestras fórmulas están diseñadas para adaptarse a ti. Si tienes turnos rotativos, solo necesitas <strong>ajustar la toma de las dos cápsulas diarias a tu propio ritmo</strong> de actividad y descanso.</p><p>Lo ideal es tomar <strong>las dos cápsulas juntas</strong> siempre en el mismo momento de tu jornada personal. Al adaptar la dosis a tu horario de vida, permites que el <strong>efecto acumulativo</strong> siga trabajando para optimizar tu rendimiento y recuperación, sin importar lo que diga el reloj.</p><p>ZZEN no está recomendado para personas menores de 18 años, mujeres embarazadas o en periodo de lactancia, ni para aquellas con condiciones médicas específicas o que estén tomando medicamentos sin consultar previamente con un profesional de la salud.</p><p>Nuestros productos están formulados para personas adultas mayores de 18 años. En caso de querer que lo consuma un menor, os recomendamos consultarlo antes con vuestro médico o pediatra para que pueda daros una valoración más personalizada.</p><p>Nuestro laboratorio, español, cuenta con certificaciones internacionales de máximo prestigio, entre ellas:</p><ul><li>IFS Food V7 (International Featured Standards).</li><li>GMP (Good Manufacturing Practices) específicas para suplementos alimenticios.</li><li>Certificación NSF para productos de alta calidad.</li><li>Registro en la FDA (Administración de Alimentos y Medicamentos de EE.UU.).</li><li>Certificación Halal.</li><li>Registro en autoridades sanitarias de Arabia Saudí (SFDA), Emiratos Árabes Unidos (UAE Ministry of Health) y Kurdistán (Medical Control Agency).</li></ul><p>Guarda el producto en un lugar fresco y seco, protegido de la luz directa y de la humedad.</p><p>Asegúrate de cerrar bien el envase tras cada uso y mantenerlo fuera del alcance de los niños.</p><p>Sí. ZZEN puede tomarse durante el ayuno intermitente, ya que no contiene azúcares ni calorías significativas. No obstante, algunas personas prefieren tomarlo durante la ventana de alimentación para una mejor tolerancia digestiva.</p><p>Todos nuestros suplementos se fabrican en España, en instalaciones certificadas con estándares internacionales de calidad y seguridad alimentaria.</p><p>No. Ninguna de las fórmulas de ZZEN contiene fármacos ni ingredientes que generen dependencia física o psicológica.</p><p>Nuestros productos están formulados para personas adultas mayores de 18 años. En caso de querer que lo consuma un menor, os recomendamos consultarlo antes con vuestro médico o pediatra para que pueda daros una valoración más personalizada.</p><p>Nuestro laboratorio, español, cuenta con certificaciones internacionales de máximo prestigio, entre ellas:</p><ul><li>IFS Food V7 (International Featured Standards).</li><li>GMP (Good Manufacturing Practices) específicas para suplementos alimenticios.</li><li>Certificación NSF para productos de alta calidad.</li><li>Registro en la FDA (Administración de Alimentos y Medicamentos de EE.UU.).</li><li>Certificación Halal.</li><li>Registro en autoridades sanitarias de Arabia Saudí (SFDA), Emiratos Árabes Unidos (UAE Ministry of Health) y Kurdistán (Medical Control Agency).</li></ul><p>Guarda el producto en un lugar fresco y seco, protegido de la luz directa y de la humedad.</p><p>Asegúrate de cerrar bien el envase tras cada uso y mantenerlo fuera del alcance de los niños.</p><p>Sí. ZZEN puede tomarse durante el ayuno intermitente, ya que no contiene azúcares ni calorías significativas. No obstante, algunas personas prefieren tomarlo durante la ventana de alimentación para una mejor tolerancia digestiva.</p><p>Todos nuestros suplementos se fabrican en España, en instalaciones certificadas con estándares internacionales de calidad y seguridad alimentaria.</p><p>No. Ninguna de las fórmulas de ZZEN contiene fármacos ni ingredientes que generen dependencia física o psicológica.</p><p>Si necesitas modificar o cancelar tu pedido, te recomendamos contactar con nuestro equipo de atención al cliente lo antes posible. Si el pedido aún no ha sido procesado o enviado, haremos todo lo posible por ayudarte.</p><p>Tu pedido será procesado y enviado dentro de las primeras 24-48 horas laborables. Generalmente, puedes esperar recibir tu suplemento en un plazo de 2 a 4 días hábiles. Nos aseguramos de que tu suplemento llegue a tus manos de manera rápida y eficiente.</p><p>Si detectas cualquier incidencia con tu pedido, ponte en contacto con nuestro servicio de atención al cliente vía <a href=\"mailto:info@zzenlabs.com\"><span style=\"text-decoration:underline\"><em><strong>email</strong></em></span></a> indicando tu número de pedido. Nuestro equipo revisará el caso y te ofrecerá una solución lo antes posible.</p><p>Una vez enviado tu pedido, recibirás un correo electrónico con la información de seguimiento para que puedas conocer el estado del envío en todo momento.</p><p>Sí, ZZEN Labs ya está disponible en España, toda Europa y también US. Puedes consultar los plazos y costes de envío en tu carrito.</p><p>El coste del envío se calcula automáticamente durante el proceso de compra y puede variar en función del destino y del importe del pedido.</p>"
+          }
+        },
+        "faq_DRqcd8": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Puedo tomar productos de ZZEN si estoy embarazada, lactando o tengo una condición médica?",
+            "answer": "<p>Si estás embarazada, lactando o bajo tratamiento médico, te recomendamos consultar previamente con tu profesional de la salud. Aunque son suplementos naturales, cada caso es diferente y la seguridad es lo primero.</p><p>¡Por supuesto! Nuestras fórmulas están diseñadas para adaptarse a ti. Si tienes turnos rotativos, solo necesitas <strong>ajustar la toma de las dos cápsulas diarias a tu propio ritmo</strong> de actividad y descanso.</p><p>Lo ideal es tomar <strong>las dos cápsulas juntas</strong> siempre en el mismo momento de tu jornada personal. Al adaptar la dosis a tu horario de vida, permites que el <strong>efecto acumulativo</strong> siga trabajando para optimizar tu rendimiento y recuperación, sin importar lo que diga el reloj.</p><p>ZZEN no está recomendado para personas menores de 18 años, mujeres embarazadas o en periodo de lactancia, ni para aquellas con condiciones médicas específicas o que estén tomando medicamentos sin consultar previamente con un profesional de la salud.</p><p>Nuestros productos están formulados para personas adultas mayores de 18 años. En caso de querer que lo consuma un menor, os recomendamos consultarlo antes con vuestro médico o pediatra para que pueda daros una valoración más personalizada.</p><p>Nuestro laboratorio, español, cuenta con certificaciones internacionales de máximo prestigio, entre ellas:</p><ul><li>IFS Food V7 (International Featured Standards).</li><li>GMP (Good Manufacturing Practices) específicas para suplementos alimenticios.</li><li>Certificación NSF para productos de alta calidad.</li><li>Registro en la FDA (Administración de Alimentos y Medicamentos de EE.UU.).</li><li>Certificación Halal.</li><li>Registro en autoridades sanitarias de Arabia Saudí (SFDA), Emiratos Árabes Unidos (UAE Ministry of Health) y Kurdistán (Medical Control Agency).</li></ul><p>Guarda el producto en un lugar fresco y seco, protegido de la luz directa y de la humedad.</p><p>Asegúrate de cerrar bien el envase tras cada uso y mantenerlo fuera del alcance de los niños.</p><p>Sí. ZZEN puede tomarse durante el ayuno intermitente, ya que no contiene azúcares ni calorías significativas. No obstante, algunas personas prefieren tomarlo durante la ventana de alimentación para una mejor tolerancia digestiva.</p><p>Todos nuestros suplementos se fabrican en España, en instalaciones certificadas con estándares internacionales de calidad y seguridad alimentaria.</p><p>No. Ninguna de las fórmulas de ZZEN contiene fármacos ni ingredientes que generen dependencia física o psicológica.</p>"
+          }
+        },
+        "faq_ny6CgW": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Puedo ajustar la toma a mi rutina si tengo turnos rotativos?",
+            "answer": "<p>¡Por supuesto! Nuestras fórmulas están diseñadas para adaptarse a ti. Si tienes turnos rotativos, solo necesitas <strong>ajustar la toma de las dos cápsulas diarias a tu propio ritmo</strong> de actividad y descanso.</p><p>Lo ideal es tomar <strong>las dos cápsulas juntas</strong> siempre en el mismo momento de tu jornada personal. Al adaptar la dosis a tu horario de vida, permites que el <strong>efecto acumulativo</strong> siga trabajando para optimizar tu rendimiento y recuperación, sin importar lo que diga el reloj.</p>"
+          }
+        },
+        "faq_AY6UJV": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Para quién no se recomienda ZZEN?",
+            "answer": "<p>ZZEN no está recomendado para personas menores de 18 años, mujeres embarazadas o en periodo de lactancia, ni para aquellas con condiciones médicas específicas o que estén tomando medicamentos sin consultar previamente con un profesional de la salud.</p><p>Nuestros productos están formulados para personas adultas mayores de 18 años. En caso de querer que lo consuma un menor, os recomendamos consultarlo antes con vuestro médico o pediatra para que pueda daros una valoración más personalizada.</p><p>Nuestro laboratorio, español, cuenta con certificaciones internacionales de máximo prestigio, entre ellas:</p><ul><li>IFS Food V7 (International Featured Standards).</li><li>GMP (Good Manufacturing Practices) específicas para suplementos alimenticios.</li><li>Certificación NSF para productos de alta calidad.</li><li>Registro en la FDA (Administración de Alimentos y Medicamentos de EE.UU.).</li><li>Certificación Halal.</li><li>Registro en autoridades sanitarias de Arabia Saudí (SFDA), Emiratos Árabes Unidos (UAE Ministry of Health) y Kurdistán (Medical Control Agency).</li></ul><p>Guarda el producto en un lugar fresco y seco, protegido de la luz directa y de la humedad.</p><p>Asegúrate de cerrar bien el envase tras cada uso y mantenerlo fuera del alcance de los niños.</p><p>Sí. ZZEN puede tomarse durante el ayuno intermitente, ya que no contiene azúcares ni calorías significativas. No obstante, algunas personas prefieren tomarlo durante la ventana de alimentación para una mejor tolerancia digestiva.</p><p>Todos nuestros suplementos se fabrican en España, en instalaciones certificadas con estándares internacionales de calidad y seguridad alimentaria.</p><p>No. Ninguna de las fórmulas de ZZEN contiene fármacos ni ingredientes que generen dependencia física o psicológica.</p>"
+          }
+        },
+        "faq_L6zq6V": {
+          "type": "faq",
+          "settings": {
+            "question": "¿A partir de qué edad se puede consumir ZZEN?",
+            "answer": "<p>Nuestros productos están formulados para personas adultas mayores de 18 años. En caso de querer que lo consuma un menor, os recomendamos consultarlo antes con vuestro médico o pediatra para que pueda daros una valoración más personalizada.</p>"
+          }
+        },
+        "faq_HpaDjK": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Qué certificaciones respaldan la calidad de ZZEN Labs?",
+            "answer": "<p>Nuestro laboratorio, español, cuenta con certificaciones internacionales de máximo prestigio, entre ellas:</p><ul><li>IFS Food V7 (International Featured Standards).</li><li>GMP (Good Manufacturing Practices) específicas para suplementos alimenticios.</li><li>Certificación NSF para productos de alta calidad.</li><li>Registro en la FDA (Administración de Alimentos y Medicamentos de EE.UU.).</li><li>Certificación Halal.</li><li>Registro en autoridades sanitarias de Arabia Saudí (SFDA), Emiratos Árabes Unidos (UAE Ministry of Health) y Kurdistán (Medical Control Agency).</li></ul>"
+          }
+        },
+        "faq_R7MYJg": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Cómo debo conservar el producto una vez abierto?",
+            "answer": "<p>Guarda el producto en un lugar fresco y seco, protegido de la luz directa y de la humedad.</p><p>Asegúrate de cerrar bien el envase tras cada uso y mantenerlo fuera del alcance de los niños.</p>"
+          }
+        },
+        "faq_qyVbnR": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Es compatible con ayuno intermitente?",
+            "answer": "<p>Sí. ZZEN puede tomarse durante el ayuno intermitente, ya que no contiene azúcares ni calorías significativas. No obstante, algunas personas prefieren tomarlo durante la ventana de alimentación para una mejor tolerancia digestiva.</p>"
+          }
+        },
+        "faq_WNgWmV": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Dónde se fabrican los productos de ZZEN Labs?",
+            "answer": "<p>Todos nuestros suplementos se fabrican en España, en instalaciones certificadas con estándares internacionales de calidad y seguridad alimentaria.</p>"
+          }
+        },
+        "faq_yxifpF": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Las fórmulas de ZZEN generan dependencia?",
+            "answer": "<p>No. Ninguna de las fórmulas de ZZEN contiene fármacos ni ingredientes que generen dependencia física o psicológica.</p>"
+          }
+        },
+        "faq_LkEHGy": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Puedo cambiar o cancelar un pedido?",
+            "answer": "<p>Si necesitas modificar o cancelar tu pedido, te recomendamos contactar con nuestro equipo de atención al cliente lo antes posible. Si el pedido aún no ha sido procesado o enviado, haremos todo lo posible por ayudarte.</p>"
+          }
+        },
+        "faq_TyMPry": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Cuánto tiempo tarda el envío?",
+            "answer": "<p>Tu pedido será procesado y enviado dentro de las primeras 24-48 horas laborables. Generalmente, puedes esperar recibir tu suplemento en un plazo de 2 a 4 días hábiles. Nos aseguramos de que tu suplemento llegue a tus manos de manera rápida y eficiente.</p>"
+          }
+        },
+        "faq_ECGzB8": {
+          "type": "faq",
+          "settings": {
+            "question": "He tenido un problema con el envío, ¿cómo lo gestiono?",
+            "answer": "<p>Si detectas cualquier incidencia con tu pedido, ponte en contacto con nuestro servicio de atención al cliente vía <a href=\"mailto:info@inlabs.com\" title=\"mailto:info@inlabs.com\"><span style=\"text-decoration:underline\"><em><strong>email </strong></em></span></a>indicando tu número de pedido. Nuestro equipo revisará el caso y te ofrecerá una solución lo antes posible.<br/><br/></p>"
+          }
+        },
+        "faq_Fp4yKe": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Cómo puedo seguir mi pedido?",
+            "answer": "<p>Una vez enviado tu pedido, recibirás un correo electrónico con la información de seguimiento para que puedas conocer el estado del envío en todo momento.</p>"
+          }
+        },
+        "faq_DGwCAX": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Hacéis envíos fuera de España?",
+            "answer": "<p>Sí, ZZEN Labs ya está disponible en España, toda Europa y también US. Puedes consultar los plazos y costes de envío en tu carrito.</p>"
+          }
+        },
+        "faq_KUUNa7": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Cuál es el coste de envío?",
+            "answer": "<p>El coste del envío se calcula automáticamente durante el proceso de compra y puede variar en función del destino y del importe del pedido.</p>"
           }
         }
       },
       "block_order": [
-        "slide_FtFTYA",
-        "slide_NBqCK9",
-        "slide_MVBcp3"
+        "faq_EXE3HE",
+        "faq_tDbPjM",
+        "faq_jtb3tK",
+        "faq_gPg3G4",
+        "faq_QF4hqq",
+        "faq_DRWzjC",
+        "faq_pHqCxi",
+        "faq_MbDBtX",
+        "faq_LzU3wE",
+        "faq_wBhaCy",
+        "faq_jEzx38",
+        "faq_FnPEe6",
+        "faq_jnrY8H",
+        "faq_mykmgi",
+        "faq_A3xVzY",
+        "faq_nzUay6",
+        "faq_4NWri9",
+        "faq_dEAbE6",
+        "faq_DRqcd8",
+        "faq_ny6CgW",
+        "faq_AY6UJV",
+        "faq_L6zq6V",
+        "faq_HpaDjK",
+        "faq_R7MYJg",
+        "faq_qyVbnR",
+        "faq_WNgWmV",
+        "faq_yxifpF",
+        "faq_LkEHGy",
+        "faq_TyMPry",
+        "faq_ECGzB8",
+        "faq_Fp4yKe",
+        "faq_DGwCAX",
+        "faq_KUUNa7"
       ],
-      "custom_css": [
-        "{background-color: black;}"
-      ],
-      "name": "Carrusel producto",
+      "name": "FAQs",
       "settings": {
-        "bg_color": "#000000",
-        "mobile_breakpoint": 750,
-        "content_max_width": 1400,
-        "heading_tag": "h3",
-        "mobile_content": "list",
-        "loop": true,
-        "fade_out_duration": 250,
-        "fade_duration": 400,
-        "fade_easing": "cubic-bezier(0.4, 0, 0.2, 1)",
-        "fade_shift": 0,
-        "image_position_d": "left",
-        "vertical_align_d": "flex-start",
-        "media_width_d": 43,
-        "gap_d": 72,
-        "padding_top_d": 48,
-        "padding_bottom_d": 60,
-        "padding_left_d": 20,
-        "padding_right_d": 20,
-        "gap_m": 28,
-        "padding_top_m": 24,
-        "padding_bottom_m": 32,
-        "padding_left_m": 14,
-        "padding_right_m": 14,
-        "aspect_d": "natural",
-        "aspect_m": "1/1",
-        "image_focus": "center",
-        "image_radius": 8,
-        "heading_font": "thin2",
-        "heading_font_custom": "'thin2', serif",
-        "heading_weight": "400",
-        "heading_color": "#ffffff",
-        "heading_size_d": 96,
-        "heading_line_height_d": 1,
-        "heading_letter_spacing_d": 0,
-        "heading_margin_bottom_d": 22,
-        "heading_align_d": "left",
-        "heading_size_m": 26,
-        "heading_line_height_m": 1.2,
-        "heading_letter_spacing_m": 0,
-        "heading_margin_bottom_m": 18,
-        "heading_align_m": "left",
-        "body_font": "helvetica",
-        "body_font_custom": "'Helvetica neue', sans-serif",
-        "body_weight": "400",
-        "body_color": "#ffffff",
-        "body_size_d": 17,
-        "body_line_height_d": 1.5,
-        "body_letter_spacing_d": 0,
-        "paragraph_gap_d": 26,
-        "body_align_d": "left",
-        "body_size_m": 14,
-        "body_line_height_m": 1.5,
-        "body_letter_spacing_m": 0,
-        "paragraph_gap_m": 16,
-        "body_align_m": "left",
-        "bullet_size_m": 14,
-        "bullet_line_height_m": 1.4,
-        "bullet_color": "#ffffff",
-        "bullet_gap_m": 16,
-        "bullet_icon_size": 13,
-        "bullet_icon_color": "#ffffff",
-        "bullet_icon_gap": 9,
-        "nav_style_d": "stepper",
-        "nav_style_m": "dots",
-        "show_arrows_d": true,
-        "show_arrows_m": false,
-        "nav_margin_top_d": 50,
-        "nav_margin_top_m": 28,
-        "nav_gap": 36,
-        "line_color": "#ffffff",
-        "dot_size_d": 14,
-        "dot_border_color": "#ffffff",
-        "dot_active_color": "#ffffff",
-        "label_size_d": 13,
-        "label_gap": 12,
-        "label_color": "#ffffff",
-        "label_active_color": "#ffffff",
-        "arrow_size": 44,
-        "arrow_gap": 12,
-        "arrow_border_color": "#ffffff",
-        "arrow_icon_color": "#ffffff",
-        "pagdot_size": 7,
-        "pagdot_gap": 8,
-        "pagdot_active_color": "#ffffff",
-        "pagdot_inactive_color": "#ffffff",
-        "aria_label": "Nuestras fórmulas",
-        "aria_prev": "Anterior",
-        "aria_next": "Siguiente"
-      }
-    },
-    "custom_pillars_grid_REzXbF": {
-      "type": "custom-pillars-grid",
-      "blocks": {
-        "pillar_fXUCR7": {
-          "type": "pillar",
-          "settings": {
-            "image": "shopify://shop_images/Frame_2001.webp",
-            "title": "Ingredientes de calidad",
-            "body": "<p>Seleccionamos ingredientes de la máxima calidad, priorizando formas de origen natural y alta biodisponibilidad. Sin colorantes, sin aromas artificiales, sin rellenos innecesarios y sin OGM. Todas nuestras fórmulas se fabrican íntegramente en España bajo estándares exigentes de calidad y control. En ZZEN no añadimos nada que no tenga sentido.</p><p>En ZZEN no añadimos nada que no tenga sentido.</p>",
-            "link": ""
-          }
-        },
-        "pillar_e73KkJ": {
-          "type": "pillar",
-          "settings": {
-            "image": "shopify://shop_images/ad5ad1a6-0f33-4bd7-b4d6-6a3ec3eb5269_6.webp",
-            "title": "Nuestra Comunidad",
-            "body": "<p>ZZEN cuenta con una comunidad activa de <strong>más de un millón de personas.</strong> Desde atletas, grandes profesionales, intelectuales, creativos y personas inquietas que valoran el conocimiento y la mejora constante.</p><p>Cuando eliges ZZEN, no solo accedes a nuestros productos. Te unes a una comunidad de personas que se toman en serio su rendimiento y entienden que el progreso se construye con constancia.</p>",
-            "link": ""
-          }
-        },
-        "pillar_QBLXQ4": {
-          "type": "pillar",
-          "settings": {
-            "image": "shopify://shop_images/WhatsApp_Image_2026-07-22_at_09.22.48.webp",
-            "title": "Respaldado por Evidencia",
-            "body": "<p>Las fórmulas de ZZEN han sido desarrolladas junto con los doctores <strong>Borja Bandera</strong> e <strong>Isabel Belaustegui</strong>, con un enfoque riguroso y basado en evidencia científica.</p><p>Cada ingrediente se selecciona por su eficacia real y su respaldo en estudios actuales, buscando siempre el equilibrio entre rendimiento, seguridad y uso continuado.</p>",
-            "link": ""
-          }
-        },
-        "pillar_nTwA9k": {
-          "type": "pillar",
-          "settings": {
-            "image": "shopify://shop_images/Frame_2-_AU.webp",
-            "title": "100% Fabricado en España",
-            "body": "<p>ZZEN es una marca fabricada íntegramente en España. Controlamos todo el proceso de producción para garantizar calidad, trazabilidad y coherencia en cada fórmula.</p><p>Producir localmente es una decisión estratégica para mantener nuestros estándares y asegurar que cada producto cumple exactamente con lo que exigimos.</p>",
-            "link": ""
-          }
-        }
-      },
-      "block_order": [
-        "pillar_fXUCR7",
-        "pillar_e73KkJ",
-        "pillar_QBLXQ4",
-        "pillar_nTwA9k"
-      ],
-      "name": "Pilares de marca",
-      "settings": {
-        "heading": "",
-        "heading_tag": "h2",
-        "bg_color": "#ffffff",
-        "content_max_width": 1500,
-        "tablet_breakpoint": 990,
-        "mobile_breakpoint": 750,
-        "layout_d": "grid",
-        "layout_m": "carousel",
-        "columns_d": 4,
-        "columns_t": 2,
-        "columns_m": "1",
-        "slide_width_d": 28,
-        "slide_width_m": 100,
-        "column_gap_d": 28,
-        "column_gap_t": 24,
-        "column_gap_m": 16,
-        "row_gap_d": 48,
-        "row_gap_m": 36,
-        "transition_ms": 300,
-        "padding_top_d": 80,
-        "padding_bottom_d": 80,
-        "padding_left_d": 60,
-        "padding_right_d": 60,
-        "padding_left_t": 32,
-        "padding_right_t": 32,
-        "padding_top_m": 32,
-        "padding_bottom_m": 32,
-        "padding_left_m": 20,
-        "padding_right_m": 20,
-        "show_image": true,
-        "image_ratio_auto": false,
-        "image_ratio_d": 1,
-        "image_ratio_m": 1,
-        "image_fit": "cover",
-        "image_bg": "#f2f2f2",
-        "image_radius_d": 0,
-        "image_radius_m": 0,
-        "image_margin_bottom_d": 40,
-        "image_margin_bottom_m": 24,
-        "image_hover_zoom": false,
-        "title_tag": "h3",
-        "title_font": "helvetica",
-        "title_font_custom": "'Helvetica neue', sans-serif",
-        "title_color": "#000000",
-        "title_weight": "600",
-        "title_uppercase": false,
-        "title_letter_spacing": 0,
-        "title_line_height": 1.3,
-        "title_size_d": 18,
-        "title_size_m": 15,
-        "title_align_d": "left",
-        "title_align_m": "left",
-        "title_margin_bottom_d": 22,
-        "title_margin_bottom_m": 14,
-        "title_min_height_d": 0,
-        "body_font": "helvetica",
-        "body_font_custom": "'Helvetica neue', sans-serif",
-        "body_color": "#1a1a1a",
-        "body_weight": "400",
-        "body_strong_weight": "600",
-        "body_strong_color": "#000000",
-        "body_letter_spacing": 0,
-        "body_size_d": 17,
-        "body_line_height_d": 1.6,
-        "body_align_d": "left",
-        "body_paragraph_gap_d": 22,
-        "body_size_m": 14,
-        "body_line_height_m": 1.6,
-        "body_align_m": "left",
-        "body_paragraph_gap_m": 16,
-        "show_dots_m": true,
-        "show_dots_d": false,
-        "dot_size": 7,
-        "dot_gap": 12,
-        "dot_hit_padding": 8,
-        "dot_color": "#c9c9c9",
-        "dot_color_active": "#4a4a4a",
-        "dot_active_scale": 1,
-        "dots_align": "center",
-        "dots_margin_top_d": 32,
-        "dots_margin_top_m": 24,
-        "dots_label": "Pilares de marca",
-        "dot_fallback_label": "Tarjeta",
-        "heading_font": "thin2",
-        "heading_font_custom": "'thin2', serif",
-        "heading_weight": "400",
-        "heading_color": "#000000",
-        "em_color": "#000000",
-        "em_italic": true,
-        "heading_size_d": 56,
-        "heading_line_height_d": 1.1,
-        "heading_letter_spacing": 0,
-        "heading_align_d": "left",
-        "heading_margin_bottom_d": 48,
-        "heading_size_m": 26,
-        "heading_line_height_m": 1.1,
-        "heading_align_m": "left",
-        "heading_margin_bottom_m": 24
-      }
-    },
-    "custom_people_carousel_KhX8x3": {
-      "type": "custom-people-carousel",
-      "blocks": {
-        "person_aV9LRJ": {
-          "type": "person",
-          "settings": {
-            "image": "shopify://shop_images/Frame_3.webp",
-            "name": "Aurelio Rojas",
-            "link": ""
-          }
-        },
-        "person_33H3Cg": {
-          "type": "person",
-          "settings": {
-            "image": "shopify://shop_images/3_803d795e-2d5c-4904-9235-9f7389cea1d7.webp",
-            "name": "Claudia Nicolasa",
-            "link": ""
-          }
-        },
-        "person_CXkxgA": {
-          "type": "person",
-          "settings": {
-            "image": "shopify://shop_images/Frame_7_888d8277-afab-4cd7-bccb-13362fb9c49b.webp",
-            "name": "",
-            "link": ""
-          }
-        },
-        "person_dVnjGd": {
-          "type": "person",
-          "settings": {
-            "image": "shopify://shop_images/Frame_5.webp",
-            "name": "Fiona Pinar",
-            "link": ""
-          }
-        },
-        "person_UfjcDx": {
-          "type": "person",
-          "settings": {
-            "image": "shopify://shop_images/Frame_10.webp",
-            "name": "José Abellán",
-            "link": ""
-          }
-        },
-        "person_B8yArL": {
-          "type": "person",
-          "settings": {
-            "name": "Isabel",
-            "link": ""
-          }
-        }
-      },
-      "block_order": [
-        "person_aV9LRJ",
-        "person_33H3Cg",
-        "person_CXkxgA",
-        "person_dVnjGd",
-        "person_UfjcDx",
-        "person_B8yArL"
-      ],
-      "name": "Carrusel de personas",
-      "settings": {
-        "heading": "¿Quiénes han <em>pasado</em> por ZZEN?",
-        "heading_tag": "h2",
-        "bg_color": "#ffffff",
-        "mobile_breakpoint": 750,
-        "content_max_width": 1500,
-        "transition_ms": 200,
-        "padding_top_d": 80,
-        "padding_bottom_d": 80,
-        "padding_left_d": 60,
-        "padding_right_d": 60,
-        "bleed_left_d": true,
-        "bleed_right_d": true,
-        "padding_top_m": 28,
-        "padding_bottom_m": 28,
-        "padding_left_m": 16,
-        "padding_right_m": 16,
-        "bleed_left_m": true,
-        "bleed_right_m": true,
-        "carousel_label": "Personas que han pasado por ZZEN",
-        "scroll_by": "card",
-        "snap_align_d": "start",
-        "snap_align_m": "center",
-        "card_width_d": 390,
-        "card_gap_d": 20,
-        "card_width_m": 72,
-        "card_gap_m": 16,
-        "ratio_d": "9 / 16",
-        "ratio_custom_d": "9 / 16",
-        "ratio_m": "9 / 16",
-        "ratio_custom_m": "9 / 16",
-        "image_fit": "cover",
-        "image_bg": "#eeeeee",
-        "card_radius_d": 4,
-        "card_radius_m": 4,
-        "image_hover_zoom": false,
-        "name_position": "over_bottom",
-        "name_font": "thin2",
-        "name_font_custom": "'thin2', serif",
-        "name_color": "#ffffff",
-        "name_weight": "400",
-        "name_uppercase": false,
-        "name_align": "center",
-        "name_size_d": 36,
-        "name_size_m": 29,
-        "name_line_height": 1.1,
-        "name_letter_spacing": 0,
-        "name_offset_d": 34,
-        "name_offset_m": 22,
-        "name_padding_x_d": 16,
-        "name_padding_x_m": 12,
-        "name_shadow": false,
-        "name_shadow_color": "#00000059",
-        "name_shadow_blur": 6,
-        "show_scrim": false,
-        "scrim_color": "#00000073",
-        "scrim_height": 45,
-        "nav_d": "bar_arrows",
-        "nav_m": "bar",
-        "nav_align_d": "space-between",
-        "nav_align_m": "center",
-        "nav_margin_top_d": 52,
-        "nav_margin_top_m": 24,
-        "nav_gap_d": 40,
-        "nav_gap_m": 16,
-        "bar_mode": "thumb",
-        "bar_track_color": "#d4d4d4",
-        "bar_fill_color": "#1a1a1a",
-        "bar_height": 1,
-        "bar_fill_height": 2,
-        "bar_radius": 0,
-        "arrow_prev_label": "Anterior",
-        "arrow_next_label": "Siguiente",
-        "arrow_color": "#1a1a1a",
-        "arrow_color_hover": "#ffffff",
-        "arrow_bg": "rgba(0,0,0,0)",
-        "arrow_bg_hover": "#1a1a1a",
-        "arrow_border_color": "#c7c7c7",
-        "arrow_border_width": 1,
-        "arrow_size_d": 40,
-        "arrow_size_m": 36,
-        "arrow_icon_size_d": 14,
-        "arrow_icon_size_m": 13,
-        "arrow_stroke": 1.4,
-        "arrow_gap": 12,
-        "dots_label": "Ir a la persona",
-        "dot_color": "#cfcfcf",
-        "dot_color_active": "#1a1a1a",
-        "dot_size": 5,
-        "dot_size_active": 8,
-        "dot_gap": 8,
-        "heading_font": "thin2",
-        "heading_font_custom": "'thin2', serif",
-        "heading_weight": "400",
-        "heading_color": "#000000",
-        "em_color": "#000000",
-        "em_italic": true,
-        "heading_size_d": 46,
-        "heading_line_height_d": 1.1,
-        "heading_letter_spacing": 0,
-        "heading_align_d": "left",
-        "heading_margin_bottom_d": 44,
-        "heading_size_m": 31,
-        "heading_line_height_m": 1.2,
-        "heading_align_m": "left",
-        "heading_margin_bottom_m": 20
-      }
-    },
-    "prod_slider_xn9HTY": {
-      "type": "prod-slider",
-      "name": "Slider de productos",
-      "settings": {
-        "title": "Modo ZZEN",
-        "collection": "frontpage",
-        "products_limit": 8,
-        "image_ratio": "1 / 1",
-        "image_fit": "cover",
-        "button_text": "Añadir",
-        "soon_badge_text": "Próximamente...",
-        "soon_button_text": "Próximamente...",
-        "title_size": 58,
-        "title_size_mobile": 32,
-        "name_size": 18,
-        "name_size_mobile": 16,
-        "benefit_size": 16,
-        "benefit_size_mobile": 15,
-        "atc_size": 16,
-        "atc_size_mobile": 15,
-        "badge_size": 13,
-        "bg_color": "#FFFFFF",
-        "padding_top": 60,
-        "padding_bottom": 60
+        "heading": "FAQs",
+        "subtext": "<strong>Cómo tomar ZZEN Labs                       . </strong>Resolvemos las preguntas frecuentes que más surgen acerca de nuestros nootrópicos naturales (<a href=\"#\" title=\"#\">ZZEN Focus</a>, <a href=\"#\" title=\"#\">ZZEN Sleep</a>, <a href=\"#\" title=\"#\">ZZEN Calm</a>) y también <a href=\"#\" title=\"#\">Modo ZZEN</a>.",
+        "single_open": false,
+        "heading_size": 56,
+        "heading_size_mobile": 36,
+        "question_size": 17,
+        "question_size_mobile": 16,
+        "question_padding": 22,
+        "question_padding_mobile": 20,
+        "max_width": 940,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "padding_x": 24,
+        "margin_top": 0,
+        "margin_bottom": 0,
+        "gap_heading": 48,
+        "padding_top_mobile": 48,
+        "padding_bottom_mobile": 48,
+        "padding_x_mobile": 20,
+        "margin_top_mobile": 0,
+        "margin_bottom_mobile": 0,
+        "gap_heading_mobile": 36,
+        "color_bg": "#0B0B0B",
+        "color_heading": "#FFFFFF",
+        "color_subtext": "#FFFFFF",
+        "color_question": "#FFFFFF",
+        "color_answer": "#D6D6D6",
+        "color_line": "#3A3A3A",
+        "color_chevron": "#FFFFFF"
       }
     }
   },
   "order": [
     "main",
-    "custom_product_slider_DMzwV9",
-    "custom_pillars_grid_REzXbF",
-    "custom_people_carousel_KhX8x3",
-    "prod_slider_xn9HTY"
+    "faqs_accordion_BGKitc"
   ]
 }
