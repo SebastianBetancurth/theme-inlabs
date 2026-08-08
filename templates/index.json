@@ -105,7 +105,7 @@
         "benefit_size_mobile": 19,
         "atc_size": 16,
         "atc_size_mobile": 15,
-        "badge_size": 13,
+        "badge_size": 18,
         "bg_color": "#f6f5f3",
         "padding_top": 60,
         "padding_bottom": 60
@@ -733,7 +733,7 @@
         "margin_top_mobile": 0,
         "margin_bottom_mobile": 0,
         "gap_heading_mobile": 36,
-        "color_bg": "#0B0B0B",
+        "color_bg": "#0b0b0b",
         "color_heading": "#ffffff",
         "color_subtext": "#ffffff",
         "color_question": "#ffffff",
