@@ -714,7 +714,7 @@
         "panel_overlap_m": 0,
         "bg_color": "#0a0a0a",
         "panel_bg": "#ffffff",
-        "panel_border_color": "#00000000",
+        "panel_border_color": "rgba(0,0,0,0)",
         "panel_border_width": 0,
         "panel_radius_d": 10,
         "panel_radius_m": 12,
@@ -768,7 +768,7 @@
         "btn_color": "#ffffff",
         "btn_bg_hover": "#2b2b2b",
         "btn_color_hover": "#ffffff",
-        "btn_border_color": "#00000000",
+        "btn_border_color": "rgba(0,0,0,0)",
         "btn_border_width": 0,
         "btn_radius": 40,
         "btn_weight": "500",
@@ -795,9 +795,9 @@
           "type": "card",
           "settings": {
             "image": "shopify://shop_images/download_31a8869d-7a75-4e16-9501-ca158c0fc37c.webp",
-            "title": "Título del artículo",
-            "text": "Escribe aquí la entradilla del artículo. Se recorta sola si se pasa de largo.",
-            "url": "",
+            "title": "Los nootrópicos naturales más efectivos para optimizar tu rendimiento mental",
+            "text": "El rendimiento cognitivo nunca ha sido tan crucial como en la actualidad. Entre las exigencias laborales, académicas y personales, nuestro cerebro necesita funcionar al máximo ni...",
+            "url": "shopify://pages/nostropicos-naturales",
             "button_label": ""
           }
         },
