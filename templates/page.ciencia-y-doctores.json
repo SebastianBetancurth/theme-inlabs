@@ -805,9 +805,9 @@
           "type": "card",
           "settings": {
             "image": "shopify://shop_images/download_0c17a1ea-97c2-47fe-9a1b-7f72e572b83a.webp",
-            "title": "Título del artículo",
-            "text": "Escribe aquí la entradilla del artículo. Se recorta sola si se pasa de largo.",
-            "url": "",
+            "title": "Cómo optimizar tu salud: la guía definitiva para transformar tu bienestar",
+            "text": "Optimizar tu salud no es cuestión de suerte ni de genética privilegiada. Es el resultado de decisiones conscientes, hábitos bien construidos y conocimiento aplicado con consisten...",
+            "url": "shopify://pages/como-optimizar-tu-salud-la-guia-definitiva-para-transformar-tu-bienestar",
             "button_label": ""
           }
         },
