@@ -815,9 +815,9 @@
           "type": "card",
           "settings": {
             "image": "shopify://shop_images/download_70b7978b-4f13-45a9-b40f-7437c72ad988.webp",
-            "title": "Título del artículo",
-            "text": "Escribe aquí la entradilla del artículo. Se recorta sola si se pasa de largo.",
-            "url": "",
+            "title": "Beneficios de los nootrópicos y cómo potenciarlos con tus hábitos",
+            "text": "Los nootrópicos se han conviertido en los aliados perfectos para mejorar el rendimiento mental, la claridad cognitiva y la capacidad de adaptación al estrés. Pero más allá del ru...",
+            "url": "shopify://pages/beneficios-de-los-nootropicos-y-como-potenciarlos-con-tus-habitos",
             "button_label": ""
           }
         }
