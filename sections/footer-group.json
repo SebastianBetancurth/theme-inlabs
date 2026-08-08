@@ -21,6 +21,13 @@
             "text": "<p>In labs es tu aliado diario para potenciar tu rendimiento mental. Una fórmula<em>natural</em>, equilibrada con nootrópicos respaldados por la ciencia</p>"
           }
         },
+        "text_wPqUy6": {
+          "type": "text",
+          "settings": {
+            "heading": "Contacto",
+            "text": "<p><a href=\"mailto:info@zzenlabs.com\" title=\"mailto:info@zzenlabs.com\">info@inlabs.com</a></p><p><a href=\"https://wa.me/34600353628\" title=\"https://wa.me/34600353628\">+34 600 35 36 28</a></p><p>C/ Velázquez 86B, Bajo Centro. 28006 Madrid.</p><p><a href=\"https://in-labs.co/pages/ciencia-y-doctores\" title=\"https://in-labs.co/pages/ciencia-y-doctores\">Ciencia y doctores</a></p><p><a href=\"https://zzenlabs.com/pages/preguntas-frecuentes\" title=\"Preguntas Frecuentes\">FAQs</a><br/><br/><a href=\"https://zzenlabs.com/a/withdrawal?locale=es&country=ES\" title=\"http://zzenlabs.com/a/withdrawal\">Formulario de desistimiento</a></p>"
+          }
+        },
         "menu_B7TgMt": {
           "type": "menu",
           "settings": {
@@ -38,6 +45,7 @@
       },
       "block_order": [
         "text_t83Ufr",
+        "text_wPqUy6",
         "menu_B7TgMt",
         "menu_xwinbF"
       ],
