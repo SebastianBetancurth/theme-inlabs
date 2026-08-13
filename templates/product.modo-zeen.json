@@ -730,7 +730,7 @@
         "zzen_videos_V49XLA"
       ],
       "custom_css": [
-        ".product__media-toggle {display: none; border: none; background-color: transparent; color: currentColor; padding: 0;}"
+        ".product__media-icon,.thumbnail__badge {display: none;}"
       ],
       "settings": {
         "enable_sticky_info": true,
@@ -747,7 +747,7 @@
         "hide_variants": true,
         "enable_video_looping": false,
         "padding_top": 36,
-        "padding_bottom": 12
+        "padding_bottom": 8
       }
     },
     "disclosures": {
