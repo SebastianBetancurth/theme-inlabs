@@ -729,6 +729,9 @@
         "zzen_reveal_HJabEA",
         "zzen_videos_V49XLA"
       ],
+      "custom_css": [
+        ".product__media-toggle {display: none; border: none; background-color: transparent; color: currentColor; padding: 0;}"
+      ],
       "settings": {
         "enable_sticky_info": true,
         "hero_gap_desktop": 24,
