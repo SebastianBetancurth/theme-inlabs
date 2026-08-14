@@ -53,6 +53,7 @@
   class="product-media-container media-type-{{ media.media_type }} media-fit-{{ media_fit }} global-media-settings gradient{% if constrain_to_viewport %} constrain-height{% endif %}"
   style="--ratio: {{ media.aspect_ratio | default: 1.0 }}; --preview-ratio: {{ media.preview_image.aspect_ratio | default: 1.0 }};"
 >
+  {%- unless media.media_type == 'video' -%}
   <modal-opener
     class="product__modal-opener product__modal-opener--{{ media.media_type }}"
     data-modal="#ProductModal-{{ modal_id }}"
@@ -99,7 +100,7 @@
       </span>
     </button>
   </modal-opener>
-
+{%- endunless -%}
   {%- if media.media_type == 'video' -%}
 
   <div
