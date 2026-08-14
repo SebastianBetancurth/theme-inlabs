@@ -1832,7 +1832,7 @@
         "cert_BiR9ny": {
           "type": "cert",
           "settings": {
-            "title": "IFS",
+            "title": "1.",
             "text": "<p>Asegura la calidad y seguridad en todo el proceso de producción, desde la selección de ingredientes hasta el envasado final.</p>",
             "link": "",
             "new_tab": false
@@ -1841,7 +1841,7 @@
         "cert_CcLfz6": {
           "type": "cert",
           "settings": {
-            "title": "GMP",
+            "title": "2.",
             "text": "<p>Garantiza que cada fórmula se fabrica bajo estrictos estándares de Buenas Prácticas.</p>",
             "link": "",
             "new_tab": false
@@ -1850,7 +1850,7 @@
         "cert_F3bfmj": {
           "type": "cert",
           "settings": {
-            "title": "FDA",
+            "title": "3.",
             "text": "<p>Cumplimos las normativas de la Administración de Alimentos y Medicamentos de EE. UU., asegurando procesos validados y productos seguros.</p>",
             "link": "",
             "new_tab": false
@@ -1861,6 +1861,10 @@
         "cert_BiR9ny",
         "cert_CcLfz6",
         "cert_F3bfmj"
+      ],
+      "custom_css": [
+        ".zcert__card-title {margin: 0 0 var(--zc-t-mb); font-family: var(--zc-b-font); font-size: var(--zc-t-size); font-weight: var(--zc-t-weight); line-height: var(--zc-t-lh); letter-spacing: var(--zc-t-ls); margin-right: 17px; text-transform: var(--zc-t-tt); color: var(--zc-t-color);}",
+        ".zcert__card {display: flex; flex-direction: row;}"
       ],
       "name": "Certificados de calidad",
       "settings": {
