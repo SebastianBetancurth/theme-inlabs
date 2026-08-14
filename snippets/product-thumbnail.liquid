@@ -100,7 +100,27 @@
     </button>
   </modal-opener>
 
-  {%- if media.media_type != 'image' -%}
+  {%- if media.media_type == 'video' -%}
+
+  <div
+    class="media media--transparent product-autoplay-video-container"
+    data-media-id="{{ media.id }}"
+  >
+    {{
+      media
+      | video_tag:
+        image_size: '2048x',
+        autoplay: true,
+        muted: true,
+        loop: true,
+        controls: false,
+        preload: 'auto',
+        loading: 'eager',
+        class: 'product-autoplay-video'
+    }}
+  </div>
+
+   {%- elsif media.media_type != 'image' -%}
     {%- if media.media_type == 'model' -%}
       <product-model class="deferred-media media media--transparent" data-media-id="{{ media.id }}">
     {%- else -%}
