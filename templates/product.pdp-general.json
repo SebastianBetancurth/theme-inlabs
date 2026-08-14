@@ -1863,7 +1863,7 @@
         "cert_F3bfmj"
       ],
       "custom_css": [
-        ".zcert__card-title {margin: 0 0 var(--zc-t-mb); font-family: var(--zc-b-font); font-size: var(--zc-t-size); font-weight: var(--zc-t-weight); line-height: var(--zc-t-lh); letter-spacing: var(--zc-t-ls); margin-right: 17px; text-transform: var(--zc-t-tt); color: var(--zc-t-color);}",
+        ".zcert__card-title {margin: 0 0 var(--zc-t-mb); font-family: var(--zc-b-font); font-size: var(--zc-t-size); font-weight: var(--zc-t-weight); width: 130px !important; line-height: var(--zc-t-lh); letter-spacing: var(--zc-t-ls); text-transform: var(--zc-t-tt); color: var(--zc-t-color);}",
         ".zcert__card {display: flex; flex-direction: row;}"
       ],
       "name": "Certificados de calidad",
