@@ -1,0 +1,1458 @@
+{%- comment -%}
+  ============================================================================
+  SECCIÓN: Cómo se usa (pasos numerados)
+  Tema: Dawn / Online Store 2.0
+  Ruta: sections/custom-how-to-use.liquid
+
+  PC     -> título grande arriba a la izquierda, subtítulo debajo y una fila
+            de tarjetas con borde fino. Dentro de cada tarjeta, el número
+            grande a la izquierda y el texto a la derecha.
+  Móvil  -> lo mismo pero las tarjetas se apilan en una sola columna. El
+            número sigue a la izquierda del texto.
+
+  TODO SE CONTROLA CON VARIABLES CSS.
+  El bloque de variables de arriba es el de PC; dentro del media query de
+  móvil solo se REDECLARAN las que cambian. Así no hay reglas duplicadas y
+  añadir un ajuste nuevo es tocar dos líneas, no dos hojas de estilo.
+
+  EL NÚMERO PUEDE SER AUTOMÁTICO O ESCRITO A MANO.
+  Por defecto se numera solo según el orden de los bloques (1., 2., 3.), con
+  el sufijo que elijas. Si en un bloque escribes algo en "Número", manda ese.
+
+  EL TEXTO DE CADA PASO ES RICHTEXT.
+  Lo que va en <strong> coge el color "resaltado" y lo que va suelto el color
+  normal, que es como está montado el original: parte de la frase en blanco y
+  el resto en gris.
+
+  El número y el texto son hermanos en un flex: el número no se estira, así
+  que aunque el texto ocupe tres líneas la cifra se queda donde la pongas
+  (arriba, centrada o abajo).
+  ============================================================================
+{%- endcomment -%}
+
+{%- liquid
+  assign s = section.settings
+  assign bp = s.mobile_breakpoint
+  assign bp_max = bp | minus: 1
+
+  case s.heading_font
+    when 'thin2'
+      assign heading_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign heading_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign heading_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign heading_stack = 'var(--font-body-family)'
+    else
+      assign heading_stack = s.heading_font_custom
+  endcase
+
+  case s.body_font
+    when 'thin2'
+      assign body_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign body_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign body_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign body_stack = 'var(--font-body-family)'
+    else
+      assign body_stack = s.body_font_custom
+  endcase
+
+  case s.num_font
+    when 'thin2'
+      assign num_stack = "'thin2', 'Times New Roman', Georgia, serif"
+    when 'helvetica'
+      assign num_stack = "'Helvetica neue', Helvetica, Arial, sans-serif"
+    when 'theme_heading'
+      assign num_stack = 'var(--font-heading-family)'
+    when 'theme_body'
+      assign num_stack = 'var(--font-body-family)'
+    else
+      assign num_stack = s.num_font_custom
+  endcase
+
+  if s.content_max_width == 0
+    assign max_w = 'none'
+  else
+    assign max_w = s.content_max_width | append: 'px'
+  endif
+
+  if s.em_italic
+    assign em_style = 'italic'
+  else
+    assign em_style = 'normal'
+  endif
+
+  if s.num_italic
+    assign num_style = 'italic'
+  else
+    assign num_style = 'normal'
+  endif
+
+  # Cómo se coloca el número respecto al texto de su tarjeta.
+  case s.num_align_v
+    when 'top'
+      assign card_align = 'flex-start'
+    when 'bottom'
+      assign card_align = 'flex-end'
+    else
+      assign card_align = 'center'
+  endcase
+
+  # Alineación vertical del contenido dentro de la tarjeta (por si una
+  # tarjeta tiene menos texto que sus vecinas).
+  case s.content_align_v
+    when 'top'
+      assign content_justify = 'flex-start'
+    when 'bottom'
+      assign content_justify = 'flex-end'
+    else
+      assign content_justify = 'center'
+  endcase
+-%}
+
+{%- style -%}
+  @font-face {
+    font-family: 'Helvetica neue';
+    src: url('{{ 'HelveticaNeueCyr-Light.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'thin2';
+    src: url('{{ 'lawrence-regular.woff2' | asset_url }}') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* ================= Variables: PC ================= */
+  .zhow-{{ section.id }} {
+    --zh-bg: {{ s.bg_color }};
+    --zh-max-w: {{ max_w }};
+    --zh-pt: {{ s.padding_top_d }}px;
+    --zh-pb: {{ s.padding_bottom_d }}px;
+    --zh-pl: {{ s.padding_left_d }}px;
+    --zh-pr: {{ s.padding_right_d }}px;
+
+    /* Título */
+    --zh-h-font: {{ heading_stack }};
+    --zh-h-size: {{ s.heading_size_d }}px;
+    --zh-h-lh: {{ s.heading_line_height_d | divided_by: 100.0 }};
+    --zh-h-ls: {{ s.heading_letter_spacing_d }}px;
+    --zh-h-weight: {{ s.heading_weight }};
+    --zh-h-color: {{ s.heading_color }};
+    --zh-h-align: {{ s.heading_align_d }};
+    --zh-h-mb: {{ s.heading_margin_bottom_d }}px;
+    --zh-em-color: {{ s.em_color }};
+    --zh-em-style: {{ em_style }};
+
+    /* Subtítulo */
+    --zh-sub-font: {{ body_stack }};
+    --zh-sub-size: {{ s.sub_size_d }}px;
+    --zh-sub-lh: {{ s.sub_line_height_d | divided_by: 100.0 }};
+    --zh-sub-ls: {{ s.sub_letter_spacing }}px;
+    --zh-sub-weight: {{ s.sub_weight }};
+    --zh-sub-color: {{ s.sub_color }};
+    --zh-sub-align: {{ s.sub_align_d }};
+    --zh-sub-mb: {{ s.sub_margin_bottom_d }}px;
+    --zh-sub-max-w: {{ s.sub_max_width_d }}%;
+
+    /* Rejilla */
+    --zh-cols: {{ s.columns_d }};
+    --zh-grid-gap-x: {{ s.grid_gap_x_d }}px;
+    --zh-grid-gap-y: {{ s.grid_gap_y_d }}px;
+
+    /* Tarjeta */
+    --zh-card-bg: {{ s.card_bg }};
+    --zh-card-border: {{ s.card_border_color }};
+    --zh-card-border-w: {{ s.card_border_width }}px;
+    --zh-card-radius: {{ s.card_radius_d }}px;
+    --zh-card-py: {{ s.card_pad_y_d }}px;
+    --zh-card-px: {{ s.card_pad_x_d }}px;
+    --zh-card-min-h: {{ s.card_min_height_d }}px;
+    --zh-card-align: {{ card_align }};
+    --zh-card-justify: {{ content_justify }};
+    --zh-card-gap: {{ s.num_gap_d }}px;
+    --zh-card-shadow: {{ s.card_shadow_size }}px {{ s.card_shadow_blur }}px {{ s.card_shadow_color }};
+
+    /* Número */
+    --zh-num-font: {{ num_stack }};
+    --zh-num-size: {{ s.num_size_d }}px;
+    --zh-num-lh: {{ s.num_line_height | divided_by: 100.0 }};
+    --zh-num-weight: {{ s.num_weight }};
+    --zh-num-style: {{ num_style }};
+    --zh-num-color: {{ s.num_color }};
+    --zh-num-w: {{ s.num_width_d }}px;
+    --zh-num-align: {{ s.num_align_h }};
+    --zh-num-shift: {{ s.num_shift_y_d }}px;
+
+    /* Texto del paso */
+    --zh-txt-font: {{ body_stack }};
+    --zh-txt-size: {{ s.step_size_d }}px;
+    --zh-txt-lh: {{ s.step_line_height_d | divided_by: 100.0 }};
+    --zh-txt-ls: {{ s.step_letter_spacing }}px;
+    --zh-txt-weight: {{ s.step_weight }};
+    --zh-txt-color: {{ s.step_color }};
+    --zh-txt-align: {{ s.step_align_d }};
+    --zh-strong-color: {{ s.strong_color }};
+    --zh-strong-weight: {{ s.strong_weight }};
+
+    --zh-anim: {{ s.transition_ms }}ms;
+  }
+
+  /* ================= Estructura ================= */
+  .zhow {
+    background-color: var(--zh-bg);
+  }
+
+  .zhow__inner {
+    max-width: var(--zh-max-w);
+    margin-inline: auto;
+    padding: var(--zh-pt) var(--zh-pr) var(--zh-pb) var(--zh-pl);
+    box-sizing: border-box;
+  }
+
+  /* ================= Título ================= */
+  .zhow__heading {
+    margin: 0 0 var(--zh-h-mb);
+    font-family: var(--zh-h-font);
+    font-size: var(--zh-h-size);
+    font-weight: var(--zh-h-weight);
+    line-height: var(--zh-h-lh);
+    letter-spacing: var(--zh-h-ls);
+    text-align: var(--zh-h-align);
+    color: var(--zh-h-color);
+  }
+
+  .zhow__heading em,
+  .zhow__heading i {
+    font-style: var(--zh-em-style);
+    color: var(--zh-em-color);
+  }
+
+  /* ================= Subtítulo ================= */
+  .zhow__sub {
+    margin: 0 0 var(--zh-sub-mb);
+    max-width: var(--zh-sub-max-w);
+    font-family: var(--zh-sub-font);
+    font-size: var(--zh-sub-size);
+    font-weight: var(--zh-sub-weight);
+    line-height: var(--zh-sub-lh);
+    letter-spacing: var(--zh-sub-ls);
+    text-align: var(--zh-sub-align);
+    color: var(--zh-sub-color);
+  }
+
+  .zhow__sub > * { margin: 0; }
+  .zhow__sub > * + * { margin-top: 0.6em; }
+  .zhow__sub p:empty { display: none; }
+  .zhow__sub a { color: inherit; }
+
+  /* El subtítulo se centra si su alineación es centro, para que el ancho
+     máximo no lo deje pegado a la izquierda. */
+  .zhow__sub--center { margin-inline: auto; }
+  .zhow__sub--right { margin-left: auto; }
+
+  /* ================= Rejilla de tarjetas ================= */
+  .zhow__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--zh-cols), minmax(0, 1fr));
+    column-gap: var(--zh-grid-gap-x);
+    row-gap: var(--zh-grid-gap-y);
+    align-items: stretch;
+  }
+
+  /* ================= Tarjeta ================= */
+  .zhow__card {
+    display: flex;
+    align-items: var(--zh-card-align);
+    justify-content: var(--zh-card-justify);
+    flex-direction: column;
+    gap: 0;
+    box-sizing: border-box;
+    min-height: var(--zh-card-min-h);
+    padding: var(--zh-card-py) var(--zh-card-px);
+    border: var(--zh-card-border-w) solid var(--zh-card-border);
+    border-radius: var(--zh-card-radius);
+    background-color: var(--zh-card-bg);
+    box-shadow: var(--zh-card-shadow);
+    transition: border-color var(--zh-anim) ease, background-color var(--zh-anim) ease,
+      transform var(--zh-anim) ease;
+  }
+
+  /* La fila número + texto. Va dentro de la tarjeta para poder centrarla en
+     vertical sin que el número y el texto se separen. */
+  .zhow__row {
+    display: flex;
+    align-items: var(--zh-card-align);
+    gap: var(--zh-card-gap);
+    width: 100%;
+  }
+
+  .zhow__card--link {
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .zhow__card--link:hover {
+    border-color: var(--zh-card-border-hover, var(--zh-card-border));
+  }
+
+  /* ================= Número ================= */
+  .zhow__num {
+    flex: 0 0 auto;
+    min-width: var(--zh-num-w);
+    margin: 0;
+    transform: translateY(var(--zh-num-shift));
+    font-family: var(--zh-num-font);
+    font-size: var(--zh-num-size);
+    font-weight: var(--zh-num-weight);
+    font-style: var(--zh-num-style);
+    line-height: var(--zh-num-lh);
+    text-align: var(--zh-num-align);
+    color: var(--zh-num-color);
+  }
+
+  /* ================= Texto del paso ================= */
+  .zhow__text {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-family: var(--zh-txt-font);
+    font-size: var(--zh-txt-size);
+    font-weight: var(--zh-txt-weight);
+    line-height: var(--zh-txt-lh);
+    letter-spacing: var(--zh-txt-ls);
+    text-align: var(--zh-txt-align);
+    color: var(--zh-txt-color);
+  }
+
+  .zhow__text > * { margin: 0; }
+  .zhow__text > * + * { margin-top: 0.6em; }
+  .zhow__text p:empty { display: none; }
+
+  .zhow__text strong,
+  .zhow__text b {
+    font-weight: var(--zh-strong-weight);
+    color: var(--zh-strong-color);
+  }
+
+  .zhow__text em,
+  .zhow__text i { font-style: italic; }
+
+  .zhow__text a {
+    color: inherit;
+    text-underline-offset: 2px;
+  }
+
+  /* ================= Móvil ================= */
+  @media screen and (max-width: {{ bp_max }}px) {
+    .zhow-{{ section.id }} {
+      --zh-max-w: none;
+      --zh-pt: {{ s.padding_top_m }}px;
+      --zh-pb: {{ s.padding_bottom_m }}px;
+      --zh-pl: {{ s.padding_left_m }}px;
+      --zh-pr: {{ s.padding_right_m }}px;
+
+      --zh-h-size: {{ s.heading_size_m }}px;
+      --zh-h-lh: {{ s.heading_line_height_m | divided_by: 100.0 }};
+      --zh-h-align: {{ s.heading_align_m }};
+      --zh-h-mb: {{ s.heading_margin_bottom_m }}px;
+
+      --zh-sub-size: {{ s.sub_size_m }}px;
+      --zh-sub-lh: {{ s.sub_line_height_m | divided_by: 100.0 }};
+      --zh-sub-align: {{ s.sub_align_m }};
+      --zh-sub-mb: {{ s.sub_margin_bottom_m }}px;
+      --zh-sub-max-w: {{ s.sub_max_width_m }}%;
+
+      --zh-cols: {{ s.columns_m }};
+      --zh-grid-gap-x: {{ s.grid_gap_x_m }}px;
+      --zh-grid-gap-y: {{ s.grid_gap_y_m }}px;
+
+      --zh-card-radius: {{ s.card_radius_m }}px;
+      --zh-card-py: {{ s.card_pad_y_m }}px;
+      --zh-card-px: {{ s.card_pad_x_m }}px;
+      --zh-card-min-h: {{ s.card_min_height_m }}px;
+      --zh-card-gap: {{ s.num_gap_m }}px;
+
+      --zh-num-size: {{ s.num_size_m }}px;
+      --zh-num-w: {{ s.num_width_m }}px;
+      --zh-num-shift: {{ s.num_shift_y_m }}px;
+
+      --zh-txt-size: {{ s.step_size_m }}px;
+      --zh-txt-lh: {{ s.step_line_height_m | divided_by: 100.0 }};
+      --zh-txt-align: {{ s.step_align_m }};
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .zhow-{{ section.id }} { --zh-anim: 1ms; }
+  }
+{%- endstyle -%}
+
+<div class="zhow zhow-{{ section.id }}"{% if s.anchor_id != blank %} id="{{ s.anchor_id | handle }}"{% endif %}>
+  <div class="zhow__inner">
+    {%- if s.heading != blank -%}
+      <{{ s.heading_tag }} class="zhow__heading">{{ s.heading | newline_to_br }}</{{ s.heading_tag }}>
+    {%- endif -%}
+
+    {%- if s.subheading != blank -%}
+      <div class="zhow__sub zhow__sub--{{ s.sub_align_d }}">{{ s.subheading }}</div>
+    {%- endif -%}
+
+    <div class="zhow__grid">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign b = block.settings
+
+          # Número: manda el escrito a mano; si no, el orden del bloque.
+          if b.number != blank
+            assign num = b.number
+          else
+            assign num = forloop.index | append: s.num_suffix
+          endif
+        -%}
+
+        {%- if b.link != blank -%}
+          <a class="zhow__card zhow__card--link" href="{{ b.link }}" {{ block.shopify_attributes }}>
+        {%- else -%}
+          <div class="zhow__card" {{ block.shopify_attributes }}>
+        {%- endif -%}
+
+          <div class="zhow__row">
+            {%- if s.show_number and num != blank -%}
+              <div class="zhow__num" aria-hidden="true">{{ num }}</div>
+            {%- endif -%}
+
+            {%- if b.text != blank -%}
+              <div class="zhow__text">{{ b.text }}</div>
+            {%- endif -%}
+          </div>
+
+        {%- if b.link != blank -%}
+          </a>
+        {%- else -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Cómo se usa (pasos)",
+  "tag": "section",
+  "class": "section-zhow",
+  "max_blocks": 12,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Título y subtítulo"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Título",
+      "info": "Enter para salto de línea. Envuelve una palabra en <em>así</em> para el acento.",
+      "default": "¿Cómo uso ZZEN Sleep?"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Etiqueta HTML del título (SEO)",
+      "options": [
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "div", "label": "div (sin peso SEO)" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "richtext",
+      "id": "subheading",
+      "label": "Subtítulo",
+      "default": "<p>Recomendamos usarlo como un ritual diario para resultados óptimos y duraderos.</p>"
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "ID de anclaje (opcional)",
+      "info": "Para enlazar desde un botón: #mi-id",
+      "default": "como-se-usa"
+    },
+
+    {
+      "type": "header",
+      "content": "Diseño general"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Color de fondo",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "mobile_breakpoint",
+      "min": 480,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "label": "Punto de cambio a móvil",
+      "default": 750
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 0,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "label": "Ancho máximo del contenido",
+      "info": "0 = ancho completo.",
+      "default": 1300
+    },
+    {
+      "type": "range",
+      "id": "transition_ms",
+      "min": 0,
+      "max": 900,
+      "step": 25,
+      "unit": "ms",
+      "label": "Duración de las transiciones",
+      "default": 250
+    },
+    {
+      "type": "range",
+      "id": "padding_top_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding superior — PC",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding inferior — PC",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_left_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding izquierdo — PC",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_right_d",
+      "min": 0,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding derecho — PC",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_top_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding superior — Móvil",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_m",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding inferior — Móvil",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_left_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding izquierdo — Móvil",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_right_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding derecho — Móvil",
+      "default": 20
+    },
+
+    {
+      "type": "header",
+      "content": "Rejilla de tarjetas"
+    },
+    {
+      "type": "range",
+      "id": "columns_d",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "label": "Columnas — PC",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "columns_m",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "label": "Columnas — Móvil",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "grid_gap_x_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación horizontal — PC",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "grid_gap_y_d",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación vertical — PC",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "grid_gap_x_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación horizontal — Móvil",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "grid_gap_y_m",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Separación vertical — Móvil",
+      "default": 12
+    },
+
+    {
+      "type": "header",
+      "content": "Tarjeta"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Fondo de la tarjeta",
+      "default": "#00000000"
+    },
+    {
+      "type": "color",
+      "id": "card_border_color",
+      "label": "Color del borde",
+      "default": "#3d3d3d"
+    },
+    {
+      "type": "range",
+      "id": "card_border_width",
+      "min": 0,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "label": "Grosor del borde",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "card_radius_d",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo — PC",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "card_radius_m",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Redondeo — Móvil",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "card_pad_y_d",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen interior arriba y abajo — PC",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "card_pad_x_d",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen interior lateral — PC",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "card_pad_y_m",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen interior arriba y abajo — Móvil",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "card_pad_x_m",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "label": "Margen interior lateral — Móvil",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "card_min_height_d",
+      "min": 0,
+      "max": 400,
+      "step": 5,
+      "unit": "px",
+      "label": "Alto mínimo — PC",
+      "default": 150
+    },
+    {
+      "type": "range",
+      "id": "card_min_height_m",
+      "min": 0,
+      "max": 300,
+      "step": 5,
+      "unit": "px",
+      "label": "Alto mínimo — Móvil",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "content_align_v",
+      "label": "Posición vertical del contenido en la tarjeta",
+      "options": [
+        { "value": "top", "label": "Arriba" },
+        { "value": "center", "label": "Centro" },
+        { "value": "bottom", "label": "Abajo" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "color",
+      "id": "card_shadow_color",
+      "label": "Color de la sombra",
+      "default": "#00000000"
+    },
+    {
+      "type": "range",
+      "id": "card_shadow_size",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Desplazamiento de la sombra",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "card_shadow_blur",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Difuminado de la sombra",
+      "default": 0
+    },
+
+    {
+      "type": "header",
+      "content": "Número"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_number",
+      "label": "Mostrar el número",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "num_suffix",
+      "label": "Sufijo del número automático",
+      "info": "Se añade detrás del 1, 2, 3… Déjalo vacío para números sin punto.",
+      "default": "."
+    },
+    {
+      "type": "select",
+      "id": "num_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "thin2"
+    },
+    {
+      "type": "text",
+      "id": "num_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'thin2', serif"
+    },
+    {
+      "type": "select",
+      "id": "num_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "checkbox",
+      "id": "num_italic",
+      "label": "Número en cursiva",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "num_color",
+      "label": "Color",
+      "default": "#e6e6e6"
+    },
+    {
+      "type": "range",
+      "id": "num_size_d",
+      "min": 20,
+      "max": 120,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 46
+    },
+    {
+      "type": "range",
+      "id": "num_size_m",
+      "min": 14,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 38
+    },
+    {
+      "type": "range",
+      "id": "num_line_height",
+      "min": 80,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "num_width_d",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "label": "Ancho reservado — PC",
+      "info": "Mantiene el texto alineado aunque el número tenga dos cifras.",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "num_width_m",
+      "min": 0,
+      "max": 140,
+      "step": 2,
+      "unit": "px",
+      "label": "Ancho reservado — Móvil",
+      "default": 36
+    },
+    {
+      "type": "select",
+      "id": "num_align_h",
+      "label": "Alineación horizontal del número",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "num_align_v",
+      "label": "Posición vertical del número",
+      "options": [
+        { "value": "top", "label": "Arriba" },
+        { "value": "center", "label": "Centro" },
+        { "value": "bottom", "label": "Abajo" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "num_gap_d",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación número / texto — PC",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "num_gap_m",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Separación número / texto — Móvil",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "num_shift_y_d",
+      "min": -30,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Ajuste vertical fino — PC",
+      "info": "Para alinear la cifra a ojo con la primera línea del texto.",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "num_shift_y_m",
+      "min": -30,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Ajuste vertical fino — Móvil",
+      "default": 3
+    },
+
+    {
+      "type": "header",
+      "content": "Texto de los pasos"
+    },
+    {
+      "type": "select",
+      "id": "body_font",
+      "label": "Fuente del subtítulo y de los pasos",
+      "options": [
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "helvetica"
+    },
+    {
+      "type": "text",
+      "id": "body_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'Helvetica neue', sans-serif"
+    },
+    {
+      "type": "select",
+      "id": "step_weight",
+      "label": "Grosor del texto normal",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "step_color",
+      "label": "Color del texto normal",
+      "default": "#b5b5b5"
+    },
+    {
+      "type": "select",
+      "id": "strong_weight",
+      "label": "Grosor del texto resaltado (negrita)",
+      "options": [
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "700"
+    },
+    {
+      "type": "color",
+      "id": "strong_color",
+      "label": "Color del texto resaltado",
+      "info": "Es lo que escribas en negrita dentro del paso.",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "step_size_d",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "step_size_m",
+      "min": 9,
+      "max": 26,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "step_line_height_d",
+      "min": 100,
+      "max": 240,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado — PC",
+      "default": 150
+    },
+    {
+      "type": "range",
+      "id": "step_line_height_m",
+      "min": 100,
+      "max": 240,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado — Móvil",
+      "default": 150
+    },
+    {
+      "type": "range",
+      "id": "step_letter_spacing",
+      "min": -1,
+      "max": 3,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "step_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "step_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía del título"
+    },
+    {
+      "type": "select",
+      "id": "heading_font",
+      "label": "Fuente",
+      "options": [
+        { "value": "thin2", "label": "thin2 (Lawrence)" },
+        { "value": "helvetica", "label": "Helvetica neue" },
+        { "value": "theme_heading", "label": "Títulos del tema" },
+        { "value": "theme_body", "label": "Cuerpo del tema" },
+        { "value": "custom", "label": "Personalizada (abajo)" }
+      ],
+      "default": "thin2"
+    },
+    {
+      "type": "text",
+      "id": "heading_font_custom",
+      "label": "Font-family personalizada",
+      "default": "'thin2', serif"
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" },
+        { "value": "700", "label": "700" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "em_color",
+      "label": "Color del acento <em>",
+      "default": "#ffffff"
+    },
+    {
+      "type": "checkbox",
+      "id": "em_italic",
+      "label": "Acento <em> en cursiva",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "heading_size_d",
+      "min": 18,
+      "max": 110,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 52
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_d",
+      "min": 80,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado — PC",
+      "default": 115
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing_d",
+      "min": -3,
+      "max": 6,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "heading_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_d",
+      "min": 0,
+      "max": 140,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — PC",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "heading_size_m",
+      "min": 14,
+      "max": 70,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height_m",
+      "min": 80,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado — Móvil",
+      "default": 115
+    },
+    {
+      "type": "select",
+      "id": "heading_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "heading_margin_bottom_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — Móvil",
+      "default": 16
+    },
+
+    {
+      "type": "header",
+      "content": "Tipografía del subtítulo"
+    },
+    {
+      "type": "select",
+      "id": "sub_weight",
+      "label": "Grosor",
+      "options": [
+        { "value": "300", "label": "300" },
+        { "value": "400", "label": "400 (normal)" },
+        { "value": "500", "label": "500" },
+        { "value": "600", "label": "600" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "color",
+      "id": "sub_color",
+      "label": "Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "sub_size_d",
+      "min": 10,
+      "max": 34,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — PC",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "sub_size_m",
+      "min": 9,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "label": "Tamaño — Móvil",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "sub_line_height_d",
+      "min": 100,
+      "max": 240,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado — PC",
+      "default": 150
+    },
+    {
+      "type": "range",
+      "id": "sub_line_height_m",
+      "min": 100,
+      "max": 240,
+      "step": 5,
+      "unit": "%",
+      "label": "Interlineado — Móvil",
+      "default": 145
+    },
+    {
+      "type": "range",
+      "id": "sub_letter_spacing",
+      "min": -1,
+      "max": 3,
+      "step": 0.1,
+      "unit": "px",
+      "label": "Espaciado entre letras",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "sub_align_d",
+      "label": "Alineación — PC",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "sub_align_m",
+      "label": "Alineación — Móvil",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "sub_max_width_d",
+      "min": 30,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho máximo — PC",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "sub_max_width_m",
+      "min": 30,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "Ancho máximo — Móvil",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "sub_margin_bottom_d",
+      "min": 0,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — PC",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "sub_margin_bottom_m",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Margen inferior — Móvil",
+      "default": 20
+    }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Paso",
+      "settings": [
+        {
+          "type": "text",
+          "id": "number",
+          "label": "Número",
+          "info": "Déjalo vacío para que se numere solo según el orden de los bloques."
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Texto del paso",
+          "info": "Pon en negrita la parte que quieras destacar en blanco.",
+          "default": "<p><strong>Pausa un momento</strong> y haz 3 respiraciones profundas para relajarte y descansar.</p>"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Enlace de la tarjeta (opcional)"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cómo se usa (pasos)",
+      "blocks": [
+        { "type": "step" },
+        {
+          "type": "step",
+          "settings": {
+            "text": "<p>Toma 2 cápsulas con agua y preferiblemente <strong>después de cenar</strong> (no es necesario).</p>"
+          }
+        },
+        {
+          "type": "step",
+          "settings": {
+            "text": "<p><strong>Disfruta</strong> de la relajación y un mejor descanso para rendir más con este suplemento para dormir.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
