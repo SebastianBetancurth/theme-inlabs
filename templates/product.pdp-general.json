@@ -1011,29 +1011,29 @@
         "benefit_wDdBwE": {
           "type": "benefit",
           "settings": {
-            "title": "Título del beneficio",
-            "text": "<p>Descripción corta del beneficio.</p>"
+            "title": "BAJA EL RITMO",
+            "text": "<p><strong>Deja el día atrás<br/></strong>Acompaña tu rutina nocturna y ese momento en el que necesitas dejar de pensar en todo y empezar a desconectarte.</p>"
           }
         },
         "benefit_PKmKcx": {
           "type": "benefit",
           "settings": {
-            "title": "Título del beneficio",
-            "text": "<p>Descripción corta del beneficio.</p>"
+            "title": "DESCANSA DE VERDAD",
+            "text": "<p><strong>No solo se trata de dormir</strong></p><p>Favorece un descanso de mayor calidad para que tus horas de sueño realmente se sientan como descanso.</p>"
           }
         },
         "benefit_Jai9rm": {
           "type": "benefit",
           "settings": {
-            "title": "Título del beneficio",
-            "text": "<p>Descripción corta del beneficio.</p>"
+            "title": "RECUPÉRATE",
+            "text": "<p><strong>La noche también cuenta</strong></p><p>El descanso es parte de tu recuperación. Dale a tu cuerpo el espacio que necesita para prepararse para un nuevo día.</p>"
           }
         },
         "benefit_NUP3cn": {
           "type": "benefit",
           "settings": {
-            "title": "Título del beneficio",
-            "text": "<p>Descripción corta del beneficio.</p>"
+            "title": "DESPIERTA MEJOR",
+            "text": "<p><strong>La diferencia también se nota en la mañana</strong></p><p>Porque el objetivo no es simplemente dormir. Es despertar sintiéndote descansado y listo para empezar el día.</p>"
           }
         }
       },
@@ -1053,8 +1053,8 @@
         "heading_font": "sans_serif_n4",
         "text_font_mode": "custom",
         "text_font": "sans_serif_n4",
-        "heading": "Potencia tu productividad",
-        "intro": "<p>Una fórmula <strong>natural</strong>, equilibrada con ingredientes respaldados por la ciencia.</p>",
+        "heading": "Haz que tus noches cuenten",
+        "intro": "<p><strong>IN SLEEP</strong> está pensado para acompañarte desde que decides bajar el ritmo hasta que empieza un nuevo día. Una fórmula para desconectarte, descansar mejor y hacer de la noche un verdadero momento de recuperación.</p>",
         "heading_size": 52,
         "intro_size": 17,
         "item_title_size": 20,
