@@ -520,11 +520,11 @@
         "zzen_reveal_HJabEA": {
           "type": "zzen_reveal",
           "settings": {
-            "title": "Con cada pedido <strong>regalamos el NUEVO ZZEN Challenge</strong>",
-            "subtitle": "Un método para acompañarte y ayudarte a mantener el compromiso",
-            "text": "<p>El ZZEN Challenge es un tracker mensual de 30 días en el que puedes registrar tus progresos y avances en tus hábitos, propósitos y objetivos.</p>",
+            "title": "Con tu pedido recibe GRATIS<strong>IN SLEEP — 30 Night Reset</strong>",
+            "subtitle": "30 noches para mejorar tu rutina, entender tu descanso y despertar mejor.",
+            "text": "",
             "image": "shopify://shop_images/12-Es_b29f6fb3-6229-47d4-b83c-297f884d3c62.webp",
-            "image_link": "shopify://products/modo-zzen",
+            "image_link": "shopify://products/zzen-calm",
             "open_by_default": false,
             "duration": 380,
             "easing": "ease_out",
@@ -602,6 +602,7 @@
         },
         "zzen_videos_V49XLA": {
           "type": "zzen_videos",
+          "disabled": true,
           "settings": {
             "video_1": "shopify://files/videos/f45282790d5d48fbb88ceb7f32872fca.HD-1080p-7.2Mbps-86930909.mp4",
             "label_1": "",
@@ -1284,7 +1285,7 @@
         "grid_gap_y_d": 20,
         "grid_gap_x_m": 12,
         "grid_gap_y_m": 12,
-        "card_bg": "#00000000",
+        "card_bg": "rgba(0,0,0,0)",
         "card_border_color": "#3d3d3d",
         "card_border_width": 1,
         "card_radius_d": 14,
@@ -1296,7 +1297,7 @@
         "card_min_height_d": 150,
         "card_min_height_m": 0,
         "content_align_v": "center",
-        "card_shadow_color": "#00000000",
+        "card_shadow_color": "rgba(0,0,0,0)",
         "card_shadow_size": 0,
         "card_shadow_blur": 0,
         "show_number": true,
