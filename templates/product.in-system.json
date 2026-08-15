@@ -1006,33 +1006,33 @@
         "stage_ndCkbX": {
           "type": "stage",
           "settings": {
-            "pill": "Semana 1",
-            "title": "Notas que algo empieza a cambiar",
-            "text": "<p>Empiezas los días con un poco más de energía. Te cuesta menos concentrarte y por la noche tu cuerpo se relaja antes. Tu cuerpo empieza a sentir un cambio.</p>"
+            "pill": "SEMANA 1",
+            "title": "Empiezas a crear tu ritmo",
+            "text": "<p>Empiezas a integrar FOCUS, CALM y SLEEP en distintos momentos de tu día. El objetivo es simple: darle a cada momento lo que necesita.</p>"
           }
         },
         "stage_XVaBi3": {
           "type": "stage",
           "settings": {
-            "pill": "Semana 1",
-            "title": "Notas que algo empieza a cambiar",
-            "text": "<p>Describe aquí qué nota la persona en esta etapa.</p>"
+            "pill": "SEMANA 2",
+            "title": "Tu rutina empieza a tomar forma",
+            "text": "<p>Identificas mejor cuándo necesitas concentrarte, cuándo bajar revoluciones y cuándo es momento de desconectarte por completo.</p>"
           }
         },
         "stage_AEq6V9": {
           "type": "stage",
           "settings": {
-            "pill": "Semana 1",
-            "title": "Notas que algo empieza a cambiar",
-            "text": "<p>Describe aquí qué nota la persona en esta etapa.</p>"
+            "pill": "SEMANA 3",
+            "title": "<strong>Todo empieza a conectar</strong>",
+            "text": "<p>Enfoque, calma y descanso dejan de sentirse como cosas separadas. Empiezas a construir una rutina más equilibrada de principio a fin.</p>"
           }
         },
         "stage_Ac6EfW": {
           "type": "stage",
           "settings": {
-            "pill": "Semana 1",
-            "title": "Notas que algo empieza a cambiar",
-            "text": "<p>Describe aquí qué nota la persona en esta etapa.</p>"
+            "pill": "SEMANA 4",
+            "title": "<strong>Ya es parte de tu d[ia</strong>",
+            "text": "<p>IN SYSTEM se integra en tu rutina para acompañarte en cada momento: rendir cuando toca, bajar el ritmo cuando lo necesitas y recuperarte para volver a empezar.</p><p><strong>FOCUS. CALM. SLEEP. REPEAT.</strong></p>"
           }
         }
       },
@@ -1046,7 +1046,7 @@
       "settings": {
         "heading": "El poder de la constancia",
         "heading_tag": "h2",
-        "intro": "<p>Gracias a su efecto acumulativo, los beneficios van incrementando con el <strong>consumo diario</strong> sostenido en el tiempo</p>",
+        "intro": "<p>IN SYSTEM está pensado para acompañarte todos los días: enfoque cuando necesitas rendir, calma cuando necesitas bajar el ritmo y descanso cuando llega el momento de recuperar.</p>",
         "image": "shopify://shop_images/Modo_ZZEN.webp",
         "show_placeholder": true,
         "item_title_tag": "h3",
@@ -1147,29 +1147,46 @@
         "stat_VAqzd9": {
           "type": "stat",
           "settings": {
-            "number": "+25% de productividad",
-            "description": "Los usuarios muestran una mejora del 25% en productividad y desempeño cognitivo tras un mes de uso.",
+            "number": "Resultados que hablan por sí solos",
+            "description": "Personas que integraron IN SYSTEM de forma constante en su rutina reportaron cambios en diferentes momentos de su día.",
             "wide": true
           }
         },
         "stat_QAhQGn": {
           "type": "stat",
           "settings": {
-            "number": "96%",
-            "description": "De los usuarios reportan una mejora notable en su concentración tras 2 semanas de uso.",
+            "number": "35%",
+            "description": "<strong>Más enfoque durante el día      </strong>Reportó sentirse más enfocado y con mayor facilidad para mantener la concentración.",
             "wide": false
           }
         },
         "stat_ifEhEH": {
           "type": "stat",
           "settings": {
+            "number": "95%",
+            "description": "<strong>Más calma  </strong>Reportó sentirse más tranquilo y con mejor manejo del estrés cotidiano.",
+            "wide": false
+          }
+        },
+        "stat_iA3XRX": {
+          "type": "stat",
+          "settings": {
             "number": "89%",
-            "description": "Profesionales experimentaron menos estrés y ansiedad en su rutina diaria.",
+            "description": "<strong>Mejor descanso   </strong>Reportó una mejora en la calidad de su descanso y en cómo se sentía al despertar.",
+            "wide": false
+          }
+        },
+        "stat_h9PtF4": {
+          "type": "stat",
+          "settings": {
+            "number": "25%",
+            "description": "<strong>Lo volvería parte de su rutina  </strong>Consideró que IN SYSTEM es una herramienta que seguiría integrando en su día a día.",
             "wide": false
           }
         },
         "circle_af798m": {
           "type": "circle",
+          "disabled": true,
           "settings": {
             "number": "9/10",
             "label": "Menos fatiga"
@@ -1177,6 +1194,7 @@
         },
         "circle_aV6bBH": {
           "type": "circle",
+          "disabled": true,
           "settings": {
             "number": "+40'",
             "label": "Sueño profundo"
@@ -1187,14 +1205,16 @@
         "stat_VAqzd9",
         "stat_QAhQGn",
         "stat_ifEhEH",
+        "stat_iA3XRX",
+        "stat_h9PtF4",
         "circle_af798m",
         "circle_aV6bBH"
       ],
       "name": "Resultados con contadores",
       "settings": {
-        "heading": "Resultados de nuestras encuestas",
-        "text": "<p>Todos nuestros productos se desarrollan y evalúan siguiendo protocolos de observación real.<br/>Las cifras que ves son resultados de personas que, como tú, buscan claridad y equilibrio cada día.</p>",
-        "footnote": "*Basado en resultados reportados por usuarios reales tras un uso continuado de nuestras fórmulas.",
+        "heading": "<em>Resultados basados en encuestas </em>",
+        "text": "",
+        "footnote": "*<em>Realizadas a usuarios de IN SYSTEM. La experiencia puede variar de persona a persona.</em>",
         "text_left": false,
         "bg_image": "shopify://shop_images/bg-deskto-estudios.jpg",
         "count_duration": 1200,
@@ -1234,10 +1254,10 @@
         "row_Dm7YEz": {
           "type": "row",
           "settings": {
-            "label": "Claridad Mental",
+            "label": "Enfoque y concentración",
             "val_1": "Sí",
-            "val_2": "Sí",
-            "val_3": "Si",
+            "val_2": "X",
+            "val_3": "X",
             "val_4": "Sí",
             "val_5": ""
           }
@@ -1245,10 +1265,10 @@
         "row_HWiTnU": {
           "type": "row",
           "settings": {
-            "label": "Claridad Mental",
+            "label": "Energía y rendimiento",
             "val_1": "Sí",
             "val_2": "X",
-            "val_3": "Si",
+            "val_3": "X",
             "val_4": "Sí",
             "val_5": ""
           }
@@ -1256,10 +1276,10 @@
         "row_7bEwjU": {
           "type": "row",
           "settings": {
-            "label": "Claridad Mental",
-            "val_1": "Sí",
-            "val_2": "X",
-            "val_3": "Si",
+            "label": "Calma y manejo del estrés",
+            "val_1": "X",
+            "val_2": "SI",
+            "val_3": "X",
             "val_4": "Sí",
             "val_5": ""
           }
@@ -1267,9 +1287,9 @@
         "row_a4W3NL": {
           "type": "row",
           "settings": {
-            "label": "Claridad Mental",
-            "val_1": "Sí",
-            "val_2": "Sí",
+            "label": "Descanso y recuperación",
+            "val_1": "X",
+            "val_2": "X",
             "val_3": "Si",
             "val_4": "Sí",
             "val_5": ""
@@ -1278,10 +1298,10 @@
         "row_ym4Amx": {
           "type": "row",
           "settings": {
-            "label": "Claridad Mental",
-            "val_1": "Sí",
-            "val_2": "Sí",
-            "val_3": "Si",
+            "label": "Apoyo durante todo el día",
+            "val_1": "X",
+            "val_2": "X",
+            "val_3": "X",
             "val_4": "Sí",
             "val_5": ""
           }
@@ -1296,17 +1316,17 @@
       ],
       "name": "Tabla comparativa",
       "settings": {
-        "heading": "La <em>sinergia</em> de\nlas fórmulas",
+        "heading": "Todo está conectado",
         "heading_tag": "h2",
-        "lead": "<p>El estrés afecta al sueño. La falta de sueño afecta a la atención. Y sin claridad mental, cualquier esfuerzo cuesta el doble.</p><p>Por eso diseñamos este sistema: para trabajar las tres piezas al mismo tiempo.</p><p>En esta tabla puedes ver cómo se refuerzan <strong>entre sí:</strong></p>",
+        "lead": "<p>Cómo rindes durante el día influye en cómo llegas a la noche. El estrés afecta tu descanso. Y descansar mal hace más difícil concentrarte al día siguiente.</p><p>Por eso existe <strong>IN SYSTEM</strong>: tres fórmulas pensadas para acompañarte en diferentes momentos de tu día y trabajar como parte de un mismo sistema.</p><p><strong>FOCUS. CALM. SLEEP.</strong></p><p>Cada uno tiene su función. Juntos completan el sistema.</p>",
         "first_col_label": "BENEFICIOS",
-        "col_1": "FOCUS",
+        "col_1": "IN FOCUS",
         "col_1_mobile": false,
-        "col_2": "CALM",
+        "col_2": "IN CALM",
         "col_2_mobile": false,
-        "col_3": "SLEEP",
+        "col_3": "IN SLEEP",
         "col_3_mobile": false,
-        "col_4": "MODO ZZEN",
+        "col_4": "IN SYSTEM",
         "col_4_mobile": true,
         "col_5": "",
         "col_5_mobile": false,
