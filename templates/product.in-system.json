@@ -520,7 +520,7 @@
         "zzen_reveal_HJabEA": {
           "type": "zzen_reveal",
           "settings": {
-            "title": "Con cada pedido <strong>regalamos el NUEVO ZZEN Challenge</strong>",
+            "title": "Con cada pedido <strong>regalamos el NUEVO IN SYSTEM</strong>",
             "subtitle": "Un método para acompañarte y ayudarte a mantener el compromiso",
             "text": "<p>El ZZEN Challenge es un tracker mensual de 30 días en el que puedes registrar tus progresos y avances en tus hábitos, propósitos y objetivos.</p>",
             "image": "shopify://shop_images/12-Es_b29f6fb3-6229-47d4-b83c-297f884d3c62.webp",
@@ -602,6 +602,7 @@
         },
         "zzen_videos_V49XLA": {
           "type": "zzen_videos",
+          "disabled": true,
           "settings": {
             "video_1": "shopify://files/videos/f45282790d5d48fbb88ceb7f32872fca.HD-1080p-7.2Mbps-86930909.mp4",
             "label_1": "",
