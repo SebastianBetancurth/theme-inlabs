@@ -93,48 +93,32 @@
         "pill_zCwTdi": {
           "type": "pill",
           "settings": {
-            "label": "MODO ZZEN",
-            "product": "modo-zzen",
+            "label": "IN FOCUS",
+            "product": "zzen-focus",
             "custom_link": ""
           }
         },
         "pill_8A7LLX": {
           "type": "pill",
           "settings": {
-            "label": "FOCUS",
+            "label": "IN SLEEP",
             "product": "zzen-calm",
-            "custom_link": ""
-          }
-        },
-        "pill_rycf7x": {
-          "type": "pill",
-          "settings": {
-            "label": "CALM",
-            "product": "zzen-focus",
             "custom_link": ""
           }
         },
         "pill_7VLNae": {
           "type": "pill",
           "settings": {
-            "label": "SLEEP",
+            "label": "IN CALM",
             "product": "modo-zzen",
             "custom_link": ""
           }
         },
-        "pill_nxx49B": {
+        "pill_rycf7x": {
           "type": "pill",
           "settings": {
-            "label": "MAGNESIUM 7+",
-            "product": "zzen-calm",
-            "custom_link": ""
-          }
-        },
-        "pill_Yxa6N3": {
-          "type": "pill",
-          "settings": {
-            "label": "OMEGA-3",
-            "product": "zzen-focus",
+            "label": "IN SYSTEM",
+            "product": "in-system",
             "custom_link": ""
           }
         }
@@ -142,15 +126,13 @@
       "block_order": [
         "pill_zCwTdi",
         "pill_8A7LLX",
-        "pill_rycf7x",
         "pill_7VLNae",
-        "pill_nxx49B",
-        "pill_Yxa6N3"
+        "pill_rycf7x"
       ],
       "name": "Pills Slider",
       "settings": {
         "visibility": "mobile",
-        "bg_color": "#0D0D0D",
+        "bg_color": "#0d0d0d",
         "pill_text_color": "#ffffff",
         "pill_border_color": "#868686",
         "pill_active_bg": "#ffffff",
