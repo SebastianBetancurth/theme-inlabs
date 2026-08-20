@@ -1088,91 +1088,67 @@
         "ingredient_YYyHDX": {
           "type": "ingredient",
           "settings": {
-            "tab": "Focus",
-            "title": "Ingrediente",
-            "dosage": "100mg",
-            "description": "<p>Describí aquí el ingrediente, su función y en qué alimentos está presente.</p>",
-            "benefits": "Contribuye al metabolismo energético\nAyuda a reducir el cansancio\nApoya el sistema inmunitario\nFavorece la función psicológica normal"
+            "tab": "MAGNESIO",
+            "image": "shopify://shop_images/ChatGPT_Image_19_ago_2026_09_00_46.png",
+            "title": "MAGNESIO",
+            "dosage": "100MG",
+            "description": "<p>Mineral esencial que participa en cientos de procesos del cuerpo. En IN SLEEP forma parte de nuestra fórmula nocturna para apoyar el funcionamiento del sistema nervioso, la función muscular y la recuperación.</p>",
+            "benefits": "Apoya el funcionamiento normal del sistema nervioso\nContribuye a la función muscular normal\nAyuda a reducir el cansancio y la fatiga\nContribuye al metabolismo energético"
           }
         },
         "ingredient_36RRf7": {
           "type": "ingredient",
           "settings": {
-            "tab": "Magnesium +´7",
-            "title": "Ingrediente",
-            "dosage": "100mg",
-            "description": "<p>Describí aquí el ingrediente, su función y en qué alimentos está presente.</p>",
-            "benefits": "Contribuye al metabolismo energético\nAyuda a reducir el cansancio\nApoya el sistema inmunitario\nFavorece la función psicológica normal"
+            "tab": "L-TEANINA",
+            "image": "shopify://shop_images/ChatGPT_Image_19_ago_2026_09_01_47.png",
+            "title": "L-TEANINA",
+            "dosage": "200MG",
+            "description": "<p>Aminoácido presente de forma natural en las hojas de té. En IN SLEEP forma parte de nuestra fórmula nocturna, pensada para acompañar ese momento en el que necesitas bajar el ritmo, desconectarte del día y prepararte para descansar.</p>",
+            "benefits": "Acompaña la relajación sin buscar sedarte\nAyuda a crear un estado de calma antes de dormir\nComplementa tu rutina de desconexión nocturna\nTrabaja en conjunto con el resto de la fórmula de IN SLEEP"
           }
         },
         "ingredient_xCnwGA": {
           "type": "ingredient",
           "settings": {
-            "tab": "Omega 3",
-            "title": "Ingrediente",
-            "dosage": "100mg",
-            "description": "<p>Describí aquí el ingrediente, su función y en qué alimentos está presente.</p>",
-            "benefits": "Contribuye al metabolismo energético\nAyuda a reducir el cansancio\nApoya el sistema inmunitario\nFavorece la función psicológica normal"
+            "tab": "GABA",
+            "image": "shopify://shop_images/ChatGPT_Image_19_ago_2026_09_02_50_1.png",
+            "title": "GABA",
+            "dosage": "100MG",
+            "description": "<p>Neurotransmisor presente de forma natural en el organismo y relacionado con la regulación de la actividad del sistema nervioso. En IN SLEEP forma parte de nuestra fórmula nocturna, pensada para acompañarte cuando necesitas bajar revoluciones y prepararte para descansar.</p>",
+            "benefits": "Neurotransmisor presente naturalmente en el organismo\nRelacionado con la regulación de la actividad neuronal\nAsociado a estados de relajación y calma\nVinculado al equilibrio entre estimulación y relajación del sistema nervioso"
+          }
+        },
+        "ingredient_Y6hLkz": {
+          "type": "ingredient",
+          "settings": {
+            "tab": "MELISSA OFFICIALIS",
+            "image": "shopify://shop_images/Lemon-balm-2024.jpg",
+            "title": "MELISSA OFFICIALIS",
+            "dosage": "100MG",
+            "description": "<p>Extracto botánico obtenido de la melisa, una planta tradicionalmente utilizada en rutinas de relajación y descanso. En IN SLEEP complementa nuestra fórmula nocturna para acompañarte al momento de bajar el ritmo y desconectarte del día.</p>",
+            "benefits": "Tradicionalmente utilizada para favorecer la relajación\nAsociada al bienestar mental y la sensación de calma\nUtilizada tradicionalmente como apoyo para el descanso\nExtracto botánico de origen vegetal"
+          }
+        },
+        "ingredient_HNWHRM": {
+          "type": "ingredient",
+          "settings": {
+            "tab": "VITAMINA B6",
+            "image": "shopify://shop_images/ChatGPT_Image_19_ago_2026_09_06_20.png",
+            "title": "VITAMINA B6",
+            "dosage": "100MG",
+            "description": "<p>Vitamina esencial que participa en múltiples procesos del organismo. En IN SLEEP complementa la fórmula apoyando el funcionamiento normal del sistema nervioso y el metabolismo energético.</p>",
+            "benefits": "Contribuye al funcionamiento normal del sistema nervioso\nAyuda a reducir el cansancio y la fatiga\nContribuye al metabolismo energético normal\nParticipa en la regulación de la actividad hormonal"
           }
         },
         "ingredient_47wqpV": {
           "type": "ingredient",
           "settings": {
-            "tab": "Focus",
-            "title": "Bacopa Monieri",
-            "dosage": "300MG",
-            "description": "",
-            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
-          }
-        },
-        "ingredient_7Jfqe8": {
-          "type": "ingredient",
-          "settings": {
-            "tab": "Focus",
-            "title": "Rhodiola rosea",
-            "dosage": "200mg",
-            "description": "",
-            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
-          }
-        },
-        "ingredient_7ry86E": {
-          "type": "ingredient",
-          "settings": {
-            "tab": "Focus",
-            "title": "Cafeína",
-            "dosage": "120MG",
-            "description": "",
-            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
-          }
-        },
-        "ingredient_FzDynU": {
-          "type": "ingredient",
-          "settings": {
-            "tab": "Focus",
-            "title": "L-teanina",
-            "dosage": "120mg",
-            "description": "",
-            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
-          }
-        },
-        "ingredient_qqELT8": {
-          "type": "ingredient",
-          "settings": {
-            "tab": "Calm",
-            "title": "Ashwagandha",
-            "dosage": "300mg",
-            "description": "",
-            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
-          }
-        },
-        "ingredient_bhnWTy": {
-          "type": "ingredient",
-          "settings": {
-            "tab": "Sleep",
-            "title": "Melatonina",
-            "dosage": "1,9mg",
-            "description": "",
-            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
+            "tab": "MELATONINA",
+            "image": "shopify://shop_images/ChatGPT_Image_19_ago_2026_09_07_45.png",
+            "title": "MELATONINA",
+            "dosage": "1MG",
+            "description": "<p>Hormona que el cuerpo produce de forma natural y que participa en la regulación del ciclo de sueño-vigilia. En IN SLEEP forma parte de una fórmula completa pensada para apoyar tu rutina nocturna y preparar al cuerpo para el descanso.</p>",
+            "benefits": "Participa en la regulación del ciclo natural de sueño-vigilia\nAyuda a señalarle al cuerpo que es momento de descansar\nEstá relacionada con nuestro reloj biológico\nSu producción natural aumenta cuando disminuye la luz"
           }
         }
       },
@@ -1180,12 +1156,9 @@
         "ingredient_YYyHDX",
         "ingredient_36RRf7",
         "ingredient_xCnwGA",
-        "ingredient_47wqpV",
-        "ingredient_7Jfqe8",
-        "ingredient_7ry86E",
-        "ingredient_FzDynU",
-        "ingredient_qqELT8",
-        "ingredient_bhnWTy"
+        "ingredient_Y6hLkz",
+        "ingredient_HNWHRM",
+        "ingredient_47wqpV"
       ],
       "custom_css": [
         "{margin-top: 20px;}"
@@ -1263,7 +1236,7 @@
       ],
       "name": "Cómo se usa (pasos)",
       "settings": {
-        "heading": "¿Cómo uso ZZEN Sleep?",
+        "heading": "¿Cómo uso IN SLEEP?",
         "heading_tag": "h2",
         "subheading": "<p>Recomendamos usarlo como un ritual diario para resultados óptimos y duraderos.</p>",
         "anchor_id": "como-se-usa",
