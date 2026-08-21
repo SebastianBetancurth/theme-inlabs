@@ -1826,36 +1826,50 @@
         "faq_hHgT8q": {
           "type": "faq",
           "settings": {
-            "question": "¿Qué diferencia a ZZEN de otras marcas?",
-            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+            "question": "¿CÓMO ENCAJA IN SYSTEM EN TU DÍA?",
+            "answer": "<p>IN SYSTEM acompaña los tres momentos clave de tu día: <strong>IN FOCUS por la mañana, IN CALM durante el día e IN SLEEP antes de dormir.</strong> Sigue siempre la dosis indicada en la etiqueta de cada producto.</p>"
           }
         },
         "faq_jqAzpA": {
           "type": "faq",
           "settings": {
-            "question": "¿Las fórmulas generan dependencia?",
-            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+            "question": "¿HAY CASOS EN LOS QUE NO SE RECOMIENDA?",
+            "answer": "<p>No se recomienda su consumo en menores de edad, durante el embarazo o la lactancia sin indicación de un profesional de la salud. Si tienes alguna condición médica, tomas medicamentos o estás bajo tratamiento, consulta con un profesional antes de consumirlo.</p>"
           }
         },
         "faq_xB6bkK": {
           "type": "faq",
           "settings": {
-            "question": "¿Las dosis son adecuadas?",
-            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+            "question": "¿PUEDES TOMARLO A DIARIO?",
+            "answer": "<p>SI, ya que no está formulado con fármacos ni con el objetivo de generar dependencia. IN SYSTEM combina suplementos pensados para acompañar funciones distintas a lo largo del día: enfoque, manejo del estrés y descanso.<br/><br/>La idea no es que dependas de IN SYSTEM para funcionar, sino <strong>sumarlo a una rutina que ya trabaja a tu favor</strong>: buenos hábitos, descanso, alimentación y movimiento.</p><p><strong>Un apoyo para tu día a día, no una solución de la que tengas que depender. </strong></p>"
           }
         },
         "faq_Bd6NRJ": {
           "type": "faq",
           "settings": {
-            "question": "¿Existen efectos secundarios?",
-            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+            "question": "¿ENCAJA CON TU ALIMENTACIÓN?",
+            "answer": "<p>Dependerá de tus necesidades y restricciones alimentarias. Consulta la información de ingredientes y alérgenos de cada producto antes de consumirlo. Si sigues una dieta por indicación médica, consulta con tu profesional de la salud.</p>"
           }
         },
         "faq_fjX7Eq": {
           "type": "faq",
           "settings": {
-            "question": "¿Cuánto tiempo tarda el envío?",
-            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+            "question": "¿CÓMO CUIDAMOS LA CALIDAD DE CADA FÓRMULA?",
+            "answer": "<p>Trabajamos con **certificaciones y sistemas internacionales de calidad y seguridad alimentaria** aplicables a sus procesos de producción.<br/><br/>Entre las acreditaciones y registros que respaldan sus instalaciones y procesos se encuentran:<br/><br/>- GMP (Good Manufacturing Practices) — buenas prácticas de fabricación.<br/>- SO 9001:2015  — sistema de gestión de calidad.<br/>- iSO 22000:2018 — sistema de gestión de seguridad alimentaria.<br/>- HACCP — análisis de peligros y puntos críticos de control.<br/>- Registro de instalación ante la FDA de Estados Unidos.<br/>- Certificación Halal.</p>"
+          }
+        },
+        "faq_KTAyEa": {
+          "type": "faq",
+          "settings": {
+            "question": "¿POR QUÉ IN SYSTEM Y NO OTRO SUPLEMENTO?",
+            "answer": "<p>No es un suplemento para un solo momento del día. Es un sistema de tres fórmulas diseñadas para acompañar necesidades diferentes: <strong>enfoque cuando necesitas avanzar, equilibrio cuando el día aprieta y descanso cuando toca desconectar.</strong> Tres fórmulas, una sola rutina.</p>"
+          }
+        },
+        "faq_YfqJAB": {
+          "type": "faq",
+          "settings": {
+            "question": "¿PUEDO TOMAR IN SYSTEM JUNTO CON OTROS SUPLEMENTOS O MEDICAMENTOS?",
+            "answer": "<p>Si consumes otros suplementos, revisa sus ingredientes para evitar duplicidades. Si tomas medicamentos o estás bajo algún tratamiento, consulta con un profesional de la salud antes de combinarlo con IN SYSTEM.</p>"
           }
         }
       },
@@ -1864,7 +1878,9 @@
         "faq_jqAzpA",
         "faq_xB6bkK",
         "faq_Bd6NRJ",
-        "faq_fjX7Eq"
+        "faq_fjX7Eq",
+        "faq_KTAyEa",
+        "faq_YfqJAB"
       ],
       "name": "FAQs",
       "settings": {
@@ -1974,9 +1990,9 @@
       ],
       "name": "Texto ampliable",
       "settings": {
-        "heading": "Una rutina diaria para foco, calma y descanso",
+        "heading": "UN SISTEMA PARA RENDIR SIN VIVIR EN MODO SUPERVIVENCIA",
         "heading_tag": "h2",
-        "intro": "<p>Modo ZZEN reúne Focus, Calm y Sleep en una rutina sencilla para quienes quieren ordenar su energía mental, gestionar mejor el estrés y cuidar el descanso sin depender de soluciones sueltas.</p>",
+        "intro": "<p>IN SYSTEM reúne <strong>IN FOCUS, IN CALM e IN SLEEP</strong> en una rutina diaria pensada para acompañarte de la mañana a la noche.</p><p>Porque no todo se arregla con dormir más, tomar otro café o intentar concentrarte a la fuerza. <strong>Cómo rindes, cómo manejas el estrés y cómo descansas está conectado.</strong></p><p>Tres fórmulas. Tres momentos del día. Un mismo sistema.</p><h3>MAÑANA PARA ENFOCARTE. DÍA PARA MANTENERTE. NOCHE PARA RECUPERARTE.</h3><p>IN SYSTEM está pensado para trabajar contigo durante todo el día.</p><p><strong>IN FOCUS</strong> acompaña tus horas de mayor exigencia mental, ayudándote a mantener el foco, la claridad y una energía más estable.</p><p><strong>IN CALM</strong> entra cuando el día empieza a pesar: pendientes, decisiones, trabajo, prisas y esa sensación de tener la cabeza en diez sitios a la vez.</p><p><strong>IN SLEEP</strong> cierra el sistema por la noche, acompañando el momento de bajar revoluciones y preparar cuerpo y mente para descansar.</p><p>No son tres productos elegidos al azar. <strong>Cada uno tiene su momento.</strong></p><h3>PARA LOS QUE TIENEN MUCHO EN LA CABEZA</h3><p>Trabajo. Entrenos. Estudios. Proyectos. Familia. Pendientes. Vida.</p><p>IN SYSTEM nace para quienes quieren hacer muchas cosas, pero no quieren que vivir a mil se convierta en sentirse agotados todo el tiempo.</p><p>No se trata de hacer todavía más.</p><p>Se trata de <strong>tener la cabeza para hacerlo, la calma para sostenerlo y el descanso para volver a empezar mañana.</strong></p><h3>ASÍ ENCAJA IN SYSTEM EN TU DÍA</h3><p><strong>POR LA MAÑANA · IN FOCUS</strong></p><p>Para empezar el día con claridad y entrar en modo trabajo cuando toca.</p><p><strong>DURANTE EL DÍA · IN CALM</strong></p><p>Para acompañarte en los momentos de mayor carga y ayudarte a mantener el equilibrio.</p><p><strong>ANTES DE DORMIR · IN SLEEP</strong></p><p>Para bajar el ritmo, desconectar del día y preparar el descanso.</p><p>Una rutina sencilla que convierte tres fórmulas en <strong>un sistema fácil de seguir todos los días.</strong></p><h3>NO NECESITAS OTRO BOTE. NECESITAS UN SISTEMA.</h3><p>Puedes trabajar el foco por separado. El estrés por separado. El descanso por separado.</p><p>Pero tu cuerpo no funciona por partes.</p><p>Una mala noche puede afectar cómo rindes al día siguiente. Un día de estrés puede hacer más difícil desconectar. Y cuando llevas días funcionando a medias, hasta concentrarte en lo más sencillo cuesta más.</p><p>Por eso IN SYSTEM conecta las tres partes:</p><p><strong>FOCUS para rendir.<br/><br/>CALM para regular.<br/><br/>SLEEP para recuperar.</strong></p><p>Y mañana, vuelta a empezar.</p>",
         "collapse_mode": "clamp",
         "clamp_height_d": 40,
         "clamp_height_m": 40,
