@@ -1007,7 +1007,7 @@
           "type": "stage",
           "settings": {
             "pill": "SEMANA 1",
-            "title": "Empiezas a crear tu ritmo",
+            "title": "<strong>Empiezas a crear tu ritmo</strong>",
             "text": "<p>Empiezas a integrar FOCUS, CALM y SLEEP en distintos momentos de tu día. El objetivo es simple: darle a cada momento lo que necesita.</p>"
           }
         },
@@ -1015,7 +1015,7 @@
           "type": "stage",
           "settings": {
             "pill": "SEMANA 2",
-            "title": "Tu rutina empieza a tomar forma",
+            "title": "<strong>Tu rutina empieza a tomar forma</strong>",
             "text": "<p>Identificas mejor cuándo necesitas concentrarte, cuándo bajar revoluciones y cuándo es momento de desconectarte por completo.</p>"
           }
         },
