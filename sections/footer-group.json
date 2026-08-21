@@ -17,8 +17,8 @@
         "text_t83Ufr": {
           "type": "text",
           "settings": {
-            "heading": "In labs.",
-            "text": "<p>In labs es tu aliado diario para potenciar tu rendimiento mental. Una fórmula<em>natural</em>, equilibrada con nootrópicos respaldados por la ciencia</p>"
+            "heading": "<strong>No necesitas hacer menos.</strong>",
+            "text": "<p><strong>Necesitas un sistema que aguante tu ritmo.</strong></p><p>Foco para avanzar.</p><p>Calma para sostener el día.</p><p>Descanso para volver a empezar.</p><p><strong>Tres fórmulas. Un solo sistema.</strong></p>"
           }
         },
         "text_wPqUy6": {
@@ -32,7 +32,7 @@
           "type": "text",
           "settings": {
             "heading": "Pruébanos",
-            "text": "<p><a href=\"#\" title=\"#\">ZZEN Focus</a></p><p><a href=\"#\" title=\"#\">ZZEN Sleep</a></p><p><a href=\"#\" title=\"#\">ZZEN Calm</a></p><p><a href=\"#\" title=\"#\">MODO ZZEN</a></p>"
+            "text": "<p><a href=\"/products/zzen-focus\" title=\"IN FOCUS\">IN FOCUS</a></p><p><a href=\"/products/zzen-calm\" title=\"IN SLEEP\">IN SLEEP</a></p><p><a href=\"/products/modo-zzen\" title=\"IN CALM\">IN CALM</a></p><p><a href=\"/products/in-system\" title=\"IN SYSTEM\">IN SYSTEM</a></p>"
           }
         }
       },
