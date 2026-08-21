@@ -431,7 +431,7 @@
           "type": "zzen_accordion",
           "settings": {
             "row_1_title": "Descripción del producto",
-            "row_1_content": "<p>Modo ZZEN es un protocolo completo de bienestar mental y físico que combina nuestros tres suplementos estrella (<strong>Focus, Calm y Sleep)</strong> en una rutina sencilla para ayudarte a <strong>rendir mejor, reducir el estrés y dormir profundamente</strong>.</p><p>Diseñado para personas que quieren equilibrar mente y cuerpo sin recurrir a estimulantes artificiales ni depender de soluciones puntuales.</p><h4><strong>¿Qué puedes esperar?</strong></h4><ul><li>Concentración constante de lunes a domingo.</li><li>Mayor sensación de equilibrio emocional y bienestar</li><li>Menos estrés y mayor sensación de equilibrio emocional y bienestar</li><li>Sueño más profundo y sensación real de descanso</li></ul><h4><strong>¿Qué vas a notar?</strong></h4><ul><li><strong>Primeras semanas:</strong> Adiós a la niebla mental al despertar. Notarás un enfoque fluido desde primera hora y desaparecerá ese bajón de energía que te frenaba a media tarde.</li><li><strong>Primer mes:</strong> El caos ya no te controla. Gestionarás el estrés con naturalidad y te despertarás con la mente limpia, sintiendo por fin que has descansado de verdad.</li><li><strong>Tercer mes:</strong> Tu estado base se optimiza por completo. Estar enfocado, tranquilo y recuperado deja de ser un esfuerzo para convertirse en tu nueva normalidad.</li></ul>",
+            "row_1_content": "<p>IN SYSTEM es un protocolo completo de bienestar mental y físico que combina nuestros tres suplementos estrella (<strong>Focus, Calm y Sleep)</strong> en una rutina sencilla para ayudarte a <strong>rendir mejor, reducir el estrés y dormir profundamente</strong>.</p><p>Diseñado para personas que quieren equilibrar mente y cuerpo sin recurrir a estimulantes artificiales ni depender de soluciones puntuales.</p><h4><strong>¿Qué puedes esperar?</strong></h4><ul><li>Concentración constante de lunes a domingo.</li><li>Mayor sensación de equilibrio emocional y bienestar</li><li>Menos estrés y mayor sensación de equilibrio emocional y bienestar</li><li>Sueño más profundo y sensación real de descanso</li></ul><h4><strong>¿Qué vas a notar?</strong></h4><ul><li><strong>Primeras semanas:</strong> Adiós a la niebla mental al despertar. Notarás un enfoque fluido desde primera hora y desaparecerá ese bajón de energía que te frenaba a media tarde.</li><li><strong>Primer mes:</strong> El caos ya no te controla. Gestionarás el estrés con naturalidad y te despertarás con la mente limpia, sintiendo por fin que has descansado de verdad.</li><li><strong>Tercer mes:</strong> Tu estado base se optimiza por completo. Estar enfocado, tranquilo y recuperado deja de ser un esfuerzo para convertirse en tu nueva normalidad.</li></ul>",
             "row_1_page": "",
             "row_2_title": "Beneficios",
             "row_2_content": "",
@@ -1486,7 +1486,7 @@
       ],
       "name": "Carrusel de perfiles",
       "settings": {
-        "heading": "¿Para <em>quién</em> es Modo ZZEN?",
+        "heading": "¿Para <em>quién</em> es IN SYSTEM?",
         "heading_tag": "h2",
         "title_tag": "h3",
         "bg_color": "#000000",
