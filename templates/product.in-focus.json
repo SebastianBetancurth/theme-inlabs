@@ -1088,7 +1088,7 @@
         "ingredient_YYyHDX": {
           "type": "ingredient",
           "settings": {
-            "tab": "Focus",
+            "tab": "",
             "title": "Ingrediente",
             "dosage": "100mg",
             "description": "<p>Describí aquí el ingrediente, su función y en qué alimentos está presente.</p>",
@@ -1098,7 +1098,7 @@
         "ingredient_36RRf7": {
           "type": "ingredient",
           "settings": {
-            "tab": "Magnesium +´7",
+            "tab": "",
             "title": "Ingrediente",
             "dosage": "100mg",
             "description": "<p>Describí aquí el ingrediente, su función y en qué alimentos está presente.</p>",
@@ -1108,7 +1108,7 @@
         "ingredient_xCnwGA": {
           "type": "ingredient",
           "settings": {
-            "tab": "Omega 3",
+            "tab": "",
             "title": "Ingrediente",
             "dosage": "100mg",
             "description": "<p>Describí aquí el ingrediente, su función y en qué alimentos está presente.</p>",
@@ -1118,7 +1118,7 @@
         "ingredient_47wqpV": {
           "type": "ingredient",
           "settings": {
-            "tab": "Focus",
+            "tab": "",
             "title": "Bacopa Monieri",
             "dosage": "300MG",
             "description": "",
@@ -1128,7 +1128,7 @@
         "ingredient_7Jfqe8": {
           "type": "ingredient",
           "settings": {
-            "tab": "Focus",
+            "tab": "",
             "title": "Rhodiola rosea",
             "dosage": "200mg",
             "description": "",
@@ -1138,7 +1138,7 @@
         "ingredient_7ry86E": {
           "type": "ingredient",
           "settings": {
-            "tab": "Focus",
+            "tab": "",
             "title": "Cafeína",
             "dosage": "120MG",
             "description": "",
@@ -1148,7 +1148,7 @@
         "ingredient_FzDynU": {
           "type": "ingredient",
           "settings": {
-            "tab": "Focus",
+            "tab": "",
             "title": "L-teanina",
             "dosage": "120mg",
             "description": "",
@@ -1158,7 +1158,7 @@
         "ingredient_qqELT8": {
           "type": "ingredient",
           "settings": {
-            "tab": "Calm",
+            "tab": "",
             "title": "Ashwagandha",
             "dosage": "300mg",
             "description": "",
@@ -1168,7 +1168,7 @@
         "ingredient_bhnWTy": {
           "type": "ingredient",
           "settings": {
-            "tab": "Sleep",
+            "tab": "",
             "title": "Melatonina",
             "dosage": "1,9mg",
             "description": "",
