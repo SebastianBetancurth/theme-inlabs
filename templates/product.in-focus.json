@@ -1011,29 +1011,29 @@
         "benefit_wDdBwE": {
           "type": "benefit",
           "settings": {
-            "title": "BAJA EL RITMO",
-            "text": "<p><strong>Deja el día atrás<br/></strong>Acompaña tu rutina nocturna y ese momento en el que necesitas dejar de pensar en todo y empezar a desconectarte.</p>"
+            "title": "ENTRA EN MODO FOCUS",
+            "text": "<p><strong>Menos distracción. Más acción.</strong></p><p>Para esos momentos en los que sabes lo que tienes que hacer, pero te cuesta sentarte y empezar.</p>"
           }
         },
         "benefit_PKmKcx": {
           "type": "benefit",
           "settings": {
-            "title": "DESCANSA DE VERDAD",
-            "text": "<p><strong>No solo se trata de dormir</strong></p><p>Favorece un descanso de mayor calidad para que tus horas de sueño realmente se sientan como descanso.</p>"
+            "title": "MANTÉN EL FOCO",
+            "text": "<p><strong>Que tu atención dure más que cinco minutos.</strong></p><p>Acompaña tus bloques de trabajo, estudio o creación cuando necesitas mantenerte concentrado en una tarea.</p>"
           }
         },
         "benefit_Jai9rm": {
           "type": "benefit",
           "settings": {
-            "title": "RECUPÉRATE",
-            "text": "<p><strong>La noche también cuenta</strong></p><p>El descanso es parte de tu recuperación. Dale a tu cuerpo el espacio que necesita para prepararse para un nuevo día.</p>"
+            "title": "SIGUE EL RITMO",
+            "text": "<p><strong>Claridad incluso en días exigentes.</strong></p><p>Una fórmula pensada para acompañar tu rendimiento mental cuando la jornada se alarga y todavía quedan cosas por hacer.</p>"
           }
         },
         "benefit_NUP3cn": {
           "type": "benefit",
           "settings": {
-            "title": "DESPIERTA MEJOR",
-            "text": "<p><strong>La diferencia también se nota en la mañana</strong></p><p>Porque el objetivo no es simplemente dormir. Es despertar sintiéndote descansado y listo para empezar el día.</p>"
+            "title": "DEJA DE POSPONERLO",
+            "text": "<p><strong>Pensarlo menos. Hacerlo más.</strong></p><p>Convierte tus pendientes en acción y haz que avanzar se sienta un poco más fácil.</p>"
           }
         }
       },
@@ -1053,8 +1053,8 @@
         "heading_font": "sans_serif_n4",
         "text_font_mode": "custom",
         "text_font": "sans_serif_n4",
-        "heading": "Haz que tus noches cuenten",
-        "intro": "<p><strong>IN FOCUS</strong> está pensado para acompañarte desde que decides bajar el ritmo hasta que empieza un nuevo día. Una fórmula para desconectarte, descansar mejor y hacer de la noche un verdadero momento de recuperación.</p>",
+        "heading": "Haz que el día te rinda",
+        "intro": "<p><strong>IN FOCUS está pensado para acompañarte en esos días en los que tienes mucho que hacer y necesitas poner la cabeza en lo que importa.</strong> Una fórmula para apoyar tu enfoque, claridad mental y rendimiento durante las horas de mayor exigencia.</p>",
         "heading_size": 52,
         "intro_size": 17,
         "item_title_size": 20,
