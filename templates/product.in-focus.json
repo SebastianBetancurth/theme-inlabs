@@ -1089,59 +1089,65 @@
           "type": "ingredient",
           "settings": {
             "tab": "",
-            "title": "Ingrediente",
-            "dosage": "100mg",
-            "description": "<p>Describí aquí el ingrediente, su función y en qué alimentos está presente.</p>",
-            "benefits": "Contribuye al metabolismo energético\nAyuda a reducir el cansancio\nApoya el sistema inmunitario\nFavorece la función psicológica normal"
+            "image": "shopify://shop_images/ChatGPT_Image_23_ago_2026_22_27_08.png",
+            "title": "L-TIROSINA",
+            "dosage": "600mg",
+            "description": "<p>Aminoácido utilizado por el organismo como precursor de sustancias implicadas en la comunicación del sistema nervioso.</p>",
+            "benefits": "Aminoácido presente de forma natural en el organismo\nPrecursor de catecolaminas como dopamina y noradrenalina\nHabitual en fórmulas orientadas al rendimiento mental\nEspecialmente estudiada en contextos de alta exigencia cognitiva"
           }
         },
         "ingredient_36RRf7": {
           "type": "ingredient",
           "settings": {
             "tab": "",
-            "title": "Ingrediente",
-            "dosage": "100mg",
-            "description": "<p>Describí aquí el ingrediente, su función y en qué alimentos está presente.</p>",
-            "benefits": "Contribuye al metabolismo energético\nAyuda a reducir el cansancio\nApoya el sistema inmunitario\nFavorece la función psicológica normal"
+            "image": "shopify://shop_images/ChatGPT_Image_23_ago_2026_22_34_46.png",
+            "title": "BACOPA MONNIERI",
+            "dosage": "300mg",
+            "description": "<p>Extracto vegetal procedente de <em>Bacopa monnieri</em>, una planta con una larga tradición de uso y ampliamente estudiada en el ámbito cognitivo. En IN FOCUS utilizamos un extracto estandarizado al <strong>20% de bacósidos</strong>.</p>",
+            "benefits": "Extracto estandarizado al 20% de bacósidos\nUno de los botánicos más conocidos en fórmulas nootrópicas\nEstudiada en relación con memoria y función cognitiva\nTradicionalmente utilizada en Ayurveda"
           }
         },
         "ingredient_xCnwGA": {
           "type": "ingredient",
           "settings": {
             "tab": "",
-            "title": "Ingrediente",
-            "dosage": "100mg",
-            "description": "<p>Describí aquí el ingrediente, su función y en qué alimentos está presente.</p>",
-            "benefits": "Contribuye al metabolismo energético\nAyuda a reducir el cansancio\nApoya el sistema inmunitario\nFavorece la función psicológica normal"
+            "image": "shopify://shop_images/ChatGPT_Image_23_ago_2026_22_37_54.png",
+            "title": "GINKGO BILOBA",
+            "dosage": "120mg",
+            "description": "<p>Extracto de hoja de <em>Ginkgo biloba</em> estandarizado al <strong>24% de glucósidos flavonoides y 6% de lactonas terpénicas</strong>.</p>",
+            "benefits": "Extracto vegetal estandarizado\n24% de glucósidos flavonoides\n6% de lactonas terpénicas\nAmpliamente utilizado en suplementación cognitiva"
           }
         },
         "ingredient_47wqpV": {
           "type": "ingredient",
           "settings": {
             "tab": "",
-            "title": "Bacopa Monieri",
-            "dosage": "300MG",
-            "description": "",
-            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
+            "image": "shopify://shop_images/ChatGPT_Image_23_ago_2026_22_41_11.png",
+            "title": "PANAX GINSENG",
+            "dosage": "150mg",
+            "description": "<p>Extracto de <em>Panax ginseng</em>, una de las plantas adaptógenas más reconocidas y estudiadas. Nuestra fórmula utiliza un extracto estandarizado al <strong>30% de ginsenósidos</strong>.</p>",
+            "benefits": "Extracto estandarizado al 30% de ginsenósidos\nPlanta tradicionalmente utilizada en Asia\nHabitual en fórmulas de rendimiento físico y mental\nUno de los adaptógenos más conocidos"
           }
         },
         "ingredient_7Jfqe8": {
           "type": "ingredient",
           "settings": {
             "tab": "",
-            "title": "Rhodiola rosea",
-            "dosage": "200mg",
-            "description": "",
-            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
+            "image": "shopify://shop_images/ChatGPT_Image_23_ago_2026_22_45_47.png",
+            "title": "R-ALA",
+            "dosage": "63mg",
+            "description": "<p>Ácido alfa lipoico en forma R-ALA estabilizada. Es una molécula que participa en procesos relacionados con el metabolismo energético celular.</p>",
+            "benefits": "Forma R del ácido alfa lipoicoPresente de manera natural en el organismo\nRelacionado con el metabolismo energético celular\nUtilizado en fórmulas de soporte metabólico"
           }
         },
         "ingredient_7ry86E": {
           "type": "ingredient",
           "settings": {
             "tab": "",
-            "title": "Cafeína",
-            "dosage": "120MG",
-            "description": "",
+            "image": "shopify://shop_images/ChatGPT_Image_24_ago_2026_12_00_40.png",
+            "title": "VITAMINA B3",
+            "dosage": "40mg",
+            "description": "<p><strong>250% VRN</strong> por dosis diaria</p><p>Contribuye al metabolismo energético normal</p><p>Contribuye al funcionamiento normal del sistema nervioso</p><p>Contribuye a disminuir el cansancio y la fatiga</p>",
             "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
           }
         },
@@ -1149,30 +1155,22 @@
           "type": "ingredient",
           "settings": {
             "tab": "",
-            "title": "L-teanina",
-            "dosage": "120mg",
-            "description": "",
-            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
+            "image": "shopify://shop_images/ChatGPT_Image_24_ago_2026_12_07_19.png",
+            "title": "VITAMINA B1",
+            "dosage": "5mg",
+            "description": "<p>Tiamina en forma de hidrocloruro de tiamina. Una vitamina esencial que participa, entre otras funciones, en el metabolismo energético y el funcionamiento del sistema nervioso.</p>",
+            "benefits": "455% VRN por dosis diaria\nContribuye al metabolismo energético normal\nContribuye al funcionamiento normal del sistema nervioso\nContribuye a la función psicológica normal"
           }
         },
         "ingredient_qqELT8": {
           "type": "ingredient",
           "settings": {
             "tab": "",
-            "title": "Ashwagandha",
-            "dosage": "300mg",
-            "description": "",
-            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
-          }
-        },
-        "ingredient_bhnWTy": {
-          "type": "ingredient",
-          "settings": {
-            "tab": "",
-            "title": "Melatonina",
-            "dosage": "1,9mg",
-            "description": "",
-            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
+            "image": "shopify://shop_images/ChatGPT_Image_24_ago_2026_12_15_50.png",
+            "title": "SELENIO",
+            "dosage": "55 mg",
+            "description": "<p>Mineral esencial presente en pequeñas cantidades en el organismo y necesario para diferentes funciones fisiológicas.</p>",
+            "benefits": "100% VRN por dosis diaria\nContribuye a proteger las células frente al daño oxidativo\nContribuye al funcionamiento normal del sistema inmunitario\nContribuye al funcionamiento normal de la tiroides"
           }
         }
       },
@@ -1184,12 +1182,11 @@
         "ingredient_7Jfqe8",
         "ingredient_7ry86E",
         "ingredient_FzDynU",
-        "ingredient_qqELT8",
-        "ingredient_bhnWTy"
+        "ingredient_qqELT8"
       ],
       "custom_css": [
         "{margin-top: 20px;}",
-        ".zi-tab[aria-selected='true'] {display: none; background: var(--zi-tab-active-bg); color: var(--zi-tab-active-text); border-color: var(--zi-tab-active-bg);}"
+        ".zi-tab[aria-selected=\"true\"] {display: none; background: var(--zi-tab-active-bg); color: var(--zi-tab-active-text); border-color: var(--zi-tab-active-bg);}"
       ],
       "name": "Ingredientes ciencia",
       "settings": {
@@ -1236,7 +1233,7 @@
           "type": "step",
           "settings": {
             "number": "",
-            "text": "<p><strong>Pausa un momento</strong> y haz 3 respiraciones profundas para relajarte y descansar.</p>",
+            "text": "<p><strong>PREPÁRATE<br/></strong>Empieza el día con intención. Define qué necesitas sacar adelante y elimina distracciones antes de empezar.</p>",
             "link": ""
           }
         },
@@ -1244,7 +1241,7 @@
           "type": "step",
           "settings": {
             "number": "",
-            "text": "<p>Toma 2 cápsulas con agua y preferiblemente <strong>después de cenar</strong> (no es necesario).</p>",
+            "text": "<p><strong>TOMA IN FOCUS<br/></strong>Toma <strong>2 cápsulas con un vaso de agua</strong>, preferiblemente por la mañana o antes de un periodo de alta exigencia mental.</p>",
             "link": ""
           }
         },
@@ -1252,7 +1249,7 @@
           "type": "step",
           "settings": {
             "number": "",
-            "text": "<p><strong>Disfruta</strong> de la relajación y un mejor descanso para rendir más con este suplemento para dormir.</p>",
+            "text": "<p><strong>ENTRA EN MODO FOCUS<br/></strong> Trabajo, estudio, reuniones o proyectos. Crea tu bloque de concentración y pon tu atención donde realmente importa.</p>",
             "link": ""
           }
         }
@@ -1264,9 +1261,9 @@
       ],
       "name": "Cómo se usa (pasos)",
       "settings": {
-        "heading": "¿Cómo uso ZZEN Sleep?",
+        "heading": "Activa tu modo FOCUS",
         "heading_tag": "h2",
-        "subheading": "<p>Recomendamos usarlo como un ritual diario para resultados óptimos y duraderos.</p>",
+        "subheading": "<p>Una rutina sencilla para empezar, concentrarte y avanzar.</p>",
         "anchor_id": "como-se-usa",
         "bg_color": "#000000",
         "mobile_breakpoint": 750,
@@ -1456,32 +1453,32 @@
           "type": "stage",
           "settings": {
             "pill": "Semana 1",
-            "title": "<strong>Empieza por tu noche</strong>",
-            "text": "<p>Haz espacio para desconectarte. Menos estímulos, una rutina más clara y un momento para indicarle a tu cuerpo que el día terminó.</p>"
+            "title": "<strong>Tu momento de foco</strong>",
+            "text": "<p>Incorpora IN FOCUS a tu rutina antes de estudiar, trabajar o enfrentarte a una jornada exigente. Un pequeño gesto que marca el inicio de tu tiempo de concentración.</p>"
           }
         },
         "stage_8R6QGm": {
           "type": "stage",
           "settings": {
-            "pill": "Mes 1",
-            "title": "<strong>Encuentra tu ritmo</strong>",
-            "text": "<p>Tu rutina nocturna empieza a sentirse más natural. Identificas qué te ayuda a bajar revoluciones y le das al descanso el espacio que necesita.</p>"
+            "pill": "SEMANA 4",
+            "title": "<strong>Menos distracción. Más intención.</strong>",
+            "text": "<p>Tu rutina empieza a tener estructura. Identificas tus mejores momentos para concentrarte y haces del foco una parte consciente de tu día, en lugar de esperar a que aparezca.</p>"
           }
         },
         "stage_dwXyFC": {
           "type": "stage",
           "settings": {
-            "pill": "Mes 2",
-            "title": "<strong>Haz que descansar sea parte del plan</strong>",
-            "text": "<p>Ya no esperas a estar agotado para pensar en dormir. El descanso se convierte en una parte más de cómo cuidas tu energía y recuperación.</p>"
+            "pill": "MES 2",
+            "title": "<strong>La constancia empieza a hacer su trabajo</strong>",
+            "text": "<p>Mantener una rutina te ayuda a afrontar tus bloques de mayor exigencia mental con más orden. Menos saltar de una cosa a otra y más atención puesta en lo que tienes delante.</p>"
           }
         },
         "stage_Aacyga": {
           "type": "stage",
           "settings": {
-            "pill": "Mes 3",
-            "title": "<strong>Cambia tus noches. Cambia tus días</strong>",
-            "text": "<p>Cuando cuidar tu descanso se vuelve un hábito, también cambia la forma en la que empiezas cada mañana. Porque un mejor día empieza desde la noche anterior.</p><p><strong>Descansa hoy. Rinde mañana.</strong></p>"
+            "pill": "MES 3",
+            "title": "<strong>Haz del foco parte de tu forma de trabajar</strong>",
+            "text": "<p>Cuando la rutina se consolida, concentrarte deja de depender tanto de tener “un buen día”. Trabajo, estudio, proyectos o decisiones: sabes cuándo toca entrar en modo focus.</p><p>Menos ruido. Más foco.</p>"
           }
         }
       },
@@ -1493,9 +1490,9 @@
       ],
       "name": "Timeline en tarjeta",
       "settings": {
-        "heading": "Tus mejores días empiezan la noche anterior",
+        "heading": "El foco también se construye",
         "heading_tag": "h2",
-        "intro": "<p>IN SLEEP está pensado para convertirse en parte de tu rutina nocturna. Porque descansar mejor no depende de una sola noche, sino de crear hábitos que te ayuden a desconectarte, recuperarte y despertar listo para el día.</p>",
+        "intro": "<p>IN FOCUS está pensado para acompañarte en tus momentos de mayor exigencia mental. La clave no es hacer más por hacer más, sino crear una rutina que te ayude a mantener la atención, la claridad y el rendimiento cuando realmente los necesitas.</p>",
         "show_placeholder": true,
         "item_title_tag": "h3",
         "bg_color": "#000000",
@@ -1858,36 +1855,57 @@
         "faq_hHgT8q": {
           "type": "faq",
           "settings": {
-            "question": "¿Qué diferencia a ZZEN de otras marcas?",
-            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+            "question": "¿Cómo tomo IN FOCUS?",
+            "answer": "<p>Toma <strong>2 cápsulas al día con agua</strong>, preferiblemente por la mañana o antes de tu principal bloque de trabajo o estudio. La idea es integrarlo fácilmente a tu rutina diaria.</p>"
           }
         },
         "faq_jqAzpA": {
           "type": "faq",
           "settings": {
-            "question": "¿Las fórmulas generan dependencia?",
-            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+            "question": "¿Qué puedo esperar de IN FOCUS?",
+            "answer": "<p>IN FOCUS está formulado para acompañar el enfoque, la claridad y el rendimiento mental durante jornadas exigentes. No busca darte un “subidón”, sino formar parte de una rutina orientada a mantener tu mente en lo que importa.</p>"
           }
         },
         "faq_xB6bkK": {
           "type": "faq",
           "settings": {
-            "question": "¿Las dosis son adecuadas?",
-            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+            "question": "¿Cuándo voy a empezar a notarlo?",
+            "answer": "<p>La experiencia puede variar de una persona a otra y no todos los ingredientes funcionan de la misma forma o en los mismos tiempos. Por eso recomendamos <strong>un uso constante</strong>, en lugar de valorar IN FOCUS únicamente por una toma puntual.</p>"
           }
         },
         "faq_Bd6NRJ": {
           "type": "faq",
           "settings": {
-            "question": "¿Existen efectos secundarios?",
-            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+            "question": "¿Para quién está pensado?",
+            "answer": "<p>Para adultos con días de alta exigencia mental: <strong>estudiantes, profesionales, emprendedores, creativos</strong> o cualquier persona que quiera apoyar su concentración y rendimiento dentro de una rutina equilibrada.</p>"
           }
         },
         "faq_fjX7Eq": {
           "type": "faq",
           "settings": {
-            "question": "¿Cuánto tiempo tarda el envío?",
-            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+            "question": "Quién debería consultar antes de tomarlo?",
+            "answer": "<p>Si estás embarazada o en periodo de lactancia, tienes alguna condición médica o tomas medicamentos, consulta con un profesional de la salud antes de utilizar cualquier suplemento. Respeta siempre la dosis indicada en el producto.</p>"
+          }
+        },
+        "faq_3rzgTR": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Tiene efectos secundarios o genera dependencia?",
+            "answer": "<p>IN FOCUS es un suplemento alimenticio y <strong>no está formulado para generar dependencia</strong>. Aun así, la tolerancia a cualquier ingrediente puede variar entre personas. Si experimentas alguna reacción adversa, suspende su uso y consulta con un profesional de la salud.</p>"
+          }
+        },
+        "faq_BRkVdj": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Puedo combinarlo con IN CALM e IN SLEEP?",
+            "answer": "<p>Los productos de IN LABS están planteados para ocupar distintos momentos de la rutina. <strong>IN FOCUS</strong> acompaña los momentos de exigencia mental, <strong>IN CALM</strong> te ayuda a gestionar tu estrés y ansiedad e <strong>IN SLEEP</strong> formará parte de tu rutina de sueño nocturna. Antes de recomendar el uso conjunto definitivo, conviene revisar dosis e ingredientes compartidos entre las tres fórmulas.</p>"
+          }
+        },
+        "faq_C8qEVD": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Cómo cuidamos la calidad de IN FOCUS?",
+            "answer": "<p>Trabajamos con fabricación y controles de calidad respaldados por la documentación y certificaciones de nuestro fabricante.  IN FOCUS se fabrica en instalaciones que cuentan con certificaciones internacionales de calidad y seguridad, entre ellas <strong>GMP, ISO 9001:2015, ISO 22000:2018 y HACCP</strong>.<br/><br/><br/>Estas certificaciones establecen estándares para las buenas prácticas de fabricación, la gestión de calidad y la seguridad alimentaria durante los procesos de producción.</p>"
           }
         }
       },
@@ -1896,7 +1914,10 @@
         "faq_jqAzpA",
         "faq_xB6bkK",
         "faq_Bd6NRJ",
-        "faq_fjX7Eq"
+        "faq_fjX7Eq",
+        "faq_3rzgTR",
+        "faq_BRkVdj",
+        "faq_C8qEVD"
       ],
       "name": "FAQs",
       "settings": {
@@ -1937,59 +1958,59 @@
         "text_gB7xNF": {
           "type": "text",
           "settings": {
-            "text": "<p>Modo ZZEN es un pack de suplementos naturales diseñado para trabajar tres momentos clave del día: rendimiento mental, gestión del estrés y recuperación nocturna. En lugar de elegir un producto aislado para cada problema, propone una rutina organizada con ZZEN Focus, ZZEN Calm y ZZEN Sleep.</p><p>La lógica del pack es sencilla: Focus acompaña las horas de mayor exigencia cognitiva, Calm ayuda a sostener el equilibrio emocional durante el día y Sleep prepara el descanso por la noche. Esta estructura es perfecta para personas que sienten que su energía, su estrés y su sueño están conectados.</p>"
+            "text": "<p>No se trata de buscar un empujón rápido para sobrevivir al día. Se trata de darle a tu mente una fórmula pensada para acompañar jornadas de estudio, trabajo y alta exigencia mental.</p><p>Su fórmula combina <strong>L-tirosina, Bacopa monnieri, Ginkgo biloba, Panax ginseng, R-ALA, vitamina B3, vitamina B1 y selenio</strong>, reuniendo distintos ingredientes en una sola rutina diaria.</p><p>Por eso, IN FOCUS está pensado para estudiantes, profesionales, emprendedores, creativos y, en general, para cualquiera que sienta que su día le exige estar mentalmente presente durante demasiado tiempo.</p>"
           }
         },
         "subheading_BE6rKG": {
           "type": "subheading",
           "settings": {
-            "text": "Para quienes necesitan una rutina completa, no otro bote más",
+            "text": "Para días en los que tu cabeza no puede ir a medias",
             "tag": "h3"
           }
         },
         "text_nqCChG": {
           "type": "text",
           "settings": {
-            "text": "<p>Muchas rutinas de suplementación fallan porque se construyen sin orden: demasiados productos, tomas confusas y objetivos poco claros. Modo ZZEN reduce esa fricción agrupando tres fórmulas con un uso diferenciado y fácil de recordar.</p><p>Tiene sentido para profesionales con alta carga mental, estudiantes, emprendedores, deportistas recreativos o personas que quieren cuidar su bienestar desde una visión más global. Si el objetivo principal es solo la concentración, <a href=\"https://zzenlabs.com/products/zzen-nootropic\">ZZEN Focus</a> puede ser suficiente; si el reto está en todo el ciclo del día, Modo ZZEN aporta más contexto.</p>"
+            "text": "<p>El cansancio mental no siempre significa tener sueño.</p><p>A veces es abrir la computadora y tardar una eternidad en arrancar. Leer lo mismo tres veces. Saltar de una tarea a otra. Llegar a media tarde y sentir que tu cabeza simplemente ya no da para más.</p><p><strong>IN FOCUS está pensado para acompañar tus bloques de mayor exigencia mental:</strong> estudio, trabajo profundo, reuniones, creación, análisis o esos días en los que tu lista de pendientes parece no terminar nunca.</p><p>No sustituye dormir bien, comer bien ni organizarte. Es una herramienta más dentro de una rutina diseñada para rendir mejor.</p>"
           }
         },
         "subheading_twzh9V": {
           "type": "subheading",
           "settings": {
-            "text": "Cómo se complementan Focus, Calm y Sleep",
+            "text": "Más que activarte: estar realmente enfocado",
             "tag": "h3"
           }
         },
         "text_cd9tQG": {
           "type": "text",
           "settings": {
-            "text": "<p>Focus está orientado a la concentración, la energía mental y la claridad durante los bloques activos. Calm trabaja el eje del estrés y la estabilidad emocional. Sleep cierra el día con una fórmula enfocada en relajación, desconexión y descanso reparador.</p><p>Esta combinación es interesante porque evita tratar cada síntoma de forma aislada. Dormir mal puede afectar al foco; el estrés puede dificultar el descanso; y una jornada sin energía puede aumentar la sensación de saturación. Por eso, el pack conecta productos que también existen por separado: <a href=\"https://zzenlabs.com/products/zzen-calm-ashwagandha\">ZZEN Calm</a> y <a href=\"https://zzenlabs.com/products/zzen-sleep\">ZZEN Sleep</a> completan lo que Focus empieza durante el día.</p>"
+            "text": "<p>Hay una diferencia entre sentirte activo y sentir que tu cabeza está donde tiene que estar.</p><p>IN FOCUS no está planteado simplemente como “algo para darte energía”. Su fórmula está diseñada alrededor del <strong>rendimiento mental</strong>, combinando ingredientes seleccionados para crear un enfoque más completo.</p><p>Porque de poco sirve tener energía si sigues abriendo diez pestañas, cambiando de tarea cada cinco minutos y terminando el día con la sensación de haber hecho de todo menos lo importante.</p><p><strong>Menos ruido. Más foco.</strong></p>"
           }
         },
         "subheading_3ftq9t": {
           "type": "subheading",
           "settings": {
-            "text": "Cuándo tomar cada suplemento dentro de Modo ZZEN",
+            "text": "Cuándo tomar IN FOCUS",
             "tag": "h3"
           }
         },
         "text_rYLAHD": {
           "type": "text",
           "settings": {
-            "text": "<p>La rutina más simple es usar Focus por la mañana o antes del primer bloque exigente, Calm por la mañana o al mediodía junto con comida, y Sleep entre 30 y 60 minutos antes de acostarse. Así, cada fórmula ocupa un momento concreto y no compite con las demás.</p><p>La constancia es más importante que la perfección. Modo ZZEN funciona mejor cuando se integra en hábitos repetibles: desayuno, inicio de jornada, pausa de comida y ritual nocturno.</p>"
+            "text": "<p>Hazlo fácil: intégralo al momento del día en el que normalmente necesitas tu mejor versión mental.</p><p>Toma <strong>2 cápsulas al día con agua</strong>, preferiblemente por la mañana o antes de tu principal bloque de trabajo o estudio.</p><p>Puedes convertirlo en parte de tu ritual antes de empezar: IN FOCUS, agua, prioridades claras y a trabajar.</p><p>La constancia importa. En lugar de reservarlo únicamente para los días caóticos, incorpóralo a una rutina estable junto con buenos hábitos de descanso, alimentación, hidratación y pausas durante el día.</p>"
           }
         },
         "subheading_RzfKfN": {
           "type": "subheading",
           "settings": {
-            "text": "Por qué elegir Modo ZZEN para tu día a día",
+            "text": "Por qué elegir IN FOCUS",
             "tag": "h3"
           }
         },
         "text_CEfTa9": {
           "type": "text",
           "settings": {
-            "text": "<p>Modo ZZEN es una opción práctica para quienes quieren simplificar decisiones y sostener una rutina completa de bienestar mental y físico. No promete transformar el día de forma automática, pero sí ofrece una estructura clara para apoyar foco, calma y descanso con productos diseñados para complementarse.</p><p>Frente a comprar suplementos sueltos sin una estrategia, Modo ZZEN aporta orden: mañana para rendir, día para regular y noche para recuperar.</p>"
+            "text": "<p>Porque no todos los días necesitas hacer más. <strong>Algunos días necesitas hacer mejor.</strong></p><p>IN FOCUS reúne en una sola fórmula ingredientes seleccionados para acompañar la <strong>concentración, el rendimiento mental y las jornadas de alta exigencia</strong>, en un formato sencillo de incorporar a tu día.</p><p>Sin preparar mezclas. Sin complicar tu rutina. Dos cápsulas y a lo que importa.</p><p><strong>Para estudiar. Para crear. Para decidir. Para ejecutar.</strong></p><p><strong>Tu atención es limitada. Úsala donde importa.</strong></p>"
           }
         }
       },
@@ -2006,9 +2027,9 @@
       ],
       "name": "Texto ampliable",
       "settings": {
-        "heading": "Una rutina diaria para foco, calma y descanso",
+        "heading": "Un nootrópico para cuando tu cabeza tiene que estar al 100",
         "heading_tag": "h2",
-        "intro": "<p>Modo ZZEN reúne Focus, Calm y Sleep en una rutina sencilla para quienes quieren ordenar su energía mental, gestionar mejor el estrés y cuidar el descanso sin depender de soluciones sueltas.</p>",
+        "intro": "<p><strong>IN FOCUS está diseñado para acompañarte en esos días en los que necesitas </strong>mantener la atención, la claridad mental y el rendimiento durante horas.</p>",
         "collapse_mode": "clamp",
         "clamp_height_d": 40,
         "clamp_height_m": 40,
