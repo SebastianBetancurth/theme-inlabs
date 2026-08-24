@@ -1188,7 +1188,8 @@
         "ingredient_bhnWTy"
       ],
       "custom_css": [
-        "{margin-top: 20px;}"
+        "{margin-top: 20px;}",
+        ".zi-tab[aria-selected='true'] {display: none; background: var(--zi-tab-active-bg); color: var(--zi-tab-active-text); border-color: var(--zi-tab-active-bg);}"
       ],
       "name": "Ingredientes ciencia",
       "settings": {
