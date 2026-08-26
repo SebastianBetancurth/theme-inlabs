@@ -14,7 +14,7 @@
       "name": "Hero V2S",
       "settings": {
         "image": "shopify://shop_images/home_in_labs.png",
-        "image_mobile": "shopify://shop_images/IN_LABS_home.png",
+        "image_mobile": "shopify://shop_images/HOME_OK_IL.png",
         "image_position_desktop": "center center",
         "image_position_mobile": "center center",
         "overlay_opacity": 0,
