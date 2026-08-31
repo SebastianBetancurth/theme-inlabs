@@ -1155,7 +1155,8 @@
         "ingredient_7ry86E"
       ],
       "custom_css": [
-        "{margin-top: 20px;}"
+        "{margin-top: 20px;}",
+        "button.zi-tab {display: none;}"
       ],
       "name": "Ingredientes ciencia",
       "settings": {
