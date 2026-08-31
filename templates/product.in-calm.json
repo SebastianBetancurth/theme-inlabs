@@ -1203,7 +1203,7 @@
           "type": "step",
           "settings": {
             "number": "",
-            "text": "<p><strong>Pausa un momento</strong> y haz 3 respiraciones profundas para relajarte y descansar.</p>",
+            "text": "<p><strong>BAJA UN MOMENTO EL RITMO </strong><br/>Haz una pausa. Respira y date unos minutos antes de empezar con todo lo que tienes por delante.</p>",
             "link": ""
           }
         },
@@ -1211,7 +1211,7 @@
           "type": "step",
           "settings": {
             "number": "",
-            "text": "<p>Toma 2 cápsulas con agua y preferiblemente <strong>después de cenar</strong> (no es necesario).</p>",
+            "text": "<p><strong>TOMA 2 CÁPSULAS<br/></strong>Toma <strong>2 cápsulas con agua, preferiblemente con el desayuno o con una comida.</strong></p>",
             "link": ""
           }
         },
@@ -1219,7 +1219,7 @@
           "type": "step",
           "settings": {
             "number": "",
-            "text": "<p><strong>Disfruta</strong> de la relajación y un mejor descanso para rendir más con este suplemento para dormir.</p>",
+            "text": "<p><strong>SIGUE CON TU DÍA<br/></strong>IN CALM está pensado para acompañarte en los días de mayor presión, ayudándote a <strong>gestionar el estrés sin tener que bajar tu ritmo de vida</strong>.</p>",
             "link": ""
           }
         }
@@ -1231,9 +1231,9 @@
       ],
       "name": "Cómo se usa (pasos)",
       "settings": {
-        "heading": "¿Cómo uso ZZEN Sleep?",
+        "heading": "¿Cómo uso IN CALM?",
         "heading_tag": "h2",
-        "subheading": "<p>Recomendamos usarlo como un ritual diario para resultados óptimos y duraderos.</p>",
+        "subheading": "<p><strong>Haz de IN CALM parte de tu rutina diaria para acompañarte en la gestión del estrés y mantener una mayor sensación de equilibrio.</strong></p>",
         "anchor_id": "como-se-usa",
         "bg_color": "#000000",
         "mobile_breakpoint": 750,
@@ -1335,39 +1335,39 @@
         "stat_VAqzd9": {
           "type": "stat",
           "settings": {
-            "number": "+25% de productividad",
-            "description": "Los usuarios muestran una mejora del 25% en productividad y desempeño cognitivo tras un mes de uso.",
+            "number": "−44% estrés percibido",
+            "description": "En un ensayo clínico de 60 días, el grupo que tomó extracto de Ashwagandha presentó una <strong>reducción del 44% en la puntuación de estrés percibido</strong>, frente al 5,5% del placebo.",
             "wide": true
           }
         },
         "stat_QAhQGn": {
           "type": "stat",
           "settings": {
-            "number": "96%",
-            "description": "De los usuarios reportan una mejora notable en su concentración tras 2 semanas de uso.",
+            "number": "83%",
+            "description": "de los usuarios hablaron de menos ansiedad y mas control del estrés",
             "wide": false
           }
         },
         "stat_ifEhEH": {
           "type": "stat",
           "settings": {
-            "number": "89%",
-            "description": "Profesionales experimentaron menos estrés y ansiedad en su rutina diaria.",
+            "number": "91%",
+            "description": "consigue una mejora notable en su estado de ánimo tras 3 semanas de uso.",
             "wide": false
           }
         },
         "circle_af798m": {
           "type": "circle",
           "settings": {
-            "number": "9/10",
-            "label": "Menos fatiga"
+            "number": "8/10",
+            "label": "Más bienestar"
           }
         },
         "circle_aV6bBH": {
           "type": "circle",
           "settings": {
-            "number": "+40'",
-            "label": "Sueño profundo"
+            "number": "40%",
+            "label": "extra de calma"
           }
         }
       },
@@ -1380,9 +1380,9 @@
       ],
       "name": "Resultados con contadores",
       "settings": {
-        "heading": "Resultados de nuestras encuestas",
-        "text": "<p>Todos nuestros productos se desarrollan y evalúan siguiendo protocolos de observación real.<br/>Las cifras que ves son resultados de personas que, como tú, buscan claridad y equilibrio cada día.</p>",
-        "footnote": "*Basado en resultados reportados por usuarios reales tras un uso continuado de nuestras fórmulas.",
+        "heading": "Lo que dice la ciencia",
+        "text": "<p><strong>Los principales ingredientes de IN CALM han sido estudiados por su relación con el estrés, la tensión mental y la respuesta del organismo ante situaciones exigentes. Probado por persona como tu, que buscan reducir niveles de estres, cortisol y ansiedad.</strong></p>",
+        "footnote": "<em>*Basado en resultados reportados por usuarios reales tras un uso continuado de nuestras fórmulas.</em>",
         "text_left": false,
         "bg_image": "shopify://shop_images/bg-deskto-estudios.jpg",
         "count_duration": 1200,
@@ -1423,32 +1423,32 @@
           "type": "stage",
           "settings": {
             "pill": "Semana 1",
-            "title": "<strong>Empieza por tu noche</strong>",
-            "text": "<p>Haz espacio para desconectarte. Menos estímulos, una rutina más clara y un momento para indicarle a tu cuerpo que el día terminó.</p>"
+            "title": "<strong>Haz espacio para la calma</strong>",
+            "text": "<p>Incorpora IN CALM a tu rutina diaria. Un pequeño gesto para empezar a darle espacio a la calma incluso cuando tu día sigue lleno de cosas por hacer.</p>"
           }
         },
         "stage_8R6QGm": {
           "type": "stage",
           "settings": {
-            "pill": "Mes 1",
-            "title": "<strong>Encuentra tu ritmo</strong>",
-            "text": "<p>Tu rutina nocturna empieza a sentirse más natural. Identificas qué te ayuda a bajar revoluciones y le das al descanso el espacio que necesita.</p>"
+            "pill": "Semana 4",
+            "title": "<strong>Baja revoluciones. No tu ritmo.</strong>",
+            "text": "<p>Empiezas a hacer más consciente cómo respondes a los días de mayor presión. <strong>Menos vivir en modo alerta y más momentos para parar, respirar y recuperar el equilibrio.</strong></p>"
           }
         },
         "stage_dwXyFC": {
           "type": "stage",
           "settings": {
             "pill": "Mes 2",
-            "title": "<strong>Haz que descansar sea parte del plan</strong>",
-            "text": "<p>Ya no esperas a estar agotado para pensar en dormir. El descanso se convierte en una parte más de cómo cuidas tu energía y recuperación.</p>"
+            "title": "<strong>Que el estrés no se acumule</strong>",
+            "text": "<p>La constancia convierte el cuidado de tu bienestar mental en parte de tu rutina. Ya no esperas a sentirte sobrepasado para empezar a bajar el ritmo.</p>"
           }
         },
         "stage_Aacyga": {
           "type": "stage",
           "settings": {
             "pill": "Mes 3",
-            "title": "<strong>Cambia tus noches. Cambia tus días</strong>",
-            "text": "<p>Cuando cuidar tu descanso se vuelve un hábito, también cambia la forma en la que empiezas cada mañana. Porque un mejor día empieza desde la noche anterior.</p><p><strong>Descansa hoy. Rinde mañana.</strong></p>"
+            "title": "<strong>Haz de la calma parte de tu día</strong>",
+            "text": "<p>Cuando cuidar cómo gestionas el estrés se convierte en un hábito, también cambia la forma en la que afrontas los días más exigentes. <strong>Más equilibrio. Menos ruido.</strong></p><p><strong>Que el estrés no marque tu día.</strong></p>"
           }
         }
       },
@@ -1460,9 +1460,9 @@
       ],
       "name": "Timeline en tarjeta",
       "settings": {
-        "heading": "Tus mejores días empiezan la noche anterior",
+        "heading": "La calma también se construye",
         "heading_tag": "h2",
-        "intro": "<p>IN SLEEP está pensado para convertirse en parte de tu rutina nocturna. Porque descansar mejor no depende de una sola noche, sino de crear hábitos que te ayuden a desconectarte, recuperarte y despertar listo para el día.</p>",
+        "intro": "<p><strong>IN CALM </strong>está pensado para acompañarte en esos periodos en los que el estrés, la presión y el ruido mental empiezan a acumularse. La idea no es eliminar el estrés de tu vida, sino crear una rutina que te ayude a gestionarlo mejor y recuperar el equilibrio incluso en los días más exigentes.</p>",
         "show_placeholder": true,
         "item_title_tag": "h3",
         "bg_color": "#000000",
@@ -1825,36 +1825,50 @@
         "faq_hHgT8q": {
           "type": "faq",
           "settings": {
-            "question": "¿Qué diferencia a ZZEN de otras marcas?",
-            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+            "question": "¿Cómo tomo IN CALM?",
+            "answer": "<p>Toma <strong>2 cápsulas al día con agua</strong>, preferiblemente en la primera parte de la mañana, con el desayuno o con una comida. Lo ideal es incorporarlo a tu rutina diaria y mantener un consumo constante.<br/><br/></p>"
           }
         },
         "faq_jqAzpA": {
           "type": "faq",
           "settings": {
-            "question": "¿Las fórmulas generan dependencia?",
-            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+            "question": "¿Qué puedo esperar de IN CALM?",
+            "answer": "<p>IN CALM está pensado para ayudarte a <strong>gestionar mejor el estrés cotidiano, reducir la sensación de tensión mental y ansiedad y mantener un mayor equilibrio</strong> durante los días de más presión.</p><p>No busca desconectarte ni hacerte sentir apagado: el objetivo es ayudarte a <strong>bajar revoluciones sin bajar tu ritmo</strong>.</p>"
           }
         },
         "faq_xB6bkK": {
           "type": "faq",
           "settings": {
-            "question": "¿Las dosis son adecuadas?",
-            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+            "question": "¿Cuándo voy a empezar a notarlo?",
+            "answer": "<p>La experiencia puede variar de una persona a otra y depende también de factores como tu nivel de estrés, descanso y estilo de vida.</p><p>Algunos ingredientes de la fórmula pueden acompañar la relajación desde las primeras tomas, mientras que los adaptógenos están pensados para integrarse dentro de una <strong>rutina de uso constante</strong>. Por eso recomendamos valorar IN CALM como parte de un hábito diario y no únicamente en momentos puntuales.</p>"
           }
         },
         "faq_Bd6NRJ": {
           "type": "faq",
           "settings": {
-            "question": "¿Existen efectos secundarios?",
-            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+            "question": "¿Para quién está pensado?",
+            "answer": "<p>Para adultos que atraviesan <strong>periodos de estrés cotidiano, presión, tensión mental o dificultad para desconectar</strong> y buscan incorporar a su rutina un apoyo para gestionar mejor esos momentos.</p><p>Especialmente para esos días en los que sientes que tienes <strong>demasiadas cosas en la cabeza y muy poco espacio para parar</strong>.</p>"
           }
         },
         "faq_fjX7Eq": {
           "type": "faq",
           "settings": {
-            "question": "¿Cuánto tiempo tarda el envío?",
-            "answer": "<p>Escribí aquí la respuesta a la pregunta.</p>"
+            "question": "¿Quién debería consultar antes de tomarlo?",
+            "answer": "<p>Si estás embarazada o en periodo de lactancia, tienes alguna condición médica o estás tomando medicamentos —especialmente <strong>ansiolíticos o antidepresivos</strong>— consulta con un profesional de la salud antes de utilizar IN CALM.</p><p>No excedas la dosis diaria recomendada y mantenlo fuera del alcance de los niños.</p>"
+          }
+        },
+        "faq_JRVPU3": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Tiene efectos secundarios o genera dependencia?",
+            "answer": "<p>IN CALM es un <strong>suplemento alimenticio</strong>, no un fármaco. No está formulado como un producto que genere dependencia.</p><p>Como ocurre con cualquier suplemento, la tolerancia puede variar entre personas. Si experimentas alguna reacción adversa, suspende su uso y consulta con un profesional de la salud.</p>"
+          }
+        },
+        "faq_GYqRm4": {
+          "type": "faq",
+          "settings": {
+            "question": "¿Puedo combinarlo con IN FOCUS e IN SLEEP?",
+            "answer": "<p>IN CALM es un <strong>suplemento alimenticio</strong>, no un fármaco. No está formulado como un producto que genere dependencia.</p><p><br/>Los tres productos están pensados para cubrir <strong>momentos y necesidades diferentes del día</strong>: IN FOCUS para foco y rendimiento mental, IN CALM para acompañar la gestión del estrés y el equilibrio, e IN SLEEP para la rutina de descanso.</p>"
           }
         }
       },
@@ -1863,7 +1877,9 @@
         "faq_jqAzpA",
         "faq_xB6bkK",
         "faq_Bd6NRJ",
-        "faq_fjX7Eq"
+        "faq_fjX7Eq",
+        "faq_JRVPU3",
+        "faq_GYqRm4"
       ],
       "name": "FAQs",
       "settings": {
