@@ -115,7 +115,7 @@
             "title_custom": "",
             "title_tag": "h1",
             "link_to_product": false,
-            "subtitle_text": "Tu sistema diario para pasar de pensarlo a hacerlo",
+            "subtitle_text": "Tu sistema diario para gestionar el estrés y recuperar la calma 60 cápsulas | 30 días | 2 al día",
             "subtitle_tag": "p",
             "show_desktop": true,
             "show_mobile": true,
@@ -154,10 +154,10 @@
           "type": "zzen_bullets",
           "settings": {
             "hoist_mobile": true,
-            "text_1": "Menos distracciones, más enfoque",
-            "text_2": "Mantén la concentración en lo que importa",
-            "text_3": "Energía mental para avanzar en tu día",
-            "text_4": "Deja de posponer. Empieza a hacer.",
+            "text_1": "Ayuda a gestionar mejor el estrés diario",
+            "text_2": "Favorece una sensación de calma y equilibrio",
+            "text_3": "Apoya el bienestar emocional",
+            "text_4": "Ayuda a mantener la claridad mental bajo presión",
             "text_5": "",
             "text_6": "",
             "icon_style": "arrow_up_right",
@@ -370,7 +370,7 @@
           "settings": {
             "heading": "<strong>30 DÍAS PARA PROBARLO</strong>",
             "heading_tag": "p",
-            "text": "<p>Queremos que pruebes IN SLEEP sin pensarlo dos veces. Si no es para ti, tienes 30 días para solicitar la devolución de tu dinero.</p>",
+            "text": "<p>Queremos que pruebes IN CALM  sin pensarlo dos veces. Si no es para ti, tienes 30 días para solicitar la devolución de tu dinero.</p>",
             "link": "",
             "icon_style": "none",
             "icon_position": "inline",
@@ -431,16 +431,16 @@
           "type": "zzen_accordion",
           "settings": {
             "row_1_title": "¿Qué es IN CALM?",
-            "row_1_content": "<p>IN FOCUS es una fórmula creada para ayudarte a bajar revoluciones al final del día, descansar mejor y favorecer tu recuperación durante la noche.</p><p>No se trata solo de dormir más. Se trata de conseguir un descanso de mayor calidad para despertar sintiéndote realmente recuperado.</p>",
+            "row_1_content": "<p><strong>IN CALM es una fórmula de uso diario creada para ayudarte a gestionar mejor los momentos de estrés y mantener la calma cuando el día se vuelve más exigente.</strong></p><p>Está pensada para acompañarte en esas etapas en las que tienes demasiadas cosas en la cabeza, sientes estrés o ansiedad y necesitas <strong>bajar el ruido sin bajar el ritmo</strong>.</p><p>Su fórmula combina ingredientes seleccionados para apoyar el <strong>equilibrio mental y emocional</strong>, ayudándote a afrontar el día desde un estado más calmado, estable y centrado.</p>",
             "row_1_page": "",
             "row_2_title": "¿Qué vas a notar?",
-            "row_2_content": "<p><strong>Más facilidad para desconectar.</strong> Para esas noches en las que estás cansado, pero tu mente sigue a mil.</p><p><strong>Un descanso de mayor calidad.</strong> Una rutina nocturna pensada para acompañarte hacia un sueño más profundo y reparador.</p><p><strong>Mejor recuperación durante la noche.</strong> Porque descansar bien también forma parte de rendir bien.</p><p><strong>Mejores mañanas.</strong> Despertar descansado cambia por completo cómo enfrentas el día.</p>",
+            "row_2_content": "<p><strong>Más calma en días intensos.</strong> Para afrontar mejor esos momentos en los que todo parece acumularse.</p><p><strong>Menos sensación de saturación mental.</strong> Para seguir con tu día sin sentir que tienes veinte pestañas abiertas en la cabeza.</p><p><strong>Mayor equilibrio durante el día.</strong> Una sensación de estabilidad que te acompaña incluso cuando el ritmo aumenta.</p><p><strong>Calma sin sentirte apagado.</strong> Pensado para ayudarte a bajar el estrés y la ansiedad.</p>",
             "row_2_page": "",
             "row_3_title": "¿Qué contiene?",
-            "row_3_content": "<p>Una fórmula que combina ingredientes seleccionados para acompañar las distintas fases de tu rutina de descanso:</p><p><strong>Magnesio — 100 mg</strong></p><p>Apoyo para relajación y descanso.</p><p><strong>L-Teanina — 200 mg</strong></p><p>Para acompañar ese momento de desconexión antes de dormir.</p><p><strong>GABA — 100 mg</strong></p><p>Pensado para complementar tu rutina de calma nocturna.</p><p><strong>Melissa officinalis — 100 mg</strong></p><p>Extracto botánico tradicionalmente utilizado en rutinas de relajación.</p><p><strong>Vitamina B6 — 5 mg</strong></p><p>Complementa la fórmula y participa en funciones normales del sistema nervioso.</p><p><strong>Melatonina — 1 mg</strong></p><p>Ayuda a regular el ciclo natural de sueño-vigilia.</p><p>Una combinación pensada para ayudarte a desconectar, favorecer el descanso y apoyar tu recuperación nocturna.</p><p>Sin fórmulas milagro. Sin complicaciones. Ciencia aplicada a tu descanso.</p>",
+            "row_3_content": "<p>Una combinación de <strong>aminoácidos, extractos vegetales, minerales y vitamina B6</strong> pensada para acompañar el equilibrio y la relajación durante el día.</p><p><strong>L-Teanina — 200 mg</strong></p><p><strong>Ashwagandha — 300 mg</strong><br/><br/>Extracto seco de raíz de <em>Withania somnifera</em>, estandarizado al <strong>5 % de withanólidos</strong>.</p><p><strong>Rhodiola rosea — 200 mg</strong><br/><br/>Extracto seco de raíz, estandarizado al <strong>3 % de rosavinas y 1 % de salidrósidos</strong>.</p><p><strong>Magnesio — 50 mg</strong><br/><br/>Procedente de bisglicinato de magnesio.</p><p><strong>Vitamina B6 — 5 mg</strong></p><p><strong>Zinc — 10 mg</strong><br/><br/>Procedente de bisglicinato de zinc.</p>",
             "row_3_page": "",
             "row_4_title": "¿Cómo tomarlo?",
-            "row_4_content": "<p>Toma <strong>2 cápsulas entre 30 y 60 minutos antes de dormir</strong> con un vaso de agua.</p><p>Haz de IN SLEEP parte de tu rutina nocturna y úsalo de forma constante para integrarlo en tus hábitos de descanso.</p>",
+            "row_4_content": "<p><strong>Toma 2 cápsulas al día con un vaso de agua</strong>, preferiblemente durante la primera parte del día.</p><p>Haz de <strong>IN CALM</strong> parte de tu rutina diaria y úsalo de forma constante para acompañar tus momentos de mayor estrés.</p>",
             "row_4_page": "",
             "row_5_title": "",
             "row_5_content": "",
@@ -1011,29 +1011,29 @@
         "benefit_wDdBwE": {
           "type": "benefit",
           "settings": {
-            "title": "BAJA EL RITMO",
-            "text": "<p><strong>Deja el día atrás<br/></strong>Acompaña tu rutina nocturna y ese momento en el que necesitas dejar de pensar en todo y empezar a desconectarte.</p>"
+            "title": "BAJA REVOLUCIONES",
+            "text": "<p><strong>Cuando todo va demasiado rápido<br/></strong>Ayuda a reducir esa sensación de tensión y saturación que aparece cuando llevas demasiado tiempo funcionando bajo presión.</p>"
           }
         },
         "benefit_PKmKcx": {
           "type": "benefit",
           "settings": {
-            "title": "DESCANSA DE VERDAD",
-            "text": "<p><strong>No solo se trata de dormir</strong></p><p>Favorece un descanso de mayor calidad para que tus horas de sueño realmente se sientan como descanso.</p>"
+            "title": "RECUPERA LA CALMA",
+            "text": "<p><strong>Menos ruido en la cabeza<br/></strong>Apoya una respuesta más equilibrada ante el estrés para ayudarte a sentirte más tranquilo incluso cuando el día sigue siendo exigente.</p>"
           }
         },
         "benefit_Jai9rm": {
           "type": "benefit",
           "settings": {
-            "title": "RECUPÉRATE",
-            "text": "<p><strong>La noche también cuenta</strong></p><p>El descanso es parte de tu recuperación. Dale a tu cuerpo el espacio que necesita para prepararse para un nuevo día.</p>"
+            "title": "GESTIONA MEJOR LA PRESIÓN",
+            "text": "<p><strong>Que un día intenso no pueda contigo<br/></strong>Acompaña a tu organismo en periodos de mayor exigencia para que puedas afrontar el estrés cotidiano desde un estado más equilibrado.</p>"
           }
         },
         "benefit_NUP3cn": {
           "type": "benefit",
           "settings": {
-            "title": "DESPIERTA MEJOR",
-            "text": "<p><strong>La diferencia también se nota en la mañana</strong></p><p>Porque el objetivo no es simplemente dormir. Es despertar sintiéndote descansado y listo para empezar el día.</p>"
+            "title": "VUELVE A SENTIR EL CONTROL",
+            "text": "<p><strong>Tú marcas el ritmo, no el estrés<br/></strong>Convierte la calma en parte de tu rutina diaria y evita esperar a sentirte sobrepasado para empezar a cuidarte.</p>"
           }
         }
       },
@@ -1053,8 +1053,8 @@
         "heading_font": "sans_serif_n4",
         "text_font_mode": "custom",
         "text_font": "sans_serif_n4",
-        "heading": "Haz que tus noches cuenten",
-        "intro": "<p><strong>IN CALM</strong> está pensado para acompañarte desde que decides bajar el ritmo hasta que empieza un nuevo día. Una fórmula para desconectarte, descansar mejor y hacer de la noche un verdadero momento de recuperación.</p>",
+        "heading": "Haz que el estrés no marque tu día",
+        "intro": "<p><strong>IN CALM </strong>está pensado para acompañarte en esos días en los que todo se acumula. Una fórmula para ayudarte a gestionar el estrés cotidiano, bajar la tensión mental y recuperar la sensación de calma sin tener que parar tu vida.</p>",
         "heading_size": 52,
         "intro_size": 17,
         "item_title_size": 20,
@@ -1088,91 +1088,61 @@
         "ingredient_YYyHDX": {
           "type": "ingredient",
           "settings": {
-            "tab": "Focus",
-            "title": "Ingrediente",
-            "dosage": "100mg",
-            "description": "<p>Describí aquí el ingrediente, su función y en qué alimentos está presente.</p>",
-            "benefits": "Contribuye al metabolismo energético\nAyuda a reducir el cansancio\nApoya el sistema inmunitario\nFavorece la función psicológica normal"
+            "tab": "",
+            "title": "L-TEANINA",
+            "dosage": "200mg",
+            "description": "<p><strong>Calma mental sin desconectarte<br/></strong>Aminoácido utilizado en fórmulas orientadas a la relajación y el manejo del estrés. En IN CALM acompaña al resto de la fórmula para favorecer un estado de <strong>mayor calma y menor tensión mental</strong>.<br/><br/><strong>En la fórmula:</strong></p>",
+            "benefits": "Apoya la relajación mental\nFavorece la calma en momentos de estrés\nComplementa la acción de los adaptógenos"
           }
         },
         "ingredient_36RRf7": {
           "type": "ingredient",
           "settings": {
-            "tab": "Magnesium +´7",
-            "title": "Ingrediente",
-            "dosage": "100mg",
-            "description": "<p>Describí aquí el ingrediente, su función y en qué alimentos está presente.</p>",
-            "benefits": "Contribuye al metabolismo energético\nAyuda a reducir el cansancio\nApoya el sistema inmunitario\nFavorece la función psicológica normal"
+            "tab": "",
+            "title": "ASHWAGANDHA",
+            "dosage": "300mg",
+            "description": "<p><strong>Adaptógeno para los días de más estrés<br/></strong>Extracto de raíz de <em>Withania somnifera</em>, estandarizado al <strong>5 % de withanólidos</strong>. Es uno de los principales adaptógenos de IN CALM y está incluido para apoyar al organismo frente al <strong>estrés cotidiano y los periodos de mayor exigencia</strong>.<br/><br/><strong>En la fórmula:</strong></p>",
+            "benefits": "Apoya la respuesta del organismo al estrés\nFavorece el equilibrio en etapas exigentes\nAyuda a mantener una sensación de calma"
           }
         },
         "ingredient_xCnwGA": {
           "type": "ingredient",
           "settings": {
-            "tab": "Omega 3",
-            "title": "Ingrediente",
-            "dosage": "100mg",
-            "description": "<p>Describí aquí el ingrediente, su función y en qué alimentos está presente.</p>",
-            "benefits": "Contribuye al metabolismo energético\nAyuda a reducir el cansancio\nApoya el sistema inmunitario\nFavorece la función psicológica normal"
+            "tab": "",
+            "title": "RHODIOLA ROSEA",
+            "dosage": "200mg",
+            "description": "<p><strong>Más equilibrio frente a la presión<br/></strong>Extracto de raíz de <em>Rhodiola rosea</em>, estandarizado al <strong>3 % de rosavinas y 1 % de salidrósidos</strong>. Un adaptógeno que complementa a la Ashwagandha dentro de la fórmula para acompañarte en momentos de <strong>estrés físico y mental</strong>.<br/><br/><strong>En la fórmula:</strong></p>",
+            "benefits": "Apoya la adaptación frente al estrés\nAcompaña en periodos de mayor exigencia\nFavorece una respuesta más equilibrada"
           }
         },
         "ingredient_47wqpV": {
           "type": "ingredient",
           "settings": {
-            "tab": "Focus",
-            "title": "Bacopa Monieri",
-            "dosage": "300MG",
-            "description": "",
-            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
+            "tab": "",
+            "title": "MAGNESIO",
+            "dosage": "50MG",
+            "description": "<p><strong>Soporte para tu sistema nervioso<br/></strong>Mineral esencial que en IN CALM procede de <strong>bisglicinato de magnesio</strong>. Forma parte de la fórmula como apoyo al funcionamiento normal del sistema nervioso.<br/><br/><strong>En la fórmula:</strong></p>",
+            "benefits": "Contribuye al funcionamiento normal del sistema nervioso\nComplementa la fórmula orientada a la calma\nForma parte del soporte nutricional diario"
           }
         },
         "ingredient_7Jfqe8": {
           "type": "ingredient",
           "settings": {
-            "tab": "Focus",
-            "title": "Rhodiola rosea",
-            "dosage": "200mg",
-            "description": "",
-            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
+            "tab": "",
+            "title": "VITAMINA B6",
+            "dosage": "5mg",
+            "description": "<p><strong>Apoyo diario para el equilibrio<br/></strong>Micronutriente incluido como parte del soporte nutricional de IN CALM y del funcionamiento normal del sistema nervioso.<br/><br/><strong>En la fórmula:</strong></p>",
+            "benefits": "Contribuye al funcionamiento normal del sistema nervioso\nComplementa la acción del magnesio\nApoya el funcionamiento diario del organismo"
           }
         },
         "ingredient_7ry86E": {
           "type": "ingredient",
           "settings": {
-            "tab": "Focus",
-            "title": "Cafeína",
-            "dosage": "120MG",
-            "description": "",
-            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
-          }
-        },
-        "ingredient_FzDynU": {
-          "type": "ingredient",
-          "settings": {
-            "tab": "Focus",
-            "title": "L-teanina",
-            "dosage": "120mg",
-            "description": "",
-            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
-          }
-        },
-        "ingredient_qqELT8": {
-          "type": "ingredient",
-          "settings": {
-            "tab": "Calm",
-            "title": "Ashwagandha",
-            "dosage": "300mg",
-            "description": "",
-            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
-          }
-        },
-        "ingredient_bhnWTy": {
-          "type": "ingredient",
-          "settings": {
-            "tab": "Sleep",
-            "title": "Melatonina",
-            "dosage": "1,9mg",
-            "description": "",
-            "benefits": "Contribuye al metabolismo energético normal\nAyuda a reducir la fatiga\nApoya el sistema nervioso"
+            "tab": "",
+            "title": "ZINC",
+            "dosage": "10mg",
+            "description": "<p><strong>Un micronutriente esencial para completar la fórmula<br/></strong>IN CALM incorpora <strong>10 mg de zinc procedente de bisglicinato de zinc</strong>, completando el aporte de micronutrientes de la fórmula.<br/><br/><strong>En la fórmula:</strong></p>",
+            "benefits": "Micronutriente esencial\nCompleta el soporte nutricional de IN CALM\nEn forma de bisglicinato de zinc"
           }
         }
       },
@@ -1182,10 +1152,7 @@
         "ingredient_xCnwGA",
         "ingredient_47wqpV",
         "ingredient_7Jfqe8",
-        "ingredient_7ry86E",
-        "ingredient_FzDynU",
-        "ingredient_qqELT8",
-        "ingredient_bhnWTy"
+        "ingredient_7ry86E"
       ],
       "custom_css": [
         "{margin-top: 20px;}"
