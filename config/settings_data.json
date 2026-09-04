@@ -11,7 +11,7 @@
   "current": {
     "logo": "shopify://shop_images/ec45b077-40a9-4573-8dac-52c62804d16f.png",
     "logo_width": 100,
-    "type_header_font": "sans_serif_n4",
+    "type_header_font": "ibm_plex_mono_n4",
     "heading_scale": 100,
     "type_body_font": "sans_serif_n4",
     "body_scale": 100,
